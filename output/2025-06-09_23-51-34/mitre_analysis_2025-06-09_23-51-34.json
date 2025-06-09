@@ -1,0 +1,2217 @@
+{
+  "analysis_date": "2025-06-09T23:51:34.071013",
+  "architecture": "DMZ with external/internal firewall and protocol break proxy",
+  "threats_detected": 103,
+  "threat_types": [
+    "Threat"
+  ],
+  "mitre_mapping": {
+    "Spoofing": {
+      "tactics": [
+        "Initial Access",
+        "Defense Evasion"
+      ],
+      "techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing"
+        },
+        {
+          "id": "T1036",
+          "name": "Masquerading",
+          "description": "Disguising malicious processes"
+        },
+        {
+          "id": "T1134",
+          "name": "Access Token Manipulation",
+          "description": "Manipulation of access tokens"
+        },
+        {
+          "id": "T1078.003",
+          "name": "Kerberoasting",
+          "description": "Attempting to obtain service principal names and then crack them offline."
+        },
+        {
+          "id": "T1110",
+          "name": "Brute Force",
+          "description": "Repeatedly trying to guess authentication credentials."
+        }
+      ]
+    },
+    "Tampering": {
+      "tactics": [
+        "Defense Evasion",
+        "Impact"
+      ],
+      "techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "description": "Unauthorized data modification"
+        },
+        {
+          "id": "T1070",
+          "name": "Indicator Removal on Host",
+          "description": "Deletion of activity traces"
+        },
+        {
+          "id": "T1027",
+          "name": "Obfuscated Files or Information",
+          "description": "Obfuscation of malicious files"
+        },
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet."
+        },
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites."
+        },
+        {
+          "id": "T1505.003",
+          "name": "Server Software Component: Web Shell",
+          "description": "Install a web shell to gain persistent access."
+        },
+        {
+          "id": "T1562.001",
+          "name": "Impair Defenses: Disable or Modify System Firewall",
+          "description": "Modify firewall rules to allow unauthorized access."
+        }
+      ]
+    },
+    "Repudiation": {
+      "tactics": [
+        "Defense Evasion"
+      ],
+      "techniques": [
+        {
+          "id": "T1070.002",
+          "name": "Clear Linux or Mac System Logs",
+          "description": "Clearing system logs"
+        },
+        {
+          "id": "T1070.001",
+          "name": "Clear Windows Event Logs",
+          "description": "Clearing Windows event logs"
+        },
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling defense mechanisms"
+        },
+        {
+          "id": "T1070.004",
+          "name": "File Deletion",
+          "description": "Removing or deleting files to remove traces of activity."
+        }
+      ]
+    },
+    "InformationDisclosure": {
+      "tactics": [
+        "Collection",
+        "Exfiltration"
+      ],
+      "techniques": [
+        {
+          "id": "T1005",
+          "name": "Data from Local System",
+          "description": "Collecting local data"
+        },
+        {
+          "id": "T1041",
+          "name": "Exfiltration Over C2 Channel",
+          "description": "Exfiltration via C2 channel"
+        },
+        {
+          "id": "T1083",
+          "name": "File and Directory Discovery",
+          "description": "Discovery of sensitive files"
+        },
+        {
+          "id": "T1040",
+          "name": "Network Sniffing",
+          "description": "Capturing network traffic to collect sensitive information."
+        },
+        {
+          "id": "T1592",
+          "name": "Gather Victim Host Information",
+          "description": "Gathering information about the target host through various means."
+        },
+        {
+          "id": "T1595",
+          "name": "Active Scanning",
+          "description": "Using active scanning techniques to gain information about the target."
+        },
+        {
+          "id": "T1592.002",
+          "name": "Gather Victim Host Information: Software",
+          "description": "Gathering information about software installed on a victim host."
+        }
+      ]
+    },
+    "DenialOfService": {
+      "tactics": [
+        "Impact"
+      ],
+      "techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "description": "Denial of service on endpoints"
+        },
+        {
+          "id": "T1498",
+          "name": "Network Denial of Service",
+          "description": "Network denial of service"
+        },
+        {
+          "id": "T1496",
+          "name": "Resource Hijacking",
+          "description": "System resource hijacking"
+        },
+        {
+          "id": "T1499.001",
+          "name": "Endpoint Denial of Service: Application or System Impairment",
+          "description": "Causing an application or system to become unresponsive or crash."
+        }
+      ]
+    },
+    "ElevationOfPrivilege": {
+      "tactics": [
+        "Privilege Escalation",
+        "Persistence"
+      ],
+      "techniques": [
+        {
+          "id": "T1548",
+          "name": "Abuse Elevation Control Mechanism",
+          "description": "Exploiting elevation mechanisms"
+        },
+        {
+          "id": "T1055",
+          "name": "Process Injection",
+          "description": "Injecting into processes"
+        },
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for elevation"
+        },
+        {
+          "id": "T1055.001",
+          "name": "Process Injection: Dynamic-link Library Injection",
+          "description": "Injecting malicious code into a running process using DLL injection."
+        },
+        {
+          "id": "T1078.001",
+          "name": "Valid Accounts: Default Accounts",
+          "description": "Using default credentials to gain unauthorized access."
+        }
+      ]
+    },
+    "Protocol Tampering": {
+      "tactics": [
+        "Impact",
+        "Defense Evasion"
+      ],
+      "techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation"
+        },
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service"
+        }
+      ]
+    }
+  },
+  "severity_levels": {
+    "CRITICAL": "9.0-10.0",
+    "HIGH": "7.5-8.9",
+    "MEDIUM": "6.0-7.4",
+    "LOW": "4.0-5.9",
+    "INFORMATIONAL": "1.0-3.9"
+  },
+  "detailed_threats": [
+    {
+      "type": "Threat",
+      "description": "Buffer Overflow via Environment Variables",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Overflow Buffers",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Server Side Include (SSI) Injection",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Session Sidejacking",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1040",
+          "name": "Network Sniffing",
+          "description": "Capturing network traffic to collect sensitive information.",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "HTTP Request Splitting",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Cross Site Tracing",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Command Line Execution through SQL Injection",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "SQL Injection through SOAP Parameter Tampering",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "JSON Hijacking (aka JavaScript Hijacking)",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "API Manipulation",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Authentication Abuse/ByPass",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Excavation",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1592",
+          "name": "Gather Victim Host Information",
+          "description": "Gathering information about the target host through various means.",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Interception",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1040",
+          "name": "Network Sniffing",
+          "description": "Capturing network traffic to collect sensitive information.",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Double Encoding",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Exploit Test APIs",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Privilege Abuse",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1548",
+          "name": "Abuse Elevation Control Mechanism",
+          "description": "Exploiting elevation mechanisms",
+          "tactics": [
+            "Privilege Escalation",
+            "Persistence"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Buffer Manipulation",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Shared Data Manipulation",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Flooding",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Path Traversal",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Subverting Environment Variable Values",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Excessive Allocation",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Try All Common Switches",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1595",
+          "name": "Active Scanning",
+          "description": "Using active scanning techniques to gain information about the target.",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Format String Injection",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "LDAP Injection",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Parameter Injection",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        },
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Relative Path Traversal",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Client-side Injection-induced Buffer Overflow",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        },
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XML Schema Poisoning",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XML Ping of the Death",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Content Spoofing",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Command Delimiters",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Input Data Manipulation",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Sniffing Attacks",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1040",
+          "name": "Network Sniffing",
+          "description": "Capturing network traffic to collect sensitive information.",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Dictionary-based Password Attack",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Exploit Script-Based APIs",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "White Box Reverse Engineering",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1592",
+          "name": "Gather Victim Host Information",
+          "description": "Gathering information about the target host through various means.",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Footprinting",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1592",
+          "name": "Gather Victim Host Information",
+          "description": "Gathering information about the target host through various means.",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Using Malicious Files",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Web Application Fingerprinting",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1592",
+          "name": "Gather Victim Host Information",
+          "description": "Gathering information about the target host through various means.",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XSS Targeting Non-Script Elements",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Exploiting Incorrectly Configured Access Control Security Levels",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1548",
+          "name": "Abuse Elevation Control Mechanism",
+          "description": "Exploiting elevation mechanisms",
+          "tactics": [
+            "Privilege Escalation",
+            "Persistence"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "IMAP/SMTP Command Injection",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Reverse Engineering",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1592",
+          "name": "Gather Victim Host Information",
+          "description": "Gathering information about the target host through various means.",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Embedding Scripts within Scripts",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        },
+        {
+          "id": "T1055",
+          "name": "Process Injection",
+          "description": "Injecting into processes",
+          "tactics": [
+            "Privilege Escalation",
+            "Persistence"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "PHP Remote File Inclusion",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Principal Spoof",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Session Credential Falsification through Forging",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "XML Entity Expansion",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XSS Targeting Error Pages",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XSS Using Alternate Syntax",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Encryption Brute Forcing",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Manipulate Registry Information",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Lifting Sensitive Data Embedded in Cache",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1005",
+          "name": "Data from Local System",
+          "description": "Collecting local data",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Removing Important Client Functionality",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XSS Using MIME Type Mismatch",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Exploitation of Trusted Credentials",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Functionality Misuse",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1548",
+          "name": "Abuse Elevation Control Mechanism",
+          "description": "Exploiting elevation mechanisms",
+          "tactics": [
+            "Privilege Escalation",
+            "Persistence"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Fuzzing and observing application log data/errors for application mapping",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1592",
+          "name": "Gather Victim Host Information",
+          "description": "Gathering information about the target host through various means.",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        },
+        {
+          "id": "T1595",
+          "name": "Active Scanning",
+          "description": "Using active scanning techniques to gain information about the target.",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Communication Channel Manipulation",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Exploiting Incorrectly Configured SSL",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1548",
+          "name": "Abuse Elevation Control Mechanism",
+          "description": "Exploiting elevation mechanisms",
+          "tactics": [
+            "Privilege Escalation",
+            "Persistence"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XML Routing Detour Attacks",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Exploiting Trust in Client",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1548",
+          "name": "Abuse Elevation Control Mechanism",
+          "description": "Exploiting elevation mechanisms",
+          "tactics": [
+            "Privilege Escalation",
+            "Persistence"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Client-Server Protocol Manipulation",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "XML External Entities Blowup",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "iFrame Overlay",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Session Credential Falsification through Manipulation",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "DTD Injection",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XML Attribute Blowup",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "File Content Injection",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        },
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XML Nested Payloads",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Privilege Escalation",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for elevation",
+          "tactics": [
+            "Privilege Escalation",
+            "Persistence"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Hijacking a privileged process",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1548",
+          "name": "Abuse Elevation Control Mechanism",
+          "description": "Exploiting elevation mechanisms",
+          "tactics": [
+            "Privilege Escalation",
+            "Persistence"
+          ]
+        },
+        {
+          "id": "T1055",
+          "name": "Process Injection",
+          "description": "Injecting into processes",
+          "tactics": [
+            "Privilege Escalation",
+            "Persistence"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Catching exception throw/signal from privileged block",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1548",
+          "name": "Abuse Elevation Control Mechanism",
+          "description": "Exploiting elevation mechanisms",
+          "tactics": [
+            "Privilege Escalation",
+            "Persistence"
+          ]
+        },
+        {
+          "id": "T1055",
+          "name": "Process Injection",
+          "description": "Injecting into processes",
+          "tactics": [
+            "Privilege Escalation",
+            "Persistence"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Filter Failure through Buffer Overflow",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Resource Injection",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Code Injection",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XSS Targeting HTML Attributes",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XSS Targeting URI Placeholders",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XSS Using Doubled Characters",
+      "target": "<pytm.pytm.varString object at 0x000001E6B14F4B60> → <pytm.pytm.varString object at 0x000001E6B14F4B60>",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XSS Using Invalid Characters",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Command Injection",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "XML Injection",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Remote Code Inclusion",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "SOAP Array Overflow",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Leverage Alternate Encoding",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Audit Log Manipulation",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        },
+        {
+          "id": "T1070",
+          "name": "Indicator Removal on Host",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Schema Poisoning",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1565",
+          "name": "Data Manipulation",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "HTTP Response Smuggling",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "HTTP Request Smuggling",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "DOM-Based XSS",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Session Credential Falsification through Prediction",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Reflected XSS",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Stored XSS",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190.001",
+          "name": "Cross-Site Scripting (XSS)",
+          "description": "Exploiting vulnerabilities in web applications to inject malicious scripts into trusted websites.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Session Hijacking - ServerSide",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Session Hijacking - ClientSide",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Argument Injection",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Exploiting vulnerabilities in applications accessible from the internet.",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Reusing Session IDs (aka Session Replay) - ServerSide",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Reusing Session IDs (aka Session Replay) - ClientSide",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Cross Site Request Forgery",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": []
+    },
+    {
+      "type": "Threat",
+      "description": "Data Leak",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1005",
+          "name": "Data from Local System",
+          "description": "Collecting local data",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Unprotected Sensitive Data",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1005",
+          "name": "Data from Local System",
+          "description": "Collecting local data",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Threat",
+      "description": "Credentials Aging",
+      "target": "Unspecified Element",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1005",
+          "name": "Data from Local System",
+          "description": "Collecting local data",
+          "tactics": [
+            "Collection",
+            "Exfiltration"
+          ]
+        }
+      ]
+    }
+  ]
+}

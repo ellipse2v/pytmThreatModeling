@@ -24,39 +24,60 @@ from datetime import datetime
 
 class ReportGenerator:
     """Class for generating HTML and JSON reports"""
-    
+
     def __init__(self, severity_calculator, mitre_mapping):
         self.severity_calculator = severity_calculator
         self.mitre_mapping = mitre_mapping
-        
-    def generate_html_report(self, threat_model, grouped_threats: Dict[str, List], 
+
+    def generate_html_report(self, threat_model, grouped_threats: Dict[str, List],
                              output_file: str = "stride_mitre_report.html") -> str:
         """Generates a complete HTML report with MITRE ATT&CK"""
+
+        # These values should come from the processed threat_model's MITRE analysis results
+        total_threats_analyzed = threat_model.mitre_analysis_results.get('total_threats', 0)
+        total_mitre_techniques_mapped = threat_model.mitre_analysis_results.get('mitre_techniques_count', 0)
+        # 'Unique STRIDE Threat Types' refers to the unique keys from PyTM's grouping
+        unique_pytm_threat_types = len(grouped_threats) 
+
+        # Get total number of STRIDE categories from the mitre_mapping
+        total_stride_categories = len(self.mitre_mapping.get_stride_categories())
         
-        total_threats = sum(len(threats) for threats in grouped_threats.values())
-        total_techniques = sum(len(self.mitre_mapping.get_techniques_for_threat(threat_type)) 
-                               for threat_type in grouped_threats.keys())
-        
+        # Get the STRIDE distribution from the threat_model's analysis results
+        stride_distribution = threat_model.mitre_analysis_results.get('stride_distribution', {})
+
+
         html = self._get_html_header()
-        html += self._get_html_summary(total_threats, len(grouped_threats), total_techniques)
-        
+        html += self._get_html_summary(
+            total_threats_analyzed,
+            unique_pytm_threat_types,
+            total_mitre_techniques_mapped,
+            total_stride_categories, # Pass the dynamic value
+            stride_distribution # Pass the new stride_distribution
+        )
+
+        # Populate all_detailed_threats_with_mitre correctly before using it
+        all_detailed_threats_with_mitre = self._get_all_threats_with_mitre_info(grouped_threats)
+
         if not grouped_threats:
             html += self._get_no_threats_section()
         else:
+            # Convert the summary stats dictionary to an HTML string
+            summary_stats = self.generate_summary_stats(all_detailed_threats_with_mitre)
+            html += self._format_summary_stats_to_html(summary_stats)
             html += self._generate_threats_sections(grouped_threats)
-        
+
         html += self._get_recommendations_section()
         html += self._get_html_footer()
-        
+
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(html)
-            
+
         return output_file
-    
-    def generate_json_export(self, grouped_threats: Dict[str, List], 
+
+    def generate_json_export(self, grouped_threats: Dict[str, List],
                              output_file: str = "mitre_analysis.json") -> str:
         """Generates a JSON export of the analysis data"""
-        
+
         export_data = {
             "analysis_date": datetime.now().isoformat(),
             "architecture": "DMZ with external/internal firewall and protocol break proxy",
@@ -65,19 +86,19 @@ class ReportGenerator:
             "mitre_mapping": self.mitre_mapping.mapping,
             "severity_levels": {
                 "CRITICAL": "9.0-10.0",
-                "HIGH": "7.5-8.9", 
+                "HIGH": "7.5-8.9",
                 "MEDIUM": "6.0-7.4",
                 "LOW": "4.0-5.9",
                 "INFORMATIONAL": "1.0-3.9"
             },
             "detailed_threats": self._export_detailed_threats(grouped_threats)
         }
-        
+
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(export_data, f, indent=2, ensure_ascii=False)
-            
+
         return output_file
-    
+
     def open_report_in_browser(self, html_file: str) -> bool:
         """Opens the report in the browser"""
         try:
@@ -86,7 +107,7 @@ class ReportGenerator:
         except Exception as e:
             print(f"⚠️ Could not automatically open browser: {e}")
             return False
-    
+
     def _get_html_header(self) -> str:
         """Returns the HTML header with styles"""
         return """<!DOCTYPE html>
@@ -95,9 +116,9 @@ class ReportGenerator:
     <meta charset="UTF-8">
     <title>STRIDE & MITRE ATT&CK Report - DMZ Architecture</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 20px; 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
@@ -109,15 +130,15 @@ class ReportGenerator:
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        h1 { 
-            color: #2c3e50; 
+        h1 {
+            color: #2c3e50;
             text-align: center;
             border-bottom: 3px solid #3498db;
             padding-bottom: 20px;
             font-size: 2.5em;
         }
-        h2 { 
-            color: #34495e; 
+        h2 {
+            color: #34495e;
             margin-top: 40px;
             padding: 15px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -137,107 +158,66 @@ class ReportGenerator:
             margin-top: 0;
             font-size: 1.3em;
         }
-        table { 
-            border-collapse: collapse; 
-            width: 100%; 
+        table {
+            border-collapse: collapse;
+            width: 100%;
             margin-bottom: 30px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             border-radius: 8px;
             overflow: hidden;
             font-size: 0.9em;
         }
-        th, td { 
-            border: 1px solid #ddd; 
-            padding: 12px; 
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: left;
             vertical-align: top;
         }
-        th { 
+        th {
             background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
             color: white;
             font-weight: bold;
             font-size: 0.95em;
         }
-        tr:nth-child(even) { background-color: #f8f9fa; }
-        tr:hover { background-color: #e3f2fd; transition: all 0.3s; }
-        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tr:hover {
+            background-color: #e3f2fd;
+            transition: all 0.3s;
+        }
         /* Severity Levels */
-        .critical { 
-            background: linear-gradient(135deg, #d63031 0%, #74b9ff 100%) !important; 
-            color: white; 
-            font-weight: bold; 
-        }
-        .high { 
-            background: linear-gradient(135deg, #e17055 0%, #fdcb6e 100%) !important; 
-            color: white; 
-            font-weight: bold; 
-        }
-        .medium { 
-            background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%) !important; 
-            color: black; 
-            font-weight: bold; 
-        }
-        .low { 
-            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%) !important; 
-            color: white; 
-        }
-        .info { 
-            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%) !important; 
-            color: white; 
-        }
-        
-        .mitre-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border-left: 4px solid #3498db;
-        }
-        .technique {
-            background: #e8f4f8;
-            padding: 8px;
-            margin: 5px 0;
-            border-radius: 5px;
-            font-size: 0.9em;
-        }
-        .tactic {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 15px;
-            font-size: 0.8em;
-            margin: 2px;
-        }
-        .mitre-tactic-cell {
+        .critical { background: linear-gradient(135deg, #d63031 0%, #74b9ff 100%); color: white; font-weight: bold; }
+        .high { background: linear-gradient(135deg, #e17055 0%, #ffeaa7 100%); color: #333; font-weight: bold; }
+        .medium { background: linear-gradient(135deg, #feca57 0%, #fdcb6e 100%); color: #333; font-weight: bold; }
+        .low { background: linear-gradient(135deg, #55efc4 0%, #81ecec 100%); color: #333; font-weight: bold; }
+        .informational { background: linear-gradient(135deg, #a29bfe 0%, #dfe6e9 100%); color: #333; font-weight: bold; }
+
+        .mitre-techniques {
             font-size: 0.85em;
-            max-width: 120px;
+            color: #555;
+            margin-top: 5px;
+            padding-left: 20px;
         }
-        .mitre-technique-cell {
-            font-size: 0.85em;
-            max-width: 180px;
+        .mitre-techniques ul {
+            list-style-type: disc;
+            margin: 5px 0 0 15px;
+            padding: 0;
+        }
+        .mitre-techniques li {
+            margin-bottom: 3px;
         }
         .mitre-id {
             font-weight: bold;
+            color: #2c3e50;
+        }
+        .mitre-id-link {
+            text-decoration: none;
             color: #2980b9;
-        }
-        .mitre-name {
-            font-size: 0.8em;
-            color: #555;
-            margin-top: 2px;
-        }
-        .score {
-            font-size: 1.2em;
             font-weight: bold;
-            text-align: center;
         }
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
-            color: white;
-            border-radius: 8px;
+        .mitre-id-link:hover {
+            text-decoration: underline;
         }
         .stats {
             display: grid;
@@ -246,27 +226,54 @@ class ReportGenerator:
             margin: 20px 0;
         }
         .stat-card {
-            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .stat-number {
-            font-size: 2em;
-            font-weight: bold;
-        }
+        background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .stat-number {
+        font-size: 2em;
+        font-weight: bold;
+    }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🛡️ STRIDE & MITRE ATT&CK Report</h1>
-        <h2 style="text-align: center; margin-top: 0;">DMZ Architecture - Comprehensive Security Analysis</h2>
+    <h1>🛡️ STRIDE & MITRE ATT&CK Report</h1>
+    <h2 style="text-align: center; margin-top: 0;">DMZ Architecture - Comprehensive Security Analysis</h2>
 """
-    
-    def _get_html_summary(self, total_threats: int, threat_types: int, total_techniques: int) -> str:
-        """Generates the summary section"""
+
+    def _get_html_summary(self, total_threats: int, unique_types: int, total_techniques: int, total_stride_categories: int, stride_distribution: Dict[str, int]) -> str:
+        """Returns the summary section HTML"""
+        
+        stride_dist_html = ""
+        if stride_distribution:
+            # Define the desired STRIDE order
+            stride_order = [
+                "Spoofing",
+                "Tampering",
+                "Repudiation",
+                "InformationDisclosure",
+                "DenialOfService",
+                "ElevationOfPrivilege"
+            ]
+            
+            stride_dist_html += "<ul>"
+            # Iterate through the predefined order
+            for stride_type in stride_order:
+                # Get the count for the current STRIDE type, default to 0 if not present
+                count = stride_distribution.get(stride_type, 0)
+                if count > 0: # Only display if there are threats of this type
+                    stride_dist_html += f"<li><strong>{stride_type}:</strong> {count} threats</li>"
+            
+            # Add any other types that might exist in the distribution but are not in the standard STRIDE order
+            for stride_type, count in stride_distribution.items():
+                if stride_type not in stride_order:
+                    stride_dist_html += f"<li><strong>{stride_type}:</strong> {count} threats</li>"
+            stride_dist_html += "</ul>"
+
         return f"""
         <div class="summary">
             <h3>📊 Analysis Summary</h3>
@@ -276,226 +283,230 @@ class ReportGenerator:
                     <div>Threats Detected</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">{threat_types}</div>
-                    <div>Threat Types</div>
+                    <div class="stat-number">{unique_types}</div>
+                    <div>Unique STRIDE Threat Types</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">6</div>
+                    <div class="stat-number">{total_stride_categories}</div>
                     <div>STRIDE Categories</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">{total_techniques}</div>
-                    <div>MITRE Techniques</div>
+                    <div>Total MITRE ATT&CK Techniques Mapped</div>
                 </div>
             </div>
+            <h4>STRIDE Distribution:</h4>
+            {stride_dist_html if stride_dist_html else "<p>No STRIDE distribution data available.</p>"}
             <p><strong>Architecture Analyzed:</strong> DMZ with external/internal firewall and protocol break proxy</p>
         </div>
 """
-    
+
     def _get_no_threats_section(self) -> str:
-        """Section displayed when no threats are detected"""
+        """Returns a section indicating no threats were found."""
         return """
-        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 20px; border-radius: 8px;">
-            <h3>⚠️ No Threats Detected</h3>
-            <p>The STRIDE analysis did not detect any specific threats. This may be due to:</p>
-            <ul>
-                <li>Incomplete model configuration</li>
-                <li>PyTM version not automatically generating threats</li>
-                <li>Need to manually define threats</li>
-            </ul>
+        <div class="details-section">
+            <h2>Threat Details</h2>
+            <p>No threats were identified in the threat model. This might indicate a very secure design or an incomplete model definition.</p>
         </div>
-"""
-    
-    def _generate_threats_sections(self, grouped_threats: Dict[str, List]) -> str:
-        """Generates sections for each threat type"""
-        html = ""
-        
-        # Sort by priority order
-        severity_order = ["ElevationOfPrivilege", "Tampering", "InformationDisclosure", 
-                          "Spoofing", "DenialOfService", "Repudiation"]
-        sorted_threats = sorted(grouped_threats.keys(), 
-                                key=lambda x: severity_order.index(x) if x in severity_order else 99)
-        
-        for threat_type in sorted_threats:
-            html += f"<h2>🔍 {threat_type}</h2>\n"
-            
-            # MITRE ATT&CK Section
-            mitre_info = self.mitre_mapping.get_mapping_for_threat(threat_type)
-            if mitre_info:
-                html += self._generate_mitre_section(mitre_info)
-            
-            html += self._generate_threats_table(threat_type, grouped_threats[threat_type])
-        
-        return html
-    
-    def _generate_mitre_section(self, mitre_info: Dict[str, Any]) -> str:
-        """Generates the MITRE ATT&CK section for a threat type"""
-        html = f"""
-        <div class="mitre-section">
-            <h4>🎯 MITRE ATT&CK Correspondence</h4>
-            <p><strong>Tactics:</strong> 
-            {''.join(f'<span class="tactic">{tactic}</span>' for tactic in mitre_info.get("tactics", []))}
-            </p>
-            <p><strong>Associated Techniques:</strong></p>
         """
-        
-        for technique in mitre_info.get("techniques", []):
-            html += f"""
-            <div class="technique">
-                <strong>{technique["id"]}</strong> - {technique["name"]}<br>
-                <small>{technique["description"]}</small>
-            </div>
+
+    def _generate_threats_sections(self, grouped_threats: Dict[str, List]) -> str:
+        """Generates sections for each threat type, including MITRE ATT&CK details"""
+        html = """
+        <div class="details-section">
+            <h2>🔍 Detailed Threat Analysis</h2>
+        """
+        if not grouped_threats:
+            html += "<p>No threats to display in detail.</p>"
+            return html + "</div>"
+
+        # Re-grouping for consistent display if necessary, but assuming grouped_threats is already structured as expected
+        # from ThreatModel's process() method.
+
+        for threat_type, threats in grouped_threats.items():
+            html += f"<h3>{threat_type} Threats</h3>"
+            html += "<table>"
+            html += """
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Target Element</th>
+                        <th>Description</th>
+                        <th>Severity</th>
+                        <th>MITRE ATT&CK Techniques</th>
+                    </tr>
+                </thead>
+                <tbody>
             """
-        
-        html += "</div>"
+            for i, (threat, target) in enumerate(threats):
+                target_name = self._get_target_name_for_severity_calc(target)
+
+                # Calculate severity for each threat (this is already a dict from SeverityCalculator)
+                severity_info = self.severity_calculator.get_severity_info(threat_type, target_name)
+                severity_score = severity_info['formatted_score']
+                severity_class = severity_info['css_class']
+
+                threat_description = getattr(threat, 'description', f"Threat of type {threat_type} affecting {target_name}")
+
+                # Map to MITRE ATT&CK
+                mitre_techniques = self.mitre_mapping.map_threat_to_mitre(threat_description)
+
+                mitre_html = "<div class='mitre-techniques'><ul>"
+                if mitre_techniques:
+                    for technique in mitre_techniques:
+                        tactic_badges = "".join([f"<span class='mitre-tactic'>{tactic}</span>" for tactic in technique.get('tactics', [])])
+                        mitre_html += f"<li>{tactic_badges} <a href='https://attack.mitre.org/techniques/{technique.get('id')}' target='_blank' class='mitre-id-link'>{technique.get('id')}</a>: {technique.get('name')} - {technique.get('description')}</li>"
+                else:
+                    mitre_html += "<li><i>No specific MITRE technique mapped.</i></li>"
+                mitre_html += "</ul></div>"
+
+                html += f"""
+                    <tr>
+                        <td>{i + 1}</td>
+                        <td>{target_name}</td>
+                        <td>{threat_description}</td>
+                        <td class="{severity_class}">{severity_score}</td>
+                        <td>{mitre_html}</td>
+                    </tr>
+                """
+            html += "</tbody></table>"
+        html += "</div>" # Close details-section
         return html
-    
-    def _generate_threats_table(self, threat_type: str, threats: List) -> str:
-        """Generates the threats table for a given type with MITRE columns"""
-        html = """<table>
-        <tr>
-            <th>Targeted Element</th>
-            <th>Description</th>
-            <th>MITRE Tactic</th>
-            <th>MITRE Technique</th>
-            <th>Mitigations</th>
-            <th>Score</th>
-            <th>Severity</th>
-        </tr>"""
-        
-        # Retrieve MITRE information for this threat type
-        mitre_info = self.mitre_mapping.get_mapping_for_threat(threat_type)
-        
-        for threat, target in threats:
-            # Robust target name handling
-            if isinstance(target, tuple) and len(target) == 2:
-                target_name = f"{getattr(target[0], 'name', 'N/A')} → {getattr(target[1], 'name', 'N/A')}"
-            elif hasattr(target, "name"):
-                target_name = target.name
-            else:
-                target_name = "Unspecified Element"
 
-            # Calculate severity
-            severity_info = self.severity_calculator.get_severity_info(threat_type, target_name)
-            
-            description = getattr(threat, 'description', 
-                                  f'Threat of type {threat_type} identified on {target_name}')
-            mitigations = getattr(threat, 'mitigations', 
-                                  'Mitigations to be defined according to security best practices')
-
-            # Format MITRE tactics
-            tactics_html = ""
-            if mitre_info and mitre_info.get("tactics"):
-                tactics_html = "<br>".join([f'<span class="tactic">{tactic}</span>' 
-                                             for tactic in mitre_info["tactics"]])
-            else:
-                tactics_html = "N/A"
-
-            # Format MITRE techniques
-            techniques_html = ""
-            if mitre_info and mitre_info.get("techniques"):
-                technique_items = []
-                for technique in mitre_info["techniques"][:2]:  # Limit to 2 techniques to avoid overload
-                    technique_items.append(
-                        f'<div class="mitre-id">{technique["id"]}</div>'
-                        f'<div class="mitre-name">{technique["name"][:40]}{"..." if len(technique["name"]) > 40 else ""}</div>'
-                    )
-                techniques_html = "<br>".join(technique_items)
-                
-                if len(mitre_info["techniques"]) > 2:
-                    techniques_html += f"<br><small>+{len(mitre_info['techniques']) - 2} more</small>"
-            else:
-                techniques_html = "N/A"
-
-            html += f"""<tr class='{severity_info["css_class"]}'>
-                <td>{target_name}</td>
-                <td>{description}</td>
-                <td class="mitre-tactic-cell">{tactics_html}</td>
-                <td class="mitre-technique-cell">{techniques_html}</td>
-                <td>{mitigations}</td>
-                <td class="score">{severity_info["formatted_score"]}</td>
-                <td><strong>{severity_info["level"]}</strong></td>
-            </tr>"""
-        
-        html += "</table>\n"
-        return html
-    
     def _get_recommendations_section(self) -> str:
-        """Generates the recommendations section"""
+        """Returns the recommendations section HTML"""
         return """
-        <h2>💡 General Recommendations</h2>
-        <div class="mitre-section">
-            <h4>🔒 Recommended Security Measures</h4>
+        <div class="recommendations">
+            <h2>💡 Recommendations and Mitigations</h2>
             <ul>
-                <li><strong>Monitoring:</strong> Implement SIEM to detect MITRE ATT&CK techniques</li>
-                <li><strong>Segmentation:</strong> Strengthen isolation between DMZ and intranet zones</li>
-                <li><strong>Authentication:</strong> Implement multi-factor authentication</li>
-                <li><strong>Logs:</strong> Centralize and protect audit logs</li>
-                <li><strong>Updates:</strong> Keep systems up-to-date with the latest patches</li>
-                <li><strong>Training:</strong> Raise awareness among teams about attack techniques</li>
+                <li>Implement strong authentication mechanisms (MFA, strong passwords) for all critical systems and user accounts.</li>
+                <li>Regularly patch and update all software, operating systems, and firmware to protect against known vulnerabilities.</li>
+                <li>Perform regular security audits and penetration testing to identify and remediate weaknesses.</li>
+                <li>Employ intrusion detection/prevention systems (IDPS) and security information and event management (SIEM) solutions for continuous monitoring.</li>
+                <li>Implement data encryption at rest and in transit for sensitive information.</li>
+                <li>Establish robust logging and monitoring to detect anomalous activities indicative of repudiation attempts.</li>
+                <li>Develop and test a comprehensive incident response plan, including data backup and recovery procedures for Denial of Service attacks.</li>
+                <li>Apply the principle of least privilege, ensuring users and processes only have the minimum necessary permissions.</li>
+                <li>Utilize web application firewalls (WAF) and API gateways to protect against common web-based attacks.</li>
+                <li>Segment networks to limit the blast radius of potential breaches.</li>
+                <li>Conduct regular security awareness training for all personnel to counter social engineering and phishing.</li>
             </ul>
         </div>
-"""
-    
+        """
+
     def _get_html_footer(self) -> str:
-        """Generates the HTML footer"""
-        return """
-        <div class="footer">
-            <p>📅 Report automatically generated | 🔧 PyTM Framework + MITRE ATT&CK</p>
-            <p>🔗 For more information: <a href="https://attack.mitre.org" style="color: #74b9ff;">MITRE ATT&CK Framework</a></p>
-        </div>
+        """Returns the HTML footer"""
+        year = datetime.now().year
+        return f"""
+    </div> <div class="footer">
+        <p>&copy; {year} STRIDE & MITRE ATT&CK Threat Analysis. All rights reserved.</p>
     </div>
 </body>
 </html>
 """
-    
-    def _export_detailed_threats(self, grouped_threats: Dict[str, List]) -> Dict[str, List]:
-        """Exports detailed threats for JSON"""
-        detailed_threats = {}
+
+    def _export_detailed_threats(self, grouped_threats: Dict[str, List]) -> List[Dict[str, Any]]:
+        """
+        Exports detailed threat information for JSON, including MITRE ATT&CK mapping and severity.
+        This method is specifically for JSON export and might be redundant with _get_all_threats_with_mitre_info
+        if the latter is designed for general detailed threat retrieval.
+        """
+        # This method duplicates logic from _get_all_threats_with_mitre_info
+        # It's better to call _get_all_threats_with_mitre_info directly for consistency.
+        return self._get_all_threats_with_mitre_info(grouped_threats)
+
+    def _get_all_threats_with_mitre_info(self, grouped_threats: Dict[str, List]) -> List[Dict[str, Any]]:
+        """
+        Gathers detailed information for all threats, including MITRE ATT&CK mapping and severity.
+        This is a helper for both HTML report and JSON export.
+        """
+        all_detailed_threats = []
         
         for threat_type, threats in grouped_threats.items():
-            threat_details = []
-            
-            for threat, target in threats:
-                if isinstance(target, tuple) and len(target) == 2:
-                    target_name = f"{getattr(target[0], 'name', 'N/A')} → {getattr(target[1], 'name', 'N/A')}"
-                elif hasattr(target, "name"):
-                    target_name = target.name
+            # Check if threats is a list of tuples (threat, target) or just strings
+            for item in threats:
+                if isinstance(item, tuple) and len(item) == 2:
+                    # Expected format: (threat, target)
+                    threat, target = item
+                    target_name = self._get_target_name_for_severity_calc(target)
+                    threat_description = getattr(threat, 'description', f"Threat of type {threat_type} affecting {target_name}")
+                elif isinstance(item, str):
+                    # If item is just a string description
+                    threat_description = item
+                    target_name = "Unknown Target"
                 else:
-                    target_name = "Unspecified Element"
-                
+                    # Handle other cases
+                    threat = item
+                    target_name = "Unknown Target"
+                    threat_description = getattr(threat, 'description', f"Threat of type {threat_type}")
+
+                # Calculate severity for each threat - get_severity_info returns a dictionary
                 severity_info = self.severity_calculator.get_severity_info(threat_type, target_name)
-                mitre_info = self.mitre_mapping.get_mapping_for_threat(threat_type)
-                
-                threat_details.append({
+
+                # Map to MITRE ATT&CK
+                mitre_techniques = self.mitre_mapping.map_threat_to_mitre(threat_description)
+
+                # Ensure mitre_techniques is a list of dictionaries, even if empty
+                if not isinstance(mitre_techniques, list):
+                    mitre_techniques = []
+
+                all_detailed_threats.append({
+                    "type": threat_type,
+                    "description": threat_description,
                     "target": target_name,
-                    "description": getattr(threat, 'description', f'Threat of type {threat_type}'),
-                    "severity_score": severity_info["score"],
-                    "severity_level": severity_info["level"],
-                    "mitre_tactics": mitre_info.get("tactics", []) if mitre_info else [],
-                    "mitre_techniques": [tech["id"] for tech in mitre_info.get("techniques", [])] if mitre_info else []
+                    "severity": severity_info,
+                    "mitre_techniques": mitre_techniques
                 })
-            
-            detailed_threats[threat_type] = threat_details
-        
-        return detailed_threats
-    
-    def generate_summary_stats(self, grouped_threats: Dict[str, List]) -> Dict[str, Any]:
-        """Generates summary statistics"""
+                
+        return all_detailed_threats
+
+    def _get_target_name_for_severity_calc(self, target: Any) -> str:
+        """Determines the target name for severity calculation, handling different target types."""
+        if isinstance(target, tuple) and len(target) == 2:
+            # This handles Dataflows where target is (source, destination)
+            return f"{getattr(target[0], 'name', 'N/A')} → {getattr(target[1], 'name', 'N/A')}"
+        elif hasattr(target, "name"):
+            # Handles Actors, Servers, Boundaries, Data
+            return target.name
+        else:
+            return "Unspecified Element"
+
+    def generate_summary_stats(self, all_detailed_threats: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Generates summary statistics based on severity scores."""
         all_scores = []
         
-        for threat_type, threats in grouped_threats.items():
-            for threat, target in threats:
-                if isinstance(target, tuple) and len(target) == 2:
-                    target_name = f"{getattr(target[0], 'name', 'N/A')} → {getattr(target[1], 'name', 'N/A')}"
-                elif hasattr(target, "name"):
-                    target_name = target.name
-                else:
-                    target_name = "Unspecified Element"
+        for threat in all_detailed_threats:
+            # Ensure threat is a dictionary
+            if not isinstance(threat, dict):
+                print(f"Warning: Expected dict, got {type(threat)}: {threat}")
+                continue
                 
-                score = self.severity_calculator.calculate_score(threat_type, target_name)
-                all_scores.append(score)
-        
+            severity_info = threat.get('severity')
+            if not severity_info:
+                print(f"Warning: No severity info for threat: {threat}")
+                continue
+                
+            # Handle different types of severity_info
+            if isinstance(severity_info, dict):
+                # If it's a dictionary, try to get the score
+                score = severity_info.get('score', 0)
+            elif isinstance(severity_info, str):
+                # If it's a string, try to extract numeric value
+                try:
+                    # Extract numeric part from formatted string like "8.5 (HIGH)"
+                    import re
+                    match = re.search(r'(\d+\.?\d*)', severity_info)
+                    score = float(match.group(1)) if match else 0
+                except (ValueError, AttributeError):
+                    score = 0
+            elif isinstance(severity_info, (int, float)):
+                # If it's already a number
+                score = float(severity_info)
+            else:
+                score = 0
+                
+            all_scores.append(score)
+
         if all_scores:
             return {
                 "total_threats": len(all_scores),
@@ -512,3 +523,30 @@ class ReportGenerator:
                 "min_severity": 0,
                 "severity_distribution": {}
             }
+
+    def _format_summary_stats_to_html(self, stats: Dict[str, Any]) -> str:
+        """Helper to format summary statistics into an HTML string."""
+        if not stats:
+            return ""
+
+        html_output = """
+        <div class="summary-stats">
+            <h2>📈 Threat Statistics</h2>
+            <ul>
+        """
+        html_output += f"<li><strong>Total Threats Analyzed:</strong> {stats.get('total_threats', 0)}</li>"
+        html_output += f"<li><strong>Average Severity Score:</strong> {stats.get('average_severity', 0):.2f}</li>"
+        html_output += f"<li><strong>Maximum Severity Score:</strong> {stats.get('max_severity', 0):.2f}</li>"
+        html_output += f"<li><strong>Minimum Severity Score:</strong> {stats.get('min_severity', 0):.2f}</li>"
+
+        if stats.get('severity_distribution'):
+            html_output += "<li><strong>Severity Distribution:</strong><ul>"
+            for level, count in stats['severity_distribution'].items():
+                html_output += f"<li>{level}: {count}</li>"
+            html_output += "</ul></li>"
+
+        html_output += """
+            </ul>
+        </div>
+        """
+        return html_output

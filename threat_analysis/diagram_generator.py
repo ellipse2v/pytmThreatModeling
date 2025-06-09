@@ -158,7 +158,8 @@ class DiagramGenerator:
                         if (hasattr(actor, 'inBoundary') and actor.inBoundary and 
                             hasattr(actor.inBoundary, 'name') and actor.inBoundary.name == name):
                             escaped_actor_name = self._escape_label(actor.name)
-                            dot_code.append(f"    \"{escaped_actor_name}\" [shape=oval, fillcolor=yellow];")
+                            node_attrs = self._get_node_attributes(actor.name, 'actor')
+                            dot_code.append(f"    \"{escaped_actor_name}\" {node_attrs};")
                 
                 # Add servers in this boundary
                 if hasattr(threat_model, 'servers'):
@@ -166,7 +167,8 @@ class DiagramGenerator:
                         if (hasattr(server, 'inBoundary') and server.inBoundary and 
                             hasattr(server.inBoundary, 'name') and server.inBoundary.name == name):
                             escaped_server_name = self._escape_label(server.name)
-                            dot_code.append(f"    \"{escaped_server_name}\" [shape=box, fillcolor=lightgreen];")
+                            node_attrs = self._get_node_attributes(server.name, 'server')
+                            dot_code.append(f"    \"{escaped_server_name}\" {node_attrs};")
                 
                 dot_code.append("  }")
         
@@ -175,14 +177,16 @@ class DiagramGenerator:
             for actor in threat_model.actors:
                 if not hasattr(actor, 'inBoundary') or not actor.inBoundary:
                     escaped_actor_name = self._escape_label(actor.name)
-                    dot_code.append(f"  \"{escaped_actor_name}\" [shape=oval, fillcolor=yellow];")
+                    node_attrs = self._get_node_attributes(actor.name, 'actor')
+                    dot_code.append(f"  \"{escaped_actor_name}\" {node_attrs};")
         
         # Add servers not in boundaries
         if hasattr(threat_model, 'servers'):
             for server in threat_model.servers:
                 if not hasattr(server, 'inBoundary') or not server.inBoundary:
                     escaped_server_name = self._escape_label(server.name)
-                    dot_code.append(f"  \"{escaped_server_name}\" [shape=box, fillcolor=lightgreen];")
+                    node_attrs = self._get_node_attributes(server.name, 'server')
+                    dot_code.append(f"  \"{escaped_server_name}\" {node_attrs};")
 
         # Add dataflows
         if hasattr(threat_model, 'dataflows'):
@@ -235,6 +239,30 @@ class DiagramGenerator:
         result = "\n".join(dot_code)
         print(f"📝 Generated DOT code ({len(result)} characters)")
         return result
+
+    def _get_node_attributes(self, node_name: str, node_type: str) -> str:
+        """
+        Returns DOT node attributes based on node name and type.
+        Adds specific icons for switches and firewalls.
+        """
+        node_name_lower = node_name.lower()
+        
+        # Check for switch
+        if 'switch' in node_name_lower:
+            return '[shape=diamond, style=filled, fillcolor=orange, label="🔀\\n' + self._escape_label(node_name) + '"]'
+        
+        # Check for firewall
+        elif 'firewall' in node_name_lower:
+            return '[shape=hexagon, style=filled, fillcolor=red, label="🔥\\n' + self._escape_label(node_name) + '"]'
+        
+        # Default attributes based on node type
+        elif node_type == 'actor':
+            return '[shape=oval, fillcolor=yellow]'
+        elif node_type == 'server':
+            return '[shape=box, fillcolor=lightgreen]'
+        else:
+            return '[shape=box, style=filled, fillcolor=lightblue]'
+        
 
     def _get_element_name(self, element) -> Optional[str]:
         """Safely extracts the name from a model element."""
