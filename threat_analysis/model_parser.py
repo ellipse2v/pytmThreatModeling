@@ -33,6 +33,7 @@ class ModelParser:
             "## Servers": self._parse_server,
             "## Data": self._parse_data,             
             "## Dataflows": self._parse_dataflow,
+            "## Protocol Styles": self._parse_protocol_style,
             "## Severity Multipliers": self._parse_severity_multiplier,
             "## Custom Mitre Mapping": self._parse_custom_mitre
         }
@@ -86,28 +87,46 @@ class ModelParser:
                 pass
 
     def _parse_boundary(self, line: str):
-        """Parses a boundary line with format: - **name**: color=value"""
-        # Support for both possible formats
-        match = re.match(r'^- \*\*([^\*:]+)\*\*(?:\s*:\s*color=([^\s,]+))?', line)
+        """Parses a boundary line with format: - **name**: color=value, isTrusted=bool, isFilled=bool"""
+        # Updated regex to capture name and all parameters
+        match = re.match(r'^- \*\*([^\*:]+)\*\*:\s*(.*)', line)
         if match:
             name = match.group(1).strip()
-            color = match.group(2).strip() if match.group(2) else "lightgray"
-            self.threat_model.add_boundary(name, color)
-            print(f"   - Added Boundary: {name} (Color: {color})")
+            params_str = match.group(2).strip()
+            
+            # Parse all key=value parameters
+            boundary_kwargs = self._parse_key_value_params(params_str)
+            
+            # Set default color if not specified
+            if 'color' not in boundary_kwargs:
+                boundary_kwargs['color'] = 'lightgray'
+            
+            self.threat_model.add_boundary(name, **boundary_kwargs)
+            
+            # Create a nice log message
+            params_display = []
+            for key, value in boundary_kwargs.items():
+                params_display.append(f"{key.capitalize()}: {value}")
+            
+            print(f"   - Added Boundary: {name} ({', '.join(params_display)})")
         else:
             print(f"⚠️ Warning: Malformed boundary line: {line}")
 
     def _parse_actor(self, line: str):
-        """Parses an actor line with format: - **name**: boundary=value"""
-        match = re.match(r'^- \*\*([^\*:]+)\*\*(?:\s*:\s*boundary=([^\s,]+))?', line)
+        """Parses an actor line."""
+        #print(f'{line}')
+        match = re.match(r'^- \*\*([^\*]+)\*\*:\s*boundary=([^,]+)(?:,\s*color=([^,]+))?(?:,\s*isFilled=(True|False))?', line)
         if match:
-            name = match.group(1).strip()
-            boundary_name = match.group(2).strip() if match.group(2) else ""
-            if boundary_name:
-                self.threat_model.add_actor(name, boundary_name)
-                print(f"   - Added Actor: {name} (Boundary: {boundary_name})")
-            else:
-                print(f"⚠️ Warning: Actor '{name}' has no boundary specified.")
+            actor_name = match.group(1).strip()
+            boundary_name = match.group(2).strip()
+            color = match.group(3).strip() if match.group(3) else None  
+            is_filled_str = match.group(4) 
+            is_filled = True 
+            if is_filled_str is not None:
+                is_filled = is_filled_str == 'True'
+            # Assuming add_actor in ThreatModel can handle color and isFilled
+            self.threat_model.add_actor(actor_name, boundary_name, color=color, is_filled=is_filled)
+            print(f"   - Added Actor: {actor_name} (Boundary: {boundary_name}, Color: {color}, Filled: {is_filled})")
         else:
             print(f"⚠️ Warning: Malformed actor line: {line}")
 
@@ -128,7 +147,7 @@ class ModelParser:
     def _parse_key_value_params(self, params_str: str) -> Dict[str, Any]:
         """Parses a key=value parameter string and returns a dictionary."""
         params = {}
-        # Regex to find key="value" or key=True/False or key=Number or key=STRING_ENUM
+        # Enhanced regex to handle quoted strings, booleans, numbers, and unquoted strings
         param_pattern = re.compile(r'(\w+)=(?:\"([^\"]*)\"|(\w+|[0-9.]+))')
         
         for m in param_pattern.finditer(params_str):
@@ -143,11 +162,10 @@ class ModelParser:
                     value = True
                 elif value_unquoted.lower() == 'false':
                     value = False
-                elif value_unquoted.replace('.', '', 1).isdigit(): # Check if it's a number (int or float)
-                    try:
-                        value = int(value_unquoted)
-                    except ValueError:
-                        value = float(value_unquoted)
+                elif '.' in value_unquoted and value_unquoted.replace('.', '', 1).isdigit():
+                    value = float(value_unquoted)
+                elif value_unquoted.isdigit():
+                    value = int(value_unquoted)
                 else:
                     value = value_unquoted # Remains a string (for enums)
             else:
@@ -180,6 +198,16 @@ class ModelParser:
             
             # Call add_data by unpacking the properties dictionary
             self.threat_model.add_data(name, **data_kwargs)
+            
+            # Create a nice log message
+            params_display = []
+            for key, value in data_kwargs.items():
+                if hasattr(value, 'name'):  # For enum objects
+                    params_display.append(f"{key}: {value.name}")
+                else:
+                    params_display.append(f"{key}: {value}")
+            
+            print(f"   - Added Data: {name} ({', '.join(params_display)})")
         else:
             print(f"⚠️ Warning: Malformed data line: {line}")
 
@@ -235,6 +263,31 @@ class ModelParser:
                       (f", Encrypted: {is_encrypted}" if is_encrypted else "") + ")")
         else:
             print(f"⚠️ Warning: Elements '{from_name}' or '{to_name}' not found for dataflow '{name}'.")
+            
+    def _parse_protocol_style(self, line: str):
+        """Parses a protocol style line with format: - **protocol**: color=value, line_style=value"""
+        match = re.match(r'^- \*\*([^\*:]+)\*\*:\s*(.*)', line)
+        if match:
+            protocol_name = match.group(1).strip()
+            params_str = match.group(2).strip()
+            
+            # Parse all key=value parameters
+            style_kwargs = self._parse_key_value_params(params_str)
+            
+            # Call add_protocol_style method if it exists
+            if hasattr(self.threat_model, 'add_protocol_style'):
+                self.threat_model.add_protocol_style(protocol_name, **style_kwargs)
+                
+                # Create a nice log message
+                params_display = []
+                for key, value in style_kwargs.items():
+                    params_display.append(f"{key}: {value}")
+                
+                print(f"   - Added Protocol Style: {protocol_name} ({', '.join(params_display)})")
+            else:
+                print(f"ℹ️ Protocol Style ignored (method not implemented): {protocol_name}")
+        else:
+            print(f"⚠️ Warning: Malformed protocol style line: {line}")
 
     def _parse_severity_multiplier(self, line: str):
         """Parses a severity multiplier line."""
@@ -259,11 +312,36 @@ class ModelParser:
             attack_name = match.group(1).strip()
             params_str = match.group(2).strip()
             
-            # For now, just log that we found a custom mapping
+            # Parse tactics and techniques arrays (this is a simplified version)
+            tactics = []
+            techniques = []
+            
+            # Extract tactics array
+            tactics_match = re.search(r'tactics=\[(.*?)\]', params_str)
+            if tactics_match:
+                tactics_str = tactics_match.group(1)
+                # Extract quoted strings from the array
+                tactics = [t.strip('"') for t in re.findall(r'"([^"]*)"', tactics_str)]
+            
+            # Extract techniques array (simplified - just extract IDs and names)
+            techniques_match = re.search(r'techniques=\[(.*?)\]', params_str)
+            if techniques_match:
+                techniques_str = techniques_match.group(1)
+                # Find all technique objects
+                technique_objects = re.findall(r'\{[^}]*\}', techniques_str)
+                for tech_obj in technique_objects:
+                    id_match = re.search(r'"id":\s*"([^"]*)"', tech_obj)
+                    name_match = re.search(r'"name":\s*"([^"]*)"', tech_obj)
+                    if id_match and name_match:
+                        techniques.append({
+                            "id": id_match.group(1),
+                            "name": name_match.group(1)
+                        })
+            
+            # Call add_custom_mitre_mapping method if it exists
             if hasattr(self.threat_model, 'add_custom_mitre_mapping'):
-                # Here, you would implement more sophisticated parsing of tactics and techniques
-                print(f"   - Added Custom MITRE Mapping: {attack_name}")
-                # self.threat_model.add_custom_mitre_mapping(attack_name, tactics, techniques)
+                self.threat_model.add_custom_mitre_mapping(attack_name, tactics, techniques)
+                print(f"   - Added Custom MITRE Mapping: {attack_name} (Tactics: {len(tactics)}, Techniques: {len(techniques)})")
             else:
                 print(f"ℹ️ Custom MITRE Mapping ignored (method not implemented): {attack_name}")
         else:

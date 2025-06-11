@@ -34,6 +34,7 @@ class ThreatModel:
         self.data_elements = {}
         self.severity_multipliers: Dict[str, float] = {}
         self.custom_mitre_mappings: Dict[str, Any] = {}
+        self.protocol_styles: Dict[str, Dict[str, Any]] = {}  # New: Store protocol styles
         self.threats_raw = []
         self.grouped_threats = defaultdict(list)
         self.data_objects = {}
@@ -45,19 +46,24 @@ class ThreatModel:
         self.mitre_analysis_results = {}
         self.threat_mitre_mapping = {}
 
-    def add_boundary(self, name: str, color: str = "lightgray") -> Boundary:
-        """Adds a boundary to the model"""
+    def add_boundary(self, name: str, color: str = "lightgray", **kwargs) -> Boundary:
+        """Adds a boundary to the model with additional properties"""
         boundary = Boundary(name)
-        self.boundaries[name] = {"boundary": boundary, "color": color}
+        
+        # Store boundary with all properties including color and any additional kwargs
+        boundary_props = {"boundary": boundary, "color": color}
+        boundary_props.update(kwargs)  # Add any additional properties like isTrusted, isFilled
+        
+        self.boundaries[name] = boundary_props
         self._elements_by_name[name] = boundary
         return boundary
 
-    def add_actor(self, name: str, boundary_name: str) -> Actor:
+    def add_actor(self, name: str, boundary_name: str, color: Optional[str] = None, is_filled: bool = True) -> Actor:
         """Adds an actor to the model"""
         actor = Actor(name)
         if boundary_name in self.boundaries:
             actor.inBoundary = self.boundaries[boundary_name]["boundary"]
-        self.actors.append(actor)
+        self.actors.append({'name': name, 'object': actor, 'boundary': self.boundaries[boundary_name]["boundary"], 'color': color, 'is_filled': is_filled})
         self._elements_by_name[name] = actor
         return actor
 
@@ -80,18 +86,17 @@ class ThreatModel:
         print(f"   - Added Data: {name} (Props: {kwargs})")  # Debugging
         return data_obj
 
-    def add_dataflow(self, from_element: Any, to_element: Any, name: str,
-                     protocol: str, data_name: Optional[str] = None,
-                     is_authenticated: bool = False,
-                     is_encrypted: bool = False) -> Dataflow:
+    def add_dataflow(self, from_element: Any, to_element: Any, name :str,
+            protocol: str, data_name: Optional[str] = None,
+            is_authenticated: bool = False,
+            is_encrypted: bool = False) -> Dataflow:
         """Adds a dataflow to the model"""
         data_object = None
         if data_name:
             data_object = self.data_objects.get(data_name)
             if not data_object:
                 print(f"⚠️ Warning: Data object '{data_name}' not found for dataflow '{name}'.")
-
-        # Arguments are passed as keyword arguments
+         # Arguments are passed as keyword arguments
         dataflow = Dataflow(
             from_element,
             to_element,
@@ -103,6 +108,79 @@ class ThreatModel:
         )
         self.dataflows.append(dataflow)
         return dataflow
+
+    def add_protocol_style(self, protocol_name: str, **style_kwargs):
+        """
+        Adds styling information for a specific protocol.
+        
+        Args:
+            protocol_name (str): Name of the protocol (e.g., "HTTPS", "TCP", "UDP")
+            **style_kwargs: Style properties like:
+                - color (str): Color for the protocol lines
+                - line_style (str): Style of the line (solid, dashed, dotted, etc.)
+                - width (int/float): Line width
+                - arrow_style (str): Arrow style for dataflows
+                - etc.
+        
+        Example:
+            add_protocol_style("HTTPS", color="green", line_style="solid", width=2)
+            add_protocol_style("HTTP", color="red", line_style="dashed", width=1)
+        """
+        self.protocol_styles[protocol_name] = style_kwargs
+        print(f"✅ Protocol style added for {protocol_name}: {style_kwargs}")
+
+    def get_protocol_style(self, protocol_name: str) -> Optional[Dict[str, Any]]:
+        """
+        Retrieves the style configuration for a given protocol.
+        
+        Args:
+            protocol_name (str): Name of the protocol
+            
+        Returns:
+            Dict[str, Any]: Style configuration dictionary or None if not found
+        """
+        return self.protocol_styles.get(protocol_name)
+
+    def get_all_protocol_styles(self) -> Dict[str, Dict[str, Any]]:
+        """
+        Returns all protocol styles defined in the model.
+        
+        Returns:
+            Dict[str, Dict[str, Any]]: All protocol styles
+        """
+        return self.protocol_styles.copy()
+
+    def update_protocol_style(self, protocol_name: str, **style_kwargs):
+        """
+        Updates an existing protocol style or creates a new one.
+        
+        Args:
+            protocol_name (str): Name of the protocol
+            **style_kwargs: Style properties to update/add
+        """
+        if protocol_name in self.protocol_styles:
+            self.protocol_styles[protocol_name].update(style_kwargs)
+            print(f"✅ Protocol style updated for {protocol_name}: {style_kwargs}")
+        else:
+            self.add_protocol_style(protocol_name, **style_kwargs)
+
+    def remove_protocol_style(self, protocol_name: str) -> bool:
+        """
+        Removes a protocol style.
+        
+        Args:
+            protocol_name (str): Name of the protocol
+            
+        Returns:
+            bool: True if style was removed, False if it didn't exist
+        """
+        if protocol_name in self.protocol_styles:
+            del self.protocol_styles[protocol_name]
+            print(f"✅ Protocol style removed for {protocol_name}")
+            return True
+        else:
+            print(f"⚠️ Warning: Protocol style for '{protocol_name}' not found")
+            return False
 
     def get_element_by_name(self, name: str) -> Optional[Any]:
         """Retrieves an element (Actor, Server, Boundary) by its name."""
@@ -117,7 +195,7 @@ class ThreatModel:
         self.tm.process()
 
         try:
-            self.threats_raw = self.tm.threats
+            self.threats_raw = self.tm._threats
             print(f"✅ {len(self.threats_raw)} menaces détectées via tm.threats")
         except AttributeError:
             try:
@@ -304,6 +382,16 @@ class ThreatModel:
         """Returns the colors of the boundaries"""
         return {name: info["color"] for name, info in self.boundaries.items()}
 
+    def get_boundary_properties(self, boundary_name: str) -> Optional[Dict[str, Any]]:
+        """Returns all properties of a specific boundary"""
+        boundary_info = self.boundaries.get(boundary_name)
+        if boundary_info:
+            # Return a copy without the boundary object itself
+            props = boundary_info.copy()
+            props.pop("boundary", None)
+            return props
+        return None
+
     def get_statistics(self) -> Dict[str, int]:
         """Returns the model statistics"""
         return {
@@ -313,6 +401,7 @@ class ThreatModel:
             "servers": len(self.servers),
             "dataflows": len(self.dataflows),
             "boundaries": len(self.boundaries),
+            "protocol_styles": len(self.protocol_styles),
             "mitre_techniques_count": self.mitre_analysis_results.get("mitre_techniques_count", 0)
         }
 

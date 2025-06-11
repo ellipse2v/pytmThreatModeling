@@ -4,23 +4,23 @@
 This model describes a network architecture with a Demilitarized Zone (DMZ), external and internal dataflows, and a potentially untrusted command zone. The goal is to identify STRIDE threats and map them to MITRE ATT&CK techniques.
 
 ## Boundaries
-- **Internet**: color=lightcoral
-- **DMZ**: color=khaki
-- **Intranet**: color=lightgreen
-- **Command_Zone**: color=lightsteelblue
+- **Internet**: color=lightcoral, isTrusted=False, isFilled=True
+- **DMZ**: color=khaki, isTrusted=True, isFilled=True, line_style=dashed
+- **Intranet**: color=lightgreen, isTrusted=True, , isFilled=False
+- **Command_Zone**: color=lightsteelblue, isFilled=False
 
 ## Actors
-- **External Client 1**: boundary=Internet
-- **External Client 2**: boundary=Internet
-- **External Client 3**: boundary=Internet
-- **External Client 4**: boundary=Internet
-- **External Client 5**: boundary=Internet
-- **External Client 6**: boundary=Internet
-- **External Client 7**: boundary=Internet
-- **External Client 8**: boundary=Internet
+- **External Client 1**: boundary=Internet, color=lightblue, isFilled=False
+- **External Client 2**: boundary=Internet, color=lightblue
+- **External Client 3**: boundary=Internet, color=lightblue
+- **External Client 4**: boundary=Internet, color=lightblue
+- **External Client 5**: boundary=Internet, color=lightblue
+- **External Client 6**: boundary=Internet, color=lightblue
+- **External Client 7**: boundary=Internet, color=lightblue
+- **External Client 8**: boundary=Internet, color=lightblue
 - **Internal Operator 1**: boundary=Intranet
-- **Internal Operator 2**: boundary=Intranet
-- **System Administrator**: boundary=Intranet
+- **Internal Operator 2**: boundary=Intranet, color=forestgreen
+- **System Administrator**: boundary=Intranet, color=forestgreen
 
 ## Servers
 - **External Firewall**: boundary=DMZ
@@ -33,23 +33,23 @@ This model describes a network architecture with a Demilitarized Zone (DMZ), ext
 - **Command Machine**: boundary=Command_Zone
 
 ## Data
-- **Web Traffic**: description="Standard web requests/responses", format="HTTP/HTTPS", classification="PUBLIC"
+- **Web Traffic**: description="Standard web requests/responses", classification="PUBLIC"
 - **API Request**: description="Application API calls", format="JSON/REST", classification="RESTRICTED"
-- **File Transfer**: description="File upload/download", format="FTP/SFTP", classification="SECRET"
-- **DNS Query**: description="Domain Name System queries", format="UDP/TCP", classification="PUBLIC"
-- **Mail Traffic**: description="Email messages", format="SMTP/IMAP/POP3", classification="SECRET"
-- **Video Stream**: description="Live video data", format="RTSP/RTMP", classification="PUBLIC"
+- **File Transfer**: description="File upload/download", classification="SECRET"
+- **DNS Query**: description="Domain Name System queries", classification="PUBLIC"
+- **Mail Traffic**: description="Email messages", classification="SECRET"
+- **Video Stream**: description="Live video data", classification="PUBLIC"
 - **Game Data**: description="Online game session data", format="UDP", classification="PUBLIC"
-- **IoT Data**: description="Sensor data from IoT devices", format="MQTT", classification="PUBLIC"
+- **IoT Data**: description="Sensor data from IoT devices", classification="PUBLIC"
 - **Server Request**: description="Request to central server", format="Proprietary", classification="SECRET"
 - **Database Query**: description="SQL database query", format="SQL", classification="SECRET"
-- **SSH Traffic**: description="Secure Shell remote access", format="SSH", classification="TOP_SECRET", credentialsLife="SHORT"
-- **Authentication Request**: description="LDAP/LDAPS authentication request", format="LDAPS", classification="SECRET"
+- **SSH Traffic**: description="Secure Shell remote access", classification="TOP_SECRET", credentialsLife="SHORT"
+- **Authentication Request**: description="LDAP/LDAPS authentication request", classification="SECRET"
 - **General Traffic**: description="General internal network traffic", format="Various", classification="PUBLIC"
 
 ## Dataflows
-- **Client 1 to External Firewall**: from="External Client 1", to="External Firewall", protocol="HTTPS", data="Web Traffic", is_encrypted=True
-- **Client 2 to External Firewall**: from="External Client 2", to="External Firewall", protocol="HTTP", data="Web Traffic"
+- **test1**: from="External Client 1", to="External Firewall", protocol="HTTPS", data="Web Traffic", is_encrypted=True, bidirectional=True
+- **test**: from="External Client 2", to="External Firewall", protocol="HTTP", data="Web Traffic"
 - **Client 3 to External Firewall**: from="External Client 3", to="External Firewall", protocol="FTP", data="File Transfer"
 - **Client 4 to External Firewall**: from="External Client 4", to="External Firewall", protocol="SFTP", data="File Transfer", is_encrypted=True
 - **Client 5 to External Firewall**: from="External Client 5", to="External Firewall", protocol="DNS", data="DNS Query"
@@ -72,6 +72,13 @@ This model describes a network architecture with a Demilitarized Zone (DMZ), ext
 - **System Administrator to Authentication Server**: from="System Administrator", to="Authentication Server", protocol="LDAPS", data="Authentication Request", is_authenticated=True, is_encrypted=True
 - **Central Server to Authentication Server**: from="Central Server", to="Authentication Server", protocol="LDAPS", data="Authentication Request", is_authenticated=True, is_encrypted=True
 
+## Protocol Styles
+- **HTTPS**: color=darkgreen, line_style=solid
+- **HTTP**: color=red, line_style=solid
+- **SSH**: color=blue, line_style=dashed
+- **SQL**: color=purple
+- **LDAPS**: color=teal
+- **MQTT**: color=teal, line_style=dashed
 
 ## Severity Multipliers
 - **Central Server**: 1.5

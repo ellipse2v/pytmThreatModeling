@@ -215,7 +215,7 @@ if __name__ == "__main__":
     print(f"    • Average score: {summary['threat_statistics']['average_severity']:.2f}/10")
     print(f"    • 8 external flows with different protocols")
 
-    if "html" in reports and reports["html"]:
-        framework.open_report_in_browser(reports["html"])
+    #if "html" in reports and reports["html"]:
+    #    framework.open_report_in_browser(reports["html"])
 
     print("\n✅ Process completed. Check generated files in the output directory.")

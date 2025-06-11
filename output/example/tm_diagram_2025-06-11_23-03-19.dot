@@ -1,0 +1,71 @@
+digraph ThreatModel {
+  rankdir=LR;
+  node [shape=box, style=filled, fillcolor=lightblue];
+  edge [fontsize=10];
+  charset="UTF-8";
+  subgraph cluster_Internet {
+    label="Internet";
+    fontsize=10;
+    fillcolor="lightcoral";
+    style="rounded,filled";
+    color=black;
+    "External Client 1" [shape=oval, style="", fillcolor="lightblue", color="lightblue", label="External Client 1"];
+    "External Client 2" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="External Client 2"];
+    "External Client 3" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="External Client 3"];
+    "External Client 4" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="External Client 4"];
+    "External Client 5" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="External Client 5"];
+    "External Client 6" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="External Client 6"];
+    "External Client 7" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="External Client 7"];
+    "External Client 8" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="External Client 8"];
+  }
+  subgraph cluster_DMZ {
+    label="DMZ";
+    fillcolor="khaki";
+    style="rounded,filled";
+    color=red;
+    penwidth=3;
+    style="rounded,filled,dashed";
+    "External Firewall" [shape=hexagon, style=filled, fillcolor="red", label="🔥\nExternal Firewall"];
+    "Protocol Break Device" [shape=box, style=filled, fillcolor="lightgreen", label="Protocol Break Device"];
+    "Internal Firewall" [shape=hexagon, style=filled, fillcolor="red", label="🔥\nInternal Firewall"];
+  }
+  subgraph cluster_Intranet {
+    label="Intranet";
+    style="rounded";
+    color=red;
+    penwidth=3;
+    "Internal Operator 1" [shape=oval, style=filled, fillcolor="yellow", label="Internal Operator 1"];
+    "Internal Operator 2" [shape=oval, style=filled, fillcolor="forestgreen", color="forestgreen", label="Internal Operator 2"];
+    "System Administrator" [shape=oval, style=filled, fillcolor="forestgreen", color="forestgreen", label="System Administrator"];
+    "Switch" [shape=diamond, style=filled, fillcolor="orange", label="🔀\nSwitch"];
+    "Central Server" [shape=box, style=filled, fillcolor="lightgreen", label="Central Server"];
+    "Application Database" [shape=box, style=filled, fillcolor="lightgreen", label="Application Database"];
+    "Authentication Server" [shape=box, style=filled, fillcolor="lightgreen", label="Authentication Server"];
+  }
+  subgraph cluster_Command_Zone {
+    label="Command_Zone";
+    fontsize=10;
+    style="rounded";
+    color=black;
+    "Command Machine" [shape=box, style=filled, fillcolor="lightgreen", label="Command Machine"];
+  }
+  "External Client 1" -> "External Firewall" [label="test1\nProtocol: HTTPS\nData: Web Traffic", fontsize=7];
+  "External Client 2" -> "External Firewall" [label="test\nProtocol: HTTP\nData: Web Traffic", fontsize=7];
+  "External Client 3" -> "External Firewall" [label="Client 3 to External Firewall\nProtocol: FTP\nData: File Transfer", fontsize=7];
+  "External Client 4" -> "External Firewall" [label="Client 4 to External Firewall\nProtocol: SFTP\nData: File Transfer", fontsize=7];
+  "External Client 5" -> "External Firewall" [label="Client 5 to External Firewall\nProtocol: DNS\nData: DNS Query", fontsize=7];
+  "External Client 6" -> "External Firewall" [label="Client 6 to External Firewall\nProtocol: SMTP\nData: Mail Traffic", fontsize=7];
+  "External Client 7" -> "External Firewall" [label="Client 7 to External Firewall\nProtocol: RTSP\nData: Video Stream", fontsize=7];
+  "External Client 8" -> "External Firewall" [label="Client 8 to External Firewall\nProtocol: MQTT\nData: IoT Data", fontsize=7];
+  "External Firewall" -> "Protocol Break Device" [label="External Firewall to Protocol Break Device\nProtocol: HTTPS\nData: Web Traffic", fontsize=7];
+  "Protocol Break Device" -> "Internal Firewall" [label="Protocol Break Device to Internal Firewall\nProtocol: HTTPS\nData: Web Traffic", fontsize=7];
+  "Internal Firewall" -> "Switch" [label="Internal Firewall to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
+  "Command Machine" -> "Switch" [label="Command Machine to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
+  "Internal Operator 1" -> "Switch" [label="Internal Operator 1 to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
+  "Internal Operator 2" -> "Switch" [label="Internal Operator 2 to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
+  "System Administrator" -> "Switch" [label="System Administrator to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
+  "Switch" -> "Central Server" [label="Switch to Central Server\nProtocol: HTTPS\nData: Server Request", fontsize=7];
+  "System Administrator" -> "Central Server" [label="System Administrator to Central Server\nProtocol: SSH\nData: SSH Traffic", fontsize=7];
+  "System Administrator" -> "Authentication Server" [label="System Administrator to Authentication Server\nProtocol: LDAPS\nData: Authentication Request", fontsize=7];
+  "Central Server" -> "Authentication Server" [label="Central Server to Authentication Server\nProtocol: LDAPS\nData: Authentication Request", fontsize=7];
+}
