@@ -27,29 +27,6 @@ class DiagramGenerator:
     def __init__(self):
         self.dot_executable = "dot"
         self.supported_formats = ["svg", "png", "pdf", "ps"]
-        
-    def generate_diagram_from_model(self, threat_model, output_file: str = "tm_diagram", 
-                                  format: str = "svg") -> Optional[str]:
-        """
-        Generates a diagram (e.g., SVG, PNG) from a threat model.
-        This method handles DOT extraction and final diagram generation.
-        """
-        try:
-            #dot_code = self._extract_dot_from_model(threat_model)
-            #if not dot_code:
-            #    dot_code = self._generate_manual_dot(threat_model)
-            
-            #if dot_code:
-                #return self.generate_diagram_from_dot(dot_code, output_file, format)
-           return self.generate_enhanced_diagram_with_legend(threat_model, output_file, format)
-
-        #    else:
-         #       print("❌ Unable to obtain DOT code for diagram generation.")
-          #      return None
-            
-        except Exception as e:
-            print(f"❌ Error during diagram generation: {e}")
-            return None
     
     def generate_dot_file_from_model(self, threat_model, output_file: str) -> Optional[str]:
         """Generates a .dot file from the threat model and saves it."""
@@ -258,11 +235,28 @@ class DiagramGenerator:
         if 'switch' in node_name_lower:
             attributes.append('shape=diamond')
             default_fillcolor = 'orange'
-            icon = '🔀\\n'
+            icon = '🔀 '
         elif 'firewall' in node_name_lower:
             attributes.append('shape=hexagon')
             default_fillcolor = 'red'
-            icon = '🔥\\n'
+            icon = '🔥 '
+                # Check for database
+        elif 'database' in node_name_lower or 'db' in node_name_lower:
+            return '[shape=cylinder, style=filled, fillcolor=lightblue, label="🗄️ ' + self._escape_label(node_name) + '"]'
+        
+        # Check for web server
+        elif 'web' in node_name_lower and 'server' in node_name_lower:
+            return '[shape=box, style=filled, fillcolor=lightgreen, label="🌐 ' + self._escape_label(node_name) + '"]'
+        
+        # Check for API
+        elif 'api' in node_name_lower:
+            return '[shape=box, style=filled, fillcolor=lightyellow, label="🔌 ' + self._escape_label(node_name) + '"]'
+        
+        # Default attributes based on node type
+        elif node_type == 'actor':
+            return '[shape=oval, fillcolor=yellow, label="👤 ' + self._escape_label(node_name) + '"]'
+        elif node_type == 'server':
+            return '[shape=box, fillcolor=lightgreen, label="🖥️ ' + self._escape_label(node_name) + '"]'
         else:
             # Default shapes based on node type
             if node_type == 'actor':
@@ -416,52 +410,6 @@ class DiagramGenerator:
         dot_code = dot_code.replace('\r\n', '\n').replace('\r', '\n')
         
         return dot_code
-    
-    def generate_enhanced_diagram_with_legend(self, threat_model, output_file: str = "tm_diagram_with_legend", 
-                                            format: str = "svg") -> Optional[str]:
-        """
-        Generates a diagram with a legend showing protocol styles and boundary types.
-        """
-        try:
-            print("🔍 DEBUG: Starting enhanced diagram generation...")
-            
-            # Generate main diagram DOT code
-            print("🔍 DEBUG: Generating main DOT code...")
-            main_dot = self._generate_manual_dot(threat_model)
-            print(f"🔍 DEBUG: Main DOT generated: {len(main_dot)} characters")
-            
-            # Add legend subgraph
-            print("🔍 DEBUG: Generating legend DOT code...")
-            legend_dot = self._generate_legend_dot(threat_model)
-            print(f"🔍 DEBUG: Legend DOT generated: {len(legend_dot)} characters")
-            
-            if legend_dot.strip():
-                print("🔍 DEBUG: Legend content found, combining with main diagram...")
-                # Insérer la légende avant la fermeture du graphe
-                combined_dot = main_dot.rstrip('}\n') + '\n' + legend_dot + '\n}'
-                print("🔍 DEBUG: Combined successfully")
-            else:
-                print("⚠️ DEBUG: No legend content generated, using main diagram only")
-                combined_dot = main_dot
-            
-            print(f"📝 Generated diagram with legend ({len(combined_dot)} characters)")
-            
-            # Debug: Save combined DOT to file for inspection
-            try:
-                debug_dot_file = f"{output_file}_debug.dot"
-                with open(debug_dot_file, 'w', encoding='utf-8') as f:
-                    f.write(combined_dot)
-                print(f"🔍 DEBUG: DOT code saved to {debug_dot_file} for inspection")
-            except Exception as debug_e:
-                print(f"⚠️ DEBUG: Could not save debug DOT file: {debug_e}")
-            
-            return self.generate_diagram_from_dot(combined_dot, output_file, format)
-            
-        except Exception as e:
-            print(f"❌ Error generating enhanced diagram with legend: {e}")
-            import traceback
-            traceback.print_exc()
-            return None
 
     def _generate_manual_dot(self, threat_model) -> str:
         """Generates manual DOT code from ThreatModel components."""
@@ -470,6 +418,11 @@ class DiagramGenerator:
             "  rankdir=LR;",
             "  node [shape=box, style=filled, fillcolor=lightblue];",
             "  edge [fontsize=10];",
+            "    splines=true;",  # Allows lines to cross cleanly
+            "    overlap=false;", # Avoids node overlapping
+            "    nodesep=0.5;",  # MODIFIED: Reduced space between nodes on the same rank
+            "    ranksep=0.6;",  # MODIFIED: Reduced space between ranks (vertical spacing)
+            
             "  charset=\"UTF-8\";"
         ]
 
@@ -615,15 +568,20 @@ class DiagramGenerator:
                     
                     # Add security attributes
                     if hasattr(df, 'isEncrypted') and df.isEncrypted:
-                        label_parts.append("Encrypted")
+                        label_parts.append("🔒 Encrypted")
                     if hasattr(df, 'authenticatedWith') and df.authenticatedWith:
-                        label_parts.append("Authenticated")
+                        label_parts.append("🔐 Authenticated")
+                    if hasattr(df, 'is_authenticated') and df.is_authenticated:
+                        label_parts.append("🔐 Authenticated")
+                    if hasattr(df, 'is_encrypted') and df.is_encrypted:
+                        label_parts.append("🔒 Encrypted")
                     
                     label = "\\n".join(label_parts) if label_parts else "Data Flow"
+                    # Get protocol styling
+                    edge_attributes = self._get_edge_attributes_for_protocol(threat_model, df.protocol)
                     
-                    # Dataflow text 30% smaller (fontsize 7 instead of 10)
-                    dot_code.append(f"  \"{escaped_source}\" -> \"{escaped_dest}\" [label=\"{label}\", fontsize=7];")
-                
+                    dot_code.append(f"  \"{escaped_source}\" -> \"{escaped_dest}\" [label=\"{label}\"{edge_attributes}, fontsize=7];")
+                    
                 except Exception as e:
                     print(f"⚠️ Error processing dataflow: {e}")
                     continue
@@ -634,129 +592,7 @@ class DiagramGenerator:
         print(f"📝 Generated DOT code ({len(result)} characters)")
         return result
     
-    def _generate_legend_dot(self, threat_model) -> str:
-        """
-        Generates DOT code for a legend showing protocol styles and boundary types.
-        """
-        try:
-            print("🔍 DEBUG: Starting legend generation...")
-            
-            legend_parts = []
-            
-            # Start legend subgraph
-            legend_parts.append('  subgraph cluster_legend {')
-            legend_parts.append('    label="Legend";')
-            legend_parts.append('    style="rounded,filled";')
-            legend_parts.append('    fillcolor="white";')
-            legend_parts.append('    color="black";')
-            legend_parts.append('    fontsize=12;')
-            legend_parts.append('    fontname="Arial";')
-            legend_parts.append('    margin=10;')
-            legend_parts.append('    rank=sink;')  # Place legend at bottom
-            
-            # Protocol styles legend
-            protocol_styles = self._get_protocol_styles_from_model(threat_model)
-            if protocol_styles:
-                print(f"🔍 DEBUG: Found {len(protocol_styles)} protocol styles")
-                
-                # Create invisible nodes for protocol legend
-                legend_parts.append('    // Protocol Styles')
-                legend_parts.append('    "protocol_header" [label="Protocol Styles:", shape=plaintext, fontsize=10, fontname="Arial Bold"];')
-                
-                for i, (protocol, style) in enumerate(protocol_styles.items()):
-                    node_id = f"protocol_{i}"
-                    legend_parts.append(f'    "{node_id}_src" [label="", shape=point, width=0.1, height=0.1];')
-                    legend_parts.append(f'    "{node_id}_dst" [label="", shape=point, width=0.1, height=0.1];')
-                    
-                    # Build edge attributes
-                    edge_attrs = self._build_legend_edge_attributes(style)
-                    protocol_label = self._escape_label(protocol)
-                    
-                    legend_parts.append(f'    "{node_id}_src" -> "{node_id}_dst" [label="{protocol_label}"{edge_attrs}];')
-            else:
-                print("🔍 DEBUG: No protocol styles found")
-            
-            # Boundary types legend
-            boundary_info = self._get_boundary_types_from_model(threat_model)
-            if boundary_info:
-                print(f"🔍 DEBUG: Found {len(boundary_info)} boundary types")
-                
-                legend_parts.append('    // Boundary Types')
-                legend_parts.append('    "boundary_header" [label="Boundary Types:", shape=plaintext, fontsize=10, fontname="Arial Bold"];')
-                
-                for i, (boundary_name, boundary_props) in enumerate(boundary_info.items()):
-                    node_id = f"boundary_{i}"
-                    boundary_label = self._escape_label(boundary_name)
-                    
-                    # Create a small rectangular node to represent the boundary
-                    is_trusted = boundary_props.get('isTrusted', True)
-                    color = boundary_props.get('color', 'lightgray')
-                    line_style = boundary_props.get('line_style', 'solid')
-                    
-                    # Build node attributes for boundary representation
-                    node_attrs = ['shape=box', 'width=0.5', 'height=0.3']
-                    node_attrs.append(f'label="{boundary_label}"')
-                    node_attrs.append('fontsize=8')
-                    
-                    if boundary_props.get('isFilled', True):
-                        node_attrs.append('style="filled,rounded"')
-                        node_attrs.append(f'fillcolor="{color}"')
-                    else:
-                        node_attrs.append('style="rounded"')
-                    
-                    if not is_trusted:
-                        node_attrs.append('color="red"')
-                        node_attrs.append('penwidth=2')
-                    else:
-                        node_attrs.append('color="black"')
-                    
-                    if line_style == 'dashed':
-                        current_style = node_attrs[-2].replace('style="', '').replace('"', '')
-                        node_attrs[-2] = f'style="{current_style},dashed"'
-                    elif line_style == 'dotted':
-                        current_style = node_attrs[-2].replace('style="', '').replace('"', '')
-                        node_attrs[-2] = f'style="{current_style},dotted"'
-                    
-                    legend_parts.append(f'    "{node_id}" [{", ".join(node_attrs)}];')
-            else:
-                print("🔍 DEBUG: No boundary types found")
-            
-            # Node types legend
-            legend_parts.append('    // Node Types')
-            legend_parts.append('    "node_header" [label="Node Types:", shape=plaintext, fontsize=10, fontname="Arial Bold"];')
-            
-            # Standard node types
-            node_types = [
-                ('Actor', 'oval', 'yellow'),
-                ('Server', 'box', 'lightgreen'),
-                ('Firewall', 'hexagon', 'red'),
-                ('Switch', 'diamond', 'orange')
-            ]
-            
-            for i, (node_type, shape, color) in enumerate(node_types):
-                node_id = f"nodetype_{i}"
-                legend_parts.append(f'    "{node_id}" [label="{node_type}", shape={shape}, style=filled, fillcolor="{color}", fontsize=8];')
-            
-            # Close legend subgraph
-            legend_parts.append('  }')
-            
-            # Add invisible edges to control legend layout
-            legend_parts.append('  // Legend layout constraints')
-            if protocol_styles:
-                legend_parts.append('  "protocol_header" -> "protocol_0_src" [style=invis];')
-            if boundary_info:
-                legend_parts.append('  "boundary_header" -> "boundary_0" [style=invis];')
-            legend_parts.append('  "node_header" -> "nodetype_0" [style=invis];')
-            
-            result = '\n'.join(legend_parts)
-            print(f"🔍 DEBUG: Legend DOT generated: {len(result)} characters")
-            return result
-            
-        except Exception as e:
-            print(f"❌ Error generating legend DOT: {e}")
-            import traceback
-            traceback.print_exc()
-            return ""
+ 
     def _get_protocol_styles_from_model(self, threat_model) -> Dict[str, Dict]:
         """
         Extracts protocol styles from the threat model.

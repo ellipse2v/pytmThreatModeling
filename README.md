@@ -24,6 +24,27 @@ The framework is designed to be flexible, allowing users to define their system 
     * Highlights elements with threats in the diagram based on severity.
 * **Extensible and Modular**: Designed with a clear separation of concerns, making it easy to extend or modify specific components.
 
+### Usage
+
+1.  **Define Your Threat Model**: Edit the `threat_model.md` file according to the syntax described below.
+2.  **Run the Analysis**: Execute the main script:
+    ```bash
+    python main_analysis.py
+    ```
+3.  **View Reports and Diagrams**:
+    * HTML report: `output/stride_mitre_report.html`
+    * JSON report: `output/stride_mitre_report.json`
+    * Diagrams: `output/tm_diagram_*.svg` (or other formats based on configuration)
+
+## Threat Model Definition (`threat_model.md`)
+
+The `threat_model.md` file uses a simple Markdown-based Domain Specific Language (DSL) to describe your system's architecture. Each section defines different components of your threat model.
+
+### Structure
+
+Each section starts with a Markdown heading (e.g., `## Boundaries`). List items (`- **Name**: property=value, another_property=value`) are used to define individual elements and their properties.
+
+
 ## Installation
 
 1.  **Clone the repository:**
