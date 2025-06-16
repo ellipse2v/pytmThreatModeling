@@ -51,6 +51,7 @@ class ThreatAnalysisFramework:
         self.json_report_filename = f"mitre_analysis_{timestamp}.json"
         self.dot_diagram_filename = f"tm_diagram_{timestamp}.dot"
         self.svg_diagram_filename = f"tm_diagram_{timestamp}.svg"
+        self.html_diagram_filename = f"tm_diagram_{timestamp}.html"
         # --- End of output path management ---
 
         # Component initialization
@@ -140,42 +141,40 @@ class ThreatAnalysisFramework:
         return {"html": html_report_path, "json": json_report_path}
 
     def generate_diagrams(self) -> Dict[str, Optional[str]]:
-        """Generates DOT and SVG diagrams in the timestamped directory."""
+        """Generates DOT, SVG and HTML diagrams in the timestamped directory."""
         print("🖼️ Generating diagrams...")
         if not self.diagram_generator.check_graphviz_installation():
             print(self.diagram_generator.get_installation_instructions())
-            return {"dot": None, "svg": None}
+            return {"dot": None, "svg": None, "html": None}
 
         dot_output_full_path = os.path.join(self.output_base_dir, self.dot_diagram_filename)
         svg_output_full_path = os.path.join(self.output_base_dir, self.svg_diagram_filename)
+        html_output_full_path = os.path.join(self.output_base_dir, self.html_diagram_filename)
 
         # Generate DOT file
         dot_path = self.diagram_generator.generate_dot_file_from_model(self.threat_model, dot_output_full_path)
         
         svg_path = None
-        if dot_path: # If DOT file was successfully generated
+        html_path = None
+        
+        if dot_path:  # If DOT file was successfully generated
             try:
                 # Read DOT file content to pass to generate_diagram_from_dot
                 with open(dot_path, 'r', encoding='utf-8') as f:
                     dot_code_content = f.read()
+                
+                # Generate SVG
                 svg_path = self.diagram_generator.generate_diagram_from_dot(dot_code_content, svg_output_full_path, "svg")
+                
+                # Generate HTML with embedded SVG and positioned legend
+                if svg_path:
+                    html_path = self.diagram_generator._generate_html_with_legend(svg_path, html_output_full_path, self.threat_model)
             except Exception as e:
-                print(f"❌ Error reading DOT file to generate SVG: {e}")
+                print(f"❌ Error reading DOT file to generate SVG/HTML: {e}")
 
         print("✅ Diagrams generated.")
-        return {"dot": dot_path, "svg": svg_path}
+        return {"dot": dot_path, "svg": svg_path, "html": html_path}
 
-    def get_analysis_summary(self) -> Dict[str, Any]:
-        """Returns a summary of the analysis."""
-        if not self.analysis_completed:
-            return {"status": "Analysis not completed"}
-
-        stats = self.report_generator.generate_summary_stats(self.grouped_threats)
-        return {
-            "model_name": self.model_name,
-            "threat_statistics": stats,
-            "element_counts": self.threat_model.get_statistics()
-        }
 
     def open_report_in_browser(self, report_path: str):
         """Opens the HTML report in the default browser."""
@@ -207,13 +206,6 @@ if __name__ == "__main__":
     reports = framework.generate_reports()
 
     diagrams = framework.generate_diagrams()
-
-    summary = framework.get_analysis_summary()
-    print("\n📋 Enhanced analysis summary:")
-    print(f"    • Model: {summary['model_name']}")
-    print(f"    • Threats detected: {summary['threat_statistics']['total_threats']}")
-    print(f"    • Average score: {summary['threat_statistics']['average_severity']:.2f}/10")
-    print(f"    • 8 external flows with different protocols")
 
     #if "html" in reports and reports["html"]:
     #    framework.open_report_in_browser(reports["html"])

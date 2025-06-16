@@ -1,4 +1,205 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html>
+        <html lang="fr">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Diagramme de Menaces - Threat Model</title>
+            <style>
+                body {
+                    margin: 0;
+                    padding: 0;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background-color: #f5f5f5;
+                    overflow: hidden;
+                    user-select: none;
+                }
+                .diagram-container {
+                    position: relative;
+                    width: 100vw;
+                    height: 100vh;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .svg-container {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background: white;
+                    padding: 20px;
+                    box-sizing: border-box;
+                }
+                .svg-container svg {
+                    max-width: 100%;
+                    max-height: 100%;
+                    object-fit: contain;
+                    drop-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+                .legend {
+                    position: absolute;
+                    top: 5px;
+                    right: 40px;
+                    background: rgba(255, 255, 255, 0.95);
+                    border: 1px solid #ddd;
+                    border-radius: 6px;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+                    backdrop-filter: blur(10px);
+                    min-width: 90px;
+                    max-width: 140px;
+                    z-index: 1000;
+                    transition: all 0.3s ease;
+                    cursor: move;
+                }
+                .legend:hover {
+                    background: rgba(255, 255, 255, 0.98);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                }
+                .legend.dragging {
+                    cursor: grabbing;
+                    transform: scale(1.05);
+                }
+                .legend-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 8px;
+                    border-bottom: 1px solid #007acc;
+                    background: rgba(0, 122, 204, 0.1);
+                    border-radius: 6px 6px 0 0;
+                }
+                .legend-title {
+                    font-weight: bold;
+                    font-size: 10px;
+                    color: #333;
+                    display: flex;
+                    align-items: center;
+                    gap: 3px;
+                    margin: 0;
+                }
+                .legend-toggle {
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 12px;
+                    padding: 0;
+                    width: 16px;
+                    height: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 2px;
+                    transition: background-color 0.2s;
+                }
+                .legend-toggle:hover {
+                    background-color: rgba(0, 122, 204, 0.2);
+                }
+                .legend-content {
+                    padding: 8px;
+                    line-height: 1.2;
+                    transition: all 0.3s ease;
+                }
+                .legend-content.hidden {
+                    display: none;
+                }
+                .legend-item {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 3px;
+                    padding: 1px 0;
+                    font-size: 9px;
+                }
+                .legend-item:hover {
+                    background-color: rgba(0, 122, 204, 0.1);
+                    border-radius: 2px;
+                    padding: 1px 2px;
+                }
+                .legend-collapsed {
+                    min-width: auto;
+                    max-width: auto;
+                }
+                /* Toggle button */
+                .legend-toggle-btn {
+                    position: absolute;
+                    top: 5px;
+                    right: 5px;
+                    background: rgba(255, 255, 255, 0.9);
+                    border: 1px solid #ddd;
+                    border-radius: 50%;
+                    width: 24px;
+                    height: 24px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1001;
+                    transition: all 0.2s ease;
+                }
+                .legend-toggle-btn:hover {
+                    background: rgba(255, 255, 255, 1);
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                }
+                .legend.hidden {
+                    display: none;
+                }
+                /* Responsive adjustments */
+                @media (max-width: 768px) {
+                    .legend {
+                        min-width: 80px;
+                        max-width: 120px;
+                        right: 35px;
+                    }
+                    .legend-title {
+                        font-size: 9px;
+                    }
+                    .legend-item {
+                        font-size: 8px;
+                    }
+                    .svg-container {
+                        padding: 10px;
+                    }
+                }
+                @media (max-width: 480px) {
+                    .legend {
+                        min-width: 70px;
+                        max-width: 100px;
+                        right: 30px;
+                    }
+                    .legend-title {
+                        font-size: 8px;
+                    }
+                    .legend-item {
+                        font-size: 7px;
+                    }
+                }
+                /* Print styles */
+                @media print {
+                    .legend {
+                        position: static;
+                        float: left;
+                        margin: 10px;
+                        box-shadow: none;
+                        border: 1px solid #333;
+                    }
+                    .legend-toggle-btn {
+                        display: none;
+                    }
+                    .diagram-container {
+                        height: auto;
+                        page-break-inside: avoid;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="diagram-container">
+                <div class="svg-container">
+                    <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <!-- Generated by graphviz version 12.2.1 (20241206.2353)
@@ -32,7 +233,7 @@
 <!-- External Client 1 -->
 <g id="node1" class="node">
 <title>External Client 1</title>
-<ellipse fill="yellow" stroke="black" cx="106.25" cy="-687" rx="90.25" ry="18"/>
+<ellipse fill="none" stroke="lightblue" cx="106.25" cy="-687" rx="90.25" ry="18"/>
 <text text-anchor="middle" x="106.25" y="-681.95" font-family="Times New Roman,serif" font-size="14.00">👤 External Client 1</text>
 </g>
 <!-- External Firewall -->
@@ -54,7 +255,7 @@
 <!-- External Client 2 -->
 <g id="node2" class="node">
 <title>External Client 2</title>
-<ellipse fill="yellow" stroke="black" cx="106.25" cy="-615" rx="90.25" ry="18"/>
+<ellipse fill="lightblue" stroke="lightblue" cx="106.25" cy="-615" rx="90.25" ry="18"/>
 <text text-anchor="middle" x="106.25" y="-609.95" font-family="Times New Roman,serif" font-size="14.00">👤 External Client 2</text>
 </g>
 <!-- External Client 2&#45;&gt;External Firewall -->
@@ -69,7 +270,7 @@
 <!-- External Client 3 -->
 <g id="node3" class="node">
 <title>External Client 3</title>
-<ellipse fill="yellow" stroke="black" cx="106.25" cy="-543" rx="90.25" ry="18"/>
+<ellipse fill="lightblue" stroke="lightblue" cx="106.25" cy="-543" rx="90.25" ry="18"/>
 <text text-anchor="middle" x="106.25" y="-537.95" font-family="Times New Roman,serif" font-size="14.00">👤 External Client 3</text>
 </g>
 <!-- External Client 3&#45;&gt;External Firewall -->
@@ -84,7 +285,7 @@
 <!-- External Client 4 -->
 <g id="node4" class="node">
 <title>External Client 4</title>
-<ellipse fill="yellow" stroke="black" cx="106.25" cy="-471" rx="90.25" ry="18"/>
+<ellipse fill="lightblue" stroke="lightblue" cx="106.25" cy="-471" rx="90.25" ry="18"/>
 <text text-anchor="middle" x="106.25" y="-465.95" font-family="Times New Roman,serif" font-size="14.00">👤 External Client 4</text>
 </g>
 <!-- External Client 4&#45;&gt;External Firewall -->
@@ -100,7 +301,7 @@
 <!-- External Client 5 -->
 <g id="node5" class="node">
 <title>External Client 5</title>
-<ellipse fill="yellow" stroke="black" cx="106.25" cy="-399" rx="90.25" ry="18"/>
+<ellipse fill="lightblue" stroke="lightblue" cx="106.25" cy="-399" rx="90.25" ry="18"/>
 <text text-anchor="middle" x="106.25" y="-393.95" font-family="Times New Roman,serif" font-size="14.00">👤 External Client 5</text>
 </g>
 <!-- External Client 5&#45;&gt;External Firewall -->
@@ -115,7 +316,7 @@
 <!-- External Client 6 -->
 <g id="node6" class="node">
 <title>External Client 6</title>
-<ellipse fill="yellow" stroke="black" cx="106.25" cy="-327" rx="90.25" ry="18"/>
+<ellipse fill="lightblue" stroke="lightblue" cx="106.25" cy="-327" rx="90.25" ry="18"/>
 <text text-anchor="middle" x="106.25" y="-321.95" font-family="Times New Roman,serif" font-size="14.00">👤 External Client 6</text>
 </g>
 <!-- External Client 6&#45;&gt;External Firewall -->
@@ -130,7 +331,7 @@
 <!-- External Client 7 -->
 <g id="node7" class="node">
 <title>External Client 7</title>
-<ellipse fill="yellow" stroke="black" cx="106.25" cy="-255" rx="90.25" ry="18"/>
+<ellipse fill="lightblue" stroke="lightblue" cx="106.25" cy="-255" rx="90.25" ry="18"/>
 <text text-anchor="middle" x="106.25" y="-249.95" font-family="Times New Roman,serif" font-size="14.00">👤 External Client 7</text>
 </g>
 <!-- External Client 7&#45;&gt;External Firewall -->
@@ -145,7 +346,7 @@
 <!-- External Client 8 -->
 <g id="node8" class="node">
 <title>External Client 8</title>
-<ellipse fill="yellow" stroke="black" cx="106.25" cy="-183" rx="90.25" ry="18"/>
+<ellipse fill="lightblue" stroke="lightblue" cx="106.25" cy="-183" rx="90.25" ry="18"/>
 <text text-anchor="middle" x="106.25" y="-177.95" font-family="Times New Roman,serif" font-size="14.00">👤 External Client 8</text>
 </g>
 <!-- External Client 8&#45;&gt;External Firewall -->
@@ -222,7 +423,7 @@
 <!-- Internal Operator 2 -->
 <g id="node13" class="node">
 <title>Internal Operator 2</title>
-<ellipse fill="yellow" stroke="black" cx="1138.71" cy="-185" rx="97.93" ry="18"/>
+<ellipse fill="forestgreen" stroke="forestgreen" cx="1138.71" cy="-185" rx="97.93" ry="18"/>
 <text text-anchor="middle" x="1138.71" y="-179.95" font-family="Times New Roman,serif" font-size="14.00">👤 Internal Operator 2</text>
 </g>
 <!-- Internal Operator 2&#45;&gt;Switch -->
@@ -237,7 +438,7 @@
 <!-- System Administrator -->
 <g id="node14" class="node">
 <title>System Administrator</title>
-<ellipse fill="yellow" stroke="black" cx="1138.71" cy="-257" rx="108.67" ry="18"/>
+<ellipse fill="forestgreen" stroke="forestgreen" cx="1138.71" cy="-257" rx="108.67" ry="18"/>
 <text text-anchor="middle" x="1138.71" y="-251.95" font-family="Times New Roman,serif" font-size="14.00">👤 System Administrator</text>
 </g>
 <!-- System Administrator&#45;&gt;Switch -->
@@ -329,3 +530,220 @@
 </g>
 </g>
 </svg>
+
+                </div>
+                
+                <!-- Toggle button for legend -->
+                <button class="legend-toggle-btn" onclick="toggleLegend()" title="Masquer/Afficher la légende">
+                    👁️
+                </button>
+                
+                <div class="legend" id="legend">
+                    <div class="legend-header">
+                        <div class="legend-title">
+                            🔍 Légende
+                        </div>
+                        <button class="legend-toggle" onclick="toggleLegendContent()" title="Réduire/Étendre">
+                            <span id="toggle-icon">−</span>
+                        </button>
+                    </div>
+                    <div class="legend-content" id="legend-content">
+                        
+                <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                    <div style="width: 12px; height: 8px; background-color: #FFFF99; 
+                            border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
+                    <span style="font-size: 9px;">👤 Acteur</span>
+                </div>
+            
+                <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                    <div style="width: 12px; height: 8px; background-color: #90EE90; 
+                            border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
+                    <span style="font-size: 9px;">🖥️ Serveur</span>
+                </div>
+            
+                <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                    <div style="width: 12px; height: 8px; background-color: #ADD8E6; 
+                            border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
+                    <span style="font-size: 9px;">🗄️ Database</span>
+                </div>
+            
+                <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                    <div style="width: 12px; height: 8px; background-color: #FF6B6B; 
+                            border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
+                    <span style="font-size: 9px;">🔥 Firewall</span>
+                </div>
+            
+                <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                    <div style="width: 20px; height: 15px; border: 3px solid #FF0000; 
+                            margin-right: 8px; border-radius: 2px;"></div>
+                    <span style="font-size: 11px;">Trust Boundaries</span>
+                </div>
+            
+                <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                    <div style="width: 20px; height: 15px; border: 1px solid #000000; 
+                            margin-right: 8px; border-radius: 2px;"></div>
+                    <span style="font-size: 11px;">Untrust Boundaries</span>
+                </div>
+            <div style="margin-top: 5px; margin-bottom: 3px; font-weight: bold; font-size: 10px;">Protocoles:</div>
+                    <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                        <div style="width: 20px; height: 2px; background-color: darkgreen; 
+                                margin-right: 8px;"></div>
+                        <span style="font-size: 11px;">HTTPS</span>
+                    </div>
+                
+                    <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                        <div style="width: 20px; height: 2px; background-color: red; 
+                                margin-right: 8px;"></div>
+                        <span style="font-size: 11px;">HTTP</span>
+                    </div>
+                
+                    <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                        <div style="width: 20px; height: 2px; background-color: blue; 
+                                margin-right: 8px;"></div>
+                        <span style="font-size: 11px;">SSH</span>
+                    </div>
+                
+                    <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                        <div style="width: 20px; height: 2px; background-color: purple; 
+                                margin-right: 8px;"></div>
+                        <span style="font-size: 11px;">SQL</span>
+                    </div>
+                
+                    <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                        <div style="width: 20px; height: 2px; background-color: teal; 
+                                margin-right: 8px;"></div>
+                        <span style="font-size: 11px;">LDAPS</span>
+                    </div>
+                
+                    <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                        <div style="width: 20px; height: 2px; background-color: teal; 
+                                margin-right: 8px;"></div>
+                        <span style="font-size: 11px;">MQTT</span>
+                    </div>
+                
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Variables pour le drag & drop
+                let isDragging = false;
+                let currentX;
+                let currentY;
+                let initialX;
+                let initialY;
+                let xOffset = 0;
+                let yOffset = 0;
+                
+                const legend = document.getElementById('legend');
+                
+                // Event listeners pour le drag & drop
+                legend.addEventListener('mousedown', dragStart);
+                document.addEventListener('mousemove', drag);
+                document.addEventListener('mouseup', dragEnd);
+                
+                // Touch events pour mobile
+                legend.addEventListener('touchstart', dragStart);
+                document.addEventListener('touchmove', drag);
+                document.addEventListener('touchend', dragEnd);
+                
+                function dragStart(e) {
+                    if (e.target.closest('.legend-toggle') || e.target.closest('.legend-toggle-btn')) {
+                        return;
+                    }
+                    
+                    if (e.type === "touchstart") {
+                        initialX = e.touches[0].clientX - xOffset;
+                        initialY = e.touches[0].clientY - yOffset;
+                    } else {
+                        initialX = e.clientX - xOffset;
+                        initialY = e.clientY - yOffset;
+                    }
+                    
+                    if (e.target === legend || legend.contains(e.target)) {
+                        isDragging = true;
+                        legend.classList.add('dragging');
+                    }
+                }
+                
+                function drag(e) {
+                    if (isDragging) {
+                        e.preventDefault();
+                        
+                        if (e.type === "touchmove") {
+                            currentX = e.touches[0].clientX - initialX;
+                            currentY = e.touches[0].clientY - initialY;
+                        } else {
+                            currentX = e.clientX - initialX;
+                            currentY = e.clientY - initialY;
+                        }
+                        
+                        xOffset = currentX;
+                        yOffset = currentY;
+                        
+                        // Contraindre la position dans la fenêtre
+                        const rect = legend.getBoundingClientRect();
+                        const maxX = window.innerWidth - rect.width;
+                        const maxY = window.innerHeight - rect.height;
+                        
+                        xOffset = Math.max(0, Math.min(maxX, xOffset));
+                        yOffset = Math.max(0, Math.min(maxY, yOffset));
+                        
+                        legend.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+                        legend.style.position = 'fixed';
+                        legend.style.bottom = 'auto';
+                        legend.style.left = 'auto';
+                        legend.style.top = '0';
+                        legend.style.right = 'auto';
+                    }
+                }
+                
+                function dragEnd(e) {
+                    initialX = currentX;
+                    initialY = currentY;
+                    isDragging = false;
+                    legend.classList.remove('dragging');
+                }
+                
+                // Fonction pour masquer/afficher la légende
+                function toggleLegend() {
+                    const legend = document.getElementById('legend');
+                    const toggleBtn = document.querySelector('.legend-toggle-btn');
+                    
+                    if (legend.classList.contains('hidden')) {
+                        legend.classList.remove('hidden');
+                        toggleBtn.innerHTML = '👁️';
+                        toggleBtn.title = 'Masquer la légende';
+                    } else {
+                        legend.classList.add('hidden');
+                        toggleBtn.innerHTML = '👁️‍🗨️';
+                        toggleBtn.title = 'Afficher la légende';
+                    }
+                }
+                
+                // Fonction pour réduire/étendre le contenu de la légende
+                function toggleLegendContent() {
+                    const content = document.getElementById('legend-content');
+                    const icon = document.getElementById('toggle-icon');
+                    const legend = document.getElementById('legend');
+                    
+                    if (content.classList.contains('hidden')) {
+                        content.classList.remove('hidden');
+                        icon.textContent = '−';
+                        legend.classList.remove('legend-collapsed');
+                    } else {
+                        content.classList.add('hidden');
+                        icon.textContent = '+';
+                        legend.classList.add('legend-collapsed');
+                    }
+                }
+                
+                // Empêcher la sélection de texte pendant le drag
+                document.addEventListener('selectstart', function(e) {
+                    if (isDragging) {
+                        e.preventDefault();
+                    }
+                });
+            </script>
+        </body>
+        </html>

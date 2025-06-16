@@ -150,38 +150,6 @@ class ThreatModel:
         """
         return self.protocol_styles.copy()
 
-    def update_protocol_style(self, protocol_name: str, **style_kwargs):
-        """
-        Updates an existing protocol style or creates a new one.
-        
-        Args:
-            protocol_name (str): Name of the protocol
-            **style_kwargs: Style properties to update/add
-        """
-        if protocol_name in self.protocol_styles:
-            self.protocol_styles[protocol_name].update(style_kwargs)
-            print(f"✅ Protocol style updated for {protocol_name}: {style_kwargs}")
-        else:
-            self.add_protocol_style(protocol_name, **style_kwargs)
-
-    def remove_protocol_style(self, protocol_name: str) -> bool:
-        """
-        Removes a protocol style.
-        
-        Args:
-            protocol_name (str): Name of the protocol
-            
-        Returns:
-            bool: True if style was removed, False if it didn't exist
-        """
-        if protocol_name in self.protocol_styles:
-            del self.protocol_styles[protocol_name]
-            print(f"✅ Protocol style removed for {protocol_name}")
-            return True
-        else:
-            print(f"⚠️ Warning: Protocol style for '{protocol_name}' not found")
-            return False
-
     def get_element_by_name(self, name: str) -> Optional[Any]:
         """Retrieves an element (Actor, Server, Boundary) by its name."""
         element = self._elements_by_name.get(name)
@@ -225,12 +193,95 @@ class ThreatModel:
                 threat, target = t
             else:
                 threat = t
-                target = getattr(threat, 'target', None)
+                target = self._extract_target_from_threat(threat)
 
             threat_type = str(threat.__class__.__name__)
             grouped[threat_type].append((threat, target))
 
         return grouped
+    
+    def _extract_target_from_threat(self, threat) -> Any:
+        """Extract target from threat object, handling different pytm threat types."""
+        
+        # Debug: Show what we're working with
+        threat_attrs = [attr for attr in dir(threat) if not attr.startswith('_')]
+        
+        # Try different common target attributes in pytm
+        target_attributes = [
+            'target',           # Most common
+            'targets',          # Plural version
+            'destination',      # For dataflows
+            'dest',            # Short version
+            'source',          # Source element
+            'element',         # Generic element
+            'component',       # Component reference
+            'asset',           # Asset reference
+        ]
+        
+        for attr in target_attributes:
+            if hasattr(threat, attr):
+                target_value = getattr(threat, attr)
+                #print(f"Found {attr}: {target_value} (type: {type(target_value)})")
+                
+                # Handle different types of target values
+                if target_value is not None:
+                    return self._process_target_value(target_value)
+        
+        # If no target found, try to extract from threat description or other fields
+        if hasattr(threat, 'description'):
+            print(f"No direct target found, using description-based target")
+            return f"Target from {threat.__class__.__name__}"
+        
+        # Final fallback
+        print(f"No target information found in threat")
+        return None
+
+    def _process_target_value(self, target_value: Any) -> Any:
+        """Process the target value to get the actual target object."""
+        
+        # If it's already a proper instance, return as is
+        if hasattr(target_value, 'name') and not isinstance(target_value, type):
+            return target_value
+        
+        # If it's a list or tuple of targets
+        if isinstance(target_value, (list, tuple)):
+            if len(target_value) == 1:
+                return self._process_single_target(target_value[0])
+            elif len(target_value) == 2:
+                # Dataflow case
+                source = self._process_single_target(target_value[0])
+                dest = self._process_single_target(target_value[1])
+                return (source, dest)
+            else:
+                # Multiple targets
+                return tuple(self._process_single_target(t) for t in target_value)
+        
+        # Single target
+        return self._process_single_target(target_value)
+
+    def _process_single_target(self, target: Any) -> Any:
+        """Process a single target item."""
+        
+        # If it's a class, try to find the actual instance
+        if isinstance(target, type):
+            # This is where the problem was - we have a class instead of an instance
+            class_name = target.__name__
+            #print(f"Got class {class_name}, looking for instance...")
+            
+            # Try to find the actual instance from the model
+            # This depends on how your pytm model is structured
+            if hasattr(self, 'tm') and hasattr(self.tm, 'elements'):
+                # Look for instances of this class in the model
+                for element in self.tm.elements:
+                    if isinstance(element, target):
+                        #print(f"Found instance: {element}")
+                        return element
+            
+            # If we can't find the instance, return a placeholder with the class name
+            return f"Unknown_{class_name}_Instance"
+        
+        # If it's already an instance, return as is
+        return target
 
     def _perform_mitre_analysis(self):
         """Performs MITRE ATT&CK analysis on all detected threats"""
@@ -248,10 +299,6 @@ class ThreatModel:
                 "mitre_techniques": processed_threat["mitre_techniques"]
             }
         
-        print(f"✅ MITRE Analysis completed:")
-        print(f"   - Total threats: {self.mitre_analysis_results['total_threats']}")
-        print(f"   - STRIDE distribution: {self.mitre_analysis_results['stride_distribution']}")
-        print(f"   - Total MITRE techniques: {self.mitre_analysis_results['mitre_techniques_count']}")
 
     def get_mitre_mapping_for_threat(self, threat_name: str, target: str = "") -> Dict[str, Any]:
         """Returns MITRE mapping for a specific threat"""
@@ -304,42 +351,6 @@ class ThreatModel:
         
         return detailed_analysis
 
-    def get_mitre_statistics(self) -> Dict[str, Any]:
-        """Returns MITRE-related statistics"""
-        if not self.mitre_analysis_results:
-            return {"error": "No MITRE analysis performed yet"}
-        
-        return {
-            "mitre_analysis": self.mitre_analysis_results,
-            "stride_categories": list(self.mitre_analysis_results.get("stride_distribution", {}).keys()),
-            "total_mitre_techniques": self.mitre_analysis_results.get("mitre_techniques_count", 0),
-            "mitre_mapper_stats": self.mitre_mapper.get_statistics()
-        }
-
-    def export_mitre_report(self) -> Dict[str, Any]:
-        """Exports a comprehensive MITRE ATT&CK report"""
-        detailed_threats = self.get_detailed_threat_analysis()
-        
-        report = {
-            "model_info": {
-                "name": self.tm.name,
-                "description": self.tm.description,
-                "generation_timestamp": None  # Could add timestamp here
-            },
-            "threat_summary": {
-                "total_threats": len(self.threats_raw),
-                "threat_types": len(self.grouped_threats),
-                "stride_distribution": self.mitre_analysis_results.get("stride_distribution", {}),
-                "total_mitre_techniques": self.mitre_analysis_results.get("mitre_techniques_count", 0)
-            },
-            "detailed_threats": detailed_threats,
-            "mitre_techniques_used": self._get_unique_mitre_techniques(),
-            "mitre_tactics_used": self._get_unique_mitre_tactics(),
-            "model_statistics": self.get_statistics()
-        }
-        
-        return report
-
     def _get_unique_mitre_techniques(self) -> List[Dict[str, str]]:
         """Returns unique MITRE techniques used across all threats"""
         techniques = []
@@ -363,34 +374,6 @@ class ThreatModel:
                 tactics.update(threat["mitre_tactics"])
         
         return list(tactics)
-
-    def add_custom_mitre_pattern(self, pattern: str, stride_category: str):
-        """Adds a custom threat pattern for MITRE classification"""
-        self.mitre_mapper.add_custom_threat_pattern(pattern, stride_category)
-        print(f"✅ Custom MITRE pattern added: '{pattern}' -> {stride_category}")
-
-    def add_custom_mitre_mapping(self, threat_type: str, tactics: List[str], techniques: List[Dict[str, str]]):
-        """Adds a custom MITRE mapping for a threat type"""
-        self.mitre_mapper.add_custom_mapping(threat_type, tactics, techniques)
-        self.custom_mitre_mappings[threat_type] = {
-            "tactics": tactics,
-            "techniques": techniques
-        }
-        print(f"✅ Custom MITRE mapping added for {threat_type}")
-
-    def get_boundary_colors(self) -> Dict[str, str]:
-        """Returns the colors of the boundaries"""
-        return {name: info["color"] for name, info in self.boundaries.items()}
-
-    def get_boundary_properties(self, boundary_name: str) -> Optional[Dict[str, Any]]:
-        """Returns all properties of a specific boundary"""
-        boundary_info = self.boundaries.get(boundary_name)
-        if boundary_info:
-            # Return a copy without the boundary object itself
-            props = boundary_info.copy()
-            props.pop("boundary", None)
-            return props
-        return None
 
     def get_statistics(self) -> Dict[str, int]:
         """Returns the model statistics"""

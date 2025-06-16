@@ -282,15 +282,7 @@ class ReportGenerator:
                     <div class="stat-number">{total_threats}</div>
                     <div>Threats Detected</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">{unique_types}</div>
-                    <div>Unique STRIDE Threat Types</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">{total_stride_categories}</div>
-                    <div>STRIDE Categories</div>
-                </div>
-                <div class="stat-card">
+                 <div class="stat-card">
                     <div class="stat-number">{total_techniques}</div>
                     <div>Total MITRE ATT&CK Techniques Mapped</div>
                 </div>
@@ -462,58 +454,165 @@ class ReportGenerator:
 
     def _get_target_name_for_severity_calc(self, target: Any) -> str:
         """Determines the target name for severity calculation, handling different target types."""
-        if isinstance(target, tuple) and len(target) == 2:
-            # This handles Dataflows where target is (source, destination)
-            return f"{getattr(target[0], 'name', 'N/A')} → {getattr(target[1], 'name', 'N/A')}"
-        elif hasattr(target, "name"):
-            # Handles Actors, Servers, Boundaries, Data
-            return target.name
-        else:
-            return "Unspecified Element"
+        
+        # Check if it's a tuple
+        if isinstance(target, tuple):
+            if len(target) == 2:
+                
+                # Check attributes of tuple elements
+                source_name = self._extract_name_from_object(target[0])
+                dest_name = self._extract_name_from_object(target[1])
+                result = f"{source_name} → {dest_name}"
+                return result
+        
+        # Check if it has a name attribute
+        if hasattr(target, "name"):
+            print(f"Has 'name' attribute: {target.name}")
+            return str(target.name)
+        
+        try:
+            attrs = [attr for attr in dir(target) if not attr.startswith('_')]            
+            # Try some common patterns
+            for attr in attrs:
+                try:
+                    value = getattr(target, attr)
+                    if isinstance(value, (str, int, float)) and value:
+                        print(f"  {attr}: {value} (type: {type(value)})")
+                except Exception as e:
+                    print(f"  {attr}: Error accessing - {e}")
+                    
+        except Exception as e:
+            print(f"Error listing attributes: {e}")
+        
+        return "Unspecified Element"
+
+    def _extract_name_from_object(self, obj: Any) -> str:
+        """Helper method to extract name from various object types."""
+        if obj is None:
+            return "None"
+        
+        # Try common name attributes
+        for attr in ['name', 'Name', 'title', 'id', 'identifier', 'label']:
+            if hasattr(obj, attr):
+                value = getattr(obj, attr)
+                if value:
+                    return str(value)
+        
+        # Try to get string representation
+        obj_str = str(obj)
+        if obj_str and obj_str != repr(obj) and "object at" not in obj_str:
+            return obj_str
+        
+        # Extract class name as fallback
+        import re
+        obj_repr = repr(obj)
+        match = re.search(r'<([^>]+\.)?(\w+)\s+object', obj_repr)
+        if match:
+            return f"Unknown_{match.group(2)}"
+        
+        return "N/A"
 
     def generate_summary_stats(self, all_detailed_threats: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Generates summary statistics based on severity scores."""
-        all_scores = []
         
-        for threat in all_detailed_threats:
-            # Ensure threat is a dictionary
-            if not isinstance(threat, dict):
-                print(f"Warning: Expected dict, got {type(threat)}: {threat}")
-                continue
-                
+        # Enhanced debugging to find all problematic entries
+        print(f"Total items: {len(all_detailed_threats)}")
+        
+        # Check all items and categorize them
+        valid_dicts = []
+        invalid_items = []
+        
+        for i, threat in enumerate(all_detailed_threats):
+            if isinstance(threat, dict):
+                valid_dicts.append((i, threat))
+            else:
+                invalid_items.append((i, type(threat), repr(threat)))
+        
+        print(f"Valid dictionaries: {len(valid_dicts)}")
+        print(f"Invalid items: {len(invalid_items)}")
+        
+        # Show details of invalid items
+        if invalid_items:
+            print("\nInvalid items found:")
+            for index, item_type, item_repr in invalid_items:
+                print(f"  Index {index}: {item_type} = {item_repr}")
+        
+        all_scores = []
+        severity_issues = []
+        
+        for orig_index, threat in valid_dicts:
             severity_info = threat.get('severity')
+            
             if not severity_info:
-                print(f"Warning: No severity info for threat: {threat}")
+                severity_issues.append(f"Index {orig_index}: No severity info")
                 continue
-                
+            
             # Handle different types of severity_info
+            score = None
+            
             if isinstance(severity_info, dict):
                 # If it's a dictionary, try to get the score
-                score = severity_info.get('score', 0)
+                score = severity_info.get('score')
+                if score is None:
+                    severity_issues.append(f"Index {orig_index}: Dict severity missing 'score' key: {severity_info.keys()}")
+                    continue
             elif isinstance(severity_info, str):
                 # If it's a string, try to extract numeric value
                 try:
-                    # Extract numeric part from formatted string like "8.5 (HIGH)"
                     import re
                     match = re.search(r'(\d+\.?\d*)', severity_info)
-                    score = float(match.group(1)) if match else 0
-                except (ValueError, AttributeError):
-                    score = 0
+                    if match:
+                        score = float(match.group(1))
+                    else:
+                        severity_issues.append(f"Index {orig_index}: Could not extract number from string: '{severity_info}'")
+                        continue
+                except (ValueError, AttributeError) as e:
+                    severity_issues.append(f"Index {orig_index}: Error parsing string '{severity_info}': {e}")
+                    continue
             elif isinstance(severity_info, (int, float)):
                 # If it's already a number
                 score = float(severity_info)
             else:
-                score = 0
-                
-            all_scores.append(score)
-
+                severity_issues.append(f"Index {orig_index}: Unexpected severity type {type(severity_info)}: {severity_info}")
+                continue
+            
+            # Validate score is a valid number
+            if isinstance(score, (int, float)) and not (score != score):  # Check for NaN
+                all_scores.append(score)
+            else:
+                severity_issues.append(f"Index {orig_index}: Invalid score value: {score}")
+        
+        # Report severity parsing issues
+        if severity_issues:
+            print(f"\nSeverity parsing issues ({len(severity_issues)}):")
+            for issue in severity_issues[:10]:  # Show first 10 issues
+                print(f"  {issue}")
+            if len(severity_issues) > 10:
+                print(f"  ... and {len(severity_issues) - 10} more")
+        
+        print(f"\nSuccessfully extracted {len(all_scores)} severity scores")
         if all_scores:
+            print(f"Score range: {min(all_scores)} - {max(all_scores)}")
+            print(f"Average score: {sum(all_scores) / len(all_scores):.2f}")
+        
+        # Generate final statistics
+        if all_scores:
+            # Calculate severity level distribution from the valid dictionaries
+            severity_distribution = {}
+            for orig_index, threat in valid_dicts:
+                severity_info = threat.get('severity', {})
+                if isinstance(severity_info, dict):
+                    level = severity_info.get('level', 'UNKNOWN')
+                    severity_distribution[level] = severity_distribution.get(level, 0) + 1
+            print("\n📋 Enhanced analysis summary:")
+            print(f"    • Threats detected: {len(all_scores)}")
+            print(f"    • Average score: {severity_distribution}")
             return {
                 "total_threats": len(all_scores),
                 "average_severity": sum(all_scores) / len(all_scores),
                 "max_severity": max(all_scores),
                 "min_severity": min(all_scores),
-                "severity_distribution": self.severity_calculator.get_severity_distribution(all_scores)
+                "severity_distribution": severity_distribution
             }
         else:
             return {

@@ -2,10 +2,10 @@ digraph ThreatModel {
   rankdir=LR;
   node [shape=box, style=filled, fillcolor=lightblue];
   edge [fontsize=10];
-    splines=true;
-    overlap=false;
-    nodesep=0.5;
-    ranksep=0.6;
+  splines=true;
+  overlap=false;
+  nodesep=0.5;
+  ranksep=0.6;
   charset="UTF-8";
   subgraph cluster_Internet {
     label="Internet";
@@ -13,14 +13,14 @@ digraph ThreatModel {
     fillcolor="lightcoral";
     style="rounded,filled";
     color=black;
-    "External Client 1" [shape=oval, fillcolor=yellow, label="👤 External Client 1"];
-    "External Client 2" [shape=oval, fillcolor=yellow, label="👤 External Client 2"];
-    "External Client 3" [shape=oval, fillcolor=yellow, label="👤 External Client 3"];
-    "External Client 4" [shape=oval, fillcolor=yellow, label="👤 External Client 4"];
-    "External Client 5" [shape=oval, fillcolor=yellow, label="👤 External Client 5"];
-    "External Client 6" [shape=oval, fillcolor=yellow, label="👤 External Client 6"];
-    "External Client 7" [shape=oval, fillcolor=yellow, label="👤 External Client 7"];
-    "External Client 8" [shape=oval, fillcolor=yellow, label="👤 External Client 8"];
+    "External Client 1" [shape=oval, style="", fillcolor="lightblue", color="lightblue", label="👤 External Client 1"];
+    "External Client 2" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="👤 External Client 2"];
+    "External Client 3" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="👤 External Client 3"];
+    "External Client 4" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="👤 External Client 4"];
+    "External Client 5" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="👤 External Client 5"];
+    "External Client 6" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="👤 External Client 6"];
+    "External Client 7" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="👤 External Client 7"];
+    "External Client 8" [shape=oval, style=filled, fillcolor="lightblue", color="lightblue", label="👤 External Client 8"];
   }
   subgraph cluster_DMZ {
     label="DMZ";
@@ -30,7 +30,7 @@ digraph ThreatModel {
     penwidth=3;
     style="rounded,filled,dashed";
     "External Firewall" [shape=hexagon, style=filled, fillcolor="red", label="🔥 External Firewall"];
-    "Protocol Break Device" [shape=box, fillcolor=lightgreen, label="🖥️ Protocol Break Device"];
+    "Protocol Break Device" [shape=box, style=filled, fillcolor="lightgreen", label="🖥️ Protocol Break Device"];
     "Internal Firewall" [shape=hexagon, style=filled, fillcolor="red", label="🔥 Internal Firewall"];
   }
   subgraph cluster_Intranet {
@@ -38,20 +38,20 @@ digraph ThreatModel {
     style="rounded";
     color=red;
     penwidth=3;
-    "Internal Operator 1" [shape=oval, fillcolor=yellow, label="👤 Internal Operator 1"];
-    "Internal Operator 2" [shape=oval, fillcolor=yellow, label="👤 Internal Operator 2"];
-    "System Administrator" [shape=oval, fillcolor=yellow, label="👤 System Administrator"];
+    "Internal Operator 1" [shape=oval, style=filled, fillcolor="yellow", label="👤 Internal Operator 1"];
+    "Internal Operator 2" [shape=oval, style=filled, fillcolor="forestgreen", color="forestgreen", label="👤 Internal Operator 2"];
+    "System Administrator" [shape=oval, style=filled, fillcolor="forestgreen", color="forestgreen", label="👤 System Administrator"];
     "Switch" [shape=diamond, style=filled, fillcolor="orange", label="🔀 Switch"];
-    "Central Server" [shape=box, fillcolor=lightgreen, label="🖥️ Central Server"];
+    "Central Server" [shape=box, style=filled, fillcolor="lightgreen", label="🖥️ Central Server"];
     "Application Database" [shape=cylinder, style=filled, fillcolor=lightblue, label="🗄️ Application Database"];
-    "Authentication Server" [shape=box, fillcolor=lightgreen, label="🖥️ Authentication Server"];
+    "Authentication Server" [shape=box, style=filled, fillcolor="lightgreen", label="🖥️ Authentication Server"];
   }
   subgraph cluster_Command_Zone {
     label="Command_Zone";
     fontsize=10;
     style="rounded";
     color=black;
-    "Command Machine" [shape=box, fillcolor=lightgreen, label="🖥️ Command Machine"];
+    "Command Machine" [shape=box, style=filled, fillcolor="lightgreen", label="🖥️ Command Machine"];
   }
   "External Client 1" -> "External Firewall" [label="test1\nProtocol: HTTPS\nData: Web Traffic\n🔒 Encrypted", color="darkgreen", style="solid", fontsize=7];
   "External Client 2" -> "External Firewall" [label="test\nProtocol: HTTP\nData: Web Traffic", color="red", style="solid", fontsize=7];
