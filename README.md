@@ -11,7 +11,7 @@ This project is a Python-based, end-to-end STRIDE threat modeling and analysis f
 - **Generate detailed reports** (HTML, JSON) and **visual diagrams** (DOT, SVG, HTML) with threat highlights.
 - **Extend and customize** all mappings, calculations, and reporting logic.
 
-> **Based on [PyTM](https://github.com/izar/pytm):** This framework leverages PyTM's modeling primitives and extends them with advanced reporting, MITRE mapping, and diagram generation.
+> **Based on [PyTM](https://github.com/OWASP/pytm):** This framework leverages PyTM's modeling primitives and extends them with advanced reporting, MITRE mapping, and diagram generation.
 
 ---
 
@@ -106,6 +106,28 @@ A network with a DMZ, external/internal firewalls, and a command zone. The goal 
 ## Custom Mitre Mapping
 - **Protocol Tampering**: tactics=["Impact", "Defense Evasion"], techniques=[{"id": "T1565", "name": "Data Manipulation"}]
 ```
+
+## Bidirectional Dataflow Visualization
+
+This makes bidirectional communications visually clear and reduces clutter in your architecture diagrams.
+
+**Example:**
+
+If your model contains:
+```markdown
+## Dataflows
+- A to B: from="A", to="B", protocol="HTTPS"
+- B to A: from="B", to="A", protocol="HTTPS"
+```
+The diagram will show:
+```
+A <--> B
+```
+(with a single arrow using `dir="both"` in DOT/Graphviz)
+
+This feature is enabled by default and works for all protocols.
+
+---
 
 ---
 

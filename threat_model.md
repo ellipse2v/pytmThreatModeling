@@ -68,6 +68,7 @@ This model describes a network architecture with a Demilitarized Zone (DMZ), ext
 - **System Administrator to Switch**: from="System Administrator", to="Switch", protocol="Ethernet", data="General Traffic"
 
 - **Switch to Central Server**: from="Switch", to="Central Server", protocol="HTTPS", data="Server Request", is_authenticated=True, is_encrypted=True
+- **Central Server to Switch**: from="Central Server", to="Switch", protocol="HTTPS", data="Server Request", is_authenticated=True, is_encrypted=True
 - **System Administrator to Central Server**: from="System Administrator", to="Central Server", protocol="SSH", data="SSH Traffic", is_authenticated=True, is_encrypted=True
 - **System Administrator to Authentication Server**: from="System Administrator", to="Authentication Server", protocol="LDAPS", data="Authentication Request", is_authenticated=True, is_encrypted=True
 - **Central Server to Authentication Server**: from="Central Server", to="Authentication Server", protocol="LDAPS", data="Authentication Request", is_authenticated=True, is_encrypted=True

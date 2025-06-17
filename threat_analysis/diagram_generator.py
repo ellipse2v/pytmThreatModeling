@@ -503,33 +503,28 @@ class DiagramGenerator:
                     dot_code.append(f"  \"{escaped_server_name}\" {node_attrs};")
 
         # Add dataflows
+        # Collect all dataflows as (src, dst, protocol, label, edge_attr)
+        dataflow_map = {}
         if hasattr(threat_model, 'dataflows'):
             for df in threat_model.dataflows:
                 try:
                     source_name = self._get_element_name(df.source)
                     dest_name = self._get_element_name(df.sink)
-                    
                     if not source_name or not dest_name:
                         print(f"⚠️ Skipping dataflow with missing source or destination")
                         continue
-                    
                     escaped_source = self._escape_label(source_name)
                     escaped_dest = self._escape_label(dest_name)
-                    
+                    protocol = getattr(df, 'protocol', None)
                     # Build label parts
                     label_parts = []
-                    
                     if hasattr(df, 'name') and df.name:
                         label_parts.append(self._escape_label(df.name))
-                    
-                    if hasattr(df, 'protocol') and df.protocol:
-                        label_parts.append(f"Protocol: {self._escape_label(df.protocol)}")
-                    
+                    if protocol:
+                        label_parts.append(f"Protocol: {self._escape_label(protocol)}")
                     data_info = self._extract_data_info(df)
                     if data_info:
                         label_parts.append(self._escape_label(data_info))
-                    
-                    # Add security attributes
                     if hasattr(df, 'isEncrypted') and df.isEncrypted:
                         label_parts.append("🔒 Encrypted")
                     if hasattr(df, 'authenticatedWith') and df.authenticatedWith:
@@ -538,19 +533,37 @@ class DiagramGenerator:
                         label_parts.append("🔐 Authenticated")
                     if hasattr(df, 'is_encrypted') and df.is_encrypted:
                         label_parts.append("🔒 Encrypted")
-                    
                     label = "\\n".join(label_parts) if label_parts else "Data Flow"
-                    edge_attributes = self._get_edge_attributes_for_protocol(threat_model, df.protocol)
-                    
-                    dot_code.append(f"  \"{escaped_source}\" -> \"{escaped_dest}\" [label=\"{label}\"{edge_attributes}, fontsize=7];")
-                    
+                    edge_attributes = self._get_edge_attributes_for_protocol(threat_model, protocol)
+                    key = (escaped_source, escaped_dest, protocol)
+                    dataflow_map[key] = {
+                        "label": label,
+                        "edge_attributes": edge_attributes
+                    }
                 except Exception as e:
                     print(f"⚠️ Error processing dataflow: {e}")
                     continue
 
-        # NOTE: Pas de légende dans le DOT - elle sera ajoutée en HTML
+        # Now, merge bidirectional flows
+        processed = set()
+        for (src, dst, proto), info in dataflow_map.items():
+            if ((dst, src, proto) in dataflow_map) and ((dst, src, proto) not in processed):
+                # Bidirectional edge
+                label = info["label"]
+                edge_attributes = info["edge_attributes"]
+                label = f"{label}\\n↔️ Bidirectional"
+                dot_code.append(f'  "{src}" -> "{dst}" [dir="both", label="{label}"{edge_attributes}, fontsize=7];')
+                processed.add((src, dst, proto))
+                processed.add((dst, src, proto))
+            elif (src, dst, proto) not in processed:
+                # Unidirectional edge
+                label = info["label"]
+                edge_attributes = info["edge_attributes"]
+                dot_code.append(f'  "{src}" -> "{dst}" [label="{label}"{edge_attributes}, fontsize=7];')
+                processed.add((src, dst, proto))
+
+        # NOTE: No legend in DOT - it will be added in HTML
         dot_code.append("}")
-        
         result = "\n".join(dot_code)
         print(f"📝 Generated DOT code ({len(result)} characters)")
         return result
