@@ -49,7 +49,6 @@ class ReportGenerator:
         html = self._get_html_header()
         html += self._get_html_summary(
             total_threats_analyzed,
-            unique_pytm_threat_types,
             total_mitre_techniques_mapped,
             total_stride_categories, # Pass the dynamic value
             stride_distribution # Pass the new stride_distribution
@@ -245,7 +244,7 @@ class ReportGenerator:
     <h2 style="text-align: center; margin-top: 0;">DMZ Architecture - Comprehensive Security Analysis</h2>
 """
 
-    def _get_html_summary(self, total_threats: int, unique_types: int, total_techniques: int, total_stride_categories: int, stride_distribution: Dict[str, int]) -> str:
+    def _get_html_summary(self, total_threats: int, total_techniques: int, total_stride_categories: int, stride_distribution: Dict[str, int]) -> str:
         """Returns the summary section HTML"""
         
         stride_dist_html = ""

@@ -92,36 +92,9 @@ class SeverityCalculator:
             "formatted_score": f"{score:.1f}/10"
         }
     
-    def update_base_scores(self, new_scores: Dict[str, float]):
-        """Updates base scores"""
-        self.base_scores.update(new_scores)
-    
     def update_target_multipliers(self, new_multipliers: Dict[str, float]):
         """Updates target multipliers"""
         self.target_multipliers.update(new_multipliers)
     
-    def update_protocol_adjustments(self, new_adjustments: Dict[str, float]):
-        """Updates protocol adjustments"""
-        self.protocol_adjustments.update(new_adjustments)
     
-    def get_severity_distribution(self, scores: list) -> Dict[str, int]:
-        """Calculates the distribution of severity levels"""
-        distribution = {level: 0 for level in self.severity_levels.keys()}
-        
-        for score in scores:
-            level, _ = self.get_severity_level(score)
-            distribution[level] += 1
-            
-        return distribution
     
-    def get_configuration(self) -> Dict[str, Dict]:
-        """Returns the current calculator configuration"""
-        return {
-            "base_scores": self.base_scores,
-            "target_multipliers": self.target_multipliers,
-            "protocol_adjustments": self.protocol_adjustments,
-            "severity_levels": {
-                level: {"min": min_val, "max": max_val, "css": css}
-                for level, (min_val, max_val, css) in self.severity_levels.items()
-            }
-        }

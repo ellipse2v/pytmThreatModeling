@@ -729,51 +729,6 @@ class MitreMapping:
         
         return list(found_techniques.values())
     
-    
-    def classify_threat_by_description(self, description: str) -> str:
-        """Classifies a threat according to STRIDE based on its description"""
-        if not description:
-            return "Threat"
-            
-        description_lower = description.lower()
-        
-        # Search for the best match (most specific pattern)
-        best_match_category = None
-        best_pattern_length = 0
-        
-        for pattern_str, mapped_value in self.threat_patterns.items():
-            if re.search(pattern_str, description_lower):
-                current_pattern_length = len(pattern_str) # Simple score: longer pattern is more specific
-
-                if current_pattern_length > best_pattern_length:
-                    # If mapped_value is a STRIDE category string
-                    if mapped_value in self.mapping:
-                        best_match_category = mapped_value
-                        best_pattern_length = current_pattern_length
-                    # If mapped_value is a T-ID, find its STRIDE category
-                    elif re.match(r'T\d{4}(?:\.\d{3})?', mapped_value):
-                        for category_name, category_info in self.mapping.items():
-                            for tech in category_info.get("techniques", []):
-                                if tech.get("id") == mapped_value:
-                                    best_match_category = category_name
-                                    best_pattern_length = current_pattern_length
-                                    break
-                            if best_match_category:
-                                break
-        
-        return best_match_category or "Threat"
-    
-    def get_mapping_for_threat(self, threat_type: str) -> Dict[str, Any]:
-        """Returns the MITRE mapping for a threat type (STRIDE category)."""
-        return self.mapping.get(threat_type, {})
-    
-    def get_mapping_for_pytm_threat(self, threat_obj: Any) -> Dict[str, Any]:
-        """
-        Returns the MITRE mapping for a PyTM threat object.
-        """
-        stride_category = self.classify_pytm_threat(threat_obj)
-        return self.get_mapping_for_threat(stride_category)
-    
     def get_all_techniques(self) -> List[Dict[str, str]]:
         """Returns all distinct MITRE techniques defined in the mapping."""
         techniques = []
@@ -791,59 +746,8 @@ class MitreMapping:
             "tactics": tactics,
             "techniques": techniques
         }
-    
-    def add_custom_threat_pattern(self, pattern: str, target: str):
-        """
-        Adds a custom pattern for threat classification.
-        Target can be a STRIDE category (e.g., "Spoofing") or a MITRE T-ID (e.g., "T1078").
-        """
-        self.threat_patterns[pattern.lower()] = target
-    
-    def get_techniques_for_threat(self, threat_type: str) -> List[Dict[str, str]]:
-        """Returns techniques for a STRIDE threat type."""
-        return self.mapping.get(threat_type, {}).get("techniques", [])
-    
-    def get_techniques_for_description(self, description: str) -> List[Dict[str, str]]:
-        """Returns MITRE techniques based on the threat description by inferring STRIDE category."""
-        stride_category = self.classify_threat_by_description(description)
-        return self.get_techniques_for_threat(stride_category)
-    
-    def get_techniques_for_pytm_threat(self, threat_obj: Any) -> List[Dict[str, str]]:
-        """
-        Returns MITRE techniques for a PyTM threat object.
-        """
-        stride_category = self.classify_pytm_threat(threat_obj)
-        return self.get_techniques_for_threat(stride_category)
-    
-    def analyze_threats_list(self, threats_list: List[Dict]) -> Dict[str, Any]:
-        """Analyzes a list of threats (dictionaries) and applies MITRE mapping."""
-        results = {
-            "total_threats": len(threats_list),
-            "stride_distribution": {},
-            "mitre_techniques_count": 0,
-            "processed_threats": []
-        }
+
         
-        for threat in threats_list:
-            description = threat.get("description", "")
-            stride_category = self.classify_threat_by_description(description)
-            
-            mitre_techniques = self.map_threat_to_mitre(description)
-            
-            processed_threat = threat.copy()
-            processed_threat["stride_category"] = stride_category
-            processed_threat["mitre_techniques"] = mitre_techniques
-            
-            results["processed_threats"].append(processed_threat)
-            
-            if stride_category not in results["stride_distribution"]:
-                results["stride_distribution"][stride_category] = 0
-            results["stride_distribution"][stride_category] += 1
-            
-            results["mitre_techniques_count"] += len(mitre_techniques) # This counts mapped techniques for THIS threat
-        
-        return results
-    
     def analyze_pytm_threats_list(self, pytm_threats_list: List[Any]) -> Dict[str, Any]:
         """
         Analyzes a list of PyTM threat objects and applies MITRE mapping.
@@ -1071,9 +975,6 @@ class MitreMapping:
                         #print(f"  Found ID pattern '{keyword}' -> {stride_cat}")
                         return stride_cat
         
-        # Enhanced fallback - check other threat attributes
-        threat_attributes = dir(threat)
-        #print(f"  Available attributes: {[attr for attr in threat_attributes if not attr.startswith('_')]}")
         
         # Check if there are severity, likelihood, or other indicators
         severity = getattr(threat, 'severity', None)
@@ -1237,22 +1138,6 @@ class MitreMapping:
     def get_stride_categories(self) -> List[str]:
         """Returns the list of available STRIDE categories."""
         return list(self.mapping.keys())
-    
-    def get_threat_patterns(self) -> Dict[str, str]:
-        """Returns the threat recognition patterns."""
-        return self.threat_patterns.copy()
-    
-    def search_techniques_by_id(self, technique_id: str) -> List[Dict[str, Any]]:
-        """Searches for techniques by MITRE ID."""
-        found_techniques = []
-        for category, mapping_info in self.mapping.items():
-            for technique in mapping_info.get("techniques", []):
-                if technique.get("id") == technique_id:
-                    result = technique.copy()
-                    result["stride_category"] = category
-                    result["tactics"] = mapping_info.get("tactics", [])
-                    found_techniques.append(result)
-        return found_techniques
     
     def get_statistics(self) -> Dict[str, Any]:
         """Returns mapping statistics."""
