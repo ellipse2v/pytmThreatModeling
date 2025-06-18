@@ -453,21 +453,16 @@ class ReportGenerator:
 
     def _get_target_name_for_severity_calc(self, target: Any) -> str:
         """Determines the target name for severity calculation, handling different target types."""
-        
+        print(f"DEBUG: Target type: {type(target)}, value: {target}")
+
         # Check if it's a tuple
         if isinstance(target, tuple):
             if len(target) == 2:
-                
                 # Check attributes of tuple elements
                 source_name = self._extract_name_from_object(target[0])
                 dest_name = self._extract_name_from_object(target[1])
                 result = f"{source_name} → {dest_name}"
                 return result
-        
-        # Check if it has a name attribute
-        if hasattr(target, "name"):
-            print(f"Has 'name' attribute: {target.name}")
-            return str(target.name)
         
         try:
             attrs = [attr for attr in dir(target) if not attr.startswith('_')]            
@@ -486,30 +481,19 @@ class ReportGenerator:
         return "Unspecified Element"
 
     def _extract_name_from_object(self, obj: Any) -> str:
-        """Helper method to extract name from various object types."""
         if obj is None:
             return "None"
-        
-        # Try common name attributes
+        if isinstance(obj, dict) and 'name' in obj:
+            return obj['name']
         for attr in ['name', 'Name', 'title', 'id', 'identifier', 'label']:
             if hasattr(obj, attr):
                 value = getattr(obj, attr)
                 if value:
                     return str(value)
-        
-        # Try to get string representation
         obj_str = str(obj)
         if obj_str and obj_str != repr(obj) and "object at" not in obj_str:
             return obj_str
-        
-        # Extract class name as fallback
-        import re
-        obj_repr = repr(obj)
-        match = re.search(r'<([^>]+\.)?(\w+)\s+object', obj_repr)
-        if match:
-            return f"Unknown_{match.group(2)}"
-        
-        return "N/A"
+        return "Unspecified"
 
     def generate_summary_stats(self, all_detailed_threats: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Generates summary statistics based on severity scores."""

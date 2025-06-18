@@ -113,64 +113,79 @@ class ModelParser:
             print(f"⚠️ Warning: Malformed boundary line: {line}")
 
     def _parse_actor(self, line: str):
-        """Parses an actor line."""
-        #print(f'{line}')
-        match = re.match(r'^- \*\*([^\*]+)\*\*:\s*boundary=([^,]+)(?:,\s*color=([^,]+))?(?:,\s*isFilled=(True|False))?', line)
-        if match:
-            actor_name = match.group(1).strip()
-            boundary_name = match.group(2).strip()
-            color = match.group(3).strip() if match.group(3) else None  
-            is_filled_str = match.group(4) 
-            is_filled = True 
-            if is_filled_str is not None:
-                is_filled = is_filled_str == 'True'
-            # Assuming add_actor in ThreatModel can handle color and isFilled
-            self.threat_model.add_actor(actor_name, boundary_name, color=color, is_filled=is_filled)
-            print(f"   - Added Actor: {actor_name} (Boundary: {boundary_name}, Color: {color}, Filled: {is_filled})")
-        else:
-            print(f"⚠️ Warning: Malformed actor line: {line}")
+            """Parses an actor line with flexible key=value attributes."""
+            match = re.match(r'^- \*\*([^\*]+)\*\*:\s*(.*)', line)
+            if match:
+                actor_name = match.group(1).strip()
+                params_str = match.group(2).strip()
+                actor_kwargs = self._parse_key_value_params(params_str)
+                boundary_name = actor_kwargs.pop('boundary', "")
+                color = actor_kwargs.pop('color', None)
+                is_filled = actor_kwargs.pop('isFilled', None)
+                self.threat_model.add_actor(
+                    actor_name,
+                    boundary_name,
+                    color=color,
+                    is_filled=is_filled
+                )
+                print(f"   - Added Actor: {actor_name} (Boundary: {boundary_name}, Color: {color}, Filled: {is_filled})")
+            else:
+                print(f"⚠️ Warning: Malformed actor line: {line}")
 
     def _parse_server(self, line: str):
-        """Parses a server line with format: - **name**: boundary=value"""
-        match = re.match(r'^- \*\*([^\*:]+)\*\*(?:\s*:\s*boundary=([^\s,]+))?', line)
+        """Parses a server line with format: - **name**: boundary=value, color=value, isFilled=bool"""
+        # Match server name and all parameters after colon
+        match = re.match(r'^- \*\*([^\*:]+)\*\*:\s*(.*)', line)
         if match:
             name = match.group(1).strip()
-            boundary_name = match.group(2).strip() if match.group(2) else ""
-            if boundary_name:
-                self.threat_model.add_server(name, boundary_name)
-                print(f"   - Added Server: {name} (Boundary: {boundary_name})")
-            else:
-                print(f"⚠️ Warning: Server '{name}' has no boundary specified.")
+            params_str = match.group(2).strip()
+            # Parse all key=value parameters
+            server_kwargs = self._parse_key_value_params(params_str)
+            boundary_name = server_kwargs.pop('boundary', "")
+            color = server_kwargs.pop('color', None)
+            is_filled = server_kwargs.pop('isFilled', None)
+            # Call add_server with extracted parameters
+            self.threat_model.add_server(
+                name,
+                boundary_name,
+                color=color,
+                is_filled=is_filled
+            )
+            print(f"   - Added Server: {name} (Boundary: {boundary_name}, Color: {color}, Filled: {is_filled})")
         else:
             print(f"⚠️ Warning: Malformed server line: {line}")
 
     def _parse_key_value_params(self, params_str: str) -> Dict[str, Any]:
-        """Parses a key=value parameter string and returns a dictionary."""
+        """
+        Parses a key=value parameter string and returns a dictionary.
+        Handles quoted strings, booleans, numbers, hex colors, and unquoted strings.
+        """
         params = {}
-        # Enhanced regex to handle quoted strings, booleans, numbers, and unquoted strings
-        param_pattern = re.compile(r'(\w+)=(?:\"([^\"]*)\"|(\w+|[0-9.]+))')
-        
+        # This regex matches key=value pairs, where value can be quoted or unquoted (including hex colors)
+        param_pattern = re.compile(
+            r'(\w+)\s*=\s*'                # key=
+            r'(?:'                         # non-capturing group for value
+                r'"([^"]*)"'               #   "quoted string"
+                r'|'
+                r'(#?\w+)'                 #   unquoted value (including #hex)
+            r')'
+        )
         for m in param_pattern.finditer(params_str):
             key = m.group(1)
             value_quoted = m.group(2)
             value_unquoted = m.group(3)
-
             if value_quoted is not None:
                 value = value_quoted
             elif value_unquoted is not None:
+                # Handle booleans
                 if value_unquoted.lower() == 'true':
                     value = True
                 elif value_unquoted.lower() == 'false':
                     value = False
-                elif '.' in value_unquoted and value_unquoted.replace('.', '', 1).isdigit():
-                    value = float(value_unquoted)
-                elif value_unquoted.isdigit():
-                    value = int(value_unquoted)
                 else:
-                    value = value_unquoted # Remains a string (for enums)
+                    value = value_unquoted
             else:
-                continue # Should not happen with this regex
-
+                continue
             params[key] = value
         return params
 

@@ -226,7 +226,9 @@ class DiagramGenerator:
             icon = '🔥 '
                 # Check for database
         elif 'database' in node_name_lower or 'db' in node_name_lower:
-            return '[shape=cylinder, style=filled, fillcolor=lightblue, label="🗄️ ' + self._escape_label(node_name) + '"]'
+                attributes.append('shape=cylinder')
+                icon = '🗄️ '
+                default_fillcolor = 'yelllightblueow'
         
         # Check for web server
         elif 'web' in node_name_lower and 'server' in node_name_lower:
@@ -472,11 +474,18 @@ class DiagramGenerator:
                 
                 # Add servers in this boundary
                 if hasattr(threat_model, 'servers'):
-                    for server in threat_model.servers:
-                        if (hasattr(server, 'inBoundary') and server.inBoundary and 
-                            hasattr(server.inBoundary, 'name') and server.inBoundary.name == name):
-                            escaped_server_name = self._escape_label(server.name)
-                            node_attrs = self._get_node_attributes(server, 'server')
+                    for server_info in threat_model.servers:
+                        if isinstance(server_info, dict):
+                            server_boundary = server_info.get('boundary')
+                            if (server_boundary and hasattr(server_boundary, 'name') and 
+                                server_boundary.name == name):
+                                escaped_server_name = self._escape_label(server_info['name'])
+                                node_attrs = self._get_node_attributes(server_info, 'server')
+                                dot_code.append(f"    \"{escaped_server_name}\" {node_attrs};")
+                        elif (hasattr(server_info, 'inBoundary') and server_info.inBoundary and 
+                              hasattr(server_info.inBoundary, 'name') and server_info.inBoundary.name == name):
+                            escaped_server_name = self._escape_label(server_info.name)
+                            node_attrs = self._get_node_attributes(server_info, 'server')
                             dot_code.append(f"    \"{escaped_server_name}\" {node_attrs};")
                 
                 dot_code.append("  }")
@@ -496,11 +505,16 @@ class DiagramGenerator:
         
         # Add servers not in boundaries
         if hasattr(threat_model, 'servers'):
-            for server in threat_model.servers:
-                if not hasattr(server, 'inBoundary') or not server.inBoundary:
-                    escaped_server_name = self._escape_label(server.name)
-                    node_attrs = self._get_node_attributes(server, 'server')
-                    dot_code.append(f"  \"{escaped_server_name}\" {node_attrs};")
+                    for server_info in threat_model.servers:
+                        if isinstance(server_info, dict):
+                            if not server_info.get('boundary'):
+                                escaped_server_name = self._escape_label(server_info['name'])
+                                node_attrs = self._get_node_attributes(server_info, 'server')
+                                dot_code.append(f"  \"{escaped_server_name}\" {node_attrs};")
+                        elif not hasattr(server_info, 'inBoundary') or not server_info.inBoundary:
+                            escaped_server_name = self._escape_label(server_info.name)
+                            node_attrs = self._get_node_attributes(server_info, 'server')
+                            dot_code.append(f"  \"{escaped_server_name}\" {node_attrs};")
 
         # Add dataflows
         # Collect all dataflows as (src, dst, protocol, label, edge_attr)

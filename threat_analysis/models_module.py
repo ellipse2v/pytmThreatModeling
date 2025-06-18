@@ -65,12 +65,19 @@ class ThreatModel:
         self._elements_by_name[name] = actor
         return actor
 
-    def add_server(self, name: str, boundary_name: str) -> Server:
-        """Adds a server to the model"""
+    def add_server(self, name: str, boundary_name: str, color: Optional[str] = None, is_filled: bool = True) -> Server:
+        """Adds a server to the model with optional color and is_filled attributes."""
         server = Server(name)
         if boundary_name in self.boundaries:
             server.inBoundary = self.boundaries[boundary_name]["boundary"]
-        self.servers.append(server)
+        # Store as dict for easy attribute access (like add_actor)
+        self.servers.append({
+            'name': name,
+            'object': server,
+            'boundary': self.boundaries[boundary_name]["boundary"] if boundary_name in self.boundaries else None,
+            'color': color,
+            'is_filled': is_filled
+        })
         self._elements_by_name[name] = server
         return server
 
@@ -255,27 +262,21 @@ class ThreatModel:
         return self._process_single_target(target_value)
 
     def _process_single_target(self, target: Any) -> Any:
-        """Process a single target item."""
-        
+        """Process a single target item, always returning a real instance or None (never a fallback string)."""
+
         # If it's a class, try to find the actual instance
         if isinstance(target, type):
-            # This is where the problem was - we have a class instead of an instance
             class_name = target.__name__
-            #print(f"Got class {class_name}, looking for instance...")
-            
             # Try to find the actual instance from the model
-            # This depends on how your pytm model is structured
             if hasattr(self, 'tm') and hasattr(self.tm, 'elements'):
-                # Look for instances of this class in the model
                 for element in self.tm.elements:
                     if isinstance(element, target):
-                        #print(f"Found instance: {element}")
                         return element
-            
-            # If we can't find the instance, return a placeholder with the class name
-            return f"Unknown_{class_name}_Instance"
-        
-        # If it's already an instance, return as is
+            # If not found, return None (do NOT return a fallback string)
+            print(f"⚠️ No instance found for class '{class_name}' in the model.")
+            return None
+
+        # If it's already an instance (object or dict), return as is
         return target
 
     def _perform_mitre_analysis(self):

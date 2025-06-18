@@ -4,31 +4,31 @@
 This model describes a network architecture with a Demilitarized Zone (DMZ), external and internal dataflows, and a potentially untrusted command zone. The goal is to identify STRIDE threats and map them to MITRE ATT&CK techniques.
 
 ## Boundaries
-- **Internet**: color=lightcoral, isTrusted=False, isFilled=True
+- **Internet**: color=#F0F0F0, isTrusted=False, isFilled=True
 - **DMZ**: color=khaki, isTrusted=True, isFilled=True, line_style=dashed
 - **Intranet**: color=lightgreen, isTrusted=True, , isFilled=False
-- **Command_Zone**: color=lightsteelblue, isFilled=False
+- **Command_Zone**: color=#F0F0F0, isFilled=True
 
 ## Actors
-- **External Client 1**: boundary=Internet, color=lightblue, isFilled=False
-- **External Client 2**: boundary=Internet, color=lightblue
-- **External Client 3**: boundary=Internet, color=lightblue
-- **External Client 4**: boundary=Internet, color=lightblue
-- **External Client 5**: boundary=Internet, color=lightblue
-- **External Client 6**: boundary=Internet, color=lightblue
-- **External Client 7**: boundary=Internet, color=lightblue
-- **External Client 8**: boundary=Internet, color=lightblue
-- **Internal Operator 1**: boundary=Intranet
+- **External Client 1**: boundary=Internet, color=#ADD8E6, isFilled=False
+- **External Client 2**: boundary=Internet, color=#ADD8E6
+- **External Client 3**: boundary=Internet, color=#ADD8E6
+- **External Client 4**: boundary=Internet, color=#ADD8E6
+- **External Client 5**: boundary=Internet, color=#ADD8E6
+- **External Client 6**: boundary=Internet, color=#ADD8E6
+- **External Client 7**: boundary=Internet, color=#ADD8E6
+- **External Client 8**: boundary=Internet, color=#ADD8E6
+- **Internal Operator 1**: boundary=Intranet, color=forestgreen
 - **Internal Operator 2**: boundary=Intranet, color=forestgreen
 - **System Administrator**: boundary=Intranet, color=forestgreen
 
 ## Servers
-- **External Firewall**: boundary=DMZ
+- **External Firewall**: boundary=DMZ, color=#D3D3D3
 - **Protocol Break Device**: boundary=DMZ
-- **Internal Firewall**: boundary=DMZ
-- **Switch**: boundary=Intranet
-- **Central Server**: boundary=Intranet
-- **Application Database**: boundary=Intranet
+- **Internal Firewall**: boundary=DMZ, color=#D3D3D3
+- **Switch**: boundary=Intranet, color=#E6E6FA
+- **Central Server**: boundary=Intranet, color=#98FB98
+- **Application Database**: boundary=Intranet,color=#FFDAB9
 - **Authentication Server**: boundary=Intranet
 - **Command Machine**: boundary=Command_Zone
 
