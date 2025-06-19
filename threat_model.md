@@ -1,12 +1,13 @@
 # Threat Model: Advanced DMZ Architecture
 
 ## Description
-This model describes a network architecture with a Demilitarized Zone (DMZ), external and internal dataflows, and a potentially untrusted command zone. The goal is to identify STRIDE threats and map them to MITRE ATT&CK techniques.
+This model describes a network architecture with a Demilitarized Zone (DMZ), external and internal dataflows, a scalable gateway, and a potentially untrusted command zone. The goal is to identify STRIDE threats and map them to MITRE ATT&CK techniques.
 
 ## Boundaries
 - **Internet**: color=#F0F0F0, isTrusted=False, isFilled=True
 - **DMZ**: color=khaki, isTrusted=True, isFilled=True, line_style=dashed
-- **Intranet**: color=lightgreen, isTrusted=True, , isFilled=False
+- **Gateway_Zone**: color=lightyellow, isTrusted=True, isFilled=True
+- **Intranet**: color=lightgreen, isTrusted=True, isFilled=False
 - **Command_Zone**: color=#F0F0F0, isFilled=True
 
 ## Actors
@@ -26,9 +27,13 @@ This model describes a network architecture with a Demilitarized Zone (DMZ), ext
 - **External Firewall**: boundary=DMZ, color=#D3D3D3
 - **Protocol Break Device**: boundary=DMZ
 - **Internal Firewall**: boundary=DMZ, color=#D3D3D3
+- **Gateway Load Balancer**: boundary=Gateway_Zone, color=gold, isFilled=True
+- **App Server 1**: boundary=Gateway_Zone, color=#B0E0E6
+- **App Server 2**: boundary=Gateway_Zone, color=#B0E0E6
+- **App Server 3**: boundary=Gateway_Zone, color=#B0E0E6
 - **Switch**: boundary=Intranet, color=#E6E6FA
 - **Central Server**: boundary=Intranet, color=#98FB98
-- **Application Database**: boundary=Intranet,color=#FFDAB9
+- **Application Database**: boundary=Intranet, color=#FFDAB9
 - **Authentication Server**: boundary=Intranet
 - **Command Machine**: boundary=Command_Zone
 
@@ -60,8 +65,17 @@ This model describes a network architecture with a Demilitarized Zone (DMZ), ext
 - **External Firewall to Protocol Break Device**: from="External Firewall", to="Protocol Break Device", protocol="HTTPS", data="Web Traffic", is_encrypted=True
 - **Protocol Break Device to Internal Firewall**: from="Protocol Break Device", to="Internal Firewall", protocol="HTTPS", data="Web Traffic", is_encrypted=True
 
-- **Internal Firewall to Switch**: from="Internal Firewall", to="Switch", protocol="Ethernet", data="General Traffic" # CHANGED
-- **Command Machine to Switch**: from="Command Machine", to="Switch", protocol="Ethernet", data="General Traffic" # CHANGED
+- **Internal Firewall to Gateway Load Balancer**: from="Internal Firewall", to="Gateway Load Balancer", protocol="HTTPS", data="Web Traffic", is_encrypted=True
+- **Gateway Load Balancer to App Server 1**: from="Gateway Load Balancer", to="App Server 1", protocol="HTTPS", data="API Request", is_encrypted=True
+- **Gateway Load Balancer to App Server 2**: from="Gateway Load Balancer", to="App Server 2", protocol="HTTPS", data="API Request", is_encrypted=True
+- **Gateway Load Balancer to App Server 3**: from="Gateway Load Balancer", to="App Server 3", protocol="HTTPS", data="API Request", is_encrypted=True
+
+- **App Server 1 to Switch**: from="App Server 1", to="Switch", protocol="Ethernet", data="General Traffic"
+- **App Server 2 to Switch**: from="App Server 2", to="Switch", protocol="Ethernet", data="General Traffic"
+- **App Server 3 to Switch**: from="App Server 3", to="Switch", protocol="Ethernet", data="General Traffic"
+
+- **Internal Firewall to Switch**: from="Internal Firewall", to="Switch", protocol="Ethernet", data="General Traffic"
+- **Command Machine to Switch**: from="Command Machine", to="Switch", protocol="Ethernet", data="General Traffic"
 
 - **Internal Operator 1 to Switch**: from="Internal Operator 1", to="Switch", protocol="Ethernet", data="General Traffic"
 - **Internal Operator 2 to Switch**: from="Internal Operator 2", to="Switch", protocol="Ethernet", data="General Traffic"
@@ -85,6 +99,10 @@ This model describes a network architecture with a Demilitarized Zone (DMZ), ext
 - **Central Server**: 1.5
 - **External Firewall**: 2.0
 - **Protocol Break Device**: 1.8
+- **Gateway Load Balancer**: 2.2
+- **App Server 1**: 1.7
+- **App Server 2**: 1.7
+- **App Server 3**: 1.7
 - **Switch**: 1.5
 - **Command Machine**: 2.5
 

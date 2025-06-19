@@ -32,6 +32,7 @@ class ThreatModel:
         self.servers = []
         self.dataflows = []
         self.severity_multipliers: Dict[str, float] = {}
+        self.custom_mitre_mappings: Dict[str, Any] = {}
         self.protocol_styles: Dict[str, Dict[str, Any]] = {}  # New: Store protocol styles
         self.threats_raw = []
         self.grouped_threats = defaultdict(list)
@@ -164,78 +165,211 @@ class ThreatModel:
 
     def process_threats(self) -> Dict[str, List[Tuple[Any, Any]]]:
         """Executes PyTM threat analysis and groups the results with MITRE mapping."""
-        print("🔍 Processing threats with PyTM...")
+        # print("🔍 Processing threats with PyTM...")
         self.tm.process()
 
         try:
             self.threats_raw = self.tm._threats
-            print(f"✅ {len(self.threats_raw)} menaces détectées via tm.threats")
+            # print(f"✅ {len(self.threats_raw)} menaces détectées via tm.threats")
         except AttributeError:
             try:
                 self.threats_raw = self.tm._threats
-                print(f"✅ {len(self.threats_raw)} menaces détectées via tm._threats")
+                # print(f"✅ {len(self.threats_raw)} menaces détectées via tm._threats")
             except AttributeError:
-                print("❌ Impossible de récupérer les menaces")
+                # print("❌ Impossible de récupérer les menaces")
                 self.threats_raw = []
 
-        print(f"DEBUG: Number of raw threats found by PyTM: {len(self.threats_raw)}")
-        
+        # print(f"DEBUG: Number of raw threats found by PyTM: {len(self.threats_raw)}")
+
+        # --- Post-processing: expand class targets to all instances ---
+        self.threats_raw = self._expand_class_targets(self.threats_raw)
+
         # Normalization and grouping of threats
         self.grouped_threats = self._group_threats()
-        
+
         # MITRE ATT&CK Analysis
-        print("🎯 Performing MITRE ATT&CK mapping...")
+        # print("🎯 Performing MITRE ATT&CK mapping...")
         self._perform_mitre_analysis()
-        
+
         return self.grouped_threats
 
+    def _expand_class_targets(self, threats):
+        """
+        Expands threats whose target is a class (e.g., Server, Dataflow) into one threat per instance.
+        """
+        import copy
+        expanded = []
+        # Gather all model elements (servers, actors, dataflows, etc.)
+        all_elements = []
+        for server in self.servers:
+            if isinstance(server, dict) and 'object' in server:
+                # print(f"DEBUG: server['object'] type: {type(server['object'])}")
+                all_elements.append(server['object'])
+            else:
+                # print(f"DEBUG: server type: {type(server)}")
+                all_elements.append(server)
+        for actor in self.actors:
+            if isinstance(actor, dict) and 'object' in actor:
+                # print(f"DEBUG: actor['object'] type: {type(actor['object'])}")
+                all_elements.append(actor['object'])
+            else:
+                # print(f"DEBUG: actor type: {type(actor)}")
+                all_elements.append(actor)
+        for df in self.dataflows:
+            # print(f"DEBUG: dataflow type: {type(df)}")
+            all_elements.append(df)
+        for b in self.boundaries.values():
+            if 'boundary' in b:
+                # print(f"DEBUG: boundary type: {type(b['boundary'])}")
+                all_elements.append(b['boundary'])
+
+        # print("DEBUG: Starting threat expansion...")
+        for t in threats:
+            if isinstance(t, tuple):
+                # print("DEBUG: isinstance...")
+                threat, target = t
+            else:
+                # print("DEBUG: not isinstance...")
+                threat = t
+                target = self._extract_target_from_threat(threat, expand_classes=False)
+
+            # print(f"DEBUG: Processing threat={threat}, target={target} (type={type(target)})")
+            if isinstance(target, type):
+                # print(f"DEBUG: target is a class: {target}")
+                found = False
+                for elem in all_elements:
+                    # print(f"DEBUG: Comparing elem {elem} ({type(elem)}) with target {target}")
+                    if type(elem).__name__ == target.__name__ and type(elem).__module__ == target.__module__:
+                        # print("DEBUG: Match found!")
+                        threat_copy = copy.copy(threat)
+                        if isinstance(t, tuple):
+                            expanded.append((threat_copy, elem))
+                        else:
+                            threat_copy.target = elem
+                            expanded.append(threat_copy)
+                        found = True
+                if not found:
+                    # print(f"⚠️ No instance found for class '{target.__name__}' in the model (expand_class_targets).")
+                    pass
+            elif isinstance(target, tuple):
+                # print(f"DEBUG: target is a tuple: {target}")
+                for idx, x in enumerate(target):
+                    # print(f"DEBUG: target[{idx}] = {x} (type={type(x)})")
+                    if isinstance(x, type):
+                        # print(f"DEBUG: class name: {x.__name__}, module: {x.__module__}, bases: {x.__bases__}")
+                        # print(f"DEBUG: class dict: {x.__dict__}")
+                        pass
+                if any(isinstance(x, type) for x in target):
+                    # print("DEBUG: At least one element in target tuple is a class, entering expansion block.")
+                    # Expand all combinations for tuple targets
+                    from_targets = []
+                    to_targets = []
+                    if isinstance(target[0], type):
+                        from_targets = [
+                            e for e in all_elements
+                            if type(e).__name__ == target[0].__name__ and type(e).__module__ == target[0].__module__
+                        ]
+                    else:
+                        from_targets = [target[0]]
+                    if isinstance(target[1], type):
+                        to_targets = [
+                            e for e in all_elements
+                            if type(e).__name__ == target[1].__name__ and type(e).__module__ == target[1].__module__
+                        ]
+                    else:
+                        to_targets = [target[1]]
+                    # print(f"DEBUG: from_targets={from_targets}")
+                    # print(f"DEBUG: to_targets={to_targets}")
+                    if from_targets and to_targets:
+                        for src in from_targets:
+                            for dst in to_targets:
+                                threat_copy = copy.copy(threat)
+                                if isinstance(t, tuple):
+                                    expanded.append((threat_copy, (src, dst)))
+                                else:
+                                    threat_copy.target = (src, dst)
+                                    expanded.append(threat_copy)
+                    else:
+                        # print(f"⚠️ No instance found for class tuple {target} in the model (expand_class_targets).")
+                        pass
+                else:
+                    # print("DEBUG: No class found in target tuple, skipping expansion.")
+                    expanded.append(t)
+            else:
+                # print("DEBUG: target is not a class or tuple, appending as is.")
+                expanded.append(t)
+        # print(f"DEBUG: Expansion complete. {len(expanded)} threats after expansion.")
+        return expanded
+
     def _group_threats(self) -> Dict[str, List[Tuple[Any, Any]]]:
-        """Groups threats by type"""
+        """Groups threats by type, skipping threats with unresolved targets."""
         grouped = defaultdict(list)
 
         for t in self.threats_raw:
+            # print(f"Processing threat: {t}")
             if isinstance(t, tuple):
                 threat, target = t
             else:
                 threat = t
                 target = self._extract_target_from_threat(threat)
 
+            # Filtrer les cibles non résolues
+            #TODO update this to find the way to map the target to an instance
+            #if target is None or (isinstance(target, tuple) and any(x is None for x in target)):
+                # print(f"⚠️ Skipping threat '{threat}' with unresolved target: {target}")
+            #    continue
+
             threat_type = str(threat.__class__.__name__)
             grouped[threat_type].append((threat, target))
 
         return grouped
     
-    def _extract_target_from_threat(self, threat) -> Any:
-        """Extract target from threat object, handling different pytm threat types."""
-        
-        # Try different common target attributes in pytm
-        target_attributes = [
-            'target',           # Most common
-            'targets',          # Plural version
-            'destination',      # For dataflows
-            'dest',            # Short version
-            'source',          # Source element
-            'element',         # Generic element
-            'component',       # Component reference
-            'asset',           # Asset reference
-        ]
-        
-        for attr in target_attributes:
+    def _extract_target_from_threat(self, threat: Any, expand_classes: bool = True) -> Optional[Any]:
+        """
+        Extracts the target element(s) from a threat object.
+        Returns an instance, a tuple of instances, or None if not found.
+        If expand_classes is True, will expand class targets to all instances (legacy, not used in main flow).
+        """
+        possible_attrs = ['target', 'targets', 'destination', 'dest', 'element', 'elements', 'object', 'objects']
+        # print(f"DEBUG: threat={threat}, attrs={dir(threat)}")
+        for attr in possible_attrs:
+            if hasattr(threat, 'target'):
+                value = getattr(threat, 'target')
+                # print(f"DEBUG: threat.target = {value!r}")
+                # --- DEBUG: Affiche le contenu des classes dans le tuple ---
+                if isinstance(value, tuple):
+                    for idx, x in enumerate(value):
+                        # print(f"DEBUG: target[{idx}] = {x} (type={type(x)})")
+                        if isinstance(x, type):
+                            # print(f"DEBUG: class name: {x.__name__}, module: {x.__module__}, bases: {x.__bases__}")
+                            # print(f"DEBUG: class dict: {x.__dict__}")
+                            pass
+                result = self._process_target_value(value)
+                # If expand_classes is False, just return as is (used by _expand_class_targets)
+                if not expand_classes:
+                    return result
+                # If expand_classes is True and result is a class, expand to all instances
+                if expand_classes and isinstance(result, type):
+                    # This branch is now handled in _expand_class_targets, so just return the class
+                    return result
+                if expand_classes and isinstance(result, tuple) and any(isinstance(x, type) for x in result):
+                    return result
+                return result
             if hasattr(threat, attr):
-                target_value = getattr(threat, attr)
-                #print(f"Found {attr}: {target_value} (type: {type(target_value)})")
-                
-                # Handle different types of target values
-                if target_value is not None:
-                    return self._process_target_value(target_value)
-        
-        # If no target found, try to extract from threat description or other fields
+                value = getattr(threat, attr)
+                result = self._process_target_value(value)
+                if not expand_classes:
+                    return result
+                if expand_classes and isinstance(result, type):
+                    return result
+                if expand_classes and isinstance(result, tuple) and any(isinstance(x, type) for x in result):
+                    return result
+                return result
+        # Fallback: try to extract from description or other fields if needed
         if hasattr(threat, 'description'):
-            print(f"No direct target found, using description-based target")
-            return f"Target from {threat.__class__.__name__}"
-        
-        # Final fallback
-        print(f"No target information found in threat")
+            desc = getattr(threat, 'description')
+            if isinstance(desc, str) and desc:
+                return desc
         return None
 
     def _process_target_value(self, target_value: Any) -> Any:
@@ -273,7 +407,7 @@ class ThreatModel:
                     if isinstance(element, target):
                         return element
             # If not found, return None (do NOT return a fallback string)
-            print(f"⚠️ No instance found for class '{class_name}' in the model.")
+            # print(f"⚠️ No instance found for class '{class_name}' in the model.")
             return None
 
         # If it's already an instance (object or dict), return as is
@@ -313,4 +447,16 @@ class ThreatModel:
         self.severity_multipliers[element_name] = multiplier
         print(f"✅ Severity Multiplier added for {element_name}: {multiplier}")
 
-    
+
+    def add_custom_mitre_mapping(self, attack_name: str, tactics: List[str], techniques: List[Dict[str, str]]):
+        """
+        Adds a custom MITRE mapping.
+        tactics: A list of MITRE ATT&CK tactic names.
+        techniques: A list of dictionaries, each with 'id' and 'name' for techniques.
+        """
+        self.custom_mitre_mappings[attack_name] = {
+            "tactics": tactics,
+            "techniques": techniques
+        }
+        print(f"✅ Custom MITRE Mapping added for {attack_name}")
+

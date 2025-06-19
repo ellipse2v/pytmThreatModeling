@@ -453,7 +453,7 @@ class ReportGenerator:
 
     def _get_target_name_for_severity_calc(self, target: Any) -> str:
         """Determines the target name for severity calculation, handling different target types."""
-        print(f"DEBUG: Target type: {type(target)}, value: {target}")
+        #print(f"DEBUG: Target type: {type(target)}, value: {target}")
 
         # Check if it's a tuple
         if isinstance(target, tuple):

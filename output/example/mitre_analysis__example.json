@@ -1,5 +1,5 @@
 {
-  "analysis_date": "2025-06-16T23:16:49.361014",
+  "analysis_date": "2025-06-19T21:54:59.461814",
   "architecture": "DMZ with external/internal firewall and protocol break proxy",
   "threats_detected": 103,
   "threat_types": [
@@ -572,7 +572,7 @@
     {
       "type": "Threat",
       "description": "Buffer Overflow via Environment Variables",
-      "target": "<built-in method title of str object at 0x000001BD340761F0> → <built-in method title of str object at 0x000001BD34098AD0>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -638,7 +638,7 @@
     {
       "type": "Threat",
       "description": "Session Sidejacking",
-      "target": "<built-in method title of str object at 0x000001BD34098A30> → <built-in method title of str object at 0x000001BD34076070>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -685,7 +685,7 @@
     {
       "type": "Threat",
       "description": "Cross Site Tracing",
-      "target": "<built-in method title of str object at 0x000001BD34098B70> → <built-in method title of str object at 0x000001BD34075F30>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -803,7 +803,7 @@
     {
       "type": "Threat",
       "description": "API Manipulation",
-      "target": "<built-in method title of str object at 0x000001BD34098C10> → <built-in method title of str object at 0x000001BD34075DB0>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -827,7 +827,7 @@
     {
       "type": "Threat",
       "description": "Authentication Abuse/ByPass",
-      "target": "<built-in method title of str object at 0x000001BD34075D30> → <built-in method title of str object at 0x000001BD34098C60>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -908,7 +908,7 @@
     {
       "type": "Threat",
       "description": "Double Encoding",
-      "target": "<built-in method title of str object at 0x000001BD34075BF0> → <built-in method title of str object at 0x000001BD34098E40>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -932,7 +932,7 @@
     {
       "type": "Threat",
       "description": "Exploit Test APIs",
-      "target": "<built-in method title of str object at 0x000001BD340991B0> → <built-in method title of str object at 0x000001BD34075B70>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1021,7 +1021,7 @@
     {
       "type": "Threat",
       "description": "Flooding",
-      "target": "<built-in method title of str object at 0x000001BD340992F0> → <built-in method title of str object at 0x000001BD340759B0>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1054,7 +1054,7 @@
     {
       "type": "Threat",
       "description": "Subverting Environment Variable Values",
-      "target": "<built-in method title of str object at 0x000001BD34099340> → <built-in method title of str object at 0x000001BD340758B0>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1099,7 +1099,7 @@
     {
       "type": "Threat",
       "description": "Try All Common Switches",
-      "target": "<built-in method title of str object at 0x000001BD34075770> → <built-in method title of str object at 0x000001BD34099480>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1203,7 +1203,7 @@
     {
       "type": "Threat",
       "description": "Client-side Injection-induced Buffer Overflow",
-      "target": "<built-in method title of str object at 0x000001BD34075030> → <built-in method title of str object at 0x000001BD34099520>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1291,7 +1291,7 @@
     {
       "type": "Threat",
       "description": "Command Delimiters",
-      "target": "<built-in method title of str object at 0x000001BD34074EF0> → <built-in method title of str object at 0x000001BD34099660>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1360,7 +1360,7 @@
     {
       "type": "Threat",
       "description": "Dictionary-based Password Attack",
-      "target": "<built-in method title of str object at 0x000001BD34099750> → <built-in method title of str object at 0x000001BD34074D30>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1393,7 +1393,7 @@
     {
       "type": "Threat",
       "description": "Exploit Script-Based APIs",
-      "target": "<built-in method title of str object at 0x000001BD340997A0> → <built-in method title of str object at 0x000001BD34074CB0>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1677,7 +1677,7 @@
     {
       "type": "Threat",
       "description": "Principal Spoof",
-      "target": "<built-in method title of str object at 0x000001BD340747B0> → <built-in method title of str object at 0x000001BD34099890>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1800,7 +1800,7 @@
     {
       "type": "Threat",
       "description": "Encryption Brute Forcing",
-      "target": "<built-in method title of str object at 0x000001BD34074570> → <built-in method title of str object at 0x000001BD34099930>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2364,7 +2364,7 @@
     {
       "type": "Threat",
       "description": "Filter Failure through Buffer Overflow",
-      "target": "<built-in method title of str object at 0x000001BD34099C00> → <built-in method title of str object at 0x000001BD34073C30>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2385,7 +2385,7 @@
     {
       "type": "Threat",
       "description": "Resource Injection",
-      "target": "<built-in method title of str object at 0x000001BD34099C50> → <built-in method title of str object at 0x000001BD34073BB0>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2409,7 +2409,7 @@
     {
       "type": "Threat",
       "description": "Code Injection",
-      "target": "<built-in method title of str object at 0x000001BD34099CA0> → <built-in method title of str object at 0x000001BD34073B30>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2457,7 +2457,7 @@
     {
       "type": "Threat",
       "description": "XSS Targeting URI Placeholders",
-      "target": "<built-in method title of str object at 0x000001BD34073A70> → <built-in method title of str object at 0x000001BD34099D40>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2481,7 +2481,7 @@
     {
       "type": "Threat",
       "description": "XSS Using Doubled Characters",
-      "target": "<built-in method title of str object at 0x000001BD340739F0> → <built-in method title of str object at 0x000001BD34099D90>",
+      "target": "None → None",
       "severity": {
         "score": 5.0,
         "level": "LOW",
