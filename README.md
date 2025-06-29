@@ -22,7 +22,7 @@ This project is a Python-based, end-to-end STRIDE threat modeling and analysis f
 - **MITRE ATT&CK Mapping**: Each threat is mapped to relevant MITRE tactics and techniques.
 - **Severity Calculation**: Customizable scoring (base, target, protocol).
 - **Comprehensive Reporting**:
-  - HTML report with threat details, STRIDE/MITRE mapping, and statistics.
+  - HTML report with integrated threat statistics, detailed threat information, STRIDE/MITRE mapping, and D3FEND mitigations.
   - JSON export for integration or further analysis.
 - **Visual Diagrams**:
   - DOT, SVG, and HTML diagrams with threat highlights.
@@ -33,11 +33,11 @@ This project is a Python-based, end-to-end STRIDE threat modeling and analysis f
 
 ## Example Output
 
-After running the analysis, you will find a timestamped folder in `output/` (e.g., `output/2025-06-08_15-45-24`) containing:
+After running the analysis, you will find a timestamped folder in `output/` (e.g., `output/example`) containing:
 
-- `stride_mitre_report_2025-06-08_15-45-24.html`:  
+- `stride_mitre_report.html`:  
   ![HTML Report Screenshot](output/example/stride_mitre_report__example.png.jpg)
-- `mitre_analysis_2025-06-08_15-45-24.json`:  
+- `mitre_analysis.json`:  
   ```json
   {
     "analysis_date": "2025-06-29T15:31:56.517773",
@@ -122,9 +122,6 @@ After running the analysis, you will find a timestamped folder in `output/` (e.g
   (Graphviz DOT format for architecture)
 - `tm_diagram__example.svg`:  
   ![SVG Diagram Example](./output/example/tm_diagram__example.svg)
-- `tm_diagram_example.html`:  
-  (Interactive HTML diagram with legend and threat highlights)
-  ![report  Example](output/example/stride_mitre_report__example.png.jpg)
 
 > **Note:** All screenshots and example files are located in the `output/example/` directory for easy preview and documentation.
 

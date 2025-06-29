@@ -35,28 +35,26 @@ class ReportGenerator:
 
         total_threats_analyzed = threat_model.mitre_analysis_results.get('total_threats', 0)
         total_mitre_techniques_mapped = threat_model.mitre_analysis_results.get('mitre_techniques_count', 0)
-        unique_pytm_threat_types = len(grouped_threats)
         total_stride_categories = len(self.mitre_mapping.get_stride_categories())
         stride_distribution = threat_model.mitre_analysis_results.get('stride_distribution', {})
 
         html = self._get_html_header()
+
+        all_detailed_threats_with_mitre = self._get_all_threats_with_mitre_info(grouped_threats)
+        summary_stats = self.generate_summary_stats(all_detailed_threats_with_mitre)
         html += self._get_html_summary(
             total_threats_analyzed,
             total_mitre_techniques_mapped,
             total_stride_categories,
-            stride_distribution
+            stride_distribution,
+            summary_stats
         )
-
-        all_detailed_threats_with_mitre = self._get_all_threats_with_mitre_info(grouped_threats)
 
         if not grouped_threats:
             html += self._get_no_threats_section()
         else:
-            summary_stats = self.generate_summary_stats(all_detailed_threats_with_mitre)
-            html += self._format_summary_stats_to_html(summary_stats)
             html += self._generate_threats_sections(all_detailed_threats_with_mitre)
 
-        html += self._get_recommendations_section()
         html += self._get_html_footer()
 
         with open(output_file, "w", encoding="utf-8") as f:
@@ -64,13 +62,13 @@ class ReportGenerator:
 
         return output_file
 
-    def generate_json_export(self, grouped_threats: Dict[str, List],
+    def generate_json_export(self, threat_model, grouped_threats: Dict[str, List],
                              output_file: str = "mitre_analysis.json") -> str:
         """Generates a JSON export of the analysis data"""
 
         export_data = {
             "analysis_date": datetime.now().isoformat(),
-            "architecture": "DMZ with external/internal firewall and protocol break proxy",
+            "architecture": threat_model.tm.name,
             "threats_detected": sum(len(threats) for threats in grouped_threats.values()),
             "threat_types": list(grouped_threats.keys()),
             "mitre_mapping": self.mitre_mapping.mapping,
@@ -203,14 +201,28 @@ class ReportGenerator:
         <h1>🛡️ STRIDE & MITRE ATT&CK Threat Model Report</h1>
 """
 
-    def _get_html_summary(self, total_threats: int, total_techniques: int, total_stride_categories: int, stride_distribution: Dict[str, int]) -> str:
+    def _get_html_summary(self, total_threats: int, total_techniques: int, total_stride_categories: int, stride_distribution: Dict[str, int], summary_stats: Dict[str, Any]) -> str:
         """Returns the summary section HTML"""
         stride_dist_html = "".join([f"<li><strong>{k}:</strong> {v}</li>" for k, v in stride_distribution.items()])
+        
+        stats_html = ""
+        if summary_stats:
+            dist_html = "".join([f"<li>{level}: {count}</li>" for level, count in summary_stats.get('severity_distribution', {}).items()])
+            stats_html = f"""
+            <ul>
+                <li><strong>Total Threats:</strong> {summary_stats.get('total_threats', 0)}</li>
+                <li><strong>Average Severity:</strong> {summary_stats.get('average_severity', 0):.2f}</li>
+                <li><strong>Max Severity:</strong> {summary_stats.get('max_severity', 0):.2f}</li>
+                <li><strong>Min Severity:</strong> {summary_stats.get('min_severity', 0):.2f}</li>
+                <li><strong>Severity Distribution:</strong><ul>{dist_html}</ul></li>
+            </ul>
+            """
+
         return f"""
         <div class="summary-grid">
             <div class="card">
-                <h3>Total Threats</h3>
-                <p style=\"font-size: 2rem; font-weight: bold;\">{total_threats}</p>
+                <h3>Threat Statistics</h3>
+                {stats_html}
             </div>
             <div class="card">
                 <h3>MITRE Techniques</h3>
@@ -238,37 +250,30 @@ class ReportGenerator:
         for i, category in enumerate(stride_categories):
             active_class = "active" if i == 0 else ""
             html += f"<div id=\"{category}\" class=\"tab-content {active_class}\">"
-            html += "<table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th></tr></thead><tbody>"
+            html += "<table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th><th>D3FEND Mitigations</th></tr></thead><tbody>"
             category_threats = [t for t in all_threats if t['stride_category'] == category]
             for j, threat in enumerate(category_threats):
                 severity_info = threat['severity']
                 mitre_html = "<ul>"
+                defend_mitigations_html = "<ul>"
                 for tech in threat['mitre_techniques']:
                     mitre_html += f"<li><a href='https://attack.mitre.org/techniques/{tech['id']}' target='_blank' class='mitre-link'>{tech['id']}: {tech['name']}</a></li>"
+                    if 'defend_mitigations' in tech and tech['defend_mitigations']:
+                        for mitigation in tech['defend_mitigations']:
+                            defend_mitigations_html += f"<li>{mitigation['id']}: {mitigation['description']}</li>"
                 mitre_html += "</ul>"
+                defend_mitigations_html += "</ul>"
                 html += f"""<tr>
                     <td>{j + 1}</td>
                     <td>{threat['target']}</td>
                     <td>{threat['description']}</td>
-                    <td class=\"severity-{severity_info['level'].lower()}\">{severity_info['level']} ({severity_info['score']})</td>
+                    <td class="severity-{severity_info['level'].lower()}">{severity_info['level']} ({severity_info['score']})</td>
                     <td>{mitre_html}</td>
+                    <td>{defend_mitigations_html}</td>
                 </tr>"""
             html += "</tbody></table></div>"
 
         return html
-
-    def _get_recommendations_section(self) -> str:
-        return """<h2>Recommendations</h2>
-        <div class="card">
-            <ul>
-                <li>Implement strong authentication mechanisms (MFA, strong passwords) for all critical systems and user accounts.</li>
-                <li>Regularly patch and update all software, operating systems, and firmware to protect against known vulnerabilities.</li>
-                <li>Perform regular security audits and penetration testing to identify and remediate weaknesses.</li>
-                <li>Employ intrusion detection/prevention systems (IDPS) and security information and event management (SIEM) solutions for continuous monitoring.</li>
-                <li>Implement data encryption at rest and in transit for sensitive information.</li>
-            </ul>
-        </div>
-"""
 
     def _get_html_footer(self) -> str:
         """Returns the HTML footer"""

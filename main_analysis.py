@@ -138,7 +138,7 @@ class ThreatAnalysisFramework:
             self.threat_model, self.grouped_threats, html_output_full_path
         )
         json_report_path = self.report_generator.generate_json_export(
-            self.grouped_threats, json_output_full_path
+            self.threat_model, self.grouped_threats, json_output_full_path
         )
         print("✅ Reports generated.")
         return {"html": html_report_path, "json": json_report_path}

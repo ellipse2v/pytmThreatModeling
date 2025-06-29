@@ -102,8 +102,16 @@
 
         <div class="summary-grid">
             <div class="card">
-                <h3>Total Threats</h3>
-                <p style="font-size: 2rem; font-weight: bold;">183</p>
+                <h3>Threat Statistics</h3>
+                
+            <ul>
+                <li><strong>Total Threats:</strong> 183</li>
+                <li><strong>Average Severity:</strong> 5.55</li>
+                <li><strong>Max Severity:</strong> 9.50</li>
+                <li><strong>Min Severity:</strong> 5.00</li>
+                <li><strong>Severity Distribution:</strong><ul><li>LOW: 140</li><li>CRITICAL: 3</li><li>HIGH: 18</li><li>MEDIUM: 22</li></ul></li>
+            </ul>
+            
             </div>
             <div class="card">
                 <h3>MITRE Techniques</h3>
@@ -114,152 +122,166 @@
                 <ul><li><strong>Unknown:</strong> 70</li><li><strong>Tampering:</strong> 45</li><li><strong>Elevation of Privilege:</strong> 18</li><li><strong>Information Disclosure:</strong> 20</li><li><strong>Denial of Service:</strong> 3</li><li><strong>Spoofing:</strong> 16</li><li><strong>Repudiation:</strong> 11</li></ul>
             </div>
         </div>
-<div class="card">
-            <h3>Threat Statistics</h3>
-            <ul>
-                <li><strong>Total Threats:</strong> 183</li>
-                <li><strong>Average Severity:</strong> 5.55</li>
-                <li><strong>Max Severity:</strong> 9.50</li>
-                <li><strong>Min Severity:</strong> 5.00</li>
-                <li><strong>Severity Distribution:</strong><ul><li>LOW: 140</li><li>CRITICAL: 3</li><li>HIGH: 18</li><li>MEDIUM: 22</li></ul></li>
-            </ul>
-        </div><h2>Detailed Threat Analysis</h2><div class="tabs"><button class="tab-button active" onclick="openTab(event, 'Denial of Service')">Denial of Service</button><button class="tab-button " onclick="openTab(event, 'Elevation of Privilege')">Elevation of Privilege</button><button class="tab-button " onclick="openTab(event, 'Information Disclosure')">Information Disclosure</button><button class="tab-button " onclick="openTab(event, 'Repudiation')">Repudiation</button><button class="tab-button " onclick="openTab(event, 'Spoofing')">Spoofing</button><button class="tab-button " onclick="openTab(event, 'Tampering')">Tampering</button><button class="tab-button " onclick="openTab(event, 'Threat')">Threat</button></div><div id="Denial of Service" class="tab-content active"><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th></tr></thead><tbody><tr>
+<h2>Detailed Threat Analysis</h2><div class="tabs"><button class="tab-button active" onclick="openTab(event, 'Denial of Service')">Denial of Service</button><button class="tab-button " onclick="openTab(event, 'Elevation of Privilege')">Elevation of Privilege</button><button class="tab-button " onclick="openTab(event, 'Information Disclosure')">Information Disclosure</button><button class="tab-button " onclick="openTab(event, 'Repudiation')">Repudiation</button><button class="tab-button " onclick="openTab(event, 'Spoofing')">Spoofing</button><button class="tab-button " onclick="openTab(event, 'Tampering')">Tampering</button><button class="tab-button " onclick="openTab(event, 'Threat')">Threat</button></div><div id="Denial of Service" class="tab-content active"><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th><th>D3FEND Mitigations</th></tr></thead><tbody><tr>
                     <td>1</td>
                     <td>External Firewall</td>
                     <td>Denial of Service (DoS) attack targeting External Firewall to exhaust its resources</td>
                     <td class="severity-medium">MEDIUM (6.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499' target='_blank' class='mitre-link'>T1499: Endpoint Denial of Service</a></li></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>2</td>
                     <td>Internal Firewall</td>
                     <td>Denial of Service (DoS) attack targeting Internal Firewall to exhaust its resources</td>
                     <td class="severity-medium">MEDIUM (6.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499' target='_blank' class='mitre-link'>T1499: Endpoint Denial of Service</a></li></ul></td>
-                </tr></tbody></table></div><div id="Elevation of Privilege" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th></tr></thead><tbody><tr>
+                    <td><ul></ul></td>
+                </tr></tbody></table></div><div id="Elevation of Privilege" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th><th>D3FEND Mitigations</th></tr></thead><tbody><tr>
                     <td>1</td>
                     <td>External Firewall</td>
                     <td>Unauthorized privilege escalation on External Firewall</td>
                     <td class="severity-medium">MEDIUM (6.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>2</td>
                     <td>External Firewall</td>
                     <td>Vulnerability in the management interface of External Firewall</td>
                     <td class="severity-medium">MEDIUM (6.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>3</td>
                     <td>Protocol Break Device</td>
                     <td>Unauthorized privilege escalation on Protocol Break Device</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>4</td>
                     <td>Internal Firewall</td>
                     <td>Unauthorized privilege escalation on Internal Firewall</td>
                     <td class="severity-medium">MEDIUM (6.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>5</td>
                     <td>Internal Firewall</td>
                     <td>Vulnerability in the management interface of Internal Firewall</td>
                     <td class="severity-medium">MEDIUM (6.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>6</td>
                     <td>Gateway Load Balancer</td>
                     <td>Unauthorized privilege escalation on Gateway Load Balancer</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>7</td>
                     <td>App Server 1</td>
                     <td>Unauthorized privilege escalation on App Server 1</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>8</td>
                     <td>App Server 2</td>
                     <td>Unauthorized privilege escalation on App Server 2</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>9</td>
                     <td>App Server 3</td>
                     <td>Unauthorized privilege escalation on App Server 3</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>10</td>
                     <td>Switch</td>
                     <td>Unauthorized privilege escalation on Switch</td>
                     <td class="severity-medium">MEDIUM (6.5)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>11</td>
                     <td>Central Server</td>
                     <td>Unauthorized privilege escalation on Central Server</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>12</td>
                     <td>Central Server</td>
                     <td>Compromise of the management interface of Central Server</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>13</td>
                     <td>Central Server</td>
                     <td>Lateral movement from Central Server to other systems in the network</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1021' target='_blank' class='mitre-link'>T1021: Remote Services</a></li></ul></td>
+                    <td><ul><li>D3-NETF: Restrict access to remote services</li><li>D3-NETM: Monitor remote service access for anomalies</li><li>D3-PRIV: Implement least privilege for remote service accounts</li><li>D3-MFA: Enforce MFA for remote service access</li></ul></td>
                 </tr><tr>
                     <td>14</td>
                     <td>Application Database</td>
                     <td>Unauthorized privilege escalation on Application Database</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>15</td>
                     <td>Authentication Server</td>
                     <td>Unauthorized privilege escalation on Authentication Server</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>16</td>
                     <td>Command Machine</td>
                     <td>Unauthorized privilege escalation on Command Machine</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
-                </tr></tbody></table></div><div id="Information Disclosure" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th></tr></thead><tbody><tr>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
+                </tr></tbody></table></div><div id="Information Disclosure" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th><th>D3FEND Mitigations</th></tr></thead><tbody><tr>
                     <td>1</td>
                     <td>External Firewall</td>
                     <td>Insecure security configuration or hardening on External Firewall</td>
                     <td class="severity-medium">MEDIUM (6.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>2</td>
                     <td>Protocol Break Device</td>
                     <td>Insecure security configuration or hardening on Protocol Break Device</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>3</td>
                     <td>Internal Firewall</td>
                     <td>Insecure security configuration or hardening on Internal Firewall</td>
                     <td class="severity-medium">MEDIUM (6.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>4</td>
                     <td>Gateway Load Balancer</td>
                     <td>Insecure security configuration or hardening on Gateway Load Balancer</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>5</td>
                     <td>Gateway Load Balancer</td>
                     <td>Weak SSL/TLS configuration or ciphers used by Gateway Load Balancer</td>
                     <td class="severity-low">LOW (5.0)</td>
+                    <td><ul></ul></td>
                     <td><ul></ul></td>
                 </tr><tr>
                     <td>6</td>
@@ -267,11 +289,13 @@
                     <td>Insecure security configuration or hardening on App Server 1</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>7</td>
                     <td>App Server 1</td>
                     <td>Insecure Direct Object References (IDOR) leading to unauthorized data access on App Server 1</td>
                     <td class="severity-low">LOW (5.0)</td>
+                    <td><ul></ul></td>
                     <td><ul></ul></td>
                 </tr><tr>
                     <td>8</td>
@@ -279,11 +303,13 @@
                     <td>Insecure security configuration or hardening on App Server 2</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>9</td>
                     <td>App Server 2</td>
                     <td>Insecure Direct Object References (IDOR) leading to unauthorized data access on App Server 2</td>
                     <td class="severity-low">LOW (5.0)</td>
+                    <td><ul></ul></td>
                     <td><ul></ul></td>
                 </tr><tr>
                     <td>10</td>
@@ -291,11 +317,13 @@
                     <td>Insecure security configuration or hardening on App Server 3</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>11</td>
                     <td>App Server 3</td>
                     <td>Insecure Direct Object References (IDOR) leading to unauthorized data access on App Server 3</td>
                     <td class="severity-low">LOW (5.0)</td>
+                    <td><ul></ul></td>
                     <td><ul></ul></td>
                 </tr><tr>
                     <td>12</td>
@@ -303,23 +331,27 @@
                     <td>Insecure security configuration or hardening on Switch</td>
                     <td class="severity-medium">MEDIUM (6.5)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>13</td>
                     <td>Central Server</td>
                     <td>Insecure security configuration or hardening on Central Server</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>14</td>
                     <td>Application Database</td>
                     <td>Insecure security configuration or hardening on Application Database</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>15</td>
                     <td>Application Database</td>
                     <td>Unauthorized access to sensitive data stored in Application Database</td>
                     <td class="severity-low">LOW (5.0)</td>
+                    <td><ul></ul></td>
                     <td><ul></ul></td>
                 </tr><tr>
                     <td>16</td>
@@ -327,269 +359,314 @@
                     <td>Data exfiltration or leakage from Application Database</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>17</td>
                     <td>Authentication Server</td>
                     <td>Insecure security configuration or hardening on Authentication Server</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>18</td>
                     <td>Command Machine</td>
                     <td>Insecure security configuration or hardening on Command Machine</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
-                </tr></tbody></table></div><div id="Repudiation" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th></tr></thead><tbody><tr>
+                    <td><ul><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
+                </tr></tbody></table></div><div id="Repudiation" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th><th>D3FEND Mitigations</th></tr></thead><tbody><tr>
                     <td>1</td>
                     <td>External Client 1</td>
                     <td>Repudiation of critical actions performed by External Client 1</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
                 </tr><tr>
                     <td>2</td>
                     <td>External Client 2</td>
                     <td>Repudiation of critical actions performed by External Client 2</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
                 </tr><tr>
                     <td>3</td>
                     <td>External Client 3</td>
                     <td>Repudiation of critical actions performed by External Client 3</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
                 </tr><tr>
                     <td>4</td>
                     <td>External Client 4</td>
                     <td>Repudiation of critical actions performed by External Client 4</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
                 </tr><tr>
                     <td>5</td>
                     <td>External Client 5</td>
                     <td>Repudiation of critical actions performed by External Client 5</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
                 </tr><tr>
                     <td>6</td>
                     <td>External Client 6</td>
                     <td>Repudiation of critical actions performed by External Client 6</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
                 </tr><tr>
                     <td>7</td>
                     <td>External Client 7</td>
                     <td>Repudiation of critical actions performed by External Client 7</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
                 </tr><tr>
                     <td>8</td>
                     <td>External Client 8</td>
                     <td>Repudiation of critical actions performed by External Client 8</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
                 </tr><tr>
                     <td>9</td>
                     <td>Internal Operator 1</td>
                     <td>Repudiation of critical actions performed by Internal Operator 1</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
                 </tr><tr>
                     <td>10</td>
                     <td>Internal Operator 2</td>
                     <td>Repudiation of critical actions performed by Internal Operator 2</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
                 </tr><tr>
                     <td>11</td>
                     <td>System Administrator</td>
                     <td>Repudiation of critical actions performed by System Administrator</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
-                </tr></tbody></table></div><div id="Spoofing" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th></tr></thead><tbody><tr>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
+                </tr></tbody></table></div><div id="Spoofing" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th><th>D3FEND Mitigations</th></tr></thead><tbody><tr>
                     <td>1</td>
                     <td>External Firewall</td>
                     <td>Firewall rule misconfiguration allowing unintended traffic to bypass External Firewall</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562.001' target='_blank' class='mitre-link'>T1562.001: Disable or Modify System Firewall</a></li></ul></td>
+                    <td><ul><li>D3-NETF: Implement multiple layers of firewall protection</li><li>D3-CONF: Monitor and enforce firewall configurations</li><li>D3-NETM: Monitor network traffic and firewall logs</li><li>D3-SYSM: Monitor system calls affecting firewall</li></ul></td>
                 </tr><tr>
                     <td>2</td>
                     <td>Internal Firewall</td>
                     <td>Firewall rule misconfiguration allowing unintended traffic to bypass Internal Firewall</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1562.001' target='_blank' class='mitre-link'>T1562.001: Disable or Modify System Firewall</a></li></ul></td>
+                    <td><ul><li>D3-NETF: Implement multiple layers of firewall protection</li><li>D3-CONF: Monitor and enforce firewall configurations</li><li>D3-NETM: Monitor network traffic and firewall logs</li><li>D3-SYSM: Monitor system calls affecting firewall</li></ul></td>
                 </tr><tr>
                     <td>3</td>
                     <td>Gateway Load Balancer</td>
                     <td>Session hijacking or fixation attack against the Gateway Load Balancer</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1185' target='_blank' class='mitre-link'>T1185: Browser Session Hijacking</a></li></ul></td>
+                    <td><ul><li>D3-SESM: Implement secure session management practices</li><li>D3-TLSA: Use HTTPS everywhere with proper TLS configuration</li><li>D3-COOK: Implement secure cookie attributes</li><li>D3-NETM: Monitor for session anomalies</li></ul></td>
                 </tr><tr>
                     <td>4</td>
                     <td>External Client 1</td>
                     <td>Identity spoofing of the actor External Client 1 via phishing or credential theft</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1566' target='_blank' class='mitre-link'>T1566: Phishing</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Implement multi-factor authentication to reduce phishing effectiveness</li><li>D3-UATR: User awareness training and security education</li><li>D3-EMAL: Deploy email security solutions with phishing detection</li><li>D3-NETF: Block malicious domains and URLs</li><li>D3-CERT: Validate SSL certificates to detect phishing sites</li></ul></td>
                 </tr><tr>
                     <td>5</td>
                     <td>External Client 2</td>
                     <td>Identity spoofing of the actor External Client 2 via phishing or credential theft</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1566' target='_blank' class='mitre-link'>T1566: Phishing</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Implement multi-factor authentication to reduce phishing effectiveness</li><li>D3-UATR: User awareness training and security education</li><li>D3-EMAL: Deploy email security solutions with phishing detection</li><li>D3-NETF: Block malicious domains and URLs</li><li>D3-CERT: Validate SSL certificates to detect phishing sites</li></ul></td>
                 </tr><tr>
                     <td>6</td>
                     <td>External Client 3</td>
                     <td>Identity spoofing of the actor External Client 3 via phishing or credential theft</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1566' target='_blank' class='mitre-link'>T1566: Phishing</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Implement multi-factor authentication to reduce phishing effectiveness</li><li>D3-UATR: User awareness training and security education</li><li>D3-EMAL: Deploy email security solutions with phishing detection</li><li>D3-NETF: Block malicious domains and URLs</li><li>D3-CERT: Validate SSL certificates to detect phishing sites</li></ul></td>
                 </tr><tr>
                     <td>7</td>
                     <td>External Client 4</td>
                     <td>Identity spoofing of the actor External Client 4 via phishing or credential theft</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1566' target='_blank' class='mitre-link'>T1566: Phishing</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Implement multi-factor authentication to reduce phishing effectiveness</li><li>D3-UATR: User awareness training and security education</li><li>D3-EMAL: Deploy email security solutions with phishing detection</li><li>D3-NETF: Block malicious domains and URLs</li><li>D3-CERT: Validate SSL certificates to detect phishing sites</li></ul></td>
                 </tr><tr>
                     <td>8</td>
                     <td>External Client 5</td>
                     <td>Identity spoofing of the actor External Client 5 via phishing or credential theft</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1566' target='_blank' class='mitre-link'>T1566: Phishing</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Implement multi-factor authentication to reduce phishing effectiveness</li><li>D3-UATR: User awareness training and security education</li><li>D3-EMAL: Deploy email security solutions with phishing detection</li><li>D3-NETF: Block malicious domains and URLs</li><li>D3-CERT: Validate SSL certificates to detect phishing sites</li></ul></td>
                 </tr><tr>
                     <td>9</td>
                     <td>External Client 6</td>
                     <td>Identity spoofing of the actor External Client 6 via phishing or credential theft</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1566' target='_blank' class='mitre-link'>T1566: Phishing</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Implement multi-factor authentication to reduce phishing effectiveness</li><li>D3-UATR: User awareness training and security education</li><li>D3-EMAL: Deploy email security solutions with phishing detection</li><li>D3-NETF: Block malicious domains and URLs</li><li>D3-CERT: Validate SSL certificates to detect phishing sites</li></ul></td>
                 </tr><tr>
                     <td>10</td>
                     <td>External Client 7</td>
                     <td>Identity spoofing of the actor External Client 7 via phishing or credential theft</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1566' target='_blank' class='mitre-link'>T1566: Phishing</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Implement multi-factor authentication to reduce phishing effectiveness</li><li>D3-UATR: User awareness training and security education</li><li>D3-EMAL: Deploy email security solutions with phishing detection</li><li>D3-NETF: Block malicious domains and URLs</li><li>D3-CERT: Validate SSL certificates to detect phishing sites</li></ul></td>
                 </tr><tr>
                     <td>11</td>
                     <td>External Client 8</td>
                     <td>Identity spoofing of the actor External Client 8 via phishing or credential theft</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1566' target='_blank' class='mitre-link'>T1566: Phishing</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Implement multi-factor authentication to reduce phishing effectiveness</li><li>D3-UATR: User awareness training and security education</li><li>D3-EMAL: Deploy email security solutions with phishing detection</li><li>D3-NETF: Block malicious domains and URLs</li><li>D3-CERT: Validate SSL certificates to detect phishing sites</li></ul></td>
                 </tr><tr>
                     <td>12</td>
                     <td>Internal Operator 1</td>
                     <td>Identity spoofing of the actor Internal Operator 1 via phishing or credential theft</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1566' target='_blank' class='mitre-link'>T1566: Phishing</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Implement multi-factor authentication to reduce phishing effectiveness</li><li>D3-UATR: User awareness training and security education</li><li>D3-EMAL: Deploy email security solutions with phishing detection</li><li>D3-NETF: Block malicious domains and URLs</li><li>D3-CERT: Validate SSL certificates to detect phishing sites</li></ul></td>
                 </tr><tr>
                     <td>13</td>
                     <td>Internal Operator 2</td>
                     <td>Identity spoofing of the actor Internal Operator 2 via phishing or credential theft</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1566' target='_blank' class='mitre-link'>T1566: Phishing</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Implement multi-factor authentication to reduce phishing effectiveness</li><li>D3-UATR: User awareness training and security education</li><li>D3-EMAL: Deploy email security solutions with phishing detection</li><li>D3-NETF: Block malicious domains and URLs</li><li>D3-CERT: Validate SSL certificates to detect phishing sites</li></ul></td>
                 </tr><tr>
                     <td>14</td>
                     <td>System Administrator</td>
                     <td>Identity spoofing of the actor System Administrator via phishing or credential theft</td>
                     <td class="severity-medium">MEDIUM (7.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1566' target='_blank' class='mitre-link'>T1566: Phishing</a></li></ul></td>
-                </tr></tbody></table></div><div id="Tampering" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th></tr></thead><tbody><tr>
+                    <td><ul><li>D3-MFA: Implement multi-factor authentication to reduce phishing effectiveness</li><li>D3-UATR: User awareness training and security education</li><li>D3-EMAL: Deploy email security solutions with phishing detection</li><li>D3-NETF: Block malicious domains and URLs</li><li>D3-CERT: Validate SSL certificates to detect phishing sites</li></ul></td>
+                </tr></tbody></table></div><div id="Tampering" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th><th>D3FEND Mitigations</th></tr></thead><tbody><tr>
                     <td>1</td>
                     <td>External Firewall</td>
                     <td>Unpatched OS or software vulnerabilities on External Firewall</td>
                     <td class="severity-critical">CRITICAL (9.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>2</td>
                     <td>Protocol Break Device</td>
                     <td>Unpatched OS or software vulnerabilities on Protocol Break Device</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>3</td>
                     <td>Internal Firewall</td>
                     <td>Unpatched OS or software vulnerabilities on Internal Firewall</td>
                     <td class="severity-critical">CRITICAL (9.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>4</td>
                     <td>Gateway Load Balancer</td>
                     <td>Unpatched OS or software vulnerabilities on Gateway Load Balancer</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>5</td>
                     <td>App Server 1</td>
                     <td>Unpatched OS or software vulnerabilities on App Server 1</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>6</td>
                     <td>App Server 1</td>
                     <td>SQL or NoSQL injection vulnerability in the application on App Server 1</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>7</td>
                     <td>App Server 1</td>
                     <td>Cross-Site Scripting (XSS) vulnerability allowing script injection on App Server 1</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>8</td>
                     <td>App Server 2</td>
                     <td>Unpatched OS or software vulnerabilities on App Server 2</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>9</td>
                     <td>App Server 2</td>
                     <td>SQL or NoSQL injection vulnerability in the application on App Server 2</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>10</td>
                     <td>App Server 2</td>
                     <td>Cross-Site Scripting (XSS) vulnerability allowing script injection on App Server 2</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>11</td>
                     <td>App Server 3</td>
                     <td>Unpatched OS or software vulnerabilities on App Server 3</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>12</td>
                     <td>App Server 3</td>
                     <td>SQL or NoSQL injection vulnerability in the application on App Server 3</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>13</td>
                     <td>App Server 3</td>
                     <td>Cross-Site Scripting (XSS) vulnerability allowing script injection on App Server 3</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>14</td>
                     <td>Switch</td>
                     <td>Unpatched OS or software vulnerabilities on Switch</td>
                     <td class="severity-critical">CRITICAL (9.5)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>15</td>
                     <td>Central Server</td>
                     <td>Unpatched OS or software vulnerabilities on Central Server</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>16</td>
                     <td>Application Database</td>
                     <td>Unpatched OS or software vulnerabilities on Application Database</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>17</td>
                     <td>Application Database</td>
                     <td>Data corruption or tampering in Application Database via unauthorized write access</td>
                     <td class="severity-high">HIGH (8.0)</td>
+                    <td><ul></ul></td>
                     <td><ul></ul></td>
                 </tr><tr>
                     <td>18</td>
@@ -597,149 +674,174 @@
                     <td>Unpatched OS or software vulnerabilities on Authentication Server</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>19</td>
                     <td>Command Machine</td>
                     <td>Unpatched OS or software vulnerabilities on Command Machine</td>
                     <td class="severity-high">HIGH (8.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
-                </tr></tbody></table></div><div id="Threat" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th></tr></thead><tbody><tr>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
+                </tr></tbody></table></div><div id="Threat" class="tab-content "><table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th><th>D3FEND Mitigations</th></tr></thead><tbody><tr>
                     <td>1</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Buffer Overflow via Environment Variables</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499' target='_blank' class='mitre-link'>T1499: Endpoint Denial of Service</a></li></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>2</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Overflow Buffers</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499.004' target='_blank' class='mitre-link'>T1499.004: Application or System Exploitation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments</li><li>D3-PATM: Maintain current security patches</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-MEMF: Enable memory protection mechanisms</li><li>D3-SAND: Use sandboxing for suspicious content</li></ul></td>
                 </tr><tr>
                     <td>3</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Server Side Include (SSI) Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>4</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Session Sidejacking</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1539' target='_blank' class='mitre-link'>T1539: Steal Web Session Cookie</a></li></ul></td>
+                    <td><ul><li>D3-COOK: Implement HttpOnly and Secure flags for cookies</li><li>D3-SESM: Use short session timeouts and rotation</li><li>D3-TLSA: Enforce HTTPS for all sensitive operations</li><li>D3-WEBS: Monitor web session patterns for anomalies</li></ul></td>
                 </tr><tr>
                     <td>5</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>HTTP Request Splitting</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1071.001' target='_blank' class='mitre-link'>T1071.001: Web Protocols</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy WAF with HTTP protocol inspection</li><li>D3-NETM: Monitor HTTP/HTTPS traffic for anomalies</li><li>D3-TLSA: Analyze TLS communications for manipulation</li><li>D3-INPV: Validate HTTP requests and responses</li></ul></td>
                 </tr><tr>
                     <td>6</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Cross Site Tracing</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1040' target='_blank' class='mitre-link'>T1040: Network Sniffing</a></li></ul></td>
+                    <td><ul><li>D3-TLSA: Enforce encryption for all network communications</li><li>D3-NETM: Monitor network traffic for sniffing activities</li><li>D3-SEGM: Implement network segmentation</li><li>D3-VPN: Use VPN for sensitive communications</li><li>D3-NIDS: Deploy network intrusion detection systems</li></ul></td>
                 </tr><tr>
                     <td>7</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Command Line Execution through SQL Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li><li><a href='https://attack.mitre.org/techniques/T1059' target='_blank' class='mitre-link'>T1059: Command and Scripting Interpreter</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li><li>D3-INPV: Implement strict input validation and sanitization</li><li>D3-EXEC: Use application allowlisting to prevent malicious execution</li><li>D3-PMON: Monitor process execution and command-line arguments</li><li>D3-SAND: Use sandboxing for script analysis</li></ul></td>
                 </tr><tr>
                     <td>8</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>SQL Injection through SOAP Parameter Tampering</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>9</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>JSON Hijacking (aka JavaScript Hijacking)</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li><li><a href='https://attack.mitre.org/techniques/T1041' target='_blank' class='mitre-link'>T1041: Exfiltration Over C2 Channel</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li><li>D3-NETM: Monitor network traffic for data exfiltration</li><li>D3-DLP: Implement network-based DLP</li><li>D3-NETF: Filter suspicious network communications</li><li>D3-ENCR: Encrypt data in transit</li><li>D3-SEGM: Implement network segmentation</li></ul></td>
                 </tr><tr>
                     <td>10</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>API Manipulation</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1041' target='_blank' class='mitre-link'>T1041: Exfiltration Over C2 Channel</a></li></ul></td>
+                    <td><ul><li>D3-NETM: Monitor network traffic for data exfiltration</li><li>D3-DLP: Implement network-based DLP</li><li>D3-NETF: Filter suspicious network communications</li><li>D3-ENCR: Encrypt data in transit</li><li>D3-SEGM: Implement network segmentation</li></ul></td>
                 </tr><tr>
                     <td>11</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Authentication Abuse/ByPass</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1078' target='_blank' class='mitre-link'>T1078: Valid Accounts</a></li><li><a href='https://attack.mitre.org/techniques/T1556' target='_blank' class='mitre-link'>T1556: Modify Authentication Process</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Enforce MFA for all account access</li><li>D3-PWDP: Implement and enforce strong password policies</li><li>D3-ACCM: Monitor account usage patterns and detect anomalies</li><li>D3-PRIV: Implement principle of least privilege</li><li>D3-AUTHA: Implement robust authentication mechanisms</li><li>D3-SYSM: Monitor system calls affecting authentication</li><li>D3-INTEG: Monitor authentication system integrity</li><li>D3-AUTHM: Monitor authentication logs for anomalies</li></ul></td>
                 </tr><tr>
                     <td>12</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Excavation</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1083' target='_blank' class='mitre-link'>T1083: File and Directory Discovery</a></li></ul></td>
+                    <td><ul><li>D3-PRIV: Implement least privilege access controls</li><li>D3-FMON: Monitor file and directory access patterns</li><li>D3-DECOY: Deploy honeypots and decoy files</li><li>D3-ENCR: Encrypt sensitive files and directories</li><li>D3-ACCM: Monitor account access to sensitive areas</li></ul></td>
                 </tr><tr>
                     <td>13</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Interception</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1040' target='_blank' class='mitre-link'>T1040: Network Sniffing</a></li></ul></td>
+                    <td><ul><li>D3-TLSA: Enforce encryption for all network communications</li><li>D3-NETM: Monitor network traffic for sniffing activities</li><li>D3-SEGM: Implement network segmentation</li><li>D3-VPN: Use VPN for sensitive communications</li><li>D3-NIDS: Deploy network intrusion detection systems</li></ul></td>
                 </tr><tr>
                     <td>14</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Double Encoding</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1027' target='_blank' class='mitre-link'>T1027: Obfuscated Files or Information</a></li></ul></td>
+                    <td><ul><li>D3-FAPA: Implement advanced file analysis and de-obfuscation</li><li>D3-SAND: Use sandboxing for suspicious file analysis</li><li>D3-HEUR: Deploy behavioral analysis for obfuscated content</li><li>D3-STAT: Perform static analysis on files and scripts</li></ul></td>
                 </tr><tr>
                     <td>15</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Exploit Test APIs</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1041' target='_blank' class='mitre-link'>T1041: Exfiltration Over C2 Channel</a></li></ul></td>
+                    <td><ul><li>D3-NETM: Monitor network traffic for data exfiltration</li><li>D3-DLP: Implement network-based DLP</li><li>D3-NETF: Filter suspicious network communications</li><li>D3-ENCR: Encrypt data in transit</li><li>D3-SEGM: Implement network segmentation</li></ul></td>
                 </tr><tr>
                     <td>16</td>
                     <td>Unspecified</td>
                     <td>Privilege Abuse</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1484' target='_blank' class='mitre-link'>T1484: Domain Policy Modification</a></li></ul></td>
+                    <td><ul><li>D3-CONF: Implement strict change control for domain policies</li><li>D3-LOGM: Centralize and monitor domain policy changes</li><li>D3-ACCM: Monitor privileged account activity related to domain policies</li><li>D3-INTEG: Monitor integrity of domain policy files</li></ul></td>
                 </tr><tr>
                     <td>17</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Buffer Manipulation</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499.004' target='_blank' class='mitre-link'>T1499.004: Application or System Exploitation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments</li><li>D3-PATM: Maintain current security patches</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-MEMF: Enable memory protection mechanisms</li><li>D3-SAND: Use sandboxing for suspicious content</li></ul></td>
                 </tr><tr>
                     <td>18</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Shared Data Manipulation</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1565' target='_blank' class='mitre-link'>T1565: Data Manipulation</a></li></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>19</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Flooding</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499' target='_blank' class='mitre-link'>T1499: Endpoint Denial of Service</a></li></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>20</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Path Traversal</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>21</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Subverting Environment Variable Values</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1574' target='_blank' class='mitre-link'>T1574: Hijack Execution Flow</a></li></ul></td>
+                    <td><ul><li>D3-EXEC: Implement application allowlisting</li><li>D3-PMON: Monitor process execution flows</li><li>D3-INTEG: Monitor system component integrity</li><li>D3-MEMF: Enable memory protection mechanisms</li></ul></td>
                 </tr><tr>
                     <td>22</td>
                     <td>Unspecified</td>
                     <td>Excessive Allocation</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499' target='_blank' class='mitre-link'>T1499: Endpoint Denial of Service</a></li></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>23</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Try All Common Switches</td>
                     <td class="severity-low">LOW (5.0)</td>
+                    <td><ul></ul></td>
                     <td><ul></ul></td>
                 </tr><tr>
                     <td>24</td>
@@ -747,491 +849,561 @@
                     <td>Format String Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>25</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>LDAP Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>26</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Parameter Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1565' target='_blank' class='mitre-link'>T1565: Data Manipulation</a></li><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>27</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Relative Path Traversal</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>28</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Client-side Injection-induced Buffer Overflow</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li><li><a href='https://attack.mitre.org/techniques/T1499' target='_blank' class='mitre-link'>T1499: Endpoint Denial of Service</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>29</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XML Schema Poisoning</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1565' target='_blank' class='mitre-link'>T1565: Data Manipulation</a></li></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>30</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XML Ping of the Death</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>31</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Content Spoofing</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1036' target='_blank' class='mitre-link'>T1036: Masquerading</a></li></ul></td>
+                    <td><ul><li>D3-FAPA: Analyze file attributes and signatures</li><li>D3-HEUR: Use behavioral analysis to detect masquerading</li><li>D3-EXEC: Implement application allowlisting</li><li>D3-PMON: Monitor process execution and parent-child relationships</li></ul></td>
                 </tr><tr>
                     <td>32</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Command Delimiters</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1574' target='_blank' class='mitre-link'>T1574: Hijack Execution Flow</a></li></ul></td>
+                    <td><ul><li>D3-EXEC: Implement application allowlisting</li><li>D3-PMON: Monitor process execution flows</li><li>D3-INTEG: Monitor system component integrity</li><li>D3-MEMF: Enable memory protection mechanisms</li></ul></td>
                 </tr><tr>
                     <td>33</td>
                     <td>Unspecified</td>
                     <td>Input Data Manipulation</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1565' target='_blank' class='mitre-link'>T1565: Data Manipulation</a></li></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>34</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Sniffing Attacks</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1040' target='_blank' class='mitre-link'>T1040: Network Sniffing</a></li></ul></td>
+                    <td><ul><li>D3-TLSA: Enforce encryption for all network communications</li><li>D3-NETM: Monitor network traffic for sniffing activities</li><li>D3-SEGM: Implement network segmentation</li><li>D3-VPN: Use VPN for sensitive communications</li><li>D3-NIDS: Deploy network intrusion detection systems</li></ul></td>
                 </tr><tr>
                     <td>35</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Dictionary-based Password Attack</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1110' target='_blank' class='mitre-link'>T1110: Brute Force</a></li><li><a href='https://attack.mitre.org/techniques/T1110.001' target='_blank' class='mitre-link'>T1110.001: Password Guessing</a></li></ul></td>
+                    <td><ul><li>D3-ACCL: Implement progressive account lockout policies</li><li>D3-CAPT: Deploy CAPTCHA systems for authentication</li><li>D3-RATL: Implement authentication rate limiting</li><li>D3-NETF: Block suspicious IP addresses</li><li>D3-MFA: Require MFA to mitigate credential compromise</li><li>D3-PWDP: Enforce complex password requirements</li><li>D3-ACCL: Lock accounts after failed attempts</li><li>D3-AUTHM: Monitor and alert on authentication failures</li><li>D3-RATL: Limit authentication attempts per time period</li></ul></td>
                 </tr><tr>
                     <td>36</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Exploit Script-Based APIs</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1041' target='_blank' class='mitre-link'>T1041: Exfiltration Over C2 Channel</a></li></ul></td>
+                    <td><ul><li>D3-NETM: Monitor network traffic for data exfiltration</li><li>D3-DLP: Implement network-based DLP</li><li>D3-NETF: Filter suspicious network communications</li><li>D3-ENCR: Encrypt data in transit</li><li>D3-SEGM: Implement network segmentation</li></ul></td>
                 </tr><tr>
                     <td>37</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>White Box Reverse Engineering</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1555' target='_blank' class='mitre-link'>T1555: Credentials from Password Stores</a></li></ul></td>
+                    <td><ul><li>D3-ENCR: Encrypt password stores and credential storage</li><li>D3-PRIV: Implement secure credential storage</li><li>D3-ACCM: Monitor credential store access</li><li>D3-MFA: Require MFA for credential store access</li><li>D3-FMON: Monitor password store file access</li></ul></td>
                 </tr><tr>
                     <td>38</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Footprinting</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1592' target='_blank' class='mitre-link'>T1592: Gather Victim Host Information</a></li></ul></td>
+                    <td><ul><li>D3-NETF: Filter reconnaissance traffic</li><li>D3-NETM: Monitor for reconnaissance activities</li><li>D3-DECOY: Deploy honeypots to detect reconnaissance</li><li>D3-CONF: Harden system configurations</li><li>D3-BANNER: Hide service banners and version information</li></ul></td>
                 </tr><tr>
                     <td>39</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Using Malicious Files</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1105' target='_blank' class='mitre-link'>T1105: Ingress Tool Transfer</a></li></ul></td>
+                    <td><ul><li>D3-NETF: Implement network segmentation and egress filtering</li><li>D3-FAPA: Analyze all file transfers and uploads</li><li>D3-NETM: Monitor network traffic for suspicious file transfers</li><li>D3-SAND: Sandbox suspicious files before execution</li></ul></td>
                 </tr><tr>
                     <td>40</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Web Application Fingerprinting</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1592' target='_blank' class='mitre-link'>T1592: Gather Victim Host Information</a></li></ul></td>
+                    <td><ul><li>D3-NETF: Filter reconnaissance traffic</li><li>D3-NETM: Monitor for reconnaissance activities</li><li>D3-DECOY: Deploy honeypots to detect reconnaissance</li><li>D3-CONF: Harden system configurations</li><li>D3-BANNER: Hide service banners and version information</li></ul></td>
                 </tr><tr>
                     <td>41</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XSS Targeting Non-Script Elements</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>42</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Exploiting Incorrectly Configured Access Control Security Levels</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1548' target='_blank' class='mitre-link'>T1548: Abuse Elevation Control Mechanism</a></li></ul></td>
+                    <td><ul><li>D3-PRIV: Implement least privilege access controls</li><li>D3-CONF: Enforce secure configuration of elevation mechanisms</li><li>D3-SYSM: Monitor system calls related to elevation</li><li>D3-INTEG: Monitor integrity of elevation control binaries</li></ul></td>
                 </tr><tr>
                     <td>43</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>IMAP/SMTP Command Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li><li><a href='https://attack.mitre.org/techniques/T1059' target='_blank' class='mitre-link'>T1059: Command and Scripting Interpreter</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li><li>D3-INPV: Implement strict input validation and sanitization</li><li>D3-EXEC: Use application allowlisting to prevent malicious execution</li><li>D3-PMON: Monitor process execution and command-line arguments</li><li>D3-SAND: Use sandboxing for script analysis</li></ul></td>
                 </tr><tr>
                     <td>44</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Reverse Engineering</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1555' target='_blank' class='mitre-link'>T1555: Credentials from Password Stores</a></li></ul></td>
+                    <td><ul><li>D3-ENCR: Encrypt password stores and credential storage</li><li>D3-PRIV: Implement secure credential storage</li><li>D3-ACCM: Monitor credential store access</li><li>D3-MFA: Require MFA for credential store access</li><li>D3-FMON: Monitor password store file access</li></ul></td>
                 </tr><tr>
                     <td>45</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Embedding Scripts within Scripts</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1055' target='_blank' class='mitre-link'>T1055: Process Injection</a></li></ul></td>
+                    <td><ul><li>D3-MEMF: Enable memory protection mechanisms (ASLR, DEP)</li><li>D3-PMON: Monitor process creation and injection activities</li><li>D3-EXEC: Implement application allowlisting</li><li>D3-SYSM: Monitor system calls related to process injection</li></ul></td>
                 </tr><tr>
                     <td>46</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>PHP Remote File Inclusion</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1505.003' target='_blank' class='mitre-link'>T1505.003: Web Shell</a></li><li><a href='https://attack.mitre.org/techniques/T1105' target='_blank' class='mitre-link'>T1105: Ingress Tool Transfer</a></li></ul></td>
+                    <td><ul><li>D3-FAPA: Monitor file uploads and analyze for web shells</li><li>D3-INTEG: Monitor web server file integrity</li><li>D3-NETM: Monitor network traffic for web shell communications</li><li>D3-WAFF: Configure WAF to detect web shell activities</li><li>D3-NETF: Implement network segmentation and egress filtering</li><li>D3-FAPA: Analyze all file transfers and uploads</li><li>D3-NETM: Monitor network traffic for suspicious file transfers</li><li>D3-SAND: Sandbox suspicious files before execution</li></ul></td>
                 </tr><tr>
                     <td>47</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Principal Spoof</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1078' target='_blank' class='mitre-link'>T1078: Valid Accounts</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Enforce MFA for all account access</li><li>D3-PWDP: Implement and enforce strong password policies</li><li>D3-ACCM: Monitor account usage patterns and detect anomalies</li><li>D3-PRIV: Implement principle of least privilege</li></ul></td>
                 </tr><tr>
                     <td>48</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Session Credential Falsification through Forging</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1539' target='_blank' class='mitre-link'>T1539: Steal Web Session Cookie</a></li></ul></td>
+                    <td><ul><li>D3-COOK: Implement HttpOnly and Secure flags for cookies</li><li>D3-SESM: Use short session timeouts and rotation</li><li>D3-TLSA: Enforce HTTPS for all sensitive operations</li><li>D3-WEBS: Monitor web session patterns for anomalies</li></ul></td>
                 </tr><tr>
                     <td>49</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XML Entity Expansion</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499' target='_blank' class='mitre-link'>T1499: Endpoint Denial of Service</a></li><li><a href='https://attack.mitre.org/techniques/T1499.004' target='_blank' class='mitre-link'>T1499.004: Application or System Exploitation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments</li><li>D3-PATM: Maintain current security patches</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-MEMF: Enable memory protection mechanisms</li><li>D3-SAND: Use sandboxing for suspicious content</li></ul></td>
                 </tr><tr>
                     <td>50</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XSS Targeting Error Pages</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>51</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XSS Using Alternate Syntax</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>52</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Encryption Brute Forcing</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1110' target='_blank' class='mitre-link'>T1110: Brute Force</a></li></ul></td>
+                    <td><ul><li>D3-ACCL: Implement progressive account lockout policies</li><li>D3-CAPT: Deploy CAPTCHA systems for authentication</li><li>D3-RATL: Implement authentication rate limiting</li><li>D3-NETF: Block suspicious IP addresses</li><li>D3-MFA: Require MFA to mitigate credential compromise</li></ul></td>
                 </tr><tr>
                     <td>53</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Manipulate Registry Information</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1112' target='_blank' class='mitre-link'>T1112: Modify Registry</a></li></ul></td>
+                    <td><ul><li>D3-SYSM: Monitor registry modifications</li><li>D3-INTEG: Monitor registry integrity</li><li>D3-CONF: Enforce registry configuration baselines</li><li>D3-BACK: Backup critical registry keys</li></ul></td>
                 </tr><tr>
                     <td>54</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Lifting Sensitive Data Embedded in Cache</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1213' target='_blank' class='mitre-link'>T1213: Data from Information Repositories</a></li></ul></td>
+                    <td><ul><li>D3-DLP: Implement comprehensive DLP solutions</li><li>D3-PRIV: Restrict access to sensitive repositories</li><li>D3-ACCM: Monitor repository access patterns</li><li>D3-ENCR: Encrypt sensitive data repositories</li><li>D3-BACK: Secure backup of sensitive repositories</li></ul></td>
                 </tr><tr>
                     <td>55</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Removing Important Client Functionality</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499' target='_blank' class='mitre-link'>T1499: Endpoint Denial of Service</a></li><li><a href='https://attack.mitre.org/techniques/T1621' target='_blank' class='mitre-link'>T1621: Multi-Factor Authentication Request Generation</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Implement robust MFA with anomaly detection</li><li>D3-AUTHM: Monitor MFA request patterns</li><li>D3-UATR: Educate users about MFA fatigue attacks</li><li>D3-RATL: Limit MFA request frequency</li></ul></td>
                 </tr><tr>
                     <td>56</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XSS Using MIME Type Mismatch</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>57</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Exploitation of Trusted Credentials</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1078' target='_blank' class='mitre-link'>T1078: Valid Accounts</a></li></ul></td>
+                    <td><ul><li>D3-MFA: Enforce MFA for all account access</li><li>D3-PWDP: Implement and enforce strong password policies</li><li>D3-ACCM: Monitor account usage patterns and detect anomalies</li><li>D3-PRIV: Implement principle of least privilege</li></ul></td>
                 </tr><tr>
                     <td>58</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Functionality Misuse</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1548' target='_blank' class='mitre-link'>T1548: Abuse Elevation Control Mechanism</a></li><li><a href='https://attack.mitre.org/techniques/T1562' target='_blank' class='mitre-link'>T1562: Impair Defenses</a></li></ul></td>
+                    <td><ul><li>D3-PRIV: Implement least privilege access controls</li><li>D3-CONF: Enforce secure configuration of elevation mechanisms</li><li>D3-SYSM: Monitor system calls related to elevation</li><li>D3-INTEG: Monitor integrity of elevation control binaries</li><li>D3-INTEG: Monitor security control integrity</li><li>D3-CONF: Enforce security configuration management</li><li>D3-SYSM: Monitor system calls affecting security controls</li><li>D3-BACK: Backup security configurations</li><li>D3-REDUNDANCY: Implement multiple layers of defense</li></ul></td>
                 </tr><tr>
                     <td>59</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Fuzzing and observing application log data/errors for application mapping</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1595' target='_blank' class='mitre-link'>T1595: Active Scanning</a></li></ul></td>
+                    <td><ul><li>D3-NETF: Filter and block scanning traffic</li><li>D3-NETM: Monitor for scanning activities</li><li>D3-RATL: Implement rate limiting on services</li><li>D3-DECOY: Deploy honeypots to detect scanning</li><li>D3-NIDS: Deploy network intrusion detection</li></ul></td>
                 </tr><tr>
                     <td>60</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Communication Channel Manipulation</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1071' target='_blank' class='mitre-link'>T1071: Application Layer Protocol</a></li></ul></td>
+                    <td><ul><li>D3-NETM: Monitor network traffic for protocol anomalies</li><li>D3-PROTF: Implement protocol-specific filtering</li><li>D3-DPI: Use deep packet inspection for protocol analysis</li><li>D3-NETF: Filter suspicious protocol communications</li></ul></td>
                 </tr><tr>
                     <td>61</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Exploiting Incorrectly Configured SSL</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1552' target='_blank' class='mitre-link'>T1552: Unsecured Credentials</a></li></ul></td>
+                    <td><ul><li>D3-TLSA: Implement proper TLS configuration and monitoring</li><li>D3-CERT: Implement certificate validation and pinning</li><li>D3-ENCR: Encrypt all sensitive communications</li><li>D3-CONF: Secure SSL/TLS configurations</li><li>D3-VULM: Regular SSL/TLS vulnerability assessment</li></ul></td>
                 </tr><tr>
                     <td>62</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XML Routing Detour Attacks</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1071.001' target='_blank' class='mitre-link'>T1071.001: Web Protocols</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy WAF with HTTP protocol inspection</li><li>D3-NETM: Monitor HTTP/HTTPS traffic for anomalies</li><li>D3-TLSA: Analyze TLS communications for manipulation</li><li>D3-INPV: Validate HTTP requests and responses</li></ul></td>
                 </tr><tr>
                     <td>63</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Exploiting Trust in Client</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1213' target='_blank' class='mitre-link'>T1213: Data from Information Repositories</a></li></ul></td>
+                    <td><ul><li>D3-DLP: Implement comprehensive DLP solutions</li><li>D3-PRIV: Restrict access to sensitive repositories</li><li>D3-ACCM: Monitor repository access patterns</li><li>D3-ENCR: Encrypt sensitive data repositories</li><li>D3-BACK: Secure backup of sensitive repositories</li></ul></td>
                 </tr><tr>
                     <td>64</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Client-Server Protocol Manipulation</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1071' target='_blank' class='mitre-link'>T1071: Application Layer Protocol</a></li><li><a href='https://attack.mitre.org/techniques/T1071.001' target='_blank' class='mitre-link'>T1071.001: Web Protocols</a></li></ul></td>
+                    <td><ul><li>D3-NETM: Monitor network traffic for protocol anomalies</li><li>D3-PROTF: Implement protocol-specific filtering</li><li>D3-DPI: Use deep packet inspection for protocol analysis</li><li>D3-NETF: Filter suspicious protocol communications</li><li>D3-WAFF: Deploy WAF with HTTP protocol inspection</li><li>D3-NETM: Monitor HTTP/HTTPS traffic for anomalies</li><li>D3-TLSA: Analyze TLS communications for manipulation</li><li>D3-INPV: Validate HTTP requests and responses</li></ul></td>
                 </tr><tr>
                     <td>65</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XML External Entities Blowup</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499' target='_blank' class='mitre-link'>T1499: Endpoint Denial of Service</a></li></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>66</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>iFrame Overlay</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1036' target='_blank' class='mitre-link'>T1036: Masquerading</a></li></ul></td>
+                    <td><ul><li>D3-FAPA: Analyze file attributes and signatures</li><li>D3-HEUR: Use behavioral analysis to detect masquerading</li><li>D3-EXEC: Implement application allowlisting</li><li>D3-PMON: Monitor process execution and parent-child relationships</li></ul></td>
                 </tr><tr>
                     <td>67</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Session Credential Falsification through Manipulation</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1539' target='_blank' class='mitre-link'>T1539: Steal Web Session Cookie</a></li></ul></td>
+                    <td><ul><li>D3-COOK: Implement HttpOnly and Secure flags for cookies</li><li>D3-SESM: Use short session timeouts and rotation</li><li>D3-TLSA: Enforce HTTPS for all sensitive operations</li><li>D3-WEBS: Monitor web session patterns for anomalies</li></ul></td>
                 </tr><tr>
                     <td>68</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>DTD Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>69</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XML Attribute Blowup</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499' target='_blank' class='mitre-link'>T1499: Endpoint Denial of Service</a></li></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>70</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>File Content Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>71</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XML Nested Payloads</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>72</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Privilege Escalation</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1068' target='_blank' class='mitre-link'>T1068: Exploitation for Privilege Escalation</a></li></ul></td>
+                    <td><ul><li>D3-VULM: Regular vulnerability assessments and penetration testing</li><li>D3-PATM: Implement timely patch management processes</li><li>D3-ENDP: Deploy EDR to detect exploitation attempts</li><li>D3-INPV: Implement comprehensive input validation</li></ul></td>
                 </tr><tr>
                     <td>73</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Hijacking a privileged process</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1548' target='_blank' class='mitre-link'>T1548: Abuse Elevation Control Mechanism</a></li><li><a href='https://attack.mitre.org/techniques/T1055' target='_blank' class='mitre-link'>T1055: Process Injection</a></li></ul></td>
+                    <td><ul><li>D3-PRIV: Implement least privilege access controls</li><li>D3-CONF: Enforce secure configuration of elevation mechanisms</li><li>D3-SYSM: Monitor system calls related to elevation</li><li>D3-INTEG: Monitor integrity of elevation control binaries</li><li>D3-MEMF: Enable memory protection mechanisms (ASLR, DEP)</li><li>D3-PMON: Monitor process creation and injection activities</li><li>D3-EXEC: Implement application allowlisting</li><li>D3-SYSM: Monitor system calls related to process injection</li></ul></td>
                 </tr><tr>
                     <td>74</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Catching exception throw/signal from privileged block</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1548' target='_blank' class='mitre-link'>T1548: Abuse Elevation Control Mechanism</a></li></ul></td>
+                    <td><ul><li>D3-PRIV: Implement least privilege access controls</li><li>D3-CONF: Enforce secure configuration of elevation mechanisms</li><li>D3-SYSM: Monitor system calls related to elevation</li><li>D3-INTEG: Monitor integrity of elevation control binaries</li></ul></td>
                 </tr><tr>
                     <td>75</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Filter Failure through Buffer Overflow</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1499' target='_blank' class='mitre-link'>T1499: Endpoint Denial of Service</a></li></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>76</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Resource Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>77</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Code Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>78</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XSS Targeting HTML Attributes</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>79</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XSS Targeting URI Placeholders</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>80</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350> → <pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XSS Using Doubled Characters</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>81</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XSS Using Invalid Characters</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>82</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Command Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li><li><a href='https://attack.mitre.org/techniques/T1059' target='_blank' class='mitre-link'>T1059: Command and Scripting Interpreter</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li><li>D3-INPV: Implement strict input validation and sanitization</li><li>D3-EXEC: Use application allowlisting to prevent malicious execution</li><li>D3-PMON: Monitor process execution and command-line arguments</li><li>D3-SAND: Use sandboxing for script analysis</li></ul></td>
                 </tr><tr>
                     <td>83</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>XML Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>84</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Remote Code Inclusion</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li><li><a href='https://attack.mitre.org/techniques/T1505.003' target='_blank' class='mitre-link'>T1505.003: Web Shell</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li><li>D3-FAPA: Monitor file uploads and analyze for web shells</li><li>D3-INTEG: Monitor web server file integrity</li><li>D3-NETM: Monitor network traffic for web shell communications</li><li>D3-WAFF: Configure WAF to detect web shell activities</li></ul></td>
                 </tr><tr>
                     <td>85</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>SOAP Array Overflow</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>86</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Leverage Alternate Encoding</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1140' target='_blank' class='mitre-link'>T1140: Deobfuscate/Decode Files or Information</a></li></ul></td>
+                    <td><ul><li>D3-GENERIC-DEFENSE-55: Implement content inspection</li><li>D3-GENERIC-DEFENSE-56: Use sandboxing for suspicious files</li></ul></td>
                 </tr><tr>
                     <td>87</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Audit Log Manipulation</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1565' target='_blank' class='mitre-link'>T1565: Data Manipulation</a></li><li><a href='https://attack.mitre.org/techniques/T1070' target='_blank' class='mitre-link'>T1070: Indicator Removal</a></li></ul></td>
+                    <td><ul><li>D3-LOGM: Implement centralized and tamper-proof logging</li><li>D3-BACK: Secure log backup and retention policies</li><li>D3-INTEG: Monitor system integrity and log modifications</li><li>D3-SIEM: Use SIEM for log analysis and correlation</li></ul></td>
                 </tr><tr>
                     <td>88</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Schema Poisoning</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1565' target='_blank' class='mitre-link'>T1565: Data Manipulation</a></li></ul></td>
+                    <td><ul></ul></td>
                 </tr><tr>
                     <td>89</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>HTTP Response Smuggling</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1071.001' target='_blank' class='mitre-link'>T1071.001: Web Protocols</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy WAF with HTTP protocol inspection</li><li>D3-NETM: Monitor HTTP/HTTPS traffic for anomalies</li><li>D3-TLSA: Analyze TLS communications for manipulation</li><li>D3-INPV: Validate HTTP requests and responses</li></ul></td>
                 </tr><tr>
                     <td>90</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>HTTP Request Smuggling</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1071.001' target='_blank' class='mitre-link'>T1071.001: Web Protocols</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy WAF with HTTP protocol inspection</li><li>D3-NETM: Monitor HTTP/HTTPS traffic for anomalies</li><li>D3-TLSA: Analyze TLS communications for manipulation</li><li>D3-INPV: Validate HTTP requests and responses</li></ul></td>
                 </tr><tr>
                     <td>91</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>DOM-Based XSS</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>92</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Session Credential Falsification through Prediction</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1539' target='_blank' class='mitre-link'>T1539: Steal Web Session Cookie</a></li></ul></td>
+                    <td><ul><li>D3-COOK: Implement HttpOnly and Secure flags for cookies</li><li>D3-SESM: Use short session timeouts and rotation</li><li>D3-TLSA: Enforce HTTPS for all sensitive operations</li><li>D3-WEBS: Monitor web session patterns for anomalies</li></ul></td>
                 </tr><tr>
                     <td>93</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Reflected XSS</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>94</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Stored XSS</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1059.007' target='_blank' class='mitre-link'>T1059.007: JavaScript</a></li></ul></td>
+                    <td><ul><li>D3-CSP: Implement and enforce Content Security Policy</li><li>D3-INPV: Validate and sanitize all user inputs</li><li>D3-OUTP: Perform proper output encoding to prevent XSS</li><li>D3-WEBS: Monitor web sessions for malicious JavaScript</li></ul></td>
                 </tr><tr>
                     <td>95</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Session Hijacking - ServerSide</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1185' target='_blank' class='mitre-link'>T1185: Browser Session Hijacking</a></li></ul></td>
+                    <td><ul><li>D3-SESM: Implement secure session management practices</li><li>D3-TLSA: Use HTTPS everywhere with proper TLS configuration</li><li>D3-COOK: Implement secure cookie attributes</li><li>D3-NETM: Monitor for session anomalies</li></ul></td>
                 </tr><tr>
                     <td>96</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Session Hijacking - ClientSide</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1185' target='_blank' class='mitre-link'>T1185: Browser Session Hijacking</a></li></ul></td>
+                    <td><ul><li>D3-SESM: Implement secure session management practices</li><li>D3-TLSA: Use HTTPS everywhere with proper TLS configuration</li><li>D3-COOK: Implement secure cookie attributes</li><li>D3-NETM: Monitor for session anomalies</li></ul></td>
                 </tr><tr>
                     <td>97</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Argument Injection</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1190' target='_blank' class='mitre-link'>T1190: Exploit Public-Facing Application</a></li></ul></td>
+                    <td><ul><li>D3-WAFF: Deploy and configure Web Application Firewalls</li><li>D3-VULM: Regular penetration testing and vulnerability assessment</li><li>D3-INPV: Implement comprehensive input validation</li><li>D3-PATM: Maintain current security patches for applications</li></ul></td>
                 </tr><tr>
                     <td>98</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Reusing Session IDs (aka Session Replay) - ServerSide</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1539' target='_blank' class='mitre-link'>T1539: Steal Web Session Cookie</a></li></ul></td>
+                    <td><ul><li>D3-COOK: Implement HttpOnly and Secure flags for cookies</li><li>D3-SESM: Use short session timeouts and rotation</li><li>D3-TLSA: Enforce HTTPS for all sensitive operations</li><li>D3-WEBS: Monitor web session patterns for anomalies</li></ul></td>
                 </tr><tr>
                     <td>99</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Reusing Session IDs (aka Session Replay) - ClientSide</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1539' target='_blank' class='mitre-link'>T1539: Steal Web Session Cookie</a></li></ul></td>
+                    <td><ul><li>D3-COOK: Implement HttpOnly and Secure flags for cookies</li><li>D3-SESM: Use short session timeouts and rotation</li><li>D3-TLSA: Enforce HTTPS for all sensitive operations</li><li>D3-WEBS: Monitor web session patterns for anomalies</li></ul></td>
                 </tr><tr>
                     <td>100</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Cross Site Request Forgery</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1598' target='_blank' class='mitre-link'>T1598: Phishing for Information</a></li></ul></td>
+                    <td><ul><li>D3-CSRF: Implement anti-CSRF tokens and SameSite cookies</li><li>D3-UATR: Educate users about phishing and CSRF attacks</li><li>D3-WEBS: Monitor web sessions for suspicious activity</li><li>D3-INPV: Validate all user inputs and requests</li></ul></td>
                 </tr><tr>
                     <td>101</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Data Leak</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1005' target='_blank' class='mitre-link'>T1005: Data from Local System</a></li></ul></td>
+                    <td><ul><li>D3-DLP: Implement comprehensive DLP solutions</li><li>D3-ENCR: Encrypt sensitive data at rest</li><li>D3-ACCM: Monitor local data access patterns</li><li>D3-PRIV: Implement least privilege access controls</li><li>D3-FMON: Monitor sensitive file access</li></ul></td>
                 </tr><tr>
                     <td>102</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Unprotected Sensitive Data</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1005' target='_blank' class='mitre-link'>T1005: Data from Local System</a></li></ul></td>
+                    <td><ul><li>D3-DLP: Implement comprehensive DLP solutions</li><li>D3-ENCR: Encrypt sensitive data at rest</li><li>D3-ACCM: Monitor local data access patterns</li><li>D3-PRIV: Implement least privilege access controls</li><li>D3-FMON: Monitor sensitive file access</li></ul></td>
                 </tr><tr>
                     <td>103</td>
-                    <td><pytm.pytm.varString object at 0x000001E1D1CD4110></td>
+                    <td><pytm.pytm.varString object at 0x000002B7B4CA4350></td>
                     <td>Credentials Aging</td>
                     <td class="severity-low">LOW (5.0)</td>
                     <td><ul><li><a href='https://attack.mitre.org/techniques/T1005' target='_blank' class='mitre-link'>T1005: Data from Local System</a></li></ul></td>
-                </tr></tbody></table></div><h2>Recommendations</h2>
-        <div class="card">
-            <ul>
-                <li>Implement strong authentication mechanisms (MFA, strong passwords) for all critical systems and user accounts.</li>
-                <li>Regularly patch and update all software, operating systems, and firmware to protect against known vulnerabilities.</li>
-                <li>Perform regular security audits and penetration testing to identify and remediate weaknesses.</li>
-                <li>Employ intrusion detection/prevention systems (IDPS) and security information and event management (SIEM) solutions for continuous monitoring.</li>
-                <li>Implement data encryption at rest and in transit for sensitive information.</li>
-            </ul>
-        </div>
-</div>
+                    <td><ul><li>D3-DLP: Implement comprehensive DLP solutions</li><li>D3-ENCR: Encrypt sensitive data at rest</li><li>D3-ACCM: Monitor local data access patterns</li><li>D3-PRIV: Implement least privilege access controls</li><li>D3-FMON: Monitor sensitive file access</li></ul></td>
+                </tr></tbody></table></div></div>
     <script>
         function openTab(evt, tabName) {
             var i, tabcontent, tablinks;
