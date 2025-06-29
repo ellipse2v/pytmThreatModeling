@@ -81,7 +81,7 @@ class DiagramGenerator:
             )
             
             if os.path.exists(output_path):
-                print(f"✅ Diagram generated: {output_path}")
+                
                 return output_path
             else:
                 print("❌ Output file was not created")
@@ -579,7 +579,7 @@ class DiagramGenerator:
         # NOTE: No legend in DOT - it will be added in HTML
         dot_code.append("}")
         result = "\n".join(dot_code)
-        print(f"📝 Generated DOT code ({len(result)} characters)")
+        
         return result
 
     def _generate_legend_html(self, threat_model) -> str:
@@ -651,7 +651,7 @@ class DiagramGenerator:
             with open(html_output_path, 'w', encoding='utf-8') as f:
                 f.write(html_content)
             
-            print(f"✅ HTML diagram with legend saved: {html_output_path}")
+            
             return html_output_path
         
         except Exception as e:
@@ -1035,7 +1035,7 @@ class DiagramGenerator:
                         'line_style': 'solid'
                     }
             
-            print(f"🔍 DEBUG: Extracted {len(protocol_styles)} protocol styles: {list(protocol_styles.keys())}")
+            
             
         except Exception as e:
             print(f"⚠️ Error extracting protocol styles: {e}")
@@ -1051,7 +1051,7 @@ class DiagramGenerator:
         except FileNotFoundError:
             return False
         except subprocess.CalledProcessError as e:
-            print(f"❌ Error running Graphviz for verification: {e.stderr}")
+            
             return False
 
     def get_installation_instructions(self) -> str:

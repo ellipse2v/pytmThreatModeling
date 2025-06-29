@@ -36,23 +36,84 @@ This project is a Python-based, end-to-end STRIDE threat modeling and analysis f
 After running the analysis, you will find a timestamped folder in `output/` (e.g., `output/2025-06-08_15-45-24`) containing:
 
 - `stride_mitre_report_2025-06-08_15-45-24.html`:  
-  ![HTML Report Screenshot](output/example/stride_mitre_report_example.png)
+  ![HTML Report Screenshot](output/example/stride_mitre_report__example.png.jpg)
 - `mitre_analysis_2025-06-08_15-45-24.json`:  
   ```json
   {
-    "analysis_date": "2025-06-08T15:45:24",
-    "threats_detected": 12,
-    "threat_types": ["Spoofing", "Tampering", "Information Disclosure", "..."],
+    "analysis_date": "2025-06-29T15:31:56.517773",
+    "threats_detected": 183,
+    "threat_types": [
+      "Threat",
+      "Tampering",
+      "Information Disclosure",
+      "Elevation of Privilege",
+      "Spoofing",
+      "Denial of Service",
+      "Repudiation"
+    ],
     "mitre_mapping": {
-      "Spoofing": [{"id": "T1078", "name": "Valid Accounts"}]
+      "Spoofing": {
+        "tactics": [
+          "Initial Access",
+          "Defense Evasion",
+          "Credential Access"
+        ],
+        "techniques": [
+          {
+            "id": "T1566",
+            "name": "Phishing",
+            "description": "Identity spoofing via phishing"
+          }
+        ]
+      },
+      "Tampering": {
+        "tactics": [
+          "Defense Evasion",
+          "Impact",
+          "Initial Access",
+          "Execution"
+        ],
+        "techniques": [
+          {
+            "id": "T1565",
+            "name": "Data Manipulation",
+            "description": "Unauthorized data modification"
+          }
+        ]
+      }
     },
     "detailed_threats": [
       {
-        "name": "Spoofing on External Firewall",
-        "stride_category": "Spoofing",
-        "mitre_techniques": [{"id": "T1078", "name": "Valid Accounts"}],
-        "severity": 8.5,
-        "description": "An attacker could spoof credentials to access the external firewall."
+        "type": "Threat",
+        "description": "Vulnerability in the management interface of External Firewall",
+        "target": "External Firewall",
+        "severity": {"score": 8.5, "level": "HIGH"},
+        "mitre_techniques": [{"id": "T1068", "name": "Exploitation for Privilege Escalation"}],
+        "stride_category": "Elevation of Privilege"
+      },
+      {
+        "type": "Threat",
+        "description": "Lateral movement from Central Server to other systems in the network",
+        "target": "Central Server",
+        "severity": {"score": 8.5, "level": "HIGH"},
+        "mitre_techniques": [{"id": "T1021", "name": "Remote Services"}],
+        "stride_category": "Elevation of Privilege"
+      },
+      {
+        "type": "Threat",
+        "description": "Insecure security configuration or hardening on App Server 1",
+        "target": "App Server 1",
+        "severity": {"score": 6.0, "level": "MEDIUM"},
+        "mitre_techniques": [{"id": "T1562", "name": "Impair Defenses"}],
+        "stride_category": "Information Disclosure"
+      },
+      {
+        "type": "Threat",
+        "description": "Data exfiltration or leakage from Application Database",
+        "target": "Application Database",
+        "severity": {"score": 8.5, "level": "HIGH"},
+        "mitre_techniques": [{"id": "T1041", "name": "Exfiltration Over C2 Channel"}],
+        "stride_category": "Information Disclosure"
       }
     ]
   }
@@ -63,7 +124,7 @@ After running the analysis, you will find a timestamped folder in `output/` (e.g
   ![SVG Diagram Example](./output/example/tm_diagram__example.svg)
 - `tm_diagram_example.html`:  
   (Interactive HTML diagram with legend and threat highlights)
-  ![report  Example](./output/example/stride_mitre_report__example.png.jpg)
+  ![report  Example](output/example/stride_mitre_report__example.png.jpg)
 
 > **Note:** All screenshots and example files are located in the `output/example/` directory for easy preview and documentation.
 
@@ -119,6 +180,7 @@ If your model contains:
 - A to B: from="A", to="B", protocol="HTTPS"
 - B to A: from="B", to="A", protocol="HTTPS"
 ```
+
 The diagram will show:
 ```
 A <--> B
@@ -148,6 +210,8 @@ This feature is enabled by default and works for all protocols.
     - Windows: [https://graphviz.org/download/](https://graphviz.org/download/)
     - macOS: `brew install graphviz`
     - Linux: `sudo apt-get install graphviz`
+
+After installation, restart your terminal or IDE.
 
 ---
 

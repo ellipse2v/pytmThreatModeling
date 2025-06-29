@@ -67,14 +67,15 @@ class ThreatAnalysisFramework:
 
         # NEW: Diagnostic to check if the model has been populated
         model_stats = self.threat_model.get_statistics()
-        print(f"DEBUG: Model statistics after loading: {model_stats}")
+        
         if model_stats['actors'] == 0 and model_stats['servers'] == 0 and model_stats['dataflows'] == 0:
             print("⚠️ WARNING: The model appears to be empty or was not parsed correctly. Check your 'threat_model.md'.")
         
         # Analysis state (after model loading)
         self.analysis_completed = False
         self.grouped_threats = {}
-
+        self.custom_threats_list = []
+        self.elements_with_custom_threats = set()
 
     def _load_model_from_dsl(self):
         """Loads the threat model from the Markdown DSL file."""
@@ -82,8 +83,10 @@ class ThreatAnalysisFramework:
         try:
             with open(self.model_filepath, 'r', encoding='utf-8') as f:
                 markdown_content = f.read()
-            parser = ModelParser(self.threat_model)
+            parser = ModelParser(self.threat_model, self.mitre_mapping)
             parser.parse_markdown(markdown_content)
+            # The custom threats are now generated within the ThreatModel class
+            # self.custom_threats_list, self.elements_with_custom_threats = parser._apply_custom_threats()
             print(f"✅ Model loaded successfully from {self.model_filepath}")
         except FileNotFoundError:
             print(f"❌ Error: Model file '{self.model_filepath}' not found.")
@@ -172,7 +175,7 @@ class ThreatAnalysisFramework:
             except Exception as e:
                 print(f"❌ Error reading DOT file to generate SVG/HTML: {e}")
 
-        print("✅ Diagrams generated.")
+        
         return {"dot": dot_path, "svg": svg_path, "html": html_path}
 
 
@@ -182,11 +185,12 @@ class ThreatAnalysisFramework:
             if os.path.exists(report_path):
                 import webbrowser
                 webbrowser.open(os.path.abspath(report_path))
-                print(f"🌐 HTML report opened in browser: {os.path.abspath(report_path)}")
+                
             else:
                 print(f"⚠️ HTML report not found at: {os.path.abspath(report_path)}")
         except Exception as e:
-            print(f"❌ Could not automatically open browser: {e}")
+            pass
+
 
 # --- Main entry point ---
 if __name__ == "__main__":
@@ -209,5 +213,3 @@ if __name__ == "__main__":
 
     #if "html" in reports and reports["html"]:
     #    framework.open_report_in_browser(reports["html"])
-
-    print("\n✅ Process completed. Check generated files in the output directory.")

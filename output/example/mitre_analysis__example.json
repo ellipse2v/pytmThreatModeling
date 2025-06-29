@@ -1,9 +1,15 @@
 {
-  "analysis_date": "2025-06-19T21:54:59.461814",
+  "analysis_date": "2025-06-29T15:27:11.192159",
   "architecture": "DMZ with external/internal firewall and protocol break proxy",
-  "threats_detected": 103,
+  "threats_detected": 183,
   "threat_types": [
-    "Threat"
+    "Threat",
+    "Tampering",
+    "Information Disclosure",
+    "Elevation of Privilege",
+    "Spoofing",
+    "Denial of Service",
+    "Repudiation"
   ],
   "mitre_mapping": {
     "Spoofing": {
@@ -151,7 +157,7 @@
         {
           "id": "T1055",
           "name": "Process Injection",
-          "description": "Code injection into running processes"
+          "description": "Injecting code into privileged processes"
         },
         {
           "id": "T1562",
@@ -171,7 +177,7 @@
         {
           "id": "T1083",
           "name": "File and Directory Discovery",
-          "description": "Path traversal and directory enumeration"
+          "description": "Discovery of sensitive files and directories"
         },
         {
           "id": "T1574",
@@ -541,6 +547,11 @@
           "id": "T1484",
           "name": "Domain Policy Modification",
           "description": "Privilege abuse and policy manipulation"
+        },
+        {
+          "id": "T1021",
+          "name": "Remote Services",
+          "description": "Lateral movement using remote services"
         }
       ]
     },
@@ -572,7 +583,7 @@
     {
       "type": "Threat",
       "description": "Buffer Overflow via Environment Variables",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -588,12 +599,13 @@
             "Defense Evasion"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Overflow Buffers",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -609,12 +621,13 @@
             "Impact"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Server Side Include (SSI) Injection",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -633,12 +646,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Session Sidejacking",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -656,12 +670,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "HTTP Request Splitting",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -680,12 +695,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Cross Site Tracing",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -704,12 +720,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Command Line Execution through SQL Injection",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -739,12 +756,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "SQL Injection through SOAP Parameter Tampering",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -763,12 +781,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "JSON Hijacking (aka JavaScript Hijacking)",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -798,12 +817,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "API Manipulation",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -822,12 +842,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Authentication Abuse/ByPass",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -855,12 +876,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Excavation",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -879,12 +901,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Interception",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -903,12 +926,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Double Encoding",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -927,12 +951,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Exploit Test APIs",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -951,12 +976,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Privilege Abuse",
-      "target": "Unspecified Element",
+      "target": "Unspecified",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -974,12 +1000,13 @@
             "Persistence"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Buffer Manipulation",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -995,12 +1022,13 @@
             "Impact"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Shared Data Manipulation",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1016,12 +1044,13 @@
             "Defense Evasion"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Flooding",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1037,24 +1066,26 @@
             "Defense Evasion"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Path Traversal",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
         "css_class": "low",
         "formatted_score": "5.0/10"
       },
-      "mitre_techniques": []
+      "mitre_techniques": [],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Subverting Environment Variable Values",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1073,12 +1104,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Excessive Allocation",
-      "target": "Unspecified Element",
+      "target": "Unspecified",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1094,24 +1126,26 @@
             "Defense Evasion"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Try All Common Switches",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
         "css_class": "low",
         "formatted_score": "5.0/10"
       },
-      "mitre_techniques": []
+      "mitre_techniques": [],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Format String Injection",
-      "target": "Unspecified Element",
+      "target": "Unspecified",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1130,12 +1164,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "LDAP Injection",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1154,12 +1189,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Parameter Injection",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1186,24 +1222,26 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Relative Path Traversal",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
         "css_class": "low",
         "formatted_score": "5.0/10"
       },
-      "mitre_techniques": []
+      "mitre_techniques": [],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Client-side Injection-induced Buffer Overflow",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1230,12 +1268,13 @@
             "Defense Evasion"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XML Schema Poisoning",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1251,24 +1290,26 @@
             "Defense Evasion"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XML Ping of the Death",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
         "css_class": "low",
         "formatted_score": "5.0/10"
       },
-      "mitre_techniques": []
+      "mitre_techniques": [],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Content Spoofing",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1286,12 +1327,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Command Delimiters",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1310,12 +1352,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Input Data Manipulation",
-      "target": "Unspecified Element",
+      "target": "Unspecified",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1331,12 +1374,13 @@
             "Defense Evasion"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Sniffing Attacks",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1355,12 +1399,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Dictionary-based Password Attack",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1388,12 +1433,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Exploit Script-Based APIs",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1412,12 +1458,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "White Box Reverse Engineering",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1436,12 +1483,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Footprinting",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1460,12 +1508,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Using Malicious Files",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1484,12 +1533,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Web Application Fingerprinting",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1508,12 +1558,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XSS Targeting Non-Script Elements",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1532,12 +1583,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Exploiting Incorrectly Configured Access Control Security Levels",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1555,12 +1607,13 @@
             "Persistence"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "IMAP/SMTP Command Injection",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1590,12 +1643,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Reverse Engineering",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1614,12 +1668,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Embedding Scripts within Scripts",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1637,12 +1692,13 @@
             "Persistence"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "PHP Remote File Inclusion",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1672,12 +1728,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Principal Spoof",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1695,12 +1752,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Session Credential Falsification through Forging",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1718,12 +1776,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XML Entity Expansion",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1747,12 +1806,13 @@
             "Impact"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XSS Targeting Error Pages",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1771,12 +1831,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XSS Using Alternate Syntax",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1795,12 +1856,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Encryption Brute Forcing",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1818,12 +1880,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Manipulate Registry Information",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1842,12 +1905,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Lifting Sensitive Data Embedded in Cache",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1866,12 +1930,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Removing Important Client Functionality",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1898,12 +1963,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XSS Using MIME Type Mismatch",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1922,12 +1988,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Exploitation of Trusted Credentials",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1945,12 +2012,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Functionality Misuse",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -1977,12 +2045,13 @@
             "Impact"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Fuzzing and observing application log data/errors for application mapping",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2001,12 +2070,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Communication Channel Manipulation",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2025,12 +2095,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Exploiting Incorrectly Configured SSL",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2049,12 +2120,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XML Routing Detour Attacks",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2073,12 +2145,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Exploiting Trust in Client",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2097,12 +2170,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Client-Server Protocol Manipulation",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2132,12 +2206,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XML External Entities Blowup",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2153,12 +2228,13 @@
             "Defense Evasion"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "iFrame Overlay",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2176,12 +2252,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Session Credential Falsification through Manipulation",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2199,12 +2276,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "DTD Injection",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2223,12 +2301,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XML Attribute Blowup",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2244,12 +2323,13 @@
             "Defense Evasion"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "File Content Injection",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2268,24 +2348,26 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XML Nested Payloads",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
         "css_class": "low",
         "formatted_score": "5.0/10"
       },
-      "mitre_techniques": []
+      "mitre_techniques": [],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Privilege Escalation",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2303,12 +2385,13 @@
             "Persistence"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Hijacking a privileged process",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2336,12 +2419,13 @@
             "Persistence"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Catching exception throw/signal from privileged block",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2359,12 +2443,13 @@
             "Persistence"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Filter Failure through Buffer Overflow",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2380,12 +2465,13 @@
             "Defense Evasion"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Resource Injection",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2404,12 +2490,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Code Injection",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2428,12 +2515,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XSS Targeting HTML Attributes",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2452,12 +2540,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XSS Targeting URI Placeholders",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2476,12 +2565,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XSS Using Doubled Characters",
-      "target": "None → None",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110> → <pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2500,12 +2590,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XSS Using Invalid Characters",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2524,12 +2615,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Command Injection",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2559,12 +2651,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "XML Injection",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2583,12 +2676,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Remote Code Inclusion",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2618,24 +2712,26 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "SOAP Array Overflow",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
         "css_class": "low",
         "formatted_score": "5.0/10"
       },
-      "mitre_techniques": []
+      "mitre_techniques": [],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Leverage Alternate Encoding",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2654,12 +2750,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Audit Log Manipulation",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2686,12 +2783,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Schema Poisoning",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2707,12 +2805,13 @@
             "Defense Evasion"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "HTTP Response Smuggling",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2731,12 +2830,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "HTTP Request Smuggling",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2755,12 +2855,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "DOM-Based XSS",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2779,12 +2880,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Session Credential Falsification through Prediction",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2802,12 +2904,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Reflected XSS",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2826,12 +2929,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Stored XSS",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2850,12 +2954,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Session Hijacking - ServerSide",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2873,12 +2978,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Session Hijacking - ClientSide",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2896,12 +3002,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Argument Injection",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2920,12 +3027,13 @@
             "Execution"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Reusing Session IDs (aka Session Replay) - ServerSide",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2943,12 +3051,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Reusing Session IDs (aka Session Replay) - ClientSide",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2966,12 +3075,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Cross Site Request Forgery",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -2989,12 +3099,13 @@
             "Credential Access"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Data Leak",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -3013,12 +3124,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Unprotected Sensitive Data",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -3037,12 +3149,13 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
     },
     {
       "type": "Threat",
       "description": "Credentials Aging",
-      "target": "Unspecified Element",
+      "target": "<pytm.pytm.varString object at 0x000001E1D1CD4110>",
       "severity": {
         "score": 5.0,
         "level": "LOW",
@@ -3061,7 +3174,1887 @@
             "Reconnaissance"
           ]
         }
-      ]
+      ],
+      "stride_category": "Threat"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on External Firewall",
+      "target": "External Firewall",
+      "severity": {
+        "score": 9.0,
+        "level": "CRITICAL",
+        "css_class": "critical",
+        "formatted_score": "9.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on Protocol Break Device",
+      "target": "Protocol Break Device",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on Internal Firewall",
+      "target": "Internal Firewall",
+      "severity": {
+        "score": 9.0,
+        "level": "CRITICAL",
+        "css_class": "critical",
+        "formatted_score": "9.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on Gateway Load Balancer",
+      "target": "Gateway Load Balancer",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on App Server 1",
+      "target": "App Server 1",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "SQL or NoSQL injection vulnerability in the application on App Server 1",
+      "target": "App Server 1",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Web application vulnerabilities exploitation",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Cross-Site Scripting (XSS) vulnerability allowing script injection on App Server 1",
+      "target": "App Server 1",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Web application vulnerabilities exploitation",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        },
+        {
+          "id": "T1059.007",
+          "name": "JavaScript",
+          "description": "JavaScript-based attacks including XSS",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on App Server 2",
+      "target": "App Server 2",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "SQL or NoSQL injection vulnerability in the application on App Server 2",
+      "target": "App Server 2",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Web application vulnerabilities exploitation",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Cross-Site Scripting (XSS) vulnerability allowing script injection on App Server 2",
+      "target": "App Server 2",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Web application vulnerabilities exploitation",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        },
+        {
+          "id": "T1059.007",
+          "name": "JavaScript",
+          "description": "JavaScript-based attacks including XSS",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on App Server 3",
+      "target": "App Server 3",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "SQL or NoSQL injection vulnerability in the application on App Server 3",
+      "target": "App Server 3",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Web application vulnerabilities exploitation",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Cross-Site Scripting (XSS) vulnerability allowing script injection on App Server 3",
+      "target": "App Server 3",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1190",
+          "name": "Exploit Public-Facing Application",
+          "description": "Web application vulnerabilities exploitation",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        },
+        {
+          "id": "T1059.007",
+          "name": "JavaScript",
+          "description": "JavaScript-based attacks including XSS",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on Switch",
+      "target": "Switch",
+      "severity": {
+        "score": 9.5,
+        "level": "CRITICAL",
+        "css_class": "critical",
+        "formatted_score": "9.5/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on Central Server",
+      "target": "Central Server",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on Application Database",
+      "target": "Application Database",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Data corruption or tampering in Application Database via unauthorized write access",
+      "target": "Application Database",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on Authentication Server",
+      "target": "Authentication Server",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Tampering",
+      "description": "Unpatched OS or software vulnerabilities on Command Machine",
+      "target": "Command Machine",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Tampering"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on External Firewall",
+      "target": "External Firewall",
+      "severity": {
+        "score": 6.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "6.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on Protocol Break Device",
+      "target": "Protocol Break Device",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on Internal Firewall",
+      "target": "Internal Firewall",
+      "severity": {
+        "score": 6.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "6.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on Gateway Load Balancer",
+      "target": "Gateway Load Balancer",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Weak SSL/TLS configuration or ciphers used by Gateway Load Balancer",
+      "target": "Gateway Load Balancer",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on App Server 1",
+      "target": "App Server 1",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure Direct Object References (IDOR) leading to unauthorized data access on App Server 1",
+      "target": "App Server 1",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on App Server 2",
+      "target": "App Server 2",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure Direct Object References (IDOR) leading to unauthorized data access on App Server 2",
+      "target": "App Server 2",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on App Server 3",
+      "target": "App Server 3",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure Direct Object References (IDOR) leading to unauthorized data access on App Server 3",
+      "target": "App Server 3",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on Switch",
+      "target": "Switch",
+      "severity": {
+        "score": 6.5,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "6.5/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on Central Server",
+      "target": "Central Server",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on Application Database",
+      "target": "Application Database",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Unauthorized access to sensitive data stored in Application Database",
+      "target": "Application Database",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Data exfiltration or leakage from Application Database",
+      "target": "Application Database",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on Authentication Server",
+      "target": "Authentication Server",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Information Disclosure",
+      "description": "Insecure security configuration or hardening on Command Machine",
+      "target": "Command Machine",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562",
+          "name": "Impair Defenses",
+          "description": "Disabling logging and monitoring",
+          "tactics": [
+            "Defense Evasion",
+            "Impact"
+          ]
+        }
+      ],
+      "stride_category": "Information Disclosure"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on External Firewall",
+      "target": "External Firewall",
+      "severity": {
+        "score": 6.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "6.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Vulnerability in the management interface of External Firewall",
+      "target": "External Firewall",
+      "severity": {
+        "score": 6.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "6.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on Protocol Break Device",
+      "target": "Protocol Break Device",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on Internal Firewall",
+      "target": "Internal Firewall",
+      "severity": {
+        "score": 6.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "6.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Vulnerability in the management interface of Internal Firewall",
+      "target": "Internal Firewall",
+      "severity": {
+        "score": 6.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "6.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on Gateway Load Balancer",
+      "target": "Gateway Load Balancer",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on App Server 1",
+      "target": "App Server 1",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on App Server 2",
+      "target": "App Server 2",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on App Server 3",
+      "target": "App Server 3",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on Switch",
+      "target": "Switch",
+      "severity": {
+        "score": 6.5,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "6.5/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on Central Server",
+      "target": "Central Server",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Compromise of the management interface of Central Server",
+      "target": "Central Server",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Lateral movement from Central Server to other systems in the network",
+      "target": "Central Server",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1021",
+          "name": "Remote Services",
+          "description": "Lateral movement using remote services",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on Application Database",
+      "target": "Application Database",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on Authentication Server",
+      "target": "Authentication Server",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Elevation of Privilege",
+      "description": "Unauthorized privilege escalation on Command Machine",
+      "target": "Command Machine",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1068",
+          "name": "Exploitation for Privilege Escalation",
+          "description": "Exploiting vulnerabilities for privilege escalation",
+          "tactics": [
+            "Privilege Escalation",
+            "Defense Evasion",
+            "Persistence"
+          ]
+        }
+      ],
+      "stride_category": "Elevation of Privilege"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Firewall rule misconfiguration allowing unintended traffic to bypass External Firewall",
+      "target": "External Firewall",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562.001",
+          "name": "Disable or Modify System Firewall",
+          "description": "Firewall manipulation",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Firewall rule misconfiguration allowing unintended traffic to bypass Internal Firewall",
+      "target": "Internal Firewall",
+      "severity": {
+        "score": 8.0,
+        "level": "HIGH",
+        "css_class": "high",
+        "formatted_score": "8.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1562.001",
+          "name": "Disable or Modify System Firewall",
+          "description": "Firewall manipulation",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Session hijacking or fixation attack against the Gateway Load Balancer",
+      "target": "Gateway Load Balancer",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1185",
+          "name": "Browser Session Hijacking",
+          "description": "Session hijacking attacks",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Identity spoofing of the actor External Client 1 via phishing or credential theft",
+      "target": "External Client 1",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Identity spoofing of the actor External Client 2 via phishing or credential theft",
+      "target": "External Client 2",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Identity spoofing of the actor External Client 3 via phishing or credential theft",
+      "target": "External Client 3",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Identity spoofing of the actor External Client 4 via phishing or credential theft",
+      "target": "External Client 4",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Identity spoofing of the actor External Client 5 via phishing or credential theft",
+      "target": "External Client 5",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Identity spoofing of the actor External Client 6 via phishing or credential theft",
+      "target": "External Client 6",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Identity spoofing of the actor External Client 7 via phishing or credential theft",
+      "target": "External Client 7",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Identity spoofing of the actor External Client 8 via phishing or credential theft",
+      "target": "External Client 8",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Identity spoofing of the actor Internal Operator 1 via phishing or credential theft",
+      "target": "Internal Operator 1",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Identity spoofing of the actor Internal Operator 2 via phishing or credential theft",
+      "target": "Internal Operator 2",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Spoofing",
+      "description": "Identity spoofing of the actor System Administrator via phishing or credential theft",
+      "target": "System Administrator",
+      "severity": {
+        "score": 7.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "7.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1566",
+          "name": "Phishing",
+          "description": "Identity spoofing via phishing",
+          "tactics": [
+            "Initial Access",
+            "Defense Evasion",
+            "Credential Access"
+          ]
+        }
+      ],
+      "stride_category": "Spoofing"
+    },
+    {
+      "type": "Denial of Service",
+      "description": "Denial of Service (DoS) attack targeting External Firewall to exhaust its resources",
+      "target": "External Firewall",
+      "severity": {
+        "score": 6.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "6.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ],
+      "stride_category": "Denial of Service"
+    },
+    {
+      "type": "Denial of Service",
+      "description": "Denial of Service (DoS) attack targeting Internal Firewall to exhaust its resources",
+      "target": "Internal Firewall",
+      "severity": {
+        "score": 6.0,
+        "level": "MEDIUM",
+        "css_class": "medium",
+        "formatted_score": "6.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1499",
+          "name": "Endpoint Denial of Service",
+          "tactics": [
+            "Impact",
+            "Defense Evasion"
+          ]
+        }
+      ],
+      "stride_category": "Denial of Service"
+    },
+    {
+      "type": "Repudiation",
+      "description": "Repudiation of critical actions performed by External Client 1",
+      "target": "External Client 1",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1070",
+          "name": "Indicator Removal",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Repudiation"
+    },
+    {
+      "type": "Repudiation",
+      "description": "Repudiation of critical actions performed by External Client 2",
+      "target": "External Client 2",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1070",
+          "name": "Indicator Removal",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Repudiation"
+    },
+    {
+      "type": "Repudiation",
+      "description": "Repudiation of critical actions performed by External Client 3",
+      "target": "External Client 3",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1070",
+          "name": "Indicator Removal",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Repudiation"
+    },
+    {
+      "type": "Repudiation",
+      "description": "Repudiation of critical actions performed by External Client 4",
+      "target": "External Client 4",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1070",
+          "name": "Indicator Removal",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Repudiation"
+    },
+    {
+      "type": "Repudiation",
+      "description": "Repudiation of critical actions performed by External Client 5",
+      "target": "External Client 5",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1070",
+          "name": "Indicator Removal",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Repudiation"
+    },
+    {
+      "type": "Repudiation",
+      "description": "Repudiation of critical actions performed by External Client 6",
+      "target": "External Client 6",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1070",
+          "name": "Indicator Removal",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Repudiation"
+    },
+    {
+      "type": "Repudiation",
+      "description": "Repudiation of critical actions performed by External Client 7",
+      "target": "External Client 7",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1070",
+          "name": "Indicator Removal",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Repudiation"
+    },
+    {
+      "type": "Repudiation",
+      "description": "Repudiation of critical actions performed by External Client 8",
+      "target": "External Client 8",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1070",
+          "name": "Indicator Removal",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Repudiation"
+    },
+    {
+      "type": "Repudiation",
+      "description": "Repudiation of critical actions performed by Internal Operator 1",
+      "target": "Internal Operator 1",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1070",
+          "name": "Indicator Removal",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Repudiation"
+    },
+    {
+      "type": "Repudiation",
+      "description": "Repudiation of critical actions performed by Internal Operator 2",
+      "target": "Internal Operator 2",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1070",
+          "name": "Indicator Removal",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Repudiation"
+    },
+    {
+      "type": "Repudiation",
+      "description": "Repudiation of critical actions performed by System Administrator",
+      "target": "System Administrator",
+      "severity": {
+        "score": 5.0,
+        "level": "LOW",
+        "css_class": "low",
+        "formatted_score": "5.0/10"
+      },
+      "mitre_techniques": [
+        {
+          "id": "T1070",
+          "name": "Indicator Removal",
+          "description": "Deletion of activity traces",
+          "tactics": [
+            "Defense Evasion",
+            "Impact",
+            "Initial Access",
+            "Execution"
+          ]
+        }
+      ],
+      "stride_category": "Repudiation"
     }
   ]
 }

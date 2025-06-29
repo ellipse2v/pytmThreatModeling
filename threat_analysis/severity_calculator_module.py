@@ -52,8 +52,15 @@ class SeverityCalculator:
             "LOW": (4.0, 5.9, "low"),
             "INFORMATIONAL": (1.0, 3.9, "info")
         }
+        
+        self.classification_multipliers = {
+            "PUBLIC": 1.0,
+            "RESTRICTED": 1.2,
+            "SECRET": 1.5,
+            "TOP_SECRET": 2.0
+        }
     
-    def calculate_score(self, threat_type: str, target_name: str, protocol: Optional[str] = None) -> float:
+    def calculate_score(self, threat_type: str, target_name: str, protocol: Optional[str] = None, classification: Optional[str] = None) -> float:
         """Calculates the severity score for a threat"""
         # Base score
         score = self.base_scores.get(threat_type, 5.0)
@@ -70,6 +77,12 @@ class SeverityCalculator:
             adjustment = self.protocol_adjustments.get(protocol_upper, 0.0)
             score += adjustment
         
+        # Factors based on data classification
+        if classification:
+            classification_upper = classification.upper()
+            multiplier = self.classification_multipliers.get(classification_upper, 1.0)
+            score *= multiplier
+        
         # Normalization between 1.0 and 10.0
         return min(10.0, max(1.0, score))
     
@@ -80,9 +93,9 @@ class SeverityCalculator:
                 return level_name, css_class
         return "INFORMATIONAL", "info"
     
-    def get_severity_info(self, threat_type: str, target_name: str, protocol: Optional[str] = None) -> Dict[str, any]:
+    def get_severity_info(self, threat_type: str, target_name: str, protocol: Optional[str] = None, classification: Optional[str] = None) -> Dict[str, any]:
         """Returns complete severity information"""
-        score = self.calculate_score(threat_type, target_name, protocol)
+        score = self.calculate_score(threat_type, target_name, protocol, classification)
         level, css_class = self.get_severity_level(score)
         
         return {

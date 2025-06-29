@@ -15,8 +15,9 @@
 # # In threat_analysis/model_parser.py
 
 import re
-from typing import List, Dict, Any, Callable, Optional
-from .models_module import ThreatModel
+from typing import List, Dict, Any, Callable, Optional, Tuple, Set
+from .models_module import ThreatModel, CustomThreat
+from .mitre_mapping_module import MitreMapping
 from pytm import Classification, Lifetime
 
 
@@ -24,8 +25,9 @@ class ModelParser:
     """
     Parses a threat model defined in Markdown and constructs a ThreatModel object.
     """
-    def __init__(self, threat_model: ThreatModel):
+    def __init__(self, threat_model: ThreatModel, mitre_mapping: MitreMapping):
         self.threat_model = threat_model
+        self.mitre_mapping = mitre_mapping
         self.current_section = None
         self.section_parsers: Dict[str, Callable[[str], None]] = {
             "## Boundaries": self._parse_boundary,
@@ -113,24 +115,23 @@ class ModelParser:
             print(f"⚠️ Warning: Malformed boundary line: {line}")
 
     def _parse_actor(self, line: str):
-            """Parses an actor line with flexible key=value attributes."""
-            match = re.match(r'^- \*\*([^\*]+)\*\*:\s*(.*)', line)
-            if match:
-                actor_name = match.group(1).strip()
-                params_str = match.group(2).strip()
-                actor_kwargs = self._parse_key_value_params(params_str)
-                boundary_name = actor_kwargs.pop('boundary', "")
-                color = actor_kwargs.pop('color', None)
-                is_filled = actor_kwargs.pop('isFilled', None)
-                self.threat_model.add_actor(
-                    actor_name,
-                    boundary_name,
-                    color=color,
-                    is_filled=is_filled
-                )
-                print(f"   - Added Actor: {actor_name} (Boundary: {boundary_name}, Color: {color}, Filled: {is_filled})")
-            else:
-                print(f"⚠️ Warning: Malformed actor line: {line}")
+        """Parses an actor line with flexible key=value attributes."""
+        match = re.match(r'^- \*\*([^\*]+)\*\*:\s*(.*)', line)
+        if match:
+            actor_name = match.group(1).strip()
+            params_str = match.group(2).strip()
+            actor_kwargs = self._parse_key_value_params(params_str)
+            boundary_name = actor_kwargs.pop('boundary', "")
+            color = actor_kwargs.pop('color', None)
+            is_filled = actor_kwargs.pop('isFilled', None)
+            self.threat_model.add_actor(
+                actor_name,
+                boundary_name,
+                color=color,
+                is_filled=is_filled
+            )
+        else:
+            print(f"⚠️ Warning: Malformed actor line: {line}")
 
     def _parse_server(self, line: str):
         """Parses a server line with format: - **name**: boundary=value, color=value, isFilled=bool"""
@@ -154,7 +155,7 @@ class ModelParser:
             print(f"   - Added Server: {name} (Boundary: {boundary_name}, Color: {color}, Filled: {is_filled})")
         else:
             print(f"⚠️ Warning: Malformed server line: {line}")
-
+            
     def _parse_key_value_params(self, params_str: str) -> Dict[str, Any]:
         """
         Parses a key=value parameter string and returns a dictionary.
@@ -358,6 +359,54 @@ class ModelParser:
                 self.threat_model.add_custom_mitre_mapping(attack_name, tactics, techniques)
                 print(f"   - Added Custom MITRE Mapping: {attack_name} (Tactics: {len(tactics)}, Techniques: {len(techniques)})")
             else:
-                print(f"ℹ️ Custom MITRE Mapping ignored (method not implemented): {attack_name}")
+                print(f"⚠️ Warning: Malformed custom MITRE mapping line: {line}")
         else:
             print(f"⚠️ Warning: Malformed custom MITRE mapping line: {line}")
+            
+
+    def _apply_custom_threats(self) -> Tuple[List[Tuple[CustomThreat, Any]], Set[Any]]:
+        """
+        Applies custom threats to the threat model and returns them along with the elements they cover.
+        """
+        
+        custom_threat_definitions = self.mitre_mapping.get_custom_threats()
+        
+        generated_custom_threats = []
+        elements_with_custom_threats = set()
+
+        # Apply threats to servers
+        for server_info in self.threat_model.servers:
+            server = server_info['object']
+            for threat_template in custom_threat_definitions.get("servers", []):
+                threat_name = threat_template["name"].format(server_name=server.name)
+                
+                custom_threat = CustomThreat(
+                    name=threat_name,
+                    description=threat_template["description"],
+                    stride_category=threat_template["stride_category"],
+                    mitre_technique_id=threat_template["mitre_technique_id"],
+                    target=server # The target is the actual PyTM object
+                )
+                
+                generated_custom_threats.append((custom_threat, server))
+                elements_with_custom_threats.add(server)
+                
+
+        # Apply threats to dataflows
+        for dataflow in self.threat_model.dataflows:
+            for threat_template in custom_threat_definitions.get("dataflows", []):
+                threat_name = threat_template["name"].format(dataflow_name=dataflow.name)
+                
+                custom_threat = CustomThreat(
+                    name=threat_name,
+                    description=threat_template["description"],
+                    stride_category=threat_template["stride_category"],
+                    mitre_technique_id=threat_template["mitre_technique_id"],
+                    target=dataflow # The target is the actual PyTM object
+                )
+                
+                generated_custom_threats.append((custom_threat, dataflow))
+                elements_with_custom_threats.add(dataflow)
+                
+        
+        return generated_custom_threats, elements_with_custom_threats
