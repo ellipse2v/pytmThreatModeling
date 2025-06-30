@@ -586,23 +586,64 @@ class DiagramGenerator:
         """Generates HTML legend content."""
         legend_items = []
         
-        # Node types with emojis and colors
-        node_types = [
-            ("👤 Acteur", "#FFFF99"),  # Yellow
-            ("🖥️ Serveur", "#90EE90"),  # Light green
-            ("🗄️ Database", "#ADD8E6"),  # Light blue
-            ("🔥 Firewall", "#FF6B6B"),  # Red
-        ]
+        # Dynamically generate node types for the legend
+        legend_node_types = {}
         
-        for label, color in node_types:
+        # Process actors
+        if hasattr(threat_model, 'actors'):
+            for actor in threat_model.actors:
+                color = actor.get('color') or '#FFFF99'
+                if 'Acteur' not in legend_node_types:
+                    legend_node_types['Acteur'] = ('👤 Acteur', color)
+
+        # Process servers to find one of each type for the legend
+        if hasattr(threat_model, 'servers'):
+            server_types_seen = set()
+            for server in threat_model.servers:
+                name = server.get('name', '').lower()
+                color = server.get('color')
+                
+                type_key = None
+                display_name = None
+
+                if 'firewall' in name and 'Firewall' not in server_types_seen:
+                    type_key = 'Firewall'
+                    display_name = '🔥 Firewall'
+                    color = color or '#FF6B6B'
+                elif ('database' in name or 'db' in name) and 'Database' not in server_types_seen:
+                    type_key = 'Database'
+                    display_name = '🗄️ Database'
+                    color = color or '#ADD8E6'
+                elif 'Serveur' not in server_types_seen: # Generic server as fallback
+                    type_key = 'Serveur'
+                    display_name = '🖥️ Serveur'
+                    color = color or '#90EE90'
+
+                if type_key and type_key not in legend_node_types:
+                    legend_node_types[type_key] = (display_name, color)
+                    server_types_seen.add(type_key)
+
+        # Add any missing default types if they weren't found
+        default_types = {
+            'Acteur': ('👤 Acteur', '#FFFF99'),
+            'Serveur': ('🖥️ Serveur', '#90EE90'),
+            'Database': ('🗄️ Database', '#ADD8E6'),
+            'Firewall': ('🔥 Firewall', '#FF6B6B'),
+        }
+        for key, value in default_types.items():
+            if key not in legend_node_types:
+                legend_node_types[key] = value
+
+        # Generate HTML for node types
+        for _, (label, color) in legend_node_types.items():
             legend_items.append(f"""
                 <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                    <div style="width: 12px; height: 8px; background-color: {color}; 
+                    <div style="width: 12px; height: 8px; background-color: {color};
                             border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
                     <span style="font-size: 9px;">{label}</span>
                 </div>
             """)
-        
+
         # Boundary types
         boundary_types = [
             ("Trust Boundaries", "#FF0000", "3px solid"),
@@ -612,7 +653,7 @@ class DiagramGenerator:
         for label, color, border_style in boundary_types:
             legend_items.append(f"""
                 <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                    <div style="width: 20px; height: 15px; border: {border_style} {color}; 
+                    <div style="width: 20px; height: 15px; border: {border_style} {color};
                             margin-right: 8px; border-radius: 2px;"></div>
                     <span style="font-size: 11px;">{label}</span>
                 </div>
@@ -626,7 +667,7 @@ class DiagramGenerator:
                 color = style.get('color', '#000000')
                 legend_items.append(f"""
                     <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                        <div style="width: 20px; height: 2px; background-color: {color}; 
+                        <div style="width: 20px; height: 2px; background-color: {color};
                                 margin-right: 8px;"></div>
                         <span style="font-size: 11px;">{protocol}</span>
                     </div>
