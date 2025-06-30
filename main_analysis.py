@@ -99,24 +99,7 @@ class ThreatAnalysisFramework:
         """Executes the threat analysis."""
         print("🔬 Starting STRIDE threat analysis...")
 
-        self.severity_calculator.update_target_multipliers(
-            {
-                "Serveur Central": 1.5,
-                "Firewall Externe": 2.0,
-                "Équipement de Rupture Protocolaire": 1.8,
-                "Switch": 1.5,
-                "Machine de Commandement": 2.5,
-            }
-        )
-
-        self.mitre_mapping.add_custom_mapping(
-            "Protocol Tampering",
-            ["Impact", "Defense Evasion"],
-            [
-                {"id": "T1565", "name": "Data Manipulation"},
-                {"id": "T1499", "name": "Endpoint Denial of Service"}
-            ]
-        )
+        self.severity_calculator.update_target_multipliers(self.mitre_mapping.severity_multipliers)
 
         self.grouped_threats = self.threat_model.process_threats()
         self.analysis_completed = True
