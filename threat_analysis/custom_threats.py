@@ -1,4 +1,16 @@
-# threat_analysis/custom_threats.py
+# Copyright 2025 ellipse2v
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 def get_custom_threats(threat_model):
     """
@@ -24,11 +36,17 @@ def get_custom_threats(threat_model):
             threats.extend(_generate_database_threats(server_name, id_counter))
         elif "firewall" in server_name.lower():
             threats.extend(_generate_firewall_threats(server_name, id_counter))
-        elif "load balancer" in server_name.lower():
+        elif "load balancer" in server_name.lower() or "gateway" in server_name.lower():
             threats.extend(_generate_load_balancer_threats(server_name, id_counter))
         elif "central server" in server_name.lower():
             threats.extend(_generate_central_server_threats(server_name, id_counter))
+        elif "switch" in server_name.lower():
+            threats.extend(_generate_switch_threats(server_name, id_counter))
         
+        # Add ATM-specific threats if relevant keywords are found
+        if any(keyword in server_name.lower() for keyword in ["atm", "flight", "radar", "control"]):
+            threats.extend(_generate_atm_specific_threats(server_name, id_counter))
+
         id_counter = len(threats) + 1
 
 
@@ -76,6 +94,13 @@ def _generate_generic_server_threats(server_name, start_id):
             "description": f"Unauthorized privilege escalation on {server_name}",
             "stride_category": "Elevation of Privilege",
             "severity": "High"
+        },
+        {
+            "id": start_id + 3,
+            "component": server_name,
+            "description": f"Lack of monitoring or logging on {server_name}, preventing detection of malicious activities",
+            "stride_category": "Repudiation",
+            "severity": "Medium"
         }
     ]
 
@@ -126,6 +151,13 @@ def _generate_database_threats(db_name, start_id):
             "description": f"Data corruption or tampering in {db_name} via unauthorized write access",
             "stride_category": "Tampering",
             "severity": "High"
+        },
+        {
+            "id": start_id + 3,
+            "component": db_name,
+            "description": f"Denial of Service against {db_name} through resource-intensive queries",
+            "stride_category": "Denial of Service",
+            "severity": "Medium"
         }
     ]
 
@@ -151,6 +183,13 @@ def _generate_firewall_threats(fw_name, start_id):
             "description": f"Vulnerability in the management interface of {fw_name}",
             "stride_category": "Elevation of Privilege",
             "severity": "Critical"
+        },
+        {
+            "id": start_id + 3,
+            "component": fw_name,
+            "description": f"Firewall bypass through fragmented packets or other evasion techniques against {fw_name}",
+            "stride_category": "Spoofing",
+            "severity": "High"
         }
     ]
 
@@ -172,6 +211,24 @@ def _generate_load_balancer_threats(lb_name, start_id):
         }
     ]
 
+def _generate_switch_threats(switch_name, start_id):
+    return [
+        {
+            "id": start_id,
+            "component": switch_name,
+            "description": f"VLAN hopping attack to gain access to unauthorized network segments through {switch_name}",
+            "stride_category": "Elevation of Privilege",
+            "severity": "High"
+        },
+        {
+            "id": start_id + 1,
+            "component": switch_name,
+            "description": f"MAC flooding attack on {switch_name} to force it into a hub-like state, enabling sniffing",
+            "stride_category": "Information Disclosure",
+            "severity": "Medium"
+        }
+    ]
+
 def _generate_central_server_threats(server_name, start_id):
     return [
         {
@@ -186,6 +243,46 @@ def _generate_central_server_threats(server_name, start_id):
             "component": server_name,
             "description": f"Lateral movement from {server_name} to other systems in the network",
             "stride_category": "Elevation of Privilege",
+            "severity": "High"
+        }
+    ]
+
+def _generate_atm_specific_threats(component_name, start_id):
+    """Generates threats specific to Air Traffic Management (ATM) systems."""
+    return [
+        {
+            "id": start_id,
+            "component": component_name,
+            "description": f"Injection of false surveillance data (e.g., ghost aircraft) into {component_name}",
+            "stride_category": "Tampering",
+            "severity": "Critical"
+        },
+        {
+            "id": start_id + 1,
+            "component": component_name,
+            "description": f"Denial of Service on {component_name} to disrupt air traffic control",
+            "stride_category": "Denial of Service",
+            "severity": "Critical"
+        },
+        {
+            "id": start_id + 2,
+            "component": component_name,
+            "description": f"Unauthorized access to or modification of flight plans in {component_name}",
+            "stride_category": "Tampering",
+            "severity": "Critical"
+        },
+        {
+            "id": start_id + 3,
+            "component": component_name,
+            "description": f"Spoofing of ADS-B signals to provide false aircraft position data to {component_name}",
+            "stride_category": "Spoofing",
+            "severity": "High"
+        },
+        {
+            "id": start_id + 4,
+            "component": component_name,
+            "description": f"Interference with Controller-Pilot Data Link Communications (CPDLC) via {component_name}",
+            "stride_category": "Information Disclosure",
             "severity": "High"
         }
     ]

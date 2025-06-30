@@ -15,11 +15,53 @@
 """
 MITRE ATT&CK mapping module with D3FEND mitigations
 """
+import os
+import requests
+import json
+import time
 from typing import Dict, List, Any
 import re
 
 from threat_analysis.custom_threats import get_custom_threats
 
+
+def fetch_and_cache_d3fend_mappings(url: str, cache_file: str, cache_duration: int = 86400) -> Dict[str, Any]:
+    """
+    Fetches D3FEND mappings from a URL, caches them locally in JSON format,
+    and returns the mappings as a dictionary.
+
+    Args:
+        url: The URL to fetch the D3FEND mappings from.
+        cache_file: The local file path to store the cached mappings.
+        cache_duration: The cache duration in seconds (default: 24 hours).
+
+    Returns:
+        A dictionary containing the D3FEND mappings.
+    """
+    try:
+        # Check if cache file exists and is recent
+        if os.path.exists(cache_file):
+            file_mod_time = os.path.getmtime(cache_file)
+            if time.time() - file_mod_time < cache_duration:
+                with open(cache_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+    except Exception as e:
+        print(f"⚠️ Could not read cache file: {e}")
+
+    # Fetch new data if cache is old or doesn't exist
+    try:
+        response = requests.get(url, timeout=15)
+        response.raise_for_status()
+        mappings = response.json()
+
+        # Save to cache
+        with open(cache_file, 'w', encoding='utf-8') as f:
+            json.dump(mappings, f, indent=4)
+        
+        return mappings
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Failed to fetch D3FEND mappings: {e}")
+        return {}
 
 class MitreMapping:
     """Class for managing MITRE ATT&CK mapping with D3FEND mitigations"""
@@ -28,6 +70,10 @@ class MitreMapping:
         self.mapping = self._initialize_mapping()
         self.threat_patterns = self._initialize_threat_patterns()
         self.custom_threats = self._load_custom_threats(threat_model)
+        self.d3fend_mappings = fetch_and_cache_d3fend_mappings(
+            url="https://d3fend.mitre.org/api/org.mitre.d3fend.attack.attack-to-d3fend.json",
+            cache_file="d3fend_mappings.json"
+        )
 
     def _load_custom_threats(self, threat_model) -> Dict[str, List[Dict[str, Any]]]:
         """Loads custom threats from the custom_threats module."""
@@ -49,6 +95,11 @@ class MitreMapping:
                         "id": "T1566",
                         "name": "Phishing",
                         "description": "Identity spoofing via phishing",
+                        "mitre_mitigations": [
+                            {"id": "M1017", "name": "User Training"},
+                            {"id": "M1021", "name": "Restrict Web-Based Content"},
+                            {"id": "M1032", "name": "Multi-factor Authentication"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-MFA", "name": "Multi-factor Authentication", "description": "Implement multi-factor authentication to reduce phishing effectiveness"},
                             {"id": "D3-UATR", "name": "User Account Control", "description": "User awareness training and security education"},
@@ -61,6 +112,10 @@ class MitreMapping:
                         "id": "T1036",
                         "name": "Masquerading",
                         "description": "Disguising malicious processes",
+                        "mitre_mitigations": [
+                            {"id": "M1038", "name": "Execution Prevention"},
+                            {"id": "M1045", "name": "Code Signing"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-FAPA", "name": "File Analysis", "description": "Analyze file attributes and signatures"},
                             {"id": "D3-HEUR", "name": "Heuristic Analysis", "description": "Use behavioral analysis to detect masquerading"},
@@ -72,6 +127,9 @@ class MitreMapping:
                         "id": "T1134",
                         "name": "Access Token Manipulation",
                         "description": "Manipulation of access tokens",
+                        "mitre_mitigations": [
+                            {"id": "M1043", "name": "Credential Access Protection"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-PRIV", "name": "Credential Hardening", "description": "Implement least privilege access controls"},
                             {"id": "D3-TOKM", "name": "Token Analysis", "description": "Monitor token usage and detect anomalies"},
@@ -83,6 +141,12 @@ class MitreMapping:
                         "id": "T1078",
                         "name": "Valid Accounts",
                         "description": "Use of valid accounts for access",
+                        "mitre_mitigations": [
+                            {"id": "M1018", "name": "User Account Management"},
+                            {"id": "M1026", "name": "Privileged Account Management"},
+                            {"id": "M1027", "name": "Password Policies"},
+                            {"id": "M1032", "name": "Multi-factor Authentication"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-MFA", "name": "Multi-factor Authentication", "description": "Enforce MFA for all account access"},
                             {"id": "D3-PWDP", "name": "Strong Password Policy", "description": "Implement and enforce strong password policies"},
@@ -94,6 +158,10 @@ class MitreMapping:
                         "id": "T1078.003",
                         "name": "Local Accounts",
                         "description": "Abuse of local accounts",
+                        "mitre_mitigations": [
+                            {"id": "M1018", "name": "User Account Management"},
+                            {"id": "M1027", "name": "Password Policies"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-LACM", "name": "Local Account Monitoring", "description": "Monitor local account activity and access patterns"},
                             {"id": "D3-PRIV", "name": "Credential Hardening", "description": "Restrict local account privileges"},
@@ -105,6 +173,11 @@ class MitreMapping:
                         "id": "T1110",
                         "name": "Brute Force",
                         "description": "Attempting to guess or crack passwords",
+                        "mitre_mitigations": [
+                            {"id": "M1027", "name": "Password Policies"},
+                            {"id": "M1032", "name": "Multi-factor Authentication"},
+                            {"id": "M1036", "name": "Account Use Policies"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-ACCL", "name": "Account Lockout", "description": "Implement progressive account lockout policies"},
                             {"id": "D3-CAPT", "name": "CAPTCHA", "description": "Deploy CAPTCHA systems for authentication"},
@@ -117,6 +190,9 @@ class MitreMapping:
                         "id": "T1110.001",
                         "name": "Password Guessing",
                         "description": "Dictionary-based password attacks",
+                        "mitre_mitigations": [
+                            {"id": "M1027", "name": "Password Policies"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-PWDP", "name": "Strong Password Policy", "description": "Enforce complex password requirements"},
                             {"id": "D3-ACCL", "name": "Account Lockout", "description": "Lock accounts after failed attempts"},
@@ -128,6 +204,9 @@ class MitreMapping:
                         "id": "T1110.003",
                         "name": "Password Spraying",
                         "description": "Low-and-slow password attack",
+                        "mitre_mitigations": [
+                            {"id": "M1036", "name": "Account Use Policies"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-AUTHM", "name": "Authentication Event Thresholding", "description": "Detect distributed authentication failures"},
                             {"id": "D3-NETF", "name": "Network Traffic Filtering", "description": "Block IP addresses showing spray patterns"},
@@ -139,6 +218,9 @@ class MitreMapping:
                         "id": "T1110.004",
                         "name": "Credential Stuffing",
                         "description": "Using breached credential pairs",
+                        "mitre_mitigations": [
+                            {"id": "M1032", "name": "Multi-factor Authentication"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-MFA", "name": "Multi-factor Authentication", "description": "Require MFA for all logins"},
                             {"id": "D3-CRED", "name": "Credential Monitoring", "description": "Monitor for reused credentials from breaches"},
@@ -150,6 +232,9 @@ class MitreMapping:
                         "id": "T1185",
                         "name": "Browser Session Hijacking",
                         "description": "Session hijacking attacks",
+                        "mitre_mitigations": [
+                            {"id": "M1021", "name": "Restrict Web-Based Content"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-SESM", "name": "Session Management", "description": "Implement secure session management practices"},
                             {"id": "D3-TLSA", "name": "TLS Analysis", "description": "Use HTTPS everywhere with proper TLS configuration"},
@@ -161,6 +246,9 @@ class MitreMapping:
                         "id": "T1539",
                         "name": "Steal Web Session Cookie",
                         "description": "Session credential theft",
+                        "mitre_mitigations": [
+                            {"id": "M1021", "name": "Restrict Web-Based Content"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-COOK", "name": "Cookie Security", "description": "Implement HttpOnly and Secure flags for cookies"},
                             {"id": "D3-SESM", "name": "Session Management", "description": "Use short session timeouts and rotation"},
@@ -172,6 +260,9 @@ class MitreMapping:
                         "id": "T1212",
                         "name": "Exploitation for Credential Access",
                         "description": "Exploiting vulnerabilities to access credentials",
+                        "mitre_mitigations": [
+                            {"id": "M1051", "name": "Update Software"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-VULM", "name": "Vulnerability Scanning", "description": "Regular vulnerability scanning and assessment"},
                             {"id": "D3-PATM", "name": "Patch Management", "description": "Implement timely patch management processes"},
@@ -183,6 +274,10 @@ class MitreMapping:
                         "id": "T1557",
                         "name": "Adversary-in-the-Middle",
                         "description": "Man-in-the-middle attacks",
+                        "mitre_mitigations": [
+                            {"id": "M1020", "name": "SSL/TLS Inspection"},
+                            {"id": "M1041", "name": "Encrypt Sensitive Information"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-TLSA", "name": "TLS Analysis", "description": "Enforce strong encryption for all communications"},
                             {"id": "D3-CERT", "name": "Certificate Analysis", "description": "Implement certificate pinning and validation"},
@@ -194,6 +289,9 @@ class MitreMapping:
                         "id": "T1556",
                         "name": "Modify Authentication Process",
                         "description": "Authentication bypass techniques",
+                        "mitre_mitigations": [
+                            {"id": "M1028", "name": "Operating System Configuration"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-AUTHA", "name": "Authentication Hardening", "description": "Implement robust authentication mechanisms"},
                             {"id": "D3-SYSM", "name": "System Call Monitoring", "description": "Monitor system calls affecting authentication"},
@@ -205,6 +303,9 @@ class MitreMapping:
                         "id": "T1598",
                         "name": "Phishing for Information",
                         "description": "Cross Site Request Forgery attacks",
+                        "mitre_mitigations": [
+                            {"id": "M1013", "name": "Application Developer Guidance"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-CSRF", "name": "CSRF Protection", "description": "Implement anti-CSRF tokens and SameSite cookies"},
                             {"id": "D3-UATR", "name": "User Account Control", "description": "Educate users about phishing and CSRF attacks"},
@@ -216,6 +317,9 @@ class MitreMapping:
                         "id": "T1213",
                         "name": "Data from Information Repositories",
                         "description": "Exploiting Trust in Client",
+                        "mitre_mitigations": [
+                            {"id": "M1041", "name": "Encrypt Sensitive Information"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-DLP", "name": "Data Loss Prevention", "description": "Implement comprehensive DLP solutions"},
                             {"id": "D3-ACCM", "name": "Account Monitoring", "description": "Monitor access to sensitive data repositories"},
@@ -232,6 +336,10 @@ class MitreMapping:
                         "id": "T1565",
                         "name": "Data Manipulation",
                         "description": "Unauthorized data modification",
+                        "mitre_mitigations": [
+                            {"id": "M1041", "name": "Encrypt Sensitive Information"},
+                            {"id": "M1053", "name": "Data Backup"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-INTEG", "name": "System Integrity Monitoring", "description": "Implement data integrity checks and monitoring"},
                             {"id": "D3-ACCM", "name": "Account Monitoring", "description": "Monitor data access and modification activities"},
@@ -243,6 +351,10 @@ class MitreMapping:
                         "id": "T1070",
                         "name": "Indicator Removal",
                         "description": "Deletion of activity traces",
+                        "mitre_mitigations": [
+                            {"id": "M1047", "name": "Audit"},
+                            {"id": "M1053", "name": "Data Backup"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-LOGM", "name": "Centralized Logging", "description": "Implement centralized and tamper-proof logging"},
                             {"id": "D3-BACK", "name": "Data Backup", "description": "Secure log backup and retention policies"},
@@ -254,6 +366,9 @@ class MitreMapping:
                         "id": "T1027",
                         "name": "Obfuscated Files or Information",
                         "description": "Obfuscation of malicious content",
+                        "mitre_mitigations": [
+                            {"id": "M1038", "name": "Execution Prevention"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-FAPA", "name": "File Analysis", "description": "Implement advanced file analysis and de-obfuscation"},
                             {"id": "D3-SAND", "name": "Dynamic Analysis", "description": "Use sandboxing for suspicious file analysis"},
@@ -265,6 +380,10 @@ class MitreMapping:
                         "id": "T1190",
                         "name": "Exploit Public-Facing Application",
                         "description": "Web application vulnerabilities exploitation",
+                        "mitre_mitigations": [
+                            {"id": "M1013", "name": "Application Developer Guidance"},
+                            {"id": "M1051", "name": "Update Software"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-WAFF", "name": "Web Application Firewall", "description": "Deploy and configure Web Application Firewalls"},
                             {"id": "D3-VULM", "name": "Vulnerability Scanning", "description": "Regular penetration testing and vulnerability assessment"},
@@ -276,6 +395,10 @@ class MitreMapping:
                         "id": "T1059",
                         "name": "Command and Scripting Interpreter",
                         "description": "Command injection and execution",
+                        "mitre_mitigations": [
+                            {"id": "M1033", "name": "Limit Software Installation"},
+                            {"id": "M1038", "name": "Execution Prevention"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-INPV", "name": "Input Validation", "description": "Implement strict input validation and sanitization"},
                             {"id": "D3-EXEC", "name": "Executable Allowlisting", "description": "Use application allowlisting to prevent malicious execution"},
@@ -287,6 +410,9 @@ class MitreMapping:
                         "id": "T1059.007",
                         "name": "JavaScript",
                         "description": "JavaScript-based attacks including XSS",
+                        "mitre_mitigations": [
+                            {"id": "M1013", "name": "Application Developer Guidance"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-CSP", "name": "Content Security Policy", "description": "Implement and enforce Content Security Policy"},
                             {"id": "D3-INPV", "name": "Input Validation", "description": "Validate and sanitize all user inputs"},
@@ -298,6 +424,9 @@ class MitreMapping:
                         "id": "T1505.003",
                         "name": "Web Shell",
                         "description": "Web shell installation and usage",
+                        "mitre_mitigations": [
+                            {"id": "M1033", "name": "Limit Software Installation"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-FAPA", "name": "File Analysis", "description": "Monitor file uploads and analyze for web shells"},
                             {"id": "D3-INTEG", "name": "System Integrity Monitoring", "description": "Monitor web server file integrity"},
@@ -309,6 +438,10 @@ class MitreMapping:
                         "id": "T1105",
                         "name": "Ingress Tool Transfer",
                         "description": "Remote file inclusion and malicious file upload",
+                        "mitre_mitigations": [
+                            {"id": "M1021", "name": "Restrict Web-Based Content"},
+                            {"id": "M1033", "name": "Limit Software Installation"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-NETF", "name": "Network Traffic Filtering", "description": "Implement network segmentation and egress filtering"},
                             {"id": "D3-FAPA", "name": "File Analysis", "description": "Analyze all file transfers and uploads"},
@@ -320,6 +453,9 @@ class MitreMapping:
                         "id": "T1211",
                         "name": "Exploitation for Defense Evasion",
                         "description": "Exploiting vulnerabilities to evade defenses",
+                        "mitre_mitigations": [
+                            {"id": "M1051", "name": "Update Software"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-VULM", "name": "Vulnerability Scanning", "description": "Regular security audits and penetration testing"},
                             {"id": "D3-PATM", "name": "Patch Management", "description": "Maintain current security patches"},
@@ -331,6 +467,9 @@ class MitreMapping:
                         "id": "T1055",
                         "name": "Process Injection",
                         "description": "Injecting code into privileged processes",
+                        "mitre_mitigations": [
+                            {"id": "M1038", "name": "Execution Prevention"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-EXEC", "name": "Executable Allowlisting", "description": "Implement application allowlisting"},
                             {"id": "D3-PMON", "name": "Process Monitoring", "description": "Monitor process creation and injection activities"},
@@ -342,6 +481,10 @@ class MitreMapping:
                         "id": "T1562",
                         "name": "Impair Defenses",
                         "description": "Disabling security controls",
+                        "mitre_mitigations": [
+                            {"id": "M1042", "name": "Disable or Remove Feature or Program"},
+                            {"id": "M1047", "name": "Audit"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-INTEG", "name": "System Integrity Monitoring", "description": "Monitor security control integrity"},
                             {"id": "D3-CONF", "name": "Configuration Management", "description": "Enforce security configuration management"},
@@ -353,6 +496,9 @@ class MitreMapping:
                         "id": "T1562.001",
                         "name": "Disable or Modify System Firewall",
                         "description": "Firewall manipulation",
+                        "mitre_mitigations": [
+                            {"id": "M1028", "name": "Operating System Configuration"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-NETF", "name": "Network Traffic Filtering", "description": "Implement multiple layers of firewall protection"},
                             {"id": "D3-CONF", "name": "Configuration Management", "description": "Monitor and enforce firewall configurations"},
@@ -364,6 +510,9 @@ class MitreMapping:
                         "id": "T1140",
                         "name": "Deobfuscate/Decode Files or Information",
                         "description": "Processing encoded/obfuscated content",
+                        "mitre_mitigations": [
+                            {"id": "M1038", "name": "Execution Prevention"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-GENERIC-DEFENSE-55", "description": "Implement content inspection"},
                             {"id": "D3-GENERIC-DEFENSE-56", "description": "Use sandboxing for suspicious files"}
@@ -1045,6 +1194,9 @@ class MitreMapping:
                         "id": "T1055.001",
                         "name": "Dynamic-link Library Injection",
                         "description": "DLL injection for privilege escalation",
+                        "mitre_mitigations": [
+                            {"id": "M1038", "name": "Execution Prevention"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-MEMF", "name": "Memory Protection", "description": "Enable memory protection mechanisms"},
                             {"id": "D3-EXEC", "name": "Executable Allowlisting", "description": "Restrict loading of unsigned DLLs"},
@@ -1056,6 +1208,9 @@ class MitreMapping:
                         "id": "T1068",
                         "name": "Exploitation for Privilege Escalation",
                         "description": "Exploiting vulnerabilities for privilege escalation",
+                        "mitre_mitigations": [
+                            {"id": "M1051", "name": "Update Software"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-VULM", "name": "Vulnerability Scanning", "description": "Regular vulnerability assessments and penetration testing"},
                             {"id": "D3-PATM", "name": "Patch Management", "description": "Implement timely patch management processes"},
@@ -1067,6 +1222,10 @@ class MitreMapping:
                         "id": "T1078.001",
                         "name": "Default Accounts",
                         "description": "Using default credentials for elevation",
+                        "mitre_mitigations": [
+                            {"id": "M1018", "name": "User Account Management"},
+                            {"id": "M1027", "name": "Password Policies"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-PWDP", "name": "Strong Password Policy", "description": "Change all default passwords"},
                             {"id": "D3-ACCM", "name": "Account Monitoring", "description": "Monitor for activity on default accounts"},
@@ -1078,6 +1237,12 @@ class MitreMapping:
                         "id": "T1078.002",
                         "name": "Domain Accounts",
                         "description": "Abusing domain accounts for elevation",
+                        "mitre_mitigations": [
+                            {"id": "M1018", "name": "User Account Management"},
+                            {"id": "M1026", "name": "Privileged Account Management"},
+                            {"id": "M1027", "name": "Password Policies"},
+                            {"id": "M1032", "name": "Multi-factor Authentication"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-PRIV", "name": "Credential Hardening", "description": "Implement least privilege for domain accounts"},
                             {"id": "D3-ACCM", "name": "Account Monitoring", "description": "Monitor domain account activity and access patterns"},
@@ -1089,6 +1254,10 @@ class MitreMapping:
                         "id": "T1078.003",
                         "name": "Local Accounts",
                         "description": "Abusing local accounts for elevation",
+                        "mitre_mitigations": [
+                            {"id": "M1018", "name": "User Account Management"},
+                            {"id": "M1027", "name": "Password Policies"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-LACM", "name": "Local Account Monitoring", "description": "Monitor local account activity and access patterns"},
                             {"id": "D3-PRIV", "name": "Credential Hardening", "description": "Restrict local account privileges"},
@@ -1100,6 +1269,11 @@ class MitreMapping:
                         "id": "T1078.004",
                         "name": "Cloud Accounts",
                         "description": "Abusing cloud accounts for elevation",
+                        "mitre_mitigations": [
+                            {"id": "M1018", "name": "User Account Management"},
+                            {"id": "M1026", "name": "Privileged Account Management"},
+                            {"id": "M1032", "name": "Multi-factor Authentication"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-CLOUD", "name": "Cloud Monitoring", "description": "Monitor cloud account activity and access"},
                             {"id": "D3-PRIV", "name": "Credential Hardening", "description": "Implement least privilege for cloud accounts"},
@@ -1111,6 +1285,9 @@ class MitreMapping:
                         "id": "T1134.001",
                         "name": "Token Impersonation/Theft",
                         "description": "Access token impersonation",
+                        "mitre_mitigations": [
+                            {"id": "M1043", "name": "Credential Access Protection"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-TOKM", "name": "Token Analysis", "description": "Monitor token usage and detect anomalies"},
                             {"id": "D3-SYSM", "name": "System Call Monitoring", "description": "Monitor system calls related to token manipulation"},
@@ -1122,6 +1299,9 @@ class MitreMapping:
                         "id": "T1134.002",
                         "name": "Create Process with Token",
                         "description": "Process creation with stolen tokens",
+                        "mitre_mitigations": [
+                            {"id": "M1043", "name": "Credential Access Protection"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-PMON", "name": "Process Monitoring", "description": "Monitor process creation with suspicious tokens"},
                             {"id": "D3-SYSM", "name": "System Call Monitoring", "description": "Monitor system calls related to process creation with tokens"},
@@ -1133,6 +1313,9 @@ class MitreMapping:
                         "id": "T1134.003",
                         "name": "Make and Impersonate Token",
                         "description": "Token creation and impersonation",
+                        "mitre_mitigations": [
+                            {"id": "M1043", "name": "Credential Access Protection"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-TOKM", "name": "Token Analysis", "description": "Monitor token creation and impersonation attempts"},
                             {"id": "D3-SYSM", "name": "System Call Monitoring", "description": "Monitor system calls related to token creation"},
@@ -1144,6 +1327,9 @@ class MitreMapping:
                         "id": "T1134.004",
                         "name": "Parent PID Spoofing",
                         "description": "Process parent spoofing for elevation",
+                        "mitre_mitigations": [
+                            {"id": "M1038", "name": "Execution Prevention"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-PMON", "name": "Process Monitoring", "description": "Monitor process parent-child relationships for anomalies"},
                             {"id": "D3-SYSM", "name": "System Call Monitoring", "description": "Monitor system calls related to process creation"},
@@ -1155,6 +1341,9 @@ class MitreMapping:
                         "id": "T1134.005",
                         "name": "SID-History Injection",
                         "description": "SID history manipulation",
+                        "mitre_mitigations": [
+                            {"id": "M1015", "name": "Active Directory Configuration"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-ACCM", "name": "Account Monitoring", "description": "Monitor for suspicious SID history modifications"},
                             {"id": "D3-INTEG", "name": "System Integrity Monitoring", "description": "Monitor integrity of security identifiers"},
@@ -1166,6 +1355,9 @@ class MitreMapping:
                         "id": "T1484",
                         "name": "Domain Policy Modification",
                         "description": "Privilege abuse and policy manipulation",
+                        "mitre_mitigations": [
+                            {"id": "M1015", "name": "Active Directory Configuration"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-CONF", "name": "Configuration Management", "description": "Implement strict change control for domain policies"},
                             {"id": "D3-LOGM", "name": "Centralized Logging", "description": "Centralize and monitor domain policy changes"},
@@ -1177,6 +1369,10 @@ class MitreMapping:
                         "id": "T1021",
                         "name": "Remote Services",
                         "description": "Lateral movement using remote services",
+                        "mitre_mitigations": [
+                            {"id": "M1035", "name": "Limit Access to Resource Over Network"},
+                            {"id": "M1030", "name": "Network Segmentation"}
+                        ],
                         "defend_mitigations": [
                             {"id": "D3-NETF", "name": "Network Traffic Filtering", "description": "Restrict access to remote services"},
                             {"id": "D3-NETM", "name": "Network Monitoring", "description": "Monitor remote service access for anomalies"},
@@ -1322,6 +1518,12 @@ class MitreMapping:
         
         return list(found_techniques.values())
     
+    def get_d3fend_mitigations_for_technique(self, technique_id: str) -> List[Dict[str, str]]:
+        """Retrieves D3FEND mitigations for a given MITRE ATT&CK technique ID."""
+        if not self.d3fend_mappings:
+            return []
+        return self.d3fend_mappings.get(technique_id, [])
+
     def get_all_techniques(self) -> List[Dict[str, str]]:
         """Returns all distinct MITRE techniques defined in the mapping."""
         techniques = []

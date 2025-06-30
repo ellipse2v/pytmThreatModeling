@@ -250,18 +250,25 @@ class ReportGenerator:
         for i, category in enumerate(stride_categories):
             active_class = "active" if i == 0 else ""
             html += f"<div id=\"{category}\" class=\"tab-content {active_class}\">"
-            html += "<table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th><th>D3FEND Mitigations</th></tr></thead><tbody>"
+            html += "<table><thead><tr><th>#</th><th>Target</th><th>Description</th><th>Severity</th><th>MITRE Techniques</th><th>MITRE Mitigations</th><th>D3FEND Mitigations</th></tr></thead><tbody>"
             category_threats = [t for t in all_threats if t['stride_category'] == category]
             for j, threat in enumerate(category_threats):
                 severity_info = threat['severity']
                 mitre_html = "<ul>"
+                mitre_mitigations_html = "<ul>"
                 defend_mitigations_html = "<ul>"
                 for tech in threat['mitre_techniques']:
                     mitre_html += f"<li><a href='https://attack.mitre.org/techniques/{tech['id']}' target='_blank' class='mitre-link'>{tech['id']}: {tech['name']}</a></li>"
+                    if 'mitre_mitigations' in tech and tech['mitre_mitigations']:
+                        for mitigation in tech['mitre_mitigations']:
+                            mitre_mitigations_html += f"<li><a href='https://attack.mitre.org/mitigations/{mitigation['id']}' target='_blank' class='mitre-link'>{mitigation['id']}: {mitigation['name']}</a></li>"
+                    # D3FEND mitigations
                     if 'defend_mitigations' in tech and tech['defend_mitigations']:
                         for mitigation in tech['defend_mitigations']:
-                            defend_mitigations_html += f"<li>{mitigation['id']}: {mitigation['description']}</li>"
+                            d3fend_url = f"https://d3fend.mitre.org/technique/{mitigation['id']}"
+                            defend_mitigations_html += f"<li><a href='{d3fend_url}' target='_blank' class='mitre-link'>{mitigation['id']}: {mitigation['description']}</a></li>"
                 mitre_html += "</ul>"
+                mitre_mitigations_html += "</ul>"
                 defend_mitigations_html += "</ul>"
                 html += f"""<tr>
                     <td>{j + 1}</td>
@@ -269,6 +276,7 @@ class ReportGenerator:
                     <td>{threat['description']}</td>
                     <td class="severity-{severity_info['level'].lower()}">{severity_info['level']} ({severity_info['score']})</td>
                     <td>{mitre_html}</td>
+                    <td>{mitre_mitigations_html}</td>
                     <td>{defend_mitigations_html}</td>
                 </tr>"""
             html += "</tbody></table></div>"
