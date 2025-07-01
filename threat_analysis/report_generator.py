@@ -18,6 +18,7 @@ Report generation module
 import json
 import webbrowser
 import os
+import re
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 
@@ -265,7 +266,10 @@ class ReportGenerator:
                     # D3FEND mitigations
                     if 'defend_mitigations' in tech and tech['defend_mitigations']:
                         for mitigation in tech['defend_mitigations']:
-                            d3fend_url = f"https://d3fend.mitre.org/technique/{mitigation['id']}"
+                            # Extract the part after 'D3-XXXX ' for the URL
+                            url_name_match = re.match(r'D3-[A-Z0-9]+\s(.*)', mitigation['url_friendly_name_source'])
+                            url_friendly_name = url_name_match.group(1).replace(' ', '') if url_name_match else mitigation['url_friendly_name_source'].replace(' ', '')
+                            d3fend_url = f"https://d3fend.mitre.org/technique/d3f:{url_friendly_name}/"
                             defend_mitigations_html += f"<li><a href='{d3fend_url}' target='_blank' class='mitre-link'>{mitigation['id']}: {mitigation['description']}</a></li>"
                 mitre_html += "</ul>"
                 mitre_mitigations_html += "</ul>"
