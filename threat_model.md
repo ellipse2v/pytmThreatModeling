@@ -111,5 +111,5 @@ This model describes a network architecture with a Demilitarized Zone (DMZ), ext
 - **Unauthorized Access**: tactics=["Initial Access", "Persistence"], techniques=[{"id": "T1133", "name": "External Remote Services"}, {"id": "T1078", "name": "Valid Accounts"}]
 - **Weak Authentication**: tactics=["Credential Access"], techniques=[{"id": "T1110", "name": "Brute Force"}, {"id": "T1552", "name": "Unsecured Credentials"}]
 - **Data Exfiltration**: tactics=["Exfiltration"], techniques=[{"id": "T1041", "name": "Exfiltration Over C2 Channel"}, {"id": "T1048", "name": "Exfiltration Over Alternative Protocol"}]
-- **Denial of Service Attack**: tactics=["Impact"], techniques=[{"id": "T1499", "name": "Endpoint Denial of Service"}, {"id": "T1498", "name": "Network Denial of Service"}]
+
 - **Privilege Escalation**: tactics=["Privilege Escalation"], techniques=[{"id": "T1068", "name": "Exploitation for Privilege Escalation"}]

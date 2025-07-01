@@ -57,7 +57,7 @@ class ThreatAnalysisFramework:
         # Component initialization
         self.threat_model = ThreatModel(model_name, model_description)
         self.mitre_mapping = MitreMapping()
-        self.severity_calculator = SeverityCalculator()
+        self.severity_calculator = SeverityCalculator(markdown_file_path=self.model_filepath)
         self.report_generator = ReportGenerator(self.severity_calculator, self.mitre_mapping)
         self.diagram_generator = DiagramGenerator()
 
@@ -99,7 +99,7 @@ class ThreatAnalysisFramework:
         """Executes the threat analysis."""
         print("🔬 Starting STRIDE threat analysis...")
 
-        self.severity_calculator.update_target_multipliers(self.mitre_mapping.severity_multipliers)
+        
 
         self.grouped_threats = self.threat_model.process_threats()
         self.analysis_completed = True

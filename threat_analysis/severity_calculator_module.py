@@ -16,12 +16,13 @@
 Threat severity calculation module
 """
 from typing import Dict, Tuple, Optional
+import re
 
 
 class SeverityCalculator:
     """Class for calculating threat severity"""
     
-    def __init__(self):
+    def __init__(self, markdown_file_path: str = "threat_model.md"):
         self.base_scores = {
             "ElevationOfPrivilege": 9.0,
             "Tampering": 8.0,
@@ -31,13 +32,7 @@ class SeverityCalculator:
             "Repudiation": 5.0
         }
         
-        self.target_multipliers = {
-            "Serveur Central": 1.5,
-            "Firewall": 1.0,
-            "Switch": 0.8,
-            "Proxy": 0.7,
-            "Rupture": 0.7
-        }
+        self.target_multipliers = self._load_severity_multipliers_from_markdown(markdown_file_path)
         
         self.protocol_adjustments = {
             "SSH": 0.5,
@@ -59,6 +54,36 @@ class SeverityCalculator:
             "SECRET": 1.5,
             "TOP_SECRET": 2.0
         }
+
+    def _load_severity_multipliers_from_markdown(self, markdown_file_path: str) -> Dict[str, float]:
+        """
+        Loads severity multipliers from the '## Severity Multipliers' section of a Markdown file.
+        Expected format:
+        ## Severity Multipliers
+        - **Server Name 1**: 1.5
+        - **Server Name 2**: 2.0
+        """
+        multipliers = {}
+        try:
+            with open(markdown_file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            multipliers_section_match = re.search(r'## Severity Multipliers\n(.*?)(\n## |$)', content, re.DOTALL)
+            if multipliers_section_match:
+                multipliers_content = multipliers_section_match.group(1).strip()
+                
+                for line in multipliers_content.split('\n'):
+                    line = line.strip()
+                    match = re.match(r'- \*\*(.*?)\*\*: (\d+\.\d+)', line)
+                    if match:
+                        name = match.group(1).strip()
+                        value = float(match.group(2))
+                        multipliers[name] = value
+        except FileNotFoundError:
+            print(f"Warning: Severity multipliers file not found at {markdown_file_path}")
+        except Exception as e:
+            print(f"Error loading severity multipliers from markdown: {e}")
+        return multipliers
     
     def calculate_score(self, threat_type: str, target_name: str, protocol: Optional[str] = None, classification: Optional[str] = None) -> float:
         """Calculates the severity score for a threat"""

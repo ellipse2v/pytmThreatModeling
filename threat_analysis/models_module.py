@@ -18,6 +18,7 @@ Threat Model Definition Module with MITRE ATT&CK Integration
 from pytm import TM, Boundary, Actor, Server, Dataflow, Data, Lambda, Process, Datastore, ExternalEntity
 from collections import defaultdict
 from typing import List, Dict, Any, Optional, Tuple
+import re
 from .mitre_mapping_module import MitreMapping
 
 class CustomThreat:
