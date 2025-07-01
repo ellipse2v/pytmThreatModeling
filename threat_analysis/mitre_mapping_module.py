@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 MITRE ATT&CK mapping module with D3FEND mitigations
 """
@@ -22,13 +21,55 @@ import time
 from typing import Dict, List, Any
 import re
 import pandas as pd
-
 from threat_analysis.custom_threats import get_custom_threats
 
+attack_d3fend_mapping = {
+    "M1013 Application Developer Guidance": ["A future release of D3FEND will define a taxonomy of Source Code Hardening Techniques."],
+    "M1015 Active Directory Configuration": ["D3-ANCI Authentication Cache Invalidation", "D3-DTP Domain Trust Policy", "D3-UAP User Account Permissions"],
+    "M1016 Vulnerability Scanning": ["Future D3FEND releases will model the scanning and inventory domains."],
+    "M1017 User Training": ["Modeling user training is outside the scope of D3FEND."],
+    "M1018 User Account Management": ["D3-LFP Local File Permissions", "D3-SCF System Call Filtering", "D3-SCP System Configuration Permissions"],
+    "M1019 Threat Intelligence Program": ["Establishing and running a Threat Intelligence Program is outside the scope of D3FEND."],
+    "M1020 SSL/TLS Inspection": ["D3-NTA Network Traffic Analysis"],
+    "M1021 Restrict Web-Based Content": ["D3-DNSAL DNS Allowlisting", "D3-DNSDL DNS Denylisting", "D3-FA File Analysis", "D3-ITF Inbound Traffic Filtering", "D3-NTA Network Traffic Analysis", "D3-OTF Outbound Traffic Filtering", "D3-UA URL Analysis"],
+    "M1022 Restrict File and Directory Permissions": ["D3-LFP Local File Permissions"],
+    "M1024 Restrict Registry Permission": ["D3-SCP System Configuration Permissions"],
+    "M1025 Privileged Process Integrity": ["D3-BA Bootloader Authentication", "D3-DLIC Driver Load Integrity Checking", "D3-PSEP Process Segment Execution Prevention", "D3-SCF System Call Filtering"],
+    "M1026 Privileged Account Management": ["D3-DAM Domain Account Monitoring", "D3-LAM Local Account Monitoring", "D3-SPP Strong Password Policy"],
+    "M1027 Password Policies": ["D3-OTP One-time Password", "D3-SPP Strong Password Policy"],
+    "M1028 Operating System Configuration": ["D3-PH Platform Hardening"],
+    "M1029 Remote Data Storage": ["IT disaster recovery plans are outside the current scope of D3FEND."],
+    "M1030 Network Segmentation": ["D3-BDI Broadcast Domain Isolation", "D3-ET Encrypted Tunnels", "D3-ISVA Inbound Session Volume Analysis", "D3-ITF Inbound Traffic Filtering"],
+    "M1031 Network Intrusion Prevention": ["D3-ITF Inbound Traffic Filtering", "D3-NTA Network Traffic Analysis", "D3-OTF Outbound Traffic Filtering"],
+    "M1032 Multi-factor Authentication": ["D3-MFA Multi-factor Authentication"],
+    "M1033 Limit Software Installation": ["D3-EAL Executable Allowlisting", "D3-EDL Executable Denylisting"],
+    "M1034 Limit Hardware Installation": ["D3-IOPR IO Port Restriction"],
+    "M1035 Limit Access to Resource Over Network": ["D3-NI Network Isolation"],
+    "M1036 Account Use Policies": ["D3-AL Account Locking", "D3-ANCI Authentication Cache Invalidation", "D3-ANET Authentication Event Thresholding"],
+    "M1037 Filter Network Traffic": ["D3-NI Network Isolation"],
+    "M1038 Execution Prevention": ["D3-DLIC Driver Load Integrity Checking", "D3-EAL Executable Allowlisting", "D3-EDL Executable Denylisting", "D3-PSEP Process Segment Execution Prevention"],
+    "M1039 Environment Variable Permissions": ["D3-ACH Application Configuration Hardening", "D3-SFA System File Analysis"],
+    "M1040 Behavior Prevention on Endpoint": ["D3-ANET Authentication Event Thresholding", "D3-AZET Authorization Event Thresholding", "D3-JFAPA Job Function Access Pattern Analysis", "D3-RAPA Resource Access Pattern Analysis", "D3-SDA Session Duration Analysis", "D3-UDTA User Data Transfer Analysis", "D3-UGLPA User Geolocation Logon Pattern Analysis", "D3-WSAA Web Session Activity Analysis"],
+    "M1041 Encrypt Sensitive Information": ["D3-DENCR Disk Encryption", "D3-ET Encrypted Tunnels", "D3-FE File Encryption", "D3-MENCR Message Encryption"],
+    "M1042 Disable or Remove Feature or Program": ["D3-ACH Application Configuration Hardening", "D3-EDL Executable Denylisting", "D3-SCF System Call Filtering"],
+    "M1043 Credential Access Protection": ["D3-HBPI Hardware-based Process Isolation"],
+    "M1044 Restrict Library Loading": ["D3-SCF System Call Filtering"],
+    "M1045 Code Signing": ["D3-DLIC Driver Load Integrity Checking", "D3-EAL Executable Allowlisting", "D3-SBV Service Binary Verification"],
+    "M1046 Boot Integrity": ["D3-BA Bootloader Authentication", "D3-TBI TPM Boot Integrity"],
+    "M1047 Audit": ["D3-DAM Domain Account Monitoring", "D3-LAM Local Account Monitoring", "D3-SFA System File Analysis"],
+    "M1048 Application Isolation and Sandboxing": ["D3-DA Dynamic Analysis", "D3-HBPI Hardware-based Process Isolation", "D3-SCF System Call Filtering"],
+    "M1049 Antivirus/Antimalware": ["D3-FCR File Content Rules", "D3-FH File Hashing", "D3-PA Process Analysis"],
+    "M1050 Exploit Protection": ["D3-SSC Shadow Stack Comparisons", "D3-AH Application Hardening", "D3-EHPV Exception Handler Pointer Validation", "D3-ITF Inbound Traffic Filtering"],
+    "M1051 Update Software": ["D3-SU Software Update"],
+    "M1052 User Account Control": ["D3-SCF System Call Filtering"],
+    "M1053 Data Backup": ["Comprehensive IT disaster recovery plans are outside the current scope of D3FEND."],
+    "M1054 Software Configuration": ["D3-ACH Application Configuration Hardening", "D3-CP Certificate Pinning"],
+    "M1055 Do Not Mitigate": [], # No D3FEND techniques listed
+    "M1056 Pre-compromise": ["D3-DE Decoy Environment", "D3-DO Decoy Object"]
+}
 
 class MitreMapping:
     """Class for managing MITRE ATT&CK mapping with D3FEND mitigations"""
-    
     def __init__(self, threat_model=None, threat_model_path: str = '/mnt/d/dev/github/threatModelBypyTm/threat_model.md'):
         self.d3fend_details = self._initialize_d3fend_mapping()
         self.mapping = self._initialize_mapping()
@@ -36,18 +77,14 @@ class MitreMapping:
         self.custom_threats = self._load_custom_threats(threat_model)
         self.custom_mitre_mappings = self._load_custom_mitre_mappings_from_markdown(threat_model_path)
         self.markdown_mitigations = {}
-        
-
     def _load_custom_threats(self, threat_model) -> Dict[str, List[Dict[str, Any]]]:
         """Loads custom threats from the custom_threats module."""
         if threat_model:
             return get_custom_threats(threat_model)
         return {}
-
     def get_custom_threats(self) -> Dict[str, List[Dict[str, Any]]]:
         """Returns the loaded custom threats."""
         return self.custom_threats
-        
     def _load_custom_mitre_mappings_from_markdown(self, markdown_file_path: str) -> List[Dict[str, Any]]:
         """
         Loads custom MITRE ATT&CK mappings from the '## Custom Mitre Mapping' section of a Markdown file.
@@ -56,36 +93,29 @@ class MitreMapping:
         try:
             with open(markdown_file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            
             mapping_section_match = re.search(r'## Custom Mitre Mapping\n(.*?)(\n## |$)', content, re.DOTALL)
             if mapping_section_match:
                 mappings_content = mapping_section_match.group(1).strip()
-                
                 # Regex to capture the threat name, tactics, and techniques string
                 # It looks for lines starting with '- **Threat Name**:'
                 # and then captures the rest of the line which should be a JSON-like string
                 pattern = re.compile(r'- \*\*(.*?)\*\*:\s*({.*?})')
-                
                 for line in mappings_content.split('\n'):
                     line = line.strip()
                     match = pattern.match(line)
                     if match:
                         threat_name = match.group(1).strip()
                         json_like_string = match.group(2)
-                        
                         # Replace single quotes with double quotes for valid JSON
                         json_like_string = json_like_string.replace("'", '"')
                         # Add quotes around keys
                         json_like_string = re.sub(r'(\w+)=', r'"\1"=', json_like_string)
-                        
                         try:
                             # Parse the JSON-like string
                             data = json.loads(json_like_string)
-                            
                             # Extract tactics and techniques
                             tactics = data.get("tactics", [])
                             techniques = data.get("techniques", [])
-                            
                             custom_mappings.append({
                                 "threat_name": threat_name,
                                 "tactics": tactics,
@@ -99,7 +129,6 @@ class MitreMapping:
         except Exception as e:
             print(f"Error loading custom MITRE mappings from markdown: {e}")
         return custom_mappings
-
     def _initialize_d3fend_mapping(self) -> Dict[str, Dict[str, str]]:
         """Initializes D3FEND mitigations by loading from d3fend.csv."""
         d3fend_details = {}
@@ -119,13 +148,9 @@ class MitreMapping:
         except Exception as e:
             print(f"Error loading d3fend.csv: {e}. Using empty D3FEND mapping.")
         return d3fend_details
-
-
     def _initialize_mapping(self) -> Dict[str, Dict[str, Any]]:
         """Initializes comprehensive STRIDE to MITRE ATT&CK mapping with D3FEND mitigations"""
-        
         official_d3fend_mapping = self._initialize_d3fend_mapping()
-        
         mapping = {
             "Spoofing": {
                 "tactics": ["Initial Access", "Defense Evasion", "Credential Access"],
@@ -241,7 +266,7 @@ class MitreMapping:
                     {
                         "id": "T1539",
                         "name": "Steal Web Session Cookie",
-                        "description": "Session credential theft",
+                        "description": "Steal Web Session Cookie",
                         "mitre_mitigations": [
                             {"id": "M1017", "name": "User Account Management"}
                         ]
@@ -448,7 +473,8 @@ class MitreMapping:
                     {
                         "id": "T1083",
                         "name": "File and Directory Discovery",
-                        "description": "Discovery of sensitive files and directories"
+                        "description": "Discovery of sensitive files and directories",
+                        "defend_mitigations": [{"id": "D3F-FDD"}]
                     },
                     {
                         "id": "T1574",
@@ -590,7 +616,6 @@ class MitreMapping:
                     }
                 ]
             },
-
 "Repudiation": {
                 "tactics": ["Defense Evasion", "Impact"],
                 "techniques": [
@@ -706,7 +731,8 @@ class MitreMapping:
                     {
                         "id": "T1005",
                         "name": "Data from Local System",
-                        "description": "Collecting local sensitive data"
+                        "description": "Collecting local sensitive data",
+                        "defend_mitigations": [{"id": "D3F-DFLS"}]
                     },
                     {
                         "id": "T1041",
@@ -719,17 +745,20 @@ class MitreMapping:
                     {
                         "id": "T1083",
                         "name": "File and Directory Discovery",
-                        "description": "Discovery of sensitive files and directories"
+                        "description": "Discovery of sensitive files and directories",
+                        "defend_mitigations": [{"id": "D3F-FDD"}]
                     },
                     {
                         "id": "T1040",
                         "name": "Network Sniffing",
-                        "description": "Network traffic interception and sniffing"
+                        "description": "Network traffic interception and sniffing",
+                        "defend_mitigations": [{"id": "D3F-NS"}]
                     },
                     {
                         "id": "T1592",
                         "name": "Gather Victim Host Information",
-                        "description": "Host information gathering and fingerprinting"
+                        "description": "Host information gathering and fingerprinting",
+                        "defend_mitigations": [{"id": "D3F-GVHI"}]
                     },
                     {
                         "id": "T1592.002",
@@ -742,7 +771,8 @@ class MitreMapping:
                     {
                         "id": "T1595",
                         "name": "Active Scanning",
-                        "description": "Active reconnaissance and scanning"
+                        "description": "Active reconnaissance and scanning",
+                        "defend_mitigations": [{"id": "D3F-AS"}]
                     },
                     {
                         "id": "T1595.001",
@@ -981,7 +1011,8 @@ class MitreMapping:
                     {
                         "id": "T1005",
                         "name": "Data from Local System",
-                        "description": "Collecting local sensitive data"
+                        "description": "Collecting local sensitive data",
+                        "defend_mitigations": [{"id": "D3F-DFLS"}]
                     },
                     {
                         "id": "T1041",
@@ -994,17 +1025,20 @@ class MitreMapping:
                     {
                         "id": "T1083",
                         "name": "File and Directory Discovery",
-                        "description": "Discovery of sensitive files and directories"
+                        "description": "Discovery of sensitive files and directories",
+                        "defend_mitigations": [{"id": "D3F-FDD"}]
                     },
                     {
                         "id": "T1040",
                         "name": "Network Sniffing",
-                        "description": "Network traffic interception and sniffing"
+                        "description": "Network traffic interception and sniffing",
+                        "defend_mitigations": [{"id": "D3F-NS"}]
                     },
                     {
                         "id": "T1592",
                         "name": "Gather Victim Host Information",
-                        "description": "Host information gathering and fingerprinting"
+                        "description": "Host information gathering and fingerprinting",
+                        "defend_mitigations": [{"id": "D3F-GVHI"}]
                     },
                     {
                         "id": "T1592.002",
@@ -1017,7 +1051,8 @@ class MitreMapping:
                     {
                         "id": "T1595",
                         "name": "Active Scanning",
-                        "description": "Active reconnaissance and scanning"
+                        "description": "Active reconnaissance and scanning",
+                        "defend_mitigations": [{"id": "D3F-AS"}]
                     },
                     {
                         "id": "T1595.001",
@@ -1141,21 +1176,11 @@ class MitreMapping:
                     }
                 ]
             }
-                
         }
-
         # Add the official D3FEND mapping to each technique
         for category in mapping.values():
             for technique in category.get("techniques", []):
-                technique['official_defend_mapping'] = {}
-                mitre_mitigations = technique.get('mitre_mitigations', [])
-                for mitre_mitigation in mitre_mitigations:
-                    mitigation_id = mitre_mitigation.get('id')
-                    if mitigation_id in self.d3fend_details:
-                        technique['official_defend_mapping'][mitigation_id] = self.d3fend_details[mitigation_id]
-        
         return mapping
-
     def _initialize_threat_patterns(self) -> Dict[str, str]:
         """
         Enhanced threat recognition patterns with comprehensive coverage
@@ -1172,7 +1197,6 @@ class MitreMapping:
             "T1557": r"(?i)man.in.the.middle|adversary.in.the.middle|mitm attack",
             "T1556": r"(?i)authentication bypass|modify authentication|authentication abuse",
             "T1598": r"(?i)cross site request forgery|csrf|phishing for information",
-            
             # Tampering and Injection Attacks
             "T1565": r"(?i)data manipulation|process tampering|alteration of data|input data manipulation|parameter injection|audit log manipulation|schema poisoning|xml schema poisoning",
             "T1190": r"(?i)exploit public.facing application|web application exploit|application vulnerability|unpatched.*vulnerabilities|injection|sql injection|xml injection|command injection|code injection|ldap injection|format string injection|server side include|ssi injection|remote code inclusion|argument injection|dtd injection|resource injection",
@@ -1182,21 +1206,16 @@ class MitreMapping:
             "T1105": r"(?i)ingress tool transfer|malicious file|file upload|remote file inclusion|php remote file inclusion",
             "T1071": r"(?i)application layer protocol|protocol manipulation|communication channel manipulation",
             "T1071.001": r"(?i)web protocols|http.*manipulation|http.*smuggling|http.*splitting|protocol tampering",
-            
             # HTTP-specific attacks
             "T1071.001": r"(?i)http request splitting|http response smuggling|http request smuggling|xml routing detour|client.server protocol manipulation",
-            
             # Path and Directory Attacks
             "T1083": r"(?i)path traversal|directory traversal|relative path traversal|file.*directory discovery|try all common switches",
-            
             # Encoding and Obfuscation
             "T1027": r"(?i)obfuscated files|double encoding|obfuscation|encoding manipulation",
             "T1140": r"(?i)deobfuscate|decode|alternate encoding|leverage alternate encoding",
-            
             # Session and Credential Attacks
             "T1212": r"(?i)exploitation for credential access|credential exploitation",
             "T1134": r"(?i)access token manipulation|token manipulation|token theft|token impersonation",
-            
             # Information Disclosure and Reconnaissance
             "T1005": r"(?i)sensitive data disclosure|local data|unprotected sensitive data|data leak|credentials aging",
             "T1040": r"(?i)network sniffing|sniffing attacks|interception|cross site tracing",
@@ -1206,40 +1225,32 @@ class MitreMapping:
             "T1213": r"(?i)exploiting trust in client|data from information repositories|lifting sensitive data.*cache|insecure direct object references|idor",
             "T1555": r"(?i)reverse engineering|white box reverse engineering|credentials from password stores",
             "T1552": r"(?i)unsecured credentials|exploiting incorrectly configured ssl|ssl/tls misconfiguration|weak ssl/tls",
-            
             # JSON and API Attacks
             "T1041": r"(?i)json hijacking|javascript hijacking|api manipulation|exploit.*apis|exploit test apis|exploit script.based apis",
-            
             # Registry and Environment
             "T1112": r"(?i)modify registry|manipulate registry|registry manipulation|manipulate registry information",
             "T1574": r"(?i)hijack execution flow|subverting environment variable|environment variable manipulation|command delimiters",
-            
             # Content and Interface Attacks
             "T1036": r"(?i)content spoofing|masquerading|iframe overlay",
-            
             # Privilege Escalation
             "T1068": r"(?i)privilege escalation|exploitation for privilege escalation|elevation of privilege|vulnerability in the management interface|unpatched.*vulnerabilities|compromise of the management interface",
             "T1548": r"(?i)abuse elevation control|exploiting incorrectly configured access control|functionality misuse|hijacking.*privileged process|catching exception.*privileged",
             "T1055": r"(?i)process injection|hijacking.*privileged process|embedding scripts",
             "T1484": r"(?i)privilege abuse|domain policy modification",
             "T1021": r"(?i)remote services|lateral movement",
-            
             # Denial of Service and Buffer Attacks
             "T1499": r"(?i)denial of service|dos attack|endpoint dos|resource exhaustion|flooding|excessive allocation|xml.*blowup|buffer overflow|removing.*functionality|xml entity expansion|xml ping of death|resource-intensive queries|exhaust its resources|disrupt air traffic control",
             "T1498": r"(?i)network denial of service|ddos|network flood|amplification",
             "T1489": r"(?i)service stop|disable.*service",
             "T1499.004": r"(?i)buffer manipulation|overflow buffers|xml entity expansion|xml ping of death",
-            
             # Client Function Removal
             "T1621": r"(?i)removing important client functionality|multi.factor authentication request generation",
-            
             # Log and Audit Manipulation
             "T1070": r"(?i)indicator removal|log deletion|clear.*logs|audit log manipulation|repudiation of critical actions|lack of monitoring|lack of logging",
             "T1070.001": r"(?i)clear windows event logs",
             "T1070.002": r"(?i)clear linux.*logs|clear mac.*logs",
             "T1562": r"(?i)impair defenses|disable.*security|functionality misuse|insecure security configuration|hardening",
             "T1562.001": r"(?i)firewall rule misconfiguration|disable or modify system firewall|firewall bypass",
-            
             # PyTM STRIDE Categories
             "spoofing": "Spoofing",
             "tampering": "Tampering|unpatched.*vulnerabilities|sql.*injection|nosql.*injection|xss|cross.site scripting|data corruption|unauthorized write access|injection of false surveillance data|unauthorized access to or modification of flight plans|unpatched.*vulnerabilities",
@@ -1251,11 +1262,9 @@ class MitreMapping:
             "elevationofprivilege": "ElevationOfPrivilege",
             "elevation of privilege": "ElevationOfPrivilege|unauthorized privilege escalation|vulnerability in the management interface|compromise of the management interface|lateral movement"
         }
-    
     def map_threat_to_mitre(self, threat_description: str) -> List[Dict[str, Any]]:
         """Maps a threat description to MITRE ATT&CK techniques using regex patterns."""
         found_techniques = {} # Use dict to store unique techniques by ID
-        
         for pattern_value, pattern_regex in self.threat_patterns.items(): # pattern_value can be a T-ID or STRIDE category
             if re.search(pattern_regex, threat_description, re.IGNORECASE):
                 # If the pattern_value is a direct MITRE T-ID
@@ -1332,34 +1341,27 @@ class MitreMapping:
                                         })
                                 tech_copy['defend_mitigations'] = defend_mitigations_list
                                 found_techniques[technique.get("id")] = tech_copy
-        
         return list(found_techniques.values())
-    
     def get_d3fend_mitigations_for_technique(self, technique_id: str) -> List[Dict[str, str]]:
         """Retrieves D3FEND mitigations for a given MITRE ATT&CK technique ID."""
         if not self.d3fend_mappings:
             return []
         return self.d3fend_mappings.get(technique_id, [])
-
     def get_all_techniques(self) -> List[Dict[str, str]]:
         """Returns all distinct MITRE techniques defined in the mapping."""
         techniques = []
         for threat_info in self.mapping.values():
             techniques.extend(threat_info.get("techniques", []))
         return techniques
-    
     def get_techniques_count(self) -> int:
         """Returns the total number of distinct MITRE techniques defined in the mapping."""
         return len(self.get_all_techniques())
-    
     def add_custom_mapping(self, threat_type: str, tactics: List[str], techniques: List[Dict[str, str]]):
         """Adds a custom mapping for a STRIDE category."""
         self.mapping[threat_type] = {
             "tactics": tactics,
             "techniques": techniques
         }
-
-        
     def analyze_pytm_threats_list(self, pytm_threats_list: List[Any]) -> Dict[str, Any]:
         """
         Analyzes a list of PyTM threat objects and applies MITRE mapping.
@@ -1371,17 +1373,13 @@ class MitreMapping:
             "processed_threats": []
         }
         unique_mitre_techniques = set()
-        
         for i, threat_tuple in enumerate(pytm_threats_list):
             threat, target = threat_tuple
-            
             threat_description = getattr(threat, 'description', '')
             threat_name = getattr(threat, 'name', str(threat.__class__.__name__))
-            
             stride_category = self.classify_pytm_threat(threat)
             mitre_techniques = self.map_threat_to_mitre(threat_description)
             mitre_tactics = self.get_tactics_for_threat(stride_category)
-            
             processed_threat = {
                 "threat_name": threat_name,
                 "description": threat_description,
@@ -1391,26 +1389,17 @@ class MitreMapping:
                 "mitre_techniques": mitre_techniques,
                 "original_threat": threat
             }
-            
             results["processed_threats"].append(processed_threat)
-            
             if stride_category:
                 if stride_category not in results["stride_distribution"]:
                     results["stride_distribution"][stride_category] = 0
                 results["stride_distribution"][stride_category] += 1
-            
             for tech in mitre_techniques:
                 unique_mitre_techniques.add(tech.get("id"))
-        
         results["mitre_techniques_count"] = len(unique_mitre_techniques)
-        
         print(f"\n=== Final Results ===")
         print(f"Total threats: {results['total_threats']}")
-        
-        
-        
         return results
-
     def classify_pytm_threat(self, threat) -> str:
         """
         Classifies a threat into a STRIDE category based on its properties.
@@ -1418,17 +1407,14 @@ class MitreMapping:
         # Priority 1: Use the pre-assigned stride_category if it exists
         if hasattr(threat, 'stride_category') and threat.stride_category:
             return threat.stride_category
-
         # Priority 2: Use the threat's class name if it maps to a STRIDE category
         threat_class_name = threat.__class__.__name__
         if threat_class_name in ['Spoofing', 'Tampering', 'Repudiation', 'InformationDisclosure', 'DenialOfService', 'ElevationOfPrivilege']:
             return threat_class_name
-
         # Priority 3: Use keyword matching on the threat's description
         description = getattr(threat, 'description', '').lower()
         if not description:
             return 'Unknown'
-
         # Keywords for each STRIDE category
         stride_keywords = {
             'Spoofing': ['spoof', 'impersonat', 'masquerad', 'phish', 'credential theft'],
@@ -1438,14 +1424,10 @@ class MitreMapping:
             'Denial of Service': ['dos', 'denial of service', 'flood', 'exhaust'],
             'Elevation of Privilege': ['privilege escalation', 'elevat', 'bypass', 'escalat']
         }
-
         for category, keywords in stride_keywords.items():
             if any(keyword in description for keyword in keywords):
                 return category
-
         return 'Unknown'
-
-
     def get_tactics_for_threat(self, stride_category: str) -> List[str]:
         """
         Enhanced MITRE tactics mapping for STRIDE categories.
@@ -1479,14 +1461,11 @@ class MitreMapping:
                 'Impact'
             ]
         }
-        
         tactics = stride_to_tactics.get(stride_category, [])
         return tactics
-    
     def get_stride_categories(self) -> List[str]:
         """Returns the list of available STRIDE categories."""
         return list(self.mapping.keys())
-    
     def get_statistics(self) -> Dict[str, Any]:
         """Returns mapping statistics."""
         return {
