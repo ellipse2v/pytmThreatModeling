@@ -18,6 +18,7 @@ import os
 import requests
 import json
 import time
+import logging
 from typing import Dict, List, Any
 import re
 import pandas as pd
@@ -122,12 +123,12 @@ class MitreMapping:
                                 "techniques": techniques
                             })
                         except json.JSONDecodeError as e:
-                            print(f"Error decoding JSON for custom mapping '{threat_name}': {e}")
-                            print(f"Problematic string: {json_like_string}")
+                            logging.error(f"Error decoding JSON for custom mapping '{threat_name}': {e}")
+                            logging.error(f"Problematic string: {json_like_string}")
         except FileNotFoundError:
-            print(f"Warning: Custom MITRE mapping file not found at {markdown_file_path}")
+            logging.warning(f"Warning: Custom MITRE mapping file not found at {markdown_file_path}")
         except Exception as e:
-            print(f"Error loading custom MITRE mappings from markdown: {e}")
+            logging.error(f"Error loading custom MITRE mappings from markdown: {e}")
         return custom_mappings
     def _initialize_d3fend_mapping(self) -> Dict[str, Dict[str, str]]:
         """Initializes D3FEND mitigations by loading from d3fend.csv."""
@@ -144,9 +145,9 @@ class MitreMapping:
                     "description": d3fend_description
                 }
         except FileNotFoundError:
-            print(f"Error: d3fend.csv not found at {csv_file_path}. Using empty D3FEND mapping.")
+            logging.error(f"Error: d3fend.csv not found at {csv_file_path}. Using empty D3FEND mapping.")
         except Exception as e:
-            print(f"Error loading d3fend.csv: {e}. Using empty D3FEND mapping.")
+            logging.error(f"Error loading d3fend.csv: {e}. Using empty D3FEND mapping.")
         return d3fend_details
     def _initialize_mapping(self) -> Dict[str, Dict[str, Any]]:
         """Initializes comprehensive STRIDE to MITRE ATT&CK mapping with D3FEND mitigations"""
@@ -1214,9 +1215,9 @@ class MitreMapping:
                                             })
                                 # Once found and processed, break from this inner loop to avoid duplicate additions
                                 break
-        # DEBUG: Add a print statement here to check the populated defend_mitigations
+        # DEBUG: Add a logging statement here to check the populated defend_mitigations
         if technique.get("id") == "T1566": # Example technique
-            print(f"DEBUG: D3FEND mitigations for T1566: {technique.get('defend_mitigations')}")
+            logging.debug(f"DEBUG: D3FEND mitigations for T1566: {technique.get('defend_mitigations')}")
         return mapping
     def _initialize_threat_patterns(self) -> Dict[str, str]:
         """
@@ -1402,8 +1403,8 @@ class MitreMapping:
             for tech in mitre_techniques:
                 unique_mitre_techniques.add(tech.get("id"))
         results["mitre_techniques_count"] = len(unique_mitre_techniques)
-        print(f"\n=== Final Results ===")
-        print(f"Total threats: {results['total_threats']}")
+        logging.info(f"\n=== Final Results ===")
+        logging.info(f"Total threats: {results['total_threats']}")
         return results
     def classify_pytm_threat(self, threat) -> str:
         """

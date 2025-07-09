@@ -18,6 +18,7 @@ Enhanced Diagram generation module with protocol styles and boundary attributes 
 import subprocess
 import os
 import re
+import logging
 from typing import Dict, List, Any, Optional
 from pytm import TM, Boundary, Actor, Server, Dataflow, Data  # Import for pytm types
 
@@ -34,7 +35,7 @@ class DiagramGenerator:
             dot_code = self._generate_manual_dot(threat_model) # Fallback to manual generation
             
             if not dot_code or not dot_code.strip(): # Check if DOT code is empty or only whitespace
-                print("❌ Unable to generate DOT code from model. DOT code is empty. Check model content.")
+                logging.error("❌ Unable to generate DOT code from model. DOT code is empty. Check model content.")
                 return None
 
             # Clean the DOT code
@@ -47,21 +48,21 @@ class DiagramGenerator:
 
             with open(output_file, "w", encoding="utf-8", newline='\n') as f:
                 f.write(cleaned_dot)
-            print(f"✅ DOT file generated: {output_file}")
+            logging.info(f"✅ DOT file generated: {output_file}")
             return output_file
         except Exception as e:
-            print(f"❌ Error during DOT file generation: {e}")
+            logging.error(f"❌ Error during DOT file generation: {e}")
             return None
 
     def generate_diagram_from_dot(self, dot_code: str, output_file: str, format: str = "svg") -> Optional[str]:
         """Generates a diagram from DOT code using Graphviz."""
         if format not in self.supported_formats:
-            print(f"❌ Unsupported format: {format}. Supported formats: {self.supported_formats}")
+            logging.error(f"❌ Unsupported format: {format}. Supported formats: {self.supported_formats}")
             return None
             
         if not self.check_graphviz_installation():
-            print("❌ Graphviz not found!")
-            print(self.get_installation_instructions())
+            logging.error("❌ Graphviz not found!")
+            logging.warning(self.get_installation_instructions())
             return None
             
         try:
@@ -84,15 +85,15 @@ class DiagramGenerator:
                 
                 return output_path
             else:
-                print("❌ Output file was not created")
+                logging.error("❌ Output file was not created")
                 return None
                 
         except subprocess.CalledProcessError as e:
-            print(f"❌ Graphviz error: {e.stderr}")
-            print(f"DOT code preview: {cleaned_dot[:200]}...")
+            logging.error(f"❌ Graphviz error: {e.stderr}")
+            logging.error(f"DOT code preview: {cleaned_dot[:200]}...")
             return None
         except Exception as e:
-            print(f"❌ Unexpected error: {e}")
+            logging.error(f"❌ Unexpected error: {e}")
             return None
 
     def _get_edge_attributes_for_protocol(self, threat_model, protocol: Optional[str]) -> str:
@@ -336,7 +337,7 @@ class DiagramGenerator:
             return f"Data: {str(data)}"
             
         except Exception as e:
-            print(f"⚠️ Error extracting data info: {e}")
+            logging.warning(f"⚠️ Error extracting data info: {e}")
             return "Data: Unknown"
 
     def _sanitize_name(self, name: str) -> str:
@@ -525,7 +526,7 @@ class DiagramGenerator:
                     source_name = self._get_element_name(df.source)
                     dest_name = self._get_element_name(df.sink)
                     if not source_name or not dest_name:
-                        print(f"⚠️ Skipping dataflow with missing source or destination")
+                        logging.warning(f"⚠️ Skipping dataflow with missing source or destination")
                         continue
                     escaped_source = self._escape_label(source_name)
                     escaped_dest = self._escape_label(dest_name)
@@ -555,7 +556,7 @@ class DiagramGenerator:
                         "edge_attributes": edge_attributes
                     }
                 except Exception as e:
-                    print(f"⚠️ Error processing dataflow: {e}")
+                    logging.warning(f"⚠️ Error processing dataflow: {e}")
                     continue
 
         # Now, merge bidirectional flows
@@ -696,7 +697,7 @@ class DiagramGenerator:
             return html_output_path
         
         except Exception as e:
-            print(f"❌ Error generating HTML with legend: {e}")
+            logging.error(f"❌ Error generating HTML with legend: {e}")
             return None   
  
     def _create_complete_html(self, svg_content: str, legend_html: str, threat_model) -> str:
@@ -1079,7 +1080,7 @@ class DiagramGenerator:
             
             
         except Exception as e:
-            print(f"⚠️ Error extracting protocol styles: {e}")
+            logging.warning(f"⚠️ Error extracting protocol styles: {e}")
         
         return protocol_styles
 

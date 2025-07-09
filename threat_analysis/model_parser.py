@@ -15,6 +15,7 @@
 # # In threat_analysis/model_parser.py
 
 import re
+import logging
 from typing import List, Dict, Any, Callable, Optional, Tuple, Set
 from .models_module import ThreatModel, CustomThreat
 from .mitre_mapping_module import MitreMapping
@@ -74,11 +75,11 @@ class ModelParser:
                 section_title = stripped_line
                 if section_title in self.section_parsers:
                     self.current_section = section_title
-                    print(f"⏳ Loading section: {self.current_section}")
+                    logging.info(f"⏳ Loading section: {self.current_section}")
                 else:
                     # Unrecognized section, ignore it but set current_section to None
                     self.current_section = None
-                    print(f"ℹ️ Section ignored: {section_title}")
+                    logging.info(f"ℹ️ Section ignored: {section_title}")
                 continue
 
             # If we are in a recognized section, call the appropriate parser
@@ -110,9 +111,9 @@ class ModelParser:
             for key, value in boundary_kwargs.items():
                 params_display.append(f"{key.capitalize()}: {value}")
             
-            print(f"   - Added Boundary: {name} ({', '.join(params_display)})")
+            logging.info(f"   - Added Boundary: {name} ({', '.join(params_display)})")
         else:
-            print(f"⚠️ Warning: Malformed boundary line: {line}")
+            logging.warning(f"⚠️ Warning: Malformed boundary line: {line}")
 
     def _parse_actor(self, line: str):
         """Parses an actor line with flexible key=value attributes."""
@@ -131,7 +132,7 @@ class ModelParser:
                 is_filled=is_filled
             )
         else:
-            print(f"⚠️ Warning: Malformed actor line: {line}")
+            logging.warning(f"⚠️ Warning: Malformed actor line: {line}")
 
     def _parse_server(self, line: str):
         """Parses a server line with format: - **name**: boundary=value, color=value, isFilled=bool"""
@@ -152,9 +153,9 @@ class ModelParser:
                 color=color,
                 is_filled=is_filled
             )
-            print(f"   - Added Server: {name} (Boundary: {boundary_name}, Color: {color}, Filled: {is_filled})")
+            logging.info(f"   - Added Server: {name} (Boundary: {boundary_name}, Color: {color}, Filled: {is_filled})")
         else:
-            print(f"⚠️ Warning: Malformed server line: {line}")
+            logging.warning(f"⚠️ Warning: Malformed server line: {line}")
             
     def _parse_key_value_params(self, params_str: str) -> Dict[str, Any]:
         """
@@ -204,13 +205,13 @@ class ModelParser:
                 enum_str = data_kwargs["classification"].upper()
                 data_kwargs["classification"] = self.classification_map.get(enum_str, Classification.UNKNOWN)
                 if enum_str not in self.classification_map:
-                    print(f"⚠️ Warning: Classification '{enum_str}' not recognized for Data '{name}'. Set to UNKNOWN.")
+                    logging.warning(f"⚠️ Warning: Classification '{enum_str}' not recognized for Data '{name}'. Set to UNKNOWN.")
 
             if "credentialsLife" in data_kwargs:
                 enum_str = data_kwargs["credentialsLife"].upper()
                 data_kwargs["credentialsLife"] = self.lifetime_map.get(enum_str, Lifetime.UNKNOWN)
                 if enum_str not in self.lifetime_map:
-                    print(f"⚠️ Warning: Lifetime '{enum_str}' not recognized for Data '{name}'. Set to UNKNOWN.")
+                    logging.warning(f"⚠️ Warning: Lifetime '{enum_str}' not recognized for Data '{name}'. Set to UNKNOWN.")
             
             # Call add_data by unpacking the properties dictionary
             self.threat_model.add_data(name, **data_kwargs)
@@ -223,16 +224,16 @@ class ModelParser:
                 else:
                     params_display.append(f"{key}: {value}")
             
-            print(f"   - Added Data: {name} ({', '.join(params_display)})")
+            logging.info(f"   - Added Data: {name} ({', '.join(params_display)})")
         else:
-            print(f"⚠️ Warning: Malformed data line: {line}")
+            logging.warning(f"⚠️ Warning: Malformed data line: {line}")
 
     def _parse_dataflow(self, line: str):
         """Parses a dataflow line with flexible named arguments."""
         # First, extract the dataflow name
         name_match = re.match(r'^- \*\*([^\*]+)\*\*:\s*(.*)', line)
         if not name_match:
-            print(f"⚠️ Warning: Malformed dataflow line (missing name): {line}")
+            logging.warning(f"⚠️ Warning: Malformed dataflow line (missing name): {line}")
             return
 
         name = name_match.group(1).strip()
@@ -260,7 +261,7 @@ class ModelParser:
         is_encrypted = params.get("is_encrypted", False)
 
         if not all([from_name, to_name, protocol]):
-            print(f"⚠️ Warning: Dataflow '{name}' is missing mandatory parameters (from, to, protocol).")
+            logging.warning(f"⚠️ Warning: Dataflow '{name}' is missing mandatory parameters (from, to, protocol).")
             return
 
         from_elem = self.threat_model.get_element_by_name(from_name)
@@ -273,12 +274,12 @@ class ModelParser:
                 is_authenticated=is_authenticated,
                 is_encrypted=is_encrypted
             )
-            print(f"   - Added Dataflow: {name} ({from_name} -> {to_name}, Proto: {protocol}" +
+            logging.info(f"   - Added Dataflow: {name} ({from_name} -> {to_name}, Proto: {protocol}" +
                       (f", Data: {data_name}" if data_name else "") +
                       (f", Authenticated: {is_authenticated}" if is_authenticated else "") +
                       (f", Encrypted: {is_encrypted}" if is_encrypted else "") + ")")
         else:
-            print(f"⚠️ Warning: Elements '{from_name}' or '{to_name}' not found for dataflow '{name}'.")
+            logging.warning(f"⚠️ Warning: Elements '{from_name}' or '{to_name}' not found for dataflow '{name}'.")
             
     def _parse_protocol_style(self, line: str):
         """Parses a protocol style line with format: - **protocol**: color=value, line_style=value"""
@@ -299,11 +300,11 @@ class ModelParser:
                 for key, value in style_kwargs.items():
                     params_display.append(f"{key}: {value}")
                 
-                print(f"   - Added Protocol Style: {protocol_name} ({', '.join(params_display)})")
+                logging.info(f"   - Added Protocol Style: {protocol_name} ({', '.join(params_display)})")
             else:
-                print(f"ℹ️ Protocol Style ignored (method not implemented): {protocol_name}")
+                logging.info(f"ℹ️ Protocol Style ignored (method not implemented): {protocol_name}")
         else:
-            print(f"⚠️ Warning: Malformed protocol style line: {line}")
+            logging.warning(f"⚠️ Warning: Malformed protocol style line: {line}")
 
     def _parse_severity_multiplier(self, line: str):
         """Parses a severity multiplier line."""
@@ -314,11 +315,11 @@ class ModelParser:
             # Assume there is an add_severity_multiplier method
             if hasattr(self.threat_model, 'add_severity_multiplier'):
                 self.threat_model.add_severity_multiplier(element_name, multiplier)
-                print(f"   - Added Severity Multiplier: {element_name} = {multiplier}")
+                logging.info(f"   - Added Severity Multiplier: {element_name} = {multiplier}")
             else:
-                print(f"ℹ️ Severity Multiplier ignored (method not implemented): {element_name} = {multiplier}")
+                logging.info(f"ℹ️ Severity Multiplier ignored (method not implemented): {element_name} = {multiplier}")
         else:
-            print(f"⚠️ Warning: Malformed severity multiplier line: {line}")
+            logging.warning(f"⚠️ Warning: Malformed severity multiplier line: {line}")
 
     def _parse_custom_mitre(self, line: str):
         """Parses a custom MITRE mapping line."""
@@ -357,11 +358,11 @@ class ModelParser:
             # Call add_custom_mitre_mapping method if it exists
             if hasattr(self.threat_model, 'add_custom_mitre_mapping'):
                 self.threat_model.add_custom_mitre_mapping(attack_name, tactics, techniques)
-                print(f"   - Added Custom MITRE Mapping: {attack_name} (Tactics: {len(tactics)}, Techniques: {len(techniques)})")
+                logging.info(f"   - Added Custom MITRE Mapping: {attack_name} (Tactics: {len(tactics)}, Techniques: {len(techniques)})")
             else:
-                print(f"⚠️ Warning: Malformed custom MITRE mapping line: {line}")
+                logging.warning(f"⚠️ Warning: Malformed custom MITRE mapping line: {line}")
         else:
-            print(f"⚠️ Warning: Malformed custom MITRE mapping line: {line}")
+            logging.warning(f"⚠️ Warning: Malformed custom MITRE mapping line: {line}")
             
 
     def _apply_custom_threats(self) -> Tuple[List[Tuple[CustomThreat, Any]], Set[Any]]:

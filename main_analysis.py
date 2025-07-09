@@ -18,6 +18,7 @@ Complete orchestration of security analysis - Modified version
 """
 import os
 import sys
+import logging
 from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 
@@ -45,7 +46,7 @@ class ThreatAnalysisFramework:
         
         self.output_base_dir = os.path.join("output", timestamp)
         os.makedirs(self.output_base_dir, exist_ok=True)
-        print(f"📁 Output files will be generated in: {os.path.abspath(self.output_base_dir)}")
+        logging.info(f"📁 Output files will be generated in: {os.path.abspath(self.output_base_dir)}")
 
         self.html_report_filename = f"stride_mitre_report_{timestamp}.html"
         self.json_report_filename = f"mitre_analysis_{timestamp}.json"
@@ -61,7 +62,7 @@ class ThreatAnalysisFramework:
         self.report_generator = ReportGenerator(self.severity_calculator, self.mitre_mapping)
         self.diagram_generator = DiagramGenerator()
 
-        print(f"🚀 Analysis framework initialized: {model_name}")
+        logging.info(f"🚀 Analysis framework initialized: {model_name}")
 
         self._load_model_from_dsl()
 
@@ -69,7 +70,7 @@ class ThreatAnalysisFramework:
         model_stats = self.threat_model.get_statistics()
         
         if model_stats['actors'] == 0 and model_stats['servers'] == 0 and model_stats['dataflows'] == 0:
-            print("⚠️ WARNING: The model appears to be empty or was not parsed correctly. Check your 'threat_model.md'.")
+            logging.warning("⚠️ WARNING: The model appears to be empty or was not parsed correctly. Check your 'threat_model.md'.")
         
         # Analysis state (after model loading)
         self.analysis_completed = False
@@ -79,7 +80,7 @@ class ThreatAnalysisFramework:
 
     def _load_model_from_dsl(self):
         """Loads the threat model from the Markdown DSL file."""
-        print(f"⏳ Loading model from {self.model_filepath}...")
+        logging.info(f"⏳ Loading model from {self.model_filepath}...")
         try:
             with open(self.model_filepath, 'r', encoding='utf-8') as f:
                 markdown_content = f.read()
@@ -87,50 +88,49 @@ class ThreatAnalysisFramework:
             parser.parse_markdown(markdown_content)
             # The custom threats are now generated within the ThreatModel class
             # self.custom_threats_list, self.elements_with_custom_threats = parser._apply_custom_threats()
-            print(f"✅ Model loaded successfully from {self.model_filepath}")
+            logging.info(f"✅ Model loaded successfully from {self.model_filepath}")
         except FileNotFoundError:
-            print(f"❌ Error: Model file '{self.model_filepath}' not found.")
+            logging.error(f"❌ Error: Model file '{self.model_filepath}' not found.")
             sys.exit(1)
         except Exception as e:
-            print(f"❌ Error parsing model: {e}")
+            logging.error(f"❌ Error parsing model: {e}")
             sys.exit(1)
 
     def run_analysis(self) -> Dict[str, List[Tuple[Any, Any]]]:
         """Executes the threat analysis."""
-        print("🔬 Starting STRIDE threat analysis...")
+        logging.info("🔬 Starting STRIDE threat analysis...")
 
         
 
         self.grouped_threats = self.threat_model.process_threats()
         self.analysis_completed = True
-        print("✅ Threat analysis completed.")
+        logging.info("✅ Threat analysis completed.")
         return self.grouped_threats
 
     def generate_reports(self) -> Dict[str, str]:
         """Generates HTML and JSON reports in the timestamped directory."""
         if not self.analysis_completed:
-            print("⚠️ Analysis has not been run. Execute run_analysis() first.")
+            logging.warning("⚠️ Analysis has not been run. Execute run_analysis() first.")
             return {}
 
-        print("📊 Generating reports...")
+        logging.info("📊 Generating reports...")
         
         html_output_full_path = os.path.join(self.output_base_dir, self.html_report_filename)
         json_output_full_path = os.path.join(self.output_base_dir, self.json_report_filename)
 
         html_report_path = self.report_generator.generate_html_report(
-            self.threat_model, self.grouped_threats, html_output_full_path
-        )
+            self.threat_model, self.grouped_threats, html_output_full_path)
         json_report_path = self.report_generator.generate_json_export(
             self.threat_model, self.grouped_threats, json_output_full_path
         )
-        print("✅ Reports generated.")
+        logging.info("✅ Reports generated.")
         return {"html": html_report_path, "json": json_report_path}
 
     def generate_diagrams(self) -> Dict[str, Optional[str]]:
         """Generates DOT, SVG and HTML diagrams in the timestamped directory."""
-        print("🖼️ Generating diagrams...")
+        logging.info("🖼️ Generating diagrams...")
         if not self.diagram_generator.check_graphviz_installation():
-            print(self.diagram_generator.get_installation_instructions())
+            logging.warning(self.diagram_generator.get_installation_instructions())
             return {"dot": None, "svg": None, "html": None}
 
         dot_output_full_path = os.path.join(self.output_base_dir, self.dot_diagram_filename)
@@ -156,7 +156,7 @@ class ThreatAnalysisFramework:
                 if svg_path:
                     html_path = self.diagram_generator._generate_html_with_legend(svg_path, html_output_full_path, self.threat_model)
             except Exception as e:
-                print(f"❌ Error reading DOT file to generate SVG/HTML: {e}")
+                logging.error(f"❌ Error reading DOT file to generate SVG/HTML: {e}")
 
         
         return {"dot": dot_path, "svg": svg_path, "html": html_path}
@@ -170,13 +170,14 @@ class ThreatAnalysisFramework:
                 webbrowser.open(os.path.abspath(report_path))
                 
             else:
-                print(f"⚠️ HTML report not found at: {os.path.abspath(report_path)}")
+                logging.warning(f"⚠️ HTML report not found at: {os.path.abspath(report_path)}")
         except Exception as e:
             pass
 
 
 # --- Main entry point ---
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     model_file = "threat_model.md"
 
     current_dir = os.path.dirname(os.path.abspath(__file__))

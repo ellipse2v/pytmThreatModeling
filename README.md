@@ -310,9 +310,6 @@ You can leverage and extend all PyTM features, including:
 - **Report Generation (`threat_analysis/report_generator.py`)**:
     - **Problem**: HTML generation via string concatenation is hard to read and maintain.
     - **Suggestion**: Adopt an HTML templating engine like Jinja2 to separate Python logic from HTML structure.
-- **Error Handling and Debugging**:
-    - **Problem**: Reliance on `print()` for debugging and error messages.
-    - **Suggestion**: Replace `print()` with Python's `logging` module for flexible log levels and destinations.
 - **Models Module (`threat_analysis/models_module.py`)**:
     - **Problem**: `_expand_class_targets` is specific to `Server` and `Actor`, requiring manual updates for new PyTM component types.
     - **Suggestion**: Make `_expand_class_targets` more generic, possibly by leveraging a PyTM property or a dynamic registry of extensible types.

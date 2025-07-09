@@ -17,6 +17,7 @@ Threat severity calculation module
 """
 from typing import Dict, Tuple, Optional
 import re
+import logging
 
 
 class SeverityCalculator:
@@ -80,9 +81,9 @@ class SeverityCalculator:
                         value = float(match.group(2))
                         multipliers[name] = value
         except FileNotFoundError:
-            print(f"Warning: Severity multipliers file not found at {markdown_file_path}")
+            logging.warning(f"Warning: Severity multipliers file not found at {markdown_file_path}")
         except Exception as e:
-            print(f"Error loading severity multipliers from markdown: {e}")
+            logging.error(f"Error loading severity multipliers from markdown: {e}")
         return multipliers
     
     def calculate_score(self, threat_type: str, target_name: str, protocol: Optional[str] = None, classification: Optional[str] = None) -> float:

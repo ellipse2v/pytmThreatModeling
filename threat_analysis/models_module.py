@@ -19,6 +19,7 @@ from pytm import TM, Boundary, Actor, Server, Dataflow, Data, Lambda, Process, D
 from collections import defaultdict
 from typing import List, Dict, Any, Optional, Tuple
 import re
+import logging
 from .mitre_mapping_module import MitreMapping
 
 class CustomThreat:
@@ -102,7 +103,7 @@ class ThreatModel:
         """
         data_obj = Data(name, **kwargs)  # Passes **kwargs to the Data constructor
         self.data_objects[name] = data_obj
-        print(f"   - Added Data: {name} (Props: {kwargs})")  # Debugging
+        logging.info(f"   - Added Data: {name} (Props: {kwargs})")  # Debugging
         return data_obj
 
     def add_dataflow(self, from_element: Any, to_element: Any, name :str,
@@ -114,7 +115,7 @@ class ThreatModel:
         if data_name:
             data_object = self.data_objects.get(data_name)
             if not data_object:
-                print(f"⚠️ Warning: Data object '{data_name}' not found for dataflow '{name}'.")
+                logging.warning(f"⚠️ Warning: Data object '{data_name}' not found for dataflow '{name}'.")
          # Arguments are passed as keyword arguments
         dataflow = Dataflow(
             from_element,
@@ -146,7 +147,7 @@ class ThreatModel:
             add_protocol_style("HTTP", color="red", line_style="dashed", width=1)
         """
         self.protocol_styles[protocol_name] = style_kwargs
-        print(f"✅ Protocol style added for {protocol_name}: {style_kwargs}")
+        logging.info(f"✅ Protocol style added for {protocol_name}: {style_kwargs}")
 
     def get_protocol_style(self, protocol_name: str) -> Optional[Dict[str, Any]]:
         """
@@ -185,7 +186,7 @@ class ThreatModel:
         try:
             pytm_raw_threats = self.tm._threats
         except AttributeError:
-            print("⚠️ Could not retrieve PyTM threats from tm._threats.")
+            logging.warning("⚠️ Could not retrieve PyTM threats from tm._threats.")
 
         # --- Post-processing: expand class targets to all instances ---
         expanded_pytm_threats = self._expand_class_targets(pytm_raw_threats)
