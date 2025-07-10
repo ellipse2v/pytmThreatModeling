@@ -188,6 +188,21 @@ This feature is enabled by default and works for all protocols.
 
 ---
 
+## Threat Model as Code
+
+This framework is designed to be used in a "Threat Model as Code" workflow. This means that the threat model is defined in a simple, version-controllable format (Markdown), and the analysis is performed by running a script. This approach has several advantages:
+
+- **Version Control**: Threat models can be stored in a Git repository, allowing you to track changes over time.
+- **Automation**: The threat modeling process can be integrated into your CI/CD pipeline, allowing you to automatically update your threat model whenever your architecture changes.
+- **Collaboration**: Developers can collaborate on the threat model using the same tools they use for code.
+
+### How to Perform a Threat Model as Code
+
+1. **Define your architecture**: Edit the `threat_model.md` file to describe your system's architecture. You can define boundaries, actors, servers, data, and dataflows.
+2. **Run the analysis**: Run the `main_analysis.py` script to perform the threat analysis. This will generate a set of reports and diagrams in the `output/` directory.
+3. **Review the results**: Review the generated reports and diagrams to identify and prioritize threats.
+4. **Iterate**: As your architecture changes, update the `threat_model.md` file and re-run the analysis to keep your threat model up-to-date.
+
 ---
 
 ## Installation
