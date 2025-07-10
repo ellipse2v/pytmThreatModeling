@@ -185,7 +185,10 @@ class ModelParser:
                 elif value_unquoted.lower() == 'false':
                     value = False
                 else:
-                    value = value_unquoted
+                    try:
+                        value = float(value_unquoted)
+                    except ValueError:
+                        value = value_unquoted
             else:
                 continue
             params[key] = value

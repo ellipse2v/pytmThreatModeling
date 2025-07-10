@@ -74,22 +74,29 @@ class ThreatModel:
     def add_actor(self, name: str, boundary_name: str, color: Optional[str] = None, is_filled: bool = True) -> Actor:
         """Adds an actor to the model"""
         actor = Actor(name)
-        if boundary_name in self.boundaries:
-            actor.inBoundary = self.boundaries[boundary_name]["boundary"]
-        self.actors.append({'name': name, 'object': actor, 'boundary': self.boundaries[boundary_name]["boundary"], 'color': color, 'is_filled': is_filled})
+        boundary_obj = None
+        if boundary_name and boundary_name in self.boundaries:
+            boundary_obj = self.boundaries[boundary_name]["boundary"]
+        if boundary_obj:
+            actor.inBoundary = boundary_obj
+        self.actors.append({'name': name, 'object': actor, 'boundary': boundary_obj, 'color': color, 'is_filled': is_filled})
         self._elements_by_name[name] = actor
         return actor
 
     def add_server(self, name: str, boundary_name: str, color: Optional[str] = None, is_filled: bool = True) -> Server:
         """Adds a server to the model with optional color and is_filled attributes."""
+        boundary_obj = None
+        if boundary_name and boundary_name in self.boundaries:
+            boundary_obj = self.boundaries[boundary_name]["boundary"]
+        
         server = Server(name)
-        if boundary_name in self.boundaries:
-            server.inBoundary = self.boundaries[boundary_name]["boundary"]
+        if boundary_obj:
+            server.inBoundary = boundary_obj
         # Store as dict for easy attribute access (like add_actor)
         self.servers.append({
             'name': name,
             'object': server,
-            'boundary': self.boundaries[boundary_name]["boundary"] if boundary_name in self.boundaries else None,
+            'boundary': boundary_obj,
             'color': color,
             'is_filled': is_filled
         })
