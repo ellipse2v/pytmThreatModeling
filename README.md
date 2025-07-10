@@ -307,9 +307,6 @@ You can leverage and extend all PyTM features, including:
 - **Custom Threats Generation (`threat_analysis/custom_threats.py`)**:
     - **Problem**: Repetitive threat dictionary creation, manual `id_counter` management, verbose component access within boundaries.
     - **Suggestion**: Implement a utility function for threat dictionary creation (`_create_threat_dict`), centralize `id_counter` management, and improve component access within boundaries (e.g., via a `ThreatModel` method).
-- **Report Generation (`threat_analysis/report_generator.py`)**:
-    - **Problem**: HTML generation via string concatenation is hard to read and maintain.
-    - **Suggestion**: Adopt an HTML templating engine like Jinja2 to separate Python logic from HTML structure.
 - **Models Module (`threat_analysis/models_module.py`)**:
     - **Problem**: `_expand_class_targets` is specific to `Server` and `Actor`, requiring manual updates for new PyTM component types.
     - **Suggestion**: Make `_expand_class_targets` more generic, possibly by leveraging a PyTM property or a dynamic registry of extensible types.
