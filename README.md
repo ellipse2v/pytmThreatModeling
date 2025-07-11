@@ -316,9 +316,6 @@ You can leverage and extend all PyTM features, including:
 
 ## Technical Debt / Refactoring Opportunities
 
-- **MITRE Mapping Module (`threat_analysis/mitre_mapping_module.py`)**:
-    - **Problem**: Complex functions (`_initialize_mapping`, `map_threat_to_mitre`) with nested loops and conditional logic.
-    - **Suggestion**: Extract smaller, dedicated helper functions (e.g., `_get_d3fend_mitigations_for_mitre_id`, `_process_technique_mitigations`) to simplify main loops.
 - **Custom Threats Generation (`threat_analysis/custom_threats.py`)**:
     - **Problem**: Repetitive threat dictionary creation, manual `id_counter` management, verbose component access within boundaries.
     - **Suggestion**: Implement a utility function for threat dictionary creation (`_create_threat_dict`), centralize `id_counter` management, and improve component access within boundaries (e.g., via a `ThreatModel` method).

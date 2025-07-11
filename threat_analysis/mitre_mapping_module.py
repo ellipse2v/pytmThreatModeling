@@ -133,7 +133,7 @@ class MitreMapping:
     def _initialize_d3fend_mapping(self) -> Dict[str, Dict[str, str]]:
         """Initializes D3FEND mitigations by loading from d3fend.csv."""
         d3fend_details = {}
-        csv_file_path = os.path.join(os.path.dirname(__file__), 'd3fend.csv')
+        csv_file_path = os.path.join(os.path.dirname(__file__), 'external_data/d3fend.csv')
         try:
             df = pd.read_csv(csv_file_path)
             for _, row in df.iterrows():
@@ -1181,44 +1181,67 @@ class MitreMapping:
         # Add the official D3FEND mapping to each technique
         for category in mapping.values():
             for technique in category.get("techniques", []):
-                # Initialize defend_mitigations list for the current technique
                 technique['defend_mitigations'] = []
                 for mitre_mitigation in technique.get("mitre_mitigations", []):
                     mitigation_id = mitre_mitigation.get("id")
-                    
-                    # Iterate through attack_d3fend_mapping to find a matching key
-                    for attack_d3fend_key, d3fend_entries in attack_d3fend_mapping.items():
-                        # Extract the MITRE ID from the attack_d3fend_key (e.g., "M1013" from "M1013 Application Developer Guidance")
-                        mitre_id_from_d3fend_key_match = re.match(r'^(M\d+)', attack_d3fend_key)
-                        if mitre_id_from_d3fend_key_match:
-                            mitre_id_from_d3fend_key = mitre_id_from_d3fend_key_match.group(1)
-                            if mitigation_id == mitre_id_from_d3fend_key: # Exact match of M-ID
-                                for d3fend_entry in d3fend_entries:
-                                    # Extract D3FEND ID from the entry (e.g., "D3-ANCI Authentication Cache Invalidation")
-                                    d3fend_id_from_entry_match = re.match(r'^(D3-[A-Z0-9]+)', d3fend_entry)
-                                    if d3fend_id_from_entry_match:
-                                        d3fend_id_from_entry = d3fend_id_from_entry_match.group(1)
-                                        
-                                        if d3fend_id_from_entry in self.d3fend_details:
-                                            technique['defend_mitigations'].append({
-                                                "id": d3fend_id_from_entry,
-                                                "name": self.d3fend_details[d3fend_id_from_entry]['name'],
-                                                "description": self.d3fend_details[d3fend_id_from_entry]['description'],
-                                                "url_friendly_name_source": d3fend_entry # Store the original string for URL construction
-                                            })
-                                        else:
-                                            # Fallback for entries like "A future release of D3FEND..." or unknown IDs
-                                            technique['defend_mitigations'].append({
-                                                "id": "UNKNOWN",
-                                                "name": d3fend_entry.split(' ', 1)[1] if ' ' in d3fend_entry else d3fend_entry,
-                                                "description": "D3FEND mitigation details not found or not applicable."
-                                            })
-                                # Once found and processed, break from this inner loop to avoid duplicate additions
-                                break
+                    if mitigation_id:
+                        technique['defend_mitigations'].extend(self._get_d3fend_mitigations_for_mitre_id(mitigation_id))
         # DEBUG: Add a logging statement here to check the populated defend_mitigations
         if technique.get("id") == "T1566": # Example technique
             logging.debug(f"DEBUG: D3FEND mitigations for T1566: {technique.get('defend_mitigations')}")
         return mapping
+
+    def _get_d3fend_mitigations_for_mitre_id(self, mitigation_id: str) -> List[Dict[str, Any]]:
+        """
+        Retrieves D3FEND mitigations for a given MITRE mitigation ID.
+        """
+        d3fend_mitigations = []
+        for attack_d3fend_key, d3fend_entries in attack_d3fend_mapping.items():
+            mitre_id_from_d3fend_key_match = re.match(r'^(M\d+)', attack_d3fend_key)
+            if mitre_id_from_d3fend_key_match:
+                mitre_id_from_d3fend_key = mitre_id_from_d3fend_key_match.group(1)
+                if mitigation_id == mitre_id_from_d3fend_key:
+                    for d3fend_entry in d3fend_entries:
+                        d3fend_id_from_entry_match = re.match(r'^(D3-[A-Z0-9]+)', d3fend_entry)
+                        if d3fend_id_from_entry_match:
+                            d3fend_id_from_entry = d3fend_id_from_entry_match.group(1)
+                            if d3fend_id_from_entry in self.d3fend_details:
+                                d3fend_mitigations.append({
+                                    "id": d3fend_id_from_entry,
+                                    "name": self.d3fend_details[d3fend_id_from_entry]['name'],
+                                    "description": self.d3fend_details[d3fend_id_from_entry]['description'],
+                                    "url_friendly_name_source": d3fend_entry
+                                })
+                            else:
+                                d3fend_mitigations.append({
+                                    "id": "UNKNOWN",
+                                    "name": d3fend_entry.split(' ', 1)[1] if ' ' in d3fend_entry else d3fend_entry,
+                                    "description": "D3FEND mitigation details not found or not applicable."
+                                })
+                    break  # Found matching M-ID, no need to check further
+        return d3fend_mitigations
+
+    def _process_technique_mitigations(self, technique: Dict[str, Any], category_mapping: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Processes and enriches a technique with MITRE and D3FEND mitigations.
+        """
+        tech_copy = technique.copy()
+        technique_id = tech_copy.get("id")
+        
+        tech_copy['tactics'] = category_mapping.get("tactics", [])
+        
+        # Process custom mitigations from Markdown
+        if technique_id in self.markdown_mitigations:
+            mitigations_list = []
+            for i, m in enumerate(self.markdown_mitigations[technique_id]):
+                mitigations_list.append({'id': f'M-CUSTOM-{i+1}', 'name': m})
+            tech_copy['mitre_mitigations'] = mitigations_list
+        
+        # Process D3FEND mitigations
+        tech_copy['defend_mitigations'] = technique.get('defend_mitigations', [])
+        
+        return tech_copy
+
     def _initialize_threat_patterns(self) -> Dict[str, str]:
         """
         Enhanced threat recognition patterns with comprehensive coverage
@@ -1305,48 +1328,21 @@ class MitreMapping:
         found_techniques = {} # Use dict to store unique techniques by ID
         for pattern_value, pattern_regex in self.threat_patterns.items(): # pattern_value can be a T-ID or STRIDE category
             if re.search(pattern_regex, threat_description, re.IGNORECASE):
-                # If the pattern_value is a direct MITRE T-ID
-                if re.match(r'T\d{4}(?:\.\d{3})?', pattern_value): # Regex to check if it's a T-ID format
+                if re.match(r'T\d{4}(?:\.\d{3})?', pattern_value):
                     technique_id = pattern_value
-                    # Find technique details across all categories in self.mapping
                     for category_mapping in self.mapping.values():
                         for technique in category_mapping.get("techniques", []):
                             if technique.get("id") == technique_id:
-                                tech_copy = technique.copy()
-                                tech_copy['tactics'] = category_mapping.get("tactics", []) # Add tactics from the category
-                                # Add mitigations from markdown if available, using the technique ID as key
-                                if technique_id in self.markdown_mitigations:
-                                    mitigations_list = []
-                                    for i, m in enumerate(self.markdown_mitigations[technique_id]):
-                                        mitigations_list.append({'id': f'M-CUSTOM-{i+1}', 'name': m})
-                                    tech_copy['mitre_mitigations'] = mitigations_list
-                                # Copy D3FEND mitigations directly (already populated in _initialize_mapping)
-                                tech_copy['defend_mitigations'] = technique.get('defend_mitigations', [])
-                                found_techniques[technique_id] = tech_copy
-                                break # Found this technique, move to next pattern
-                else: # The pattern_value is likely a STRIDE category
+                                if technique_id not in found_techniques:
+                                    found_techniques[technique_id] = self._process_technique_mitigations(technique, category_mapping)
+                                break
+                else:
                     stride_category = pattern_value
                     category_mapping = self.mapping.get(stride_category)
                     if category_mapping:
-                        # For a STRIDE category, we return all associated techniques
-                        # However, for 'map_threat_to_mitre' we want specific matches if possible.
-                        # If a specific T-ID pattern didn't match, we fall back to the general STRIDE techniques.
-                        # To avoid over-mapping, we only add if no specific T-ID was already found for this description.
-                        # This logic might need refinement based on desired precision.
                         for technique in category_mapping.get("techniques", []):
-                            # Avoid adding if a more specific T-ID was already found for this description
                             if technique.get("id") not in found_techniques:
-                                tech_copy = technique.copy()
-                                tech_copy['tactics'] = category_mapping.get("tactics", [])
-                                # Add mitigations from markdown if available, using the technique ID as key
-                                if technique.get("id") in self.markdown_mitigations:
-                                    mitigations_list = []
-                                    for i, m in enumerate(self.markdown_mitigations[technique.get("id")]):
-                                        mitigations_list.append({'id': f'M-CUSTOM-{i+1}', 'name': m})
-                                    tech_copy['mitre_mitigations'] = mitigations_list
-                                # Copy D3FEND mitigations directly (already populated in _initialize_mapping)
-                                tech_copy['defend_mitigations'] = technique.get('defend_mitigations', [])
-                                found_techniques[technique.get("id")] = tech_copy
+                                found_techniques[technique.get("id")] = self._process_technique_mitigations(technique, category_mapping)
         return list(found_techniques.values())
     def get_d3fend_mitigations_for_technique(self, technique_id: str) -> List[Dict[str, str]]:
         """Retrieves D3FEND mitigations for a given MITRE ATT&CK technique ID."""
