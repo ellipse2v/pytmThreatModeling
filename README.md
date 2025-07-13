@@ -316,9 +316,6 @@ You can leverage and extend all PyTM features, including:
 
 ## Technical Debt / Refactoring Opportunities
 
-- **Custom Threats Generation (`threat_analysis/custom_threats.py`)**:
-    - **Problem**: Repetitive threat dictionary creation, manual `id_counter` management, verbose component access within boundaries.
-    - **Suggestion**: Implement a utility function for threat dictionary creation (`_create_threat_dict`), centralize `id_counter` management, and improve component access within boundaries (e.g., via a `ThreatModel` method).
 - **Models Module (`threat_analysis/models_module.py`)**:
     - **Problem**: `_expand_class_targets` is specific to `Server` and `Actor`, requiring manual updates for new PyTM component types.
     - **Suggestion**: Make `_expand_class_targets` more generic, possibly by leveraging a PyTM property or a dynamic registry of extensible types.
