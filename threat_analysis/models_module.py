@@ -53,6 +53,11 @@ class ThreatModel:
         self.data_objects = {}
         # Adding a dictionary for quick access to elements by their name
         self._elements_by_name: Dict[str, Any] = {}
+        self._component_collections: Dict[type, list] = {
+            Actor: self.actors,
+            Server: self.servers
+            # Other types like Datastore can be added here
+        }
         
         # MITRE ATT&CK Integration
         self.mitre_mapper = MitreMapping(self)
@@ -118,18 +123,20 @@ class ThreatModel:
             is_authenticated: bool = False,
             is_encrypted: bool = False) -> Dataflow:
         """Adds a dataflow to the model"""
-        data_object = None
+        data_objects = []
         if data_name:
             data_object = self.data_objects.get(data_name)
-            if not data_object:
+            if data_object:
+                data_objects.append(data_object)
+            else:
                 logging.warning(f"⚠️ Warning: Data object '{data_name}' not found for dataflow '{name}'.")
-         # Arguments are passed as keyword arguments
+
         dataflow = Dataflow(
             from_element,
             to_element,
             name,
             protocol=protocol,
-            data=data_object,
+            data=data_objects,  # Always pass a list
             is_authenticated=is_authenticated,
             is_encrypted=is_encrypted
         )
@@ -232,29 +239,20 @@ class ThreatModel:
         """
         Expands threats that target a class (e.g., Server, Actor) into separate threats
         for each instance of that class in the model.
+        This method is now generic and uses the _component_collections registry.
         """
         expanded_threats = []
         for threat in threats:
-            target = threat.target if hasattr(threat, 'target') else None
+            target = getattr(threat, 'target', None)
 
-            # If the target is a class (e.g., pytm.Server), expand it
-            if isinstance(target, type):
-                # Find all instances of this class in the model
-                if target == Server:
-                    for server_info in self.servers:
-                        instance = server_info['object']
-                        new_threat = threat.__class__(**threat.__dict__)
-                        new_threat.target = instance
-                        expanded_threats.append((new_threat, instance))
-                elif target == Actor:
-                    for actor_info in self.actors:
-                        instance = actor_info['object']
-                        new_threat = threat.__class__(**threat.__dict__)
-                        new_threat.target = instance
-                        expanded_threats.append((new_threat, instance))
-                # Add other classes here if needed (e.g., Dataflow, Datastore)
+            if isinstance(target, type) and target in self._component_collections:
+                collection = self._component_collections[target]
+                for item_info in collection:
+                    instance = item_info['object']
+                    new_threat = threat.__class__(**threat.__dict__)
+                    new_threat.target = instance
+                    expanded_threats.append((new_threat, instance))
             else:
-                # If the target is already an instance, just add it
                 expanded_threats.append((threat, target))
         
         return expanded_threats

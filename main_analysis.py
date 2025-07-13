@@ -18,41 +18,40 @@ Complete orchestration of security analysis - Modified version
 """
 import os
 import sys
+import argparse
 import logging
-from datetime import datetime
 from typing import Dict, List, Any, Optional, Tuple
 
-# Import library modules (corrected relative imports)
+# Import library modules
 from threat_analysis.models_module import ThreatModel
 from threat_analysis.mitre_mapping_module import MitreMapping
 from threat_analysis.severity_calculator_module import SeverityCalculator
 from threat_analysis.report_generator import ReportGenerator
 from threat_analysis.diagram_generator import DiagramGenerator
 from threat_analysis.model_parser import ModelParser
+from threat_analysis.model_validator import ModelValidator
+from threat_analysis import config
+
 
 class ThreatAnalysisFramework:
     """Main framework for threat analysis"""
 
-    def __init__(self, model_filepath: str = "threat_model.md",
-                 model_name: str = "Enhanced DMZ Security Analysis",
-                 model_description: str = "Advanced DMZ architecture with 8 external flows and command zone"):
+    def __init__(self, model_filepath: str, model_name: str, model_description: str):
         """Initializes the analysis framework"""
         self.model_filepath = model_filepath
         self.model_name = model_name
         self.model_description = model_description
 
-        # --- Output path management with timestamp ---
-        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        
-        self.output_base_dir = os.path.join("output", timestamp)
+        # --- Output path management ---
+        self.output_base_dir = config.OUTPUT_BASE_DIR
         os.makedirs(self.output_base_dir, exist_ok=True)
         logging.info(f"📁 Output files will be generated in: {os.path.abspath(self.output_base_dir)}")
 
-        self.html_report_filename = f"stride_mitre_report_{timestamp}.html"
-        self.json_report_filename = f"mitre_analysis_{timestamp}.json"
-        self.dot_diagram_filename = f"tm_diagram_{timestamp}.dot"
-        self.svg_diagram_filename = f"tm_diagram_{timestamp}.svg"
-        self.html_diagram_filename = f"tm_diagram_{timestamp}.html"
+        self.html_report_filename = config.HTML_REPORT_FILENAME_TPL.format(timestamp=config.TIMESTAMP)
+        self.json_report_filename = config.JSON_REPORT_FILENAME_TPL.format(timestamp=config.TIMESTAMP)
+        self.dot_diagram_filename = config.DOT_DIAGRAM_FILENAME_TPL.format(timestamp=config.TIMESTAMP)
+        self.svg_diagram_filename = config.SVG_DIAGRAM_FILENAME_TPL.format(timestamp=config.TIMESTAMP)
+        self.html_diagram_filename = config.HTML_DIAGRAM_FILENAME_TPL.format(timestamp=config.TIMESTAMP)
         # --- End of output path management ---
 
         # Component initialization
@@ -64,7 +63,7 @@ class ThreatAnalysisFramework:
 
         logging.info(f"🚀 Analysis framework initialized: {model_name}")
 
-        self._load_model_from_dsl()
+        self._load_and_validate_model()
 
         # NEW: Diagnostic to check if the model has been populated
         model_stats = self.threat_model.get_statistics()
@@ -78,22 +77,28 @@ class ThreatAnalysisFramework:
         self.custom_threats_list = []
         self.elements_with_custom_threats = set()
 
-    def _load_model_from_dsl(self):
-        """Loads the threat model from the Markdown DSL file."""
+    def _load_and_validate_model(self):
+        """Loads and validates the threat model from the Markdown DSL file."""
         logging.info(f"⏳ Loading model from {self.model_filepath}...")
         try:
             with open(self.model_filepath, 'r', encoding='utf-8') as f:
                 markdown_content = f.read()
             parser = ModelParser(self.threat_model, self.mitre_mapping)
             parser.parse_markdown(markdown_content)
-            # The custom threats are now generated within the ThreatModel class
-            # self.custom_threats_list, self.elements_with_custom_threats = parser._apply_custom_threats()
             logging.info(f"✅ Model loaded successfully from {self.model_filepath}")
+
+            logging.info("🛡️ Validating model...")
+            validator = ModelValidator(self.threat_model)
+            if not validator.validate():
+                logging.error("❌ Model validation failed. Halting analysis.")
+                sys.exit(1)
+            logging.info("✅ Model validation successful.")
+
         except FileNotFoundError:
             logging.error(f"❌ Error: Model file '{self.model_filepath}' not found.")
             sys.exit(1)
         except Exception as e:
-            logging.error(f"❌ Error parsing model: {e}")
+            logging.error(f"❌ Error parsing or validating model: {e}")
             sys.exit(1)
 
     def run_analysis(self) -> Dict[str, List[Tuple[Any, Any]]]:
@@ -175,11 +180,27 @@ class ThreatAnalysisFramework:
             pass
 
 
+class CustomArgumentParser:
+    def __init__(self):
+        self.parser = argparse.ArgumentParser(
+            description='Threat Analysis Framework',
+            epilog='This script also accepts PyTM arguments. Use --help with PyTM commands for more details.'
+        )
+        self.parser.add_argument('--model-file', type=str, default=config.DEFAULT_MODEL_FILEPATH, help='Path to the threat model Markdown file.')
+
+    def parse_args(self):
+        return self.parser.parse_known_args()
+
 # --- Main entry point ---
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-    model_file = "threat_model.md"
+    custom_parser = CustomArgumentParser()
+    args, remaining_argv = custom_parser.parse_args()
 
+    # Reconstruct sys.argv for PyTM
+    sys.argv = [sys.argv[0]] + remaining_argv
+
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    
     current_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(current_dir)
     if current_dir not in sys.path:
@@ -187,7 +208,11 @@ if __name__ == "__main__":
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
 
-    framework = ThreatAnalysisFramework(model_filepath=model_file)
+    framework = ThreatAnalysisFramework(
+        model_filepath=args.model_file,
+        model_name=config.DEFAULT_MODEL_NAME,
+        model_description=config.DEFAULT_MODEL_DESCRIPTION
+    )
 
     threats = framework.run_analysis()
 
