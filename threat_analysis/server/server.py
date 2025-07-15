@@ -116,6 +116,13 @@ def update_diagram():
         return jsonify({'error': 'Markdown content is empty'}), 400
 
     try:
+        # Save the received markdown to a temporary file
+        tmp_md_path = os.path.join(config.TMP_DIR, "live_model.md")
+        os.makedirs(config.TMP_DIR, exist_ok=True)
+        with open(tmp_md_path, 'w', encoding='utf-8') as f:
+            f.write(markdown_content)
+        logging.info(f"Saved live markdown to {tmp_md_path}")
+
         # 1. Create a new ThreatModel instance for each request
         threat_model = ThreatModel("WebThreatModel", "Live-updated threat model")
 
