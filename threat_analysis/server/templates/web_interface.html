@@ -22,6 +22,7 @@
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            flex-shrink: 0;
         }
         .header h1 {
             font-size: 1.5em;
@@ -55,11 +56,24 @@
             flex: 1;
             overflow: hidden;
         }
-        .editor-pane, .preview-pane {
+        .split {
+            display: flex;
             flex: 1;
+        }
+        .gutter {
+            background-color: #eee;
+            background-repeat: no-repeat;
+            background-position: 50%;
+        }
+        .gutter.gutter-horizontal {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxl79uz5T5Gj5WBGjma8+fABAF0pIxXTG4ToAAAAAElFTkSuQmCC');
+            cursor: col-resize;
+        }
+        .editor-pane, .preview-container {
             padding: 10px;
             box-sizing: border-box;
-            overflow: auto;
+            /* overflow: auto; */ /* Removed to prevent double scrollbar */
+            height: 100%;
         }
         .editor-pane {
             background-color: #ffffff;
@@ -75,15 +89,59 @@
             line-height: 1.5;
             resize: none;
             box-sizing: border-box;
+            white-space: pre; /* Prevent text wrapping */
+            overflow: auto; /* Add scrollbars when content overflows */
         }
-        #preview-iframe {
-            width: 100%;
-            height: 100%;
+        .preview-container {
+            display: flex;
+            flex-direction: column;
+        }
+        #svg-container {
+            flex: 1;
             border: 1px solid #d1d5da;
             border-radius: 6px;
             background-color: #ffffff;
+            overflow: hidden; /* Important for pan/zoom */
+            height: 70%; /* Default height */
+        }
+        #svg-container svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        #legend-container {
+            flex-shrink: 0;
+            padding-top: 10px;
+            height: 30%; /* Default height */
+            overflow-y: auto;
+        }
+        .legend-content {
+            padding: 8px;
+            line-height: 1.2;
+            transition: all 0.3s ease;
+        }
+        .legend-content.hidden {
+            display: none;
+        }
+        .legend-collapsed {
+            min-width: auto;
+            max-width: auto;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3px;
+            padding: 1px 0;
+            font-size: 9px;
+        }
+        .legend-item:hover {
+            background-color: rgba(0, 122, 204, 0.1);
+            border-radius: 2px;
+            padding: 1px 2px;
         }
     </style>
+    <script src="/static/js/split.min.js"></script>
+    <script src="/static/js/svg-pan-zoom.min.js"></script>
 </head>
 <body>
 
@@ -100,23 +158,34 @@
 
     <div class="error-message" id="errorMessage"></div>
 
-    <div class="container">
-        <div class="editor-pane">
+    <div id="split-container" class="container">
+        <div id="editor-split" class="editor-pane">
             <textarea id="markdown-editor" placeholder="Enter your threat model in Markdown here..."></textarea>
         </div>
-        <div class="preview-pane">
-            <iframe id="preview-iframe"></iframe>
+        <div id="preview-split" class="preview-container">
+            <div id="svg-container"></div>
+            <div id="legend-container"></div>
         </div>
     </div>
 
     <script>
         const editor = document.getElementById('markdown-editor');
-        const iframe = document.getElementById('preview-iframe');
+        const svgContainer = document.getElementById('svg-container');
+        const legendContainer = document.getElementById('legend-container');
         const errorMessageDiv = document.getElementById('errorMessage');
         let debounceTimer;
+        let panZoomInstance;
 
         // Set initial markdown content from server
         editor.value = atob("{{ initial_markdown | e }}");
+
+        // Initialize Split.js
+        Split(['#editor-split', '#preview-split'], {
+            sizes: [50, 50],
+            minSize: 200,
+            gutterSize: 10,
+            cursor: 'col-resize'
+        });
 
         editor.addEventListener('input', () => {
             clearTimeout(debounceTimer);
@@ -147,14 +216,47 @@
                 if (!response.ok) {
                     const errorData = await response.json();
                     showErrorMessage(`Error updating diagram: ${errorData.error}`);
-                    iframe.srcdoc = ''; // Clear diagram on error
+                    svgContainer.innerHTML = ''; // Clear diagram on error
+                    legendContainer.innerHTML = '';
+                    if (panZoomInstance) {
+                        panZoomInstance.destroy();
+                        panZoomInstance = null;
+                    }
                     return;
                 }
                 const data = await response.json();
-                iframe.srcdoc = data.diagram_html;
+
+                // Destroy previous instance if it exists
+                if (panZoomInstance) {
+                    panZoomInstance.destroy();
+                }
+
+                // Update SVG and Legend
+                svgContainer.innerHTML = data.diagram_svg;
+                legendContainer.innerHTML = data.legend_html;
+
+                // Initialize svg-pan-zoom
+                const svgElement = svgContainer.querySelector('svg');
+                if (svgElement) {
+                    panZoomInstance = svgPanZoom(svgElement, {
+                        zoomEnabled: true,
+                        panEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: true,
+                        center: true,
+                        minZoom: 0.1,
+                        maxZoom: 10
+                    });
+                }
+
             } catch (error) {
                 showErrorMessage(`Failed to fetch preview: ${error.message}`);
-                iframe.srcdoc = ''; // Clear diagram on error
+                svgContainer.innerHTML = ''; // Clear diagram on error
+                legendContainer.innerHTML = '';
+                 if (panZoomInstance) {
+                    panZoomInstance.destroy();
+                    panZoomInstance = null;
+                }
             }
         }
 

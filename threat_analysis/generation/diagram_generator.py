@@ -595,10 +595,10 @@ class DiagramGenerator:
     def _generate_legend_html(self, threat_model) -> str:
         """Generates HTML legend content."""
         legend_items = []
-        
+
         # Dynamically generate node types for the legend
         legend_node_types = {}
-        
+
         # Process actors
         if hasattr(threat_model, 'actors'):
             for actor in threat_model.actors:
@@ -612,7 +612,7 @@ class DiagramGenerator:
             for server in threat_model.servers:
                 name = server.get('name', '').lower()
                 color = server.get('color')
-                
+
                 type_key = None
                 display_name = None
 
@@ -623,7 +623,7 @@ class DiagramGenerator:
                 elif ('database' in name or 'db' in name) and 'Database' not in server_types_seen:
                     type_key = 'Database'
                     display_name = '🗄️ Database'
-                    color = color or '#ADD8E6'
+                    color = color or '#ADD8D6'
                 elif 'Serveur' not in server_types_seen: # Generic server as fallback
                     type_key = 'Serveur'
                     display_name = '🖥️ Serveur'
@@ -637,7 +637,7 @@ class DiagramGenerator:
         default_types = {
             'Acteur': ('👤 Acteur', '#FFFF99'),
             'Serveur': ('🖥️ Serveur', '#90EE90'),
-            'Database': ('🗄️ Database', '#ADD8E6'),
+            'Database': ('🗄️ Database', '#ADD8D6'),
             'Firewall': ('🔥 Firewall', '#FF6B6B'),
         }
         for key, value in default_types.items():

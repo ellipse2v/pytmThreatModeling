@@ -2,6 +2,7 @@ import pytest
 import json
 import os
 from unittest.mock import patch, MagicMock, mock_open
+import base64
 
 # This is a bit tricky. We need to add the project root to the path
 # BEFORE we import the app, so the app can find its own modules.
@@ -103,7 +104,7 @@ def test_run_gui_with_no_model_file(client):
                 # After run_gui, the global initial_markdown_content should be set
                 # We then make a request to the index route to get the rendered HTML
                 client.get('/') # This will call the real index route, which calls render_template
-                mock_render_template.assert_called_once_with('web_interface.html', initial_markdown=DEFAULT_EMPTY_MARKDOWN)
+                mock_render_template.assert_called_once_with('web_interface.html', initial_markdown=base64.b64encode(DEFAULT_EMPTY_MARKDOWN.encode('utf-8')).decode('utf-8'))
 
 def test_run_gui_with_non_existent_model_file(client):
     """Test that run_gui starts with DEFAULT_EMPTY_MARKDOWN if a non-existent model file is provided."""
@@ -112,7 +113,7 @@ def test_run_gui_with_non_existent_model_file(client):
             with patch('threat_analysis.server.server.render_template') as mock_render_template:
                 run_gui(model_filepath='/non/existent/path/to/model.md')
                 client.get('/') # This will call the real index route, which calls render_template
-                mock_render_template.assert_called_once_with('web_interface.html', initial_markdown=DEFAULT_EMPTY_MARKDOWN)
+                mock_render_template.assert_called_once_with('web_interface.html', initial_markdown=base64.b64encode(DEFAULT_EMPTY_MARKDOWN.encode('utf-8')).decode('utf-8'))
 
 def test_update_api_with_full_model_content(client):
     """Test the /api/update endpoint with a full threat model content (simulating paste)."""

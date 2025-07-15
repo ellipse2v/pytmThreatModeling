@@ -153,10 +153,15 @@ def update_diagram():
         # 6. Generate the legend
         legend_html = diagram_generator._generate_legend_html(threat_model)
 
-        # 7. Combine into a full HTML document
+        # 7. Combine into a full HTML document for other purposes if needed
         full_html = diagram_generator._create_complete_html(svg_content, legend_html, threat_model)
 
-        return jsonify({'diagram_html': full_html})
+        # 8. Return raw SVG, legend, and full HTML
+        return jsonify({
+            'diagram_html': full_html,
+            'diagram_svg': svg_content,
+            'legend_html': legend_html
+        })
 
     except Exception as e:
         logging.error(f"Error during diagram update: {e}", exc_info=True)
