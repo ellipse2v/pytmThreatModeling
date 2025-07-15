@@ -14,14 +14,14 @@
 # 
 
 import pytest
-from unittest.mock import MagicMock, patch
-from threat_analysis.mitre_mapping_module import MitreMapping
+from unittest.mock import MagicMock, patch, mock_open
+from threat_analysis.core.mitre_mapping_module import MitreMapping
 
 @pytest.fixture
 def mitre_mapping():
-    with patch('threat_analysis.mitre_mapping_module.pd.read_csv') as mock_read_csv:
+    with patch('threat_analysis.core.mitre_mapping_module.pd.read_csv') as mock_read_csv:
         mock_read_csv.return_value = MagicMock()
-        with patch('threat_analysis.mitre_mapping_module.get_custom_threats') as mock_get_custom_threats:
+        with patch('threat_analysis.core.mitre_mapping_module.get_custom_threats') as mock_get_custom_threats:
             mock_get_custom_threats.return_value = {}
             with patch('builtins.open', new_callable=MagicMock) as mock_open:
                 mock_open.return_value.read.return_value = ""
@@ -42,3 +42,34 @@ def test_classify_pytm_threat(mitre_mapping):
     threat.stride_category = "Spoofing"
     stride_category = mitre_mapping.classify_pytm_threat(threat)
     assert stride_category == 'Spoofing'
+
+def test_initialize_d3fend_mapping_file_not_found(caplog):
+    with patch('threat_analysis.core.mitre_mapping_module.pd.read_csv', side_effect=FileNotFoundError):
+        with patch('os.path.join', return_value='/fake/path/d3fend.csv'):
+            with caplog.at_level(1):
+                mitre_mapping = MitreMapping(threat_model=MagicMock())
+                assert mitre_mapping.d3fend_details == {}
+                assert "Error: d3fend.csv not found" in caplog.text
+
+def test_load_custom_mitre_mappings_from_markdown_file_not_found(caplog):
+    with patch('builtins.open', side_effect=FileNotFoundError):
+        with patch('os.path.exists', return_value=False): # Ensure os.path.exists returns False
+            with patch('os.path.join', return_value='/fake/path/threat_model.md'):
+                with caplog.at_level(1):
+                    mitre_mapping = MitreMapping(threat_model=MagicMock(), threat_model_path='/fake/path/threat_model.md')
+                    assert mitre_mapping.custom_mitre_mappings == []
+                    assert "Warning: Custom MITRE mapping file not found" not in caplog.text # No warning expected
+
+def test_load_custom_mitre_mappings_from_markdown_success():
+    mock_markdown_content = """
+## Custom Mitre Mapping
+- **Test Attack**: {"tactics": ["Test Tactic"], "techniques": [{"id": "T9999", "name": "Test Technique"}]}
+"""
+    with patch('builtins.open', mock_open(read_data=mock_markdown_content)) as mock_file:
+        with patch('os.path.exists', return_value=True): # Simulate file found
+            with patch('os.path.join', return_value='/fake/path/threat_model.md'):
+                mitre_mapping = MitreMapping(threat_model=MagicMock(), threat_model_path='/fake/path/threat_model.md')
+                assert len(mitre_mapping.custom_mitre_mappings) == 1
+                assert mitre_mapping.custom_mitre_mappings[0]['threat_name'] == 'Test Attack'
+                assert mitre_mapping.custom_mitre_mappings[0]['tactics'] == ['Test Tactic']
+                assert mitre_mapping.custom_mitre_mappings[0]['techniques'] == [{'id': 'T9999', 'name': 'Test Technique'}]

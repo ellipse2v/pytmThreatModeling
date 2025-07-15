@@ -16,8 +16,8 @@
 import pytest
 from unittest.mock import MagicMock, patch, mock_open
 import subprocess
-import os
-from threat_analysis.diagram_generator import DiagramGenerator
+
+from threat_analysis.generation.diagram_generator import DiagramGenerator
 
 @pytest.fixture
 def diagram_generator():

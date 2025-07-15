@@ -19,7 +19,7 @@ Threat Model Validator Module
 import logging
 from typing import List, Dict, Any
 
-from threat_analysis.models_module import ThreatModel
+from .models_module import ThreatModel
 
 class ModelValidator:
     """Validates the threat model for consistency and correctness."""

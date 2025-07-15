@@ -27,6 +27,7 @@ DEFAULT_MODEL_DESCRIPTION = "Advanced DMZ architecture with 8 external flows and
 # --- Output Path Management ---
 TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 OUTPUT_BASE_DIR = os.path.join("output", TIMESTAMP)
+TMP_DIR = os.path.join("output", "tmp")
 
 # --- Filename Templates ---
 # Note: These are templates; the timestamp will be added in the main script.

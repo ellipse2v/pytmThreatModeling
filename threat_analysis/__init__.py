@@ -19,12 +19,12 @@ STRIDE Threat Analysis Library with MITRE ATT&CK Integration
 __version__ = "1.0.0"
 __author__ = "ellipse2v"
 
-from .models_module import ThreatModel
-from .mitre_mapping_module import MitreMapping
+from .core.models_module import ThreatModel
+from .core.mitre_mapping_module import MitreMapping
 from .severity_calculator_module import SeverityCalculator
-from .report_generator import ReportGenerator
-from .diagram_generator import DiagramGenerator
-from .model_parser import ModelParser
+from .generation.report_generator import ReportGenerator
+from .generation.diagram_generator import DiagramGenerator
+from .core.model_parser import ModelParser
 
 __all__ = [
     'ThreatModel',

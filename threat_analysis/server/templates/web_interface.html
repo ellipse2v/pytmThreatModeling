@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Model Editor</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header {
+            background-color: #ffffff;
+            padding: 10px 20px;
+            border-bottom: 1px solid #d1d5da;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .header h1 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+        .button-group button {
+            background-color: #2c974b;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+            transition: background-color 0.2s;
+        }
+        .button-group button:hover {
+            background-color: #278341;
+        }
+        .error-message {
+            color: #d8000c;
+            background-color: #ffbaba;
+            border: 1px solid #d8000c;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            display: none; /* Hidden by default */
+        }
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .editor-pane, .preview-pane {
+            flex: 1;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow: auto;
+        }
+        .editor-pane {
+            background-color: #ffffff;
+        }
+        #markdown-editor {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #d1d5da;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            box-sizing: border-box;
+        }
+        #preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #d1d5da;
+            border-radius: 6px;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Threat Model Editor</h1>
+        <div class="button-group">
+            <button onclick="saveMarkdown()">Save Model (.md)</button>
+            <button onclick="exportFile('svg')">Export SVG</button>
+            <button onclick="exportFile('diagram')">Export Diagram (HTML)</button>
+            <button onclick="exportFile('report')">Export Report (HTML)</button>
+            <button onclick="exportAllFiles()">Export All (ZIP)</button>
+        </div>
+    </div>
+
+    <div class="error-message" id="errorMessage"></div>
+
+    <div class="container">
+        <div class="editor-pane">
+            <textarea id="markdown-editor" placeholder="Enter your threat model in Markdown here..."></textarea>
+        </div>
+        <div class="preview-pane">
+            <iframe id="preview-iframe"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('markdown-editor');
+        const iframe = document.getElementById('preview-iframe');
+        const errorMessageDiv = document.getElementById('errorMessage');
+        let debounceTimer;
+
+        // Set initial markdown content from server
+        editor.value = atob("{{ initial_markdown | e }}");
+
+        editor.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(updatePreview, 500); // Debounce requests
+        });
+
+        function showErrorMessage(message) {
+            errorMessageDiv.textContent = message;
+            errorMessageDiv.style.display = 'block';
+        }
+
+        function hideErrorMessage() {
+            errorMessageDiv.textContent = '';
+            errorMessageDiv.style.display = 'none';
+        }
+
+        async function updatePreview() {
+            hideErrorMessage(); // Clear previous errors
+            const markdownContent = editor.value;
+            try {
+                const response = await fetch('/api/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ markdown: markdownContent }),
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    showErrorMessage(`Error updating diagram: ${errorData.error}`);
+                    iframe.srcdoc = ''; // Clear diagram on error
+                    return;
+                }
+                const data = await response.json();
+                iframe.srcdoc = data.diagram_html;
+            } catch (error) {
+                showErrorMessage(`Failed to fetch preview: ${error.message}`);
+                iframe.srcdoc = ''; // Clear diagram on error
+            }
+        }
+
+        function saveMarkdown() {
+            const markdownContent = editor.value;
+            const blob = new Blob([markdownContent], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'threat_model.md';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        async function exportFile(format) {
+            const markdownContent = editor.value;
+            try {
+                const response = await fetch('/api/export', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ markdown: markdownContent, format: format }),
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert(`Export failed: ${errorData.error}`);
+                    return;
+                }
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = response.headers.get('Content-Disposition')?.split('filename=')[1] || `export.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('An error occurred during export.');
+            }
+        }
+
+        async function exportAllFiles() {
+            const markdownContent = editor.value;
+            try {
+                const response = await fetch('/api/export_all', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ markdown: markdownContent }),
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert(`Export All failed: ${errorData.error}`);
+                    return;
+                }
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = response.headers.get('Content-Disposition')?.split('filename=')[1] || 'threat_model_export.zip';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Export All error:', error);
+                alert('An error occurred during export all.');
+            }
+        }
+
+        // Initial empty state
+        updatePreview();
+
+    </script>
+
+</body>
+</html>

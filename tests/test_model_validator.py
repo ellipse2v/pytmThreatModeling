@@ -17,8 +17,8 @@ Tests for the ModelValidator.
 """
 
 import pytest
-from threat_analysis.models_module import ThreatModel
-from threat_analysis.model_validator import ModelValidator
+from threat_analysis.core.models_module import ThreatModel
+from threat_analysis.core.model_validator import ModelValidator
 from pytm import Actor, Server, Dataflow
 
 @pytest.fixture

@@ -205,6 +205,39 @@ This framework is designed to be used in a "Threat Model as Code" workflow. This
 
 ---
 
+---
+
+## Web-Based Threat Model Editor (Optional)
+
+This project includes an optional, lightweight web server that provides a graphical interface for editing your threat model in real-time.
+
+**Features:**
+- **Live Preview**: See your threat model diagram update instantly as you type.
+- **Markdown Editor**: A simple, clean interface for writing your threat model.
+- **Export Functionality**:
+  - Save the Markdown model (`.md`).
+  - Export the diagram as an SVG file.
+  - Export the diagram as a self-contained HTML file (with legend).
+  - Export the full HTML analysis report.
+
+### How to Use the Web Editor
+
+1.  **Install Flask (if you haven't already):**
+    ```bash
+    pip install Flask
+    ```
+
+2.  **Run the server:**
+    ```bash
+    python threat_analysis/server/server.py
+    ```
+
+3.  **Open your browser** and navigate to `http://127.0.0.1:5001`.
+
+> **Note:** The web server is an optional feature. All core functionalities of the framework remain accessible via the command line without needing to install Flask or run the server.
+
+---
+
 ## Installation
 
 1. **Clone the repository:**
@@ -229,15 +262,39 @@ After installation, restart your terminal or IDE.
 
 ## Usage
 
-1. **Edit `threat_model.md`** to describe your architecture.
-2. **Run the analysis:**
+This framework supports two modes of operation: Command Line Interface (CLI) for automated analysis and a Web-based Graphical User Interface (GUI) for interactive editing and visualization.
+
+### 1. Command Line Interface (CLI) Mode
+
+Use the CLI mode for automated threat analysis, report generation, and diagram creation. This is ideal for integration into CI/CD pipelines or batch processing.
+
+1.  **Edit `threat_model.md`** to describe your architecture.
+2.  **Run the analysis:**
     ```bash
-    python main_analysis.py
+    python main_analysis.py --model-file threat_model.md
     ```
-3. **View the results** in the generated `output/` folder:
+    (You can omit `--model-file threat_model.md` if your model file is named `threat_model.md` and is in the root directory.)
+3.  **View the results** in the generated `output/` folder:
     - HTML report
     - JSON export
     - DOT/SVG/HTML diagrams
+
+### 2. Web-based Graphical User Interface (GUI) Mode
+
+Launch the interactive web editor to visualize your threat model in real-time, edit Markdown content, and export various formats directly from your browser.
+
+1.  **Install Flask (if you haven't already):**
+    ```bash
+    pip install Flask
+    ```
+
+2.  **Launch the GUI:**
+    ```bash
+    python main_analysis.py --gui
+    ```
+    The console will display the address (e.g., `http://127.0.0.1:5001`) where you can access the GUI in your web browser.
+
+> **Note:** When using `--gui`, the `--model-file` option can be used to load an initial threat model as a template into the editor. If not provided, the GUI will start with an empty editor. The GUI mode requires Flask. If Flask is not installed, the `--gui` option will inform you how to install it. The CLI mode does not require Flask.
 
 ---
 
@@ -316,9 +373,6 @@ You can leverage and extend all PyTM features, including:
 
 ## Technical Debt / Refactoring Opportunities
 
-- **Models Module (`threat_analysis/models_module.py`)**:
-    - **Problem**: `_expand_class_targets` is specific to `Server` and `Actor`, requiring manual updates for new PyTM component types.
-    - **Suggestion**: Make `_expand_class_targets` more generic, possibly by leveraging a PyTM property or a dynamic registry of extensible types.
 
 ---
 

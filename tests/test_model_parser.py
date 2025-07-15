@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from threat_analysis.model_parser import ModelParser
-from threat_analysis.models_module import ThreatModel, Actor, Server, Data, Dataflow, Boundary
-from threat_analysis.mitre_mapping_module import MitreMapping
+from threat_analysis.core.model_parser import ModelParser
+from threat_analysis.core.models_module import ThreatModel
+from threat_analysis.core.mitre_mapping_module import MitreMapping
 from pytm import Classification, Lifetime
 
 @pytest.fixture

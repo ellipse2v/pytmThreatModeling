@@ -23,13 +23,13 @@ import logging
 from typing import Dict, List, Any, Optional, Tuple
 
 # Import library modules
-from threat_analysis.models_module import ThreatModel
-from threat_analysis.mitre_mapping_module import MitreMapping
+from threat_analysis.core.models_module import ThreatModel
+from threat_analysis.core.mitre_mapping_module import MitreMapping
 from threat_analysis.severity_calculator_module import SeverityCalculator
-from threat_analysis.report_generator import ReportGenerator
-from threat_analysis.diagram_generator import DiagramGenerator
-from threat_analysis.model_parser import ModelParser
-from threat_analysis.model_validator import ModelValidator
+from threat_analysis.generation.report_generator import ReportGenerator
+from threat_analysis.generation.diagram_generator import DiagramGenerator
+from threat_analysis.core.model_parser import ModelParser
+from threat_analysis.core.model_validator import ModelValidator
 from threat_analysis import config
 
 
@@ -47,11 +47,21 @@ class ThreatAnalysisFramework:
         os.makedirs(self.output_base_dir, exist_ok=True)
         logging.info(f"📁 Output files will be generated in: {os.path.abspath(self.output_base_dir)}")
 
-        self.html_report_filename = config.HTML_REPORT_FILENAME_TPL.format(timestamp=config.TIMESTAMP)
-        self.json_report_filename = config.JSON_REPORT_FILENAME_TPL.format(timestamp=config.TIMESTAMP)
-        self.dot_diagram_filename = config.DOT_DIAGRAM_FILENAME_TPL.format(timestamp=config.TIMESTAMP)
-        self.svg_diagram_filename = config.SVG_DIAGRAM_FILENAME_TPL.format(timestamp=config.TIMESTAMP)
-        self.html_diagram_filename = config.HTML_DIAGRAM_FILENAME_TPL.format(timestamp=config.TIMESTAMP)
+        self.html_report_filename = config.HTML_REPORT_FILENAME_TPL.format(
+            timestamp=config.TIMESTAMP
+        )
+        self.json_report_filename = config.JSON_REPORT_FILENAME_TPL.format(
+            timestamp=config.TIMESTAMP
+        )
+        self.dot_diagram_filename = config.DOT_DIAGRAM_FILENAME_TPL.format(
+            timestamp=config.TIMESTAMP
+        )
+        self.svg_diagram_filename = config.SVG_DIAGRAM_FILENAME_TPL.format(
+            timestamp=config.TIMESTAMP
+        )
+        self.html_diagram_filename = config.HTML_DIAGRAM_FILENAME_TPL.format(
+            timestamp=config.TIMESTAMP
+        )
         # --- End of output path management ---
 
         # Component initialization
@@ -70,7 +80,7 @@ class ThreatAnalysisFramework:
         
         if model_stats['actors'] == 0 and model_stats['servers'] == 0 and model_stats['dataflows'] == 0:
             logging.warning("⚠️ WARNING: The model appears to be empty or was not parsed correctly. Check your 'threat_model.md'.")
-        
+
         # Analysis state (after model loading)
         self.analysis_completed = False
         self.grouped_threats = {}
@@ -97,15 +107,13 @@ class ThreatAnalysisFramework:
         except FileNotFoundError:
             logging.error(f"❌ Error: Model file '{self.model_filepath}' not found.")
             sys.exit(1)
-        except Exception as e:
-            logging.error(f"❌ Error parsing or validating model: {e}")
+        except Exception as _e:  # Changed 'e' to '_e'
+            logging.error(f"❌ Error parsing or validating model: {_e}")
             sys.exit(1)
 
     def run_analysis(self) -> Dict[str, List[Tuple[Any, Any]]]:
         """Executes the threat analysis."""
         logging.info("🔬 Starting STRIDE threat analysis...")
-
-        
 
         self.grouped_threats = self.threat_model.process_threats()
         self.analysis_completed = True
@@ -119,7 +127,7 @@ class ThreatAnalysisFramework:
             return {}
 
         logging.info("📊 Generating reports...")
-        
+
         html_output_full_path = os.path.join(self.output_base_dir, self.html_report_filename)
         json_output_full_path = os.path.join(self.output_base_dir, self.json_report_filename)
 
@@ -186,7 +194,15 @@ class CustomArgumentParser:
             description='Threat Analysis Framework',
             epilog='This script also accepts PyTM arguments. Use --help with PyTM commands for more details.'
         )
-        self.parser.add_argument('--model-file', type=str, default=config.DEFAULT_MODEL_FILEPATH, help='Path to the threat model Markdown file.')
+        self.parser.add_argument(
+            '--model-file', type=str,
+            default=config.DEFAULT_MODEL_FILEPATH,
+            help='Path to the threat model Markdown file.'
+        )
+        self.parser.add_argument(
+            '--gui', action='store_true',
+            help='Launch the web-based GUI editor.'
+        )
 
     def parse_args(self):
         return self.parser.parse_known_args()
@@ -208,17 +224,25 @@ if __name__ == "__main__":
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
 
-    framework = ThreatAnalysisFramework(
-        model_filepath=args.model_file,
-        model_name=config.DEFAULT_MODEL_NAME,
-        model_description=config.DEFAULT_MODEL_DESCRIPTION
-    )
+    if args.gui:
+        try:
+            from threat_analysis.server.server import run_gui
+            run_gui(args.model_file)
+        except ImportError:
+            logging.error("❌ Flask is not installed. Please install it to use the GUI: pip install Flask")
+            sys.exit(1)
+    else:
+        framework = ThreatAnalysisFramework(
+            model_filepath=args.model_file,
+            model_name=config.DEFAULT_MODEL_NAME,
+            model_description=config.DEFAULT_MODEL_DESCRIPTION
+        )
 
-    threats = framework.run_analysis()
+        threats = framework.run_analysis()
 
-    reports = framework.generate_reports()
+        reports = framework.generate_reports()
 
-    diagrams = framework.generate_diagrams()
+        diagrams = framework.generate_diagrams()
 
-    #if "html" in reports and reports["html"]:
-    #    framework.open_report_in_browser(reports["html"])
+        # if "html" in reports and reports["html"]:
+        #     framework.open_report_in_browser(reports["html"])

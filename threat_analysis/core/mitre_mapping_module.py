@@ -15,9 +15,8 @@
 MITRE ATT&CK mapping module with D3FEND mitigations
 """
 import os
-import requests
-import json
-import time
+import ast # Added for safe evaluation of literal structures
+
 import logging
 from typing import Dict, List, Any
 import re
@@ -76,7 +75,11 @@ class MitreMapping:
         self.mapping = self._initialize_mapping()
         self.threat_patterns = self._initialize_threat_patterns()
         self.custom_threats = self._load_custom_threats(threat_model)
-        self.custom_mitre_mappings = self._load_custom_mitre_mappings_from_markdown(threat_model_path)
+        self.custom_mitre_mappings = []
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+        full_markdown_path = os.path.join(project_root, threat_model_path)
+        if os.path.exists(full_markdown_path):
+            self.custom_mitre_mappings = self._load_custom_mitre_mappings_from_markdown(threat_model_path)
         self.markdown_mitigations = {}
     def _load_custom_threats(self, threat_model) -> Dict[str, List[Dict[str, Any]]]:
         """Loads custom threats from the custom_threats module."""
@@ -91,49 +94,48 @@ class MitreMapping:
         Loads custom MITRE ATT&CK mappings from the '## Custom Mitre Mapping' section of a Markdown file.
         """
         custom_mappings = []
+        # Adjust path to look for threat_model.md in the project root
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+        full_markdown_path = os.path.join(project_root, markdown_file_path)
         try:
-            with open(markdown_file_path, 'r', encoding='utf-8') as f:
+            with open(full_markdown_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             mapping_section_match = re.search(r'## Custom Mitre Mapping\n(.*?)(\n## |$)', content, re.DOTALL)
             if mapping_section_match:
                 mappings_content = mapping_section_match.group(1).strip()
                 # Regex to capture the threat name, tactics, and techniques string
                 # It looks for lines starting with '- **Threat Name**:'
-                # and then captures the rest of the line which should be a JSON-like string
-                pattern = re.compile(r'- \*\*(.*?)\*\*:\s*({.*?})')
+                # and then captures the rest of the line which should contain tactics and techniques lists
+                pattern = re.compile(r'- \*\*(.*?)\*\*:\s*(.*)')
                 for line in mappings_content.split('\n'):
                     line = line.strip()
                     match = pattern.match(line)
                     if match:
                         threat_name = match.group(1).strip()
-                        json_like_string = match.group(2)
-                        # Replace single quotes with double quotes for valid JSON
-                        json_like_string = json_like_string.replace("'", '"')
-                        # Add quotes around keys
-                        json_like_string = re.sub(r'(\w+)=', r'"\1"=', json_like_string)
+                        raw_mapping_string = match.group(2).strip()
+
                         try:
-                            # Parse the JSON-like string
-                            data = json.loads(json_like_string)
-                            # Extract tactics and techniques
-                            tactics = data.get("tactics", [])
-                            techniques = data.get("techniques", [])
-                            custom_mappings.append({
-                                "threat_name": threat_name,
-                                "tactics": tactics,
-                                "techniques": techniques
-                            })
-                        except json.JSONDecodeError as e:
-                            logging.error(f"Error decoding JSON for custom mapping '{threat_name}': {e}")
-                            logging.error(f"Problematic string: {json_like_string}")
-        except FileNotFoundError:
-            logging.warning(f"Warning: Custom MITRE mapping file not found at {markdown_file_path}")
+                            # Safely evaluate the string as a Python literal (dictionary)
+                            parsed_mapping = ast.literal_eval(raw_mapping_string)
+                            tactics = parsed_mapping.get('tactics', [])
+                            techniques = parsed_mapping.get('techniques', [])
+                        except (SyntaxError, ValueError) as e:
+                            logging.error(f"Error evaluating custom MITRE mapping for '{threat_name}': {e}")
+                            tactics = []
+                            techniques = []
+
+                        custom_mappings.append({
+                            "threat_name": threat_name,
+                            "tactics": tactics,
+                            "techniques": techniques
+                        })
         except Exception as e:
             logging.error(f"Error loading custom MITRE mappings from markdown: {e}")
         return custom_mappings
     def _initialize_d3fend_mapping(self) -> Dict[str, Dict[str, str]]:
         """Initializes D3FEND mitigations by loading from d3fend.csv."""
         d3fend_details = {}
-        csv_file_path = os.path.join(os.path.dirname(__file__), 'external_data/d3fend.csv')
+        csv_file_path = os.path.join(os.path.dirname(__file__), '..', 'external_data/d3fend.csv')
         try:
             df = pd.read_csv(csv_file_path)
             for _, row in df.iterrows():
@@ -1210,7 +1212,7 @@ class MitreMapping:
                                     "id": d3fend_id_from_entry,
                                     "name": self.d3fend_details[d3fend_id_from_entry]['name'],
                                     "description": self.d3fend_details[d3fend_id_from_entry]['description'],
-                                    "url_friendly_name_source": d3fend_entry
+                                    "url_friendly_name_source": d3fend_entry # Ensure this key is always present
                                 })
                             else:
                                 d3fend_mitigations.append({
@@ -1266,11 +1268,9 @@ class MitreMapping:
             "T1505.003": r"(?i)web shell|php.*inclusion|remote.*inclusion|file.*inclusion",
             "T1105": r"(?i)ingress tool transfer|malicious file|file upload|remote file inclusion|php remote file inclusion",
             "T1071": r"(?i)application layer protocol|protocol manipulation|communication channel manipulation",
-            "T1071.001": r"(?i)web protocols|http.*manipulation|http.*smuggling|http.*splitting|protocol tampering",
-            # HTTP-specific attacks
-            "T1071.001": r"(?i)http request splitting|http response smuggling|http request smuggling|xml routing detour|client.server protocol manipulation",
+            "T1071.001": r"(?i)web protocols|http.*manipulation|http.*smuggling|http.*splitting|protocol tampering|http request splitting|http response smuggling|http request smuggling|xml routing detour|client.server protocol manipulation",
             # Path and Directory Attacks
-            "T1083": r"(?i)path traversal|directory traversal|relative path traversal|file.*directory discovery|try all common switches",
+            "T1083": r"(?i)path traversal|directory traversal|relative path traversal|file.*directory discovery|try all common switches|excavation",
             # Encoding and Obfuscation
             "T1027": r"(?i)obfuscated files|double encoding|obfuscation|encoding manipulation",
             "T1140": r"(?i)deobfuscate|decode|alternate encoding|leverage alternate encoding",
@@ -1282,7 +1282,6 @@ class MitreMapping:
             "T1040": r"(?i)network sniffing|sniffing attacks|interception|cross site tracing",
             "T1592": r"(?i)footprinting|web application fingerprinting|victim host information|software fingerprinting",
             "T1595": r"(?i)active scanning|vulnerability scanning|fuzzing|scanning",
-            "T1083": r"(?i)file.*directory discovery|excavation",
             "T1213": r"(?i)exploiting trust in client|data from information repositories|lifting sensitive data.*cache|insecure direct object references|idor",
             "T1555": r"(?i)reverse engineering|white box reverse engineering|credentials from password stores",
             "T1552": r"(?i)unsecured credentials|exploiting incorrectly configured ssl|ssl/tls misconfiguration|weak ssl/tls",
@@ -1292,7 +1291,7 @@ class MitreMapping:
             "T1112": r"(?i)modify registry|manipulate registry|registry manipulation|manipulate registry information",
             "T1574": r"(?i)hijack execution flow|subverting environment variable|environment variable manipulation|command delimiters",
             # Content and Interface Attacks
-            "T1036": r"(?i)content spoofing|masquerading|iframe overlay",
+            "T1036": r"(?i)masquerading|impersonation|disguise|process masquerading|content spoofing|iframe overlay",
             # Privilege Escalation
             "T1068": r"(?i)privilege escalation|exploitation for privilege escalation|elevation of privilege|vulnerability in the management interface|unpatched.*vulnerabilities|compromise of the management interface",
             "T1548": r"(?i)abuse elevation control|exploiting incorrectly configured access control|functionality misuse|hijacking.*privileged process|catching exception.*privileged",
@@ -1315,13 +1314,10 @@ class MitreMapping:
             # PyTM STRIDE Categories
             "spoofing": "Spoofing",
             "tampering": "Tampering|unpatched.*vulnerabilities|sql.*injection|nosql.*injection|xss|cross.site scripting|data corruption|unauthorized write access|injection of false surveillance data|unauthorized access to or modification of flight plans|unpatched.*vulnerabilities",
-            "repudiation": "Repudiation", 
-            "informationdisclosure": "InformationDisclosure",
+            "repudiation": "Repudiation",
             "information disclosure": "InformationDisclosure",
             "denialofservice": "DenialOfService",
-            "denial of service": "DenialOfService",
-            "elevationofprivilege": "ElevationOfPrivilege",
-            "elevation of privilege": "ElevationOfPrivilege|unauthorized privilege escalation|vulnerability in the management interface|compromise of the management interface|lateral movement"
+            "elevationofprivilege": "ElevationOfPrivilege|unauthorized privilege escalation|vulnerability in the management interface|compromise of the management interface|lateral movement"
         }
     def map_threat_to_mitre(self, threat_description: str) -> List[Dict[str, Any]]:
         """Maps a threat description to MITRE ATT&CK techniques using regex patterns."""

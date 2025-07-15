@@ -20,7 +20,7 @@ import os
 # Add the current directory to the path, assuming the script is run from the project root.
 sys.path.insert(0, os.getcwd())
 
-from threat_analysis.mitre_mapping_module import MitreMapping
+from threat_analysis.core.mitre_mapping_module import MitreMapping
 
 def run_performance_test():
     """

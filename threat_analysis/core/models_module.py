@@ -15,10 +15,9 @@
 """
 Threat Model Definition Module with MITRE ATT&CK Integration
 """
-from pytm import TM, Boundary, Actor, Server, Dataflow, Data, Lambda, Process, Datastore, ExternalEntity
+from pytm import TM, Boundary, Actor, Server, Dataflow, Data
 from collections import defaultdict
 from typing import List, Dict, Any, Optional, Tuple
-import re
 import logging
 from .mitre_mapping_module import MitreMapping
 
@@ -206,7 +205,7 @@ class ThreatModel:
         expanded_pytm_threats = self._expand_class_targets(pytm_raw_threats)
 
         # --- Generate and add custom threats ---
-        from .custom_threats import get_custom_threats
+        from threat_analysis.custom_threats import get_custom_threats
         custom_threats_list = get_custom_threats(self)
         
         # Convert custom threats to (threat, target) tuples

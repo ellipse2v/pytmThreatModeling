@@ -15,10 +15,9 @@
 """
 Report generation module
 """
-import json
-import webbrowser
 import os
 import re
+import json
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
@@ -30,7 +29,7 @@ class ReportGenerator:
     def __init__(self, severity_calculator, mitre_mapping):
         self.severity_calculator = severity_calculator
         self.mitre_mapping = mitre_mapping
-        self.env = Environment(loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), 'templates')))
+        self.env = Environment(loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), '..', 'templates')))
 
     def generate_html_report(self, threat_model, grouped_threats: Dict[str, List],
                              output_file: str = "stride_mitre_report.html") -> str:
@@ -123,8 +122,9 @@ class ReportGenerator:
                     if 'defend_mitigations' in tech and tech['defend_mitigations']:
                         for mitigation in tech['defend_mitigations']:
                             # Extract the part after 'D3-XXXX ' for the URL
-                            url_name_match = re.match(r'D3-[A-Z0-9]+\s(.*)', mitigation['url_friendly_name_source'])
-                            url_friendly_name = url_name_match.group(1).replace(' ', '') if url_name_match else mitigation['url_friendly_name_source'].replace(' ', '')
+                            source_name = mitigation.get('url_friendly_name_source', '')
+                            url_name_match = re.match(r'D3-[A-Z0-9]+\s(.*)', source_name)
+                            url_friendly_name = url_name_match.group(1).replace(' ', '') if url_name_match else source_name.replace(' ', '')
                             mitigation['url_friendly_name'] = url_friendly_name
 
                 all_detailed_threats.append({

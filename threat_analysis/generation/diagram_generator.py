@@ -20,7 +20,7 @@ import os
 import re
 import logging
 from typing import Dict, List, Any, Optional
-from pytm import TM, Boundary, Actor, Server, Dataflow, Data  # Import for pytm types
+from pytm import TM, Boundary, Actor, Server, Dataflow, Data
 
 class DiagramGenerator:
     """Enhanced class for threat model diagram generation with protocol styles and boundary attributes"""
@@ -66,7 +66,16 @@ class DiagramGenerator:
             return None
             
         try:
-            output_path = f"{output_file}.{format}"
+            # Ensure the output directory exists
+            output_dir = os.path.dirname(output_file)
+            if output_dir and not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+
+            # Construct the output path, avoiding double extensions
+            if output_file.endswith(f'.{format}'):
+                output_path = output_file
+            else:
+                output_path = f"{output_file}.{format}"
             
             # Clean the DOT code before processing
             cleaned_dot = self._clean_dot_code(dot_code)
