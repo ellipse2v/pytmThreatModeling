@@ -557,12 +557,16 @@ class DiagramGenerator:
                         label_parts.append("🔐 Authenticated")
                     if hasattr(df, 'is_encrypted') and df.is_encrypted:
                         label_parts.append("🔒 Encrypted")
-                    label = "\\n".join(label_parts) if label_parts else "Data Flow"
+                    label = "\n".join(label_parts) if label_parts else "Data Flow"
                     edge_attributes = self._get_edge_attributes_for_protocol(threat_model, protocol)
+                    # Add a class attribute for JavaScript toggling
+                    protocol_class = self._sanitize_name(protocol) if protocol else ''
+                    class_attribute = f'class="{protocol_class}"' if protocol_class else ''
                     key = (escaped_source, escaped_dest, protocol)
                     dataflow_map[key] = {
                         "label": label,
-                        "edge_attributes": edge_attributes
+                        "edge_attributes": edge_attributes,
+                        "class_attribute": class_attribute
                     }
                 except Exception as e:
                     logging.warning(f"⚠️ Error processing dataflow: {e}")
@@ -575,15 +579,17 @@ class DiagramGenerator:
                 # Bidirectional edge
                 label = info["label"]
                 edge_attributes = info["edge_attributes"]
-                label = f"{label}\\n↔️ Bidirectional"
-                dot_code.append(f'  "{src}" -> "{dst}" [dir="both", label="{label}"{edge_attributes}, fontsize=7];')
+                class_attribute = info["class_attribute"]
+                label = f"{label}\n↔️ Bidirectional"
+                dot_code.append(f'  "{src}" -> "{dst}" [dir="both", label="{label}"{edge_attributes}, fontsize=7, {class_attribute}];')
                 processed.add((src, dst, proto))
                 processed.add((dst, src, proto))
             elif (src, dst, proto) not in processed:
                 # Unidirectional edge
                 label = info["label"]
                 edge_attributes = info["edge_attributes"]
-                dot_code.append(f'  "{src}" -> "{dst}" [label="{label}"{edge_attributes}, fontsize=7];')
+                class_attribute = info["class_attribute"]
+                dot_code.append(f'  "{src}" -> "{dst}" [label="{label}"{edge_attributes}, fontsize=7, {class_attribute}];')
                 processed.add((src, dst, proto))
 
         # NOTE: No legend in DOT - it will be added in HTML
@@ -675,8 +681,9 @@ class DiagramGenerator:
             legend_items.append('<div style="margin-top: 5px; margin-bottom: 3px; font-weight: bold; font-size: 10px;">Protocoles:</div>')
             for protocol, style in protocol_styles.items():
                 color = style.get('color', '#000000')
+                sanitized_protocol = self._sanitize_name(protocol)
                 legend_items.append(f"""
-                    <div style="display: flex; align-items: center; margin-bottom: 3px;">
+                    <div class="legend-item" data-protocol="{sanitized_protocol}">
                         <div style="width: 20px; height: 2px; background-color: {color};
                                 margin-right: 8px;"></div>
                         <span style="font-size: 11px;">{protocol}</span>
