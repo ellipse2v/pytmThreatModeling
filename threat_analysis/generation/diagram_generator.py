@@ -1067,38 +1067,51 @@ class DiagramGenerator:
 
     def _get_protocol_styles_from_model(self, threat_model) -> Dict[str, Dict]:
         """
-        Extracts protocol styles from the threat model.
+        Extracts protocol styles from the threat model, ensuring all protocols from dataflows are included.
         """
-        protocol_styles = {}
-        
+        all_protocols = set()
+        final_styles = {}
+
         try:
-            # Check if threat model has protocol styles method
+            # 1. Get all unique protocols from dataflows
+            if hasattr(threat_model, 'dataflows'):
+                for df in threat_model.dataflows:
+                    if hasattr(df, 'protocol') and df.protocol:
+                        all_protocols.add(df.protocol)
+
+            # 2. Get any user-defined styles
+            user_defined_styles = {}
             if hasattr(threat_model, 'get_all_protocol_styles'):
-                protocol_styles = threat_model.get_all_protocol_styles()
+                user_defined_styles = threat_model.get_all_protocol_styles()
             elif hasattr(threat_model, 'protocol_styles'):
-                protocol_styles = threat_model.protocol_styles
-            else:
-                # Extract protocols from dataflows and create default styles
-                protocols = set()
-                if hasattr(threat_model, 'dataflows'):
-                    for df in threat_model.dataflows:
-                        if hasattr(df, 'protocol') and df.protocol:
-                            protocols.add(df.protocol)
-                
-                # Create default styles for found protocols
-                colors = ['blue', 'green', 'purple', 'orange', 'brown']
-                for i, protocol in enumerate(protocols):
-                    protocol_styles[protocol] = {
-                        'color': colors[i % len(colors)],
+                user_defined_styles = threat_model.protocol_styles
+
+            # Add user-defined protocols to the set to ensure they appear even if not in a dataflow
+            for protocol in user_defined_styles.keys():
+                all_protocols.add(protocol)
+
+            # 3. Merge and assign default styles for missing ones
+            default_colors = [
+                '#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1',
+                '#20c997', '#fd7e14', '#6610f2', '#e83e8c', '#000000'
+            ]
+            
+            sorted_protocols = sorted(list(all_protocols))
+
+            for i, protocol in enumerate(sorted_protocols):
+                if protocol in user_defined_styles:
+                    final_styles[protocol] = user_defined_styles[protocol]
+                else:
+                    # Assign a default style
+                    final_styles[protocol] = {
+                        'color': default_colors[i % len(default_colors)],
                         'line_style': 'solid'
                     }
-            
-            
-            
+
         except Exception as e:
             logging.warning(f"⚠️ Error extracting protocol styles: {e}")
-        
-        return protocol_styles
+
+        return final_styles
 
     def check_graphviz_installation(self) -> bool:
         """Checks if Graphviz is installed"""
