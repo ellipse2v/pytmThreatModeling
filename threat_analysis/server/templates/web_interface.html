@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Threat Model Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/material.min.css">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -77,19 +79,13 @@
         .editor-pane {
             background-color: #ffffff;
         }
-        #markdown-editor {
+        .CodeMirror {
             width: 100%;
             height: 100%;
             border: 1px solid #d1d5da;
             border-radius: 6px;
-            padding: 15px;
             font-family: "Courier New", Courier, monospace;
             font-size: 14px;
-            line-height: 1.5;
-            resize: none;
-            box-sizing: border-box;
-            white-space: pre;
-            overflow: auto;
         }
         .preview-container {
             display: flex;
@@ -174,6 +170,8 @@
     </style>
     <script src="/static/js/split.min.js"></script>
     <script src="/static/js/svg-pan-zoom.min.js"></script>
+    <script src="/static/js/codemirror/codemirror.min.js"></script>
+    <script src="/static/js/codemirror/markdown.min.js"></script>
 </head>
 <body>
 
@@ -208,7 +206,6 @@
     </div>
 
     <script>
-        const editor = document.getElementById('markdown-editor');
         const svgContainer = document.getElementById('svg-container');
         const svgWrapper = document.getElementById('svg-wrapper');
         const legendContainer = document.getElementById('legend-container');
@@ -217,8 +214,16 @@
         let panZoomInstance;
         let protocolVisibilityState = {}; // Stores { 'protocol_name': 'hidden' / 'visible' }
 
+        // Initialize CodeMirror
+        const editor = CodeMirror.fromTextArea(document.getElementById('markdown-editor'), {
+            mode: 'markdown',
+            theme: 'material',
+            lineNumbers: true,
+            lineWrapping: true,
+        });
+
         // Set initial markdown content from server
-        editor.value = atob("{{ initial_markdown | e }}");
+        editor.setValue(atob("{{ initial_markdown | e }}"));
 
         // Initialize Split.js
         Split(['#editor-split', '#preview-split'], {
@@ -228,7 +233,7 @@
             cursor: 'col-resize'
         });
 
-        editor.addEventListener('input', () => {
+        editor.on('change', () => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(updatePreview, 500); // Debounce requests
         });
@@ -256,7 +261,7 @@
 
         async function updatePreview() {
             hideErrorMessage(); // Clear previous errors
-            const markdownContent = editor.value;
+            const markdownContent = editor.getValue();
             try {
                 const response = await fetch('/api/update', {
                     method: 'POST',
@@ -316,7 +321,7 @@
         }
 
         function saveMarkdown() {
-            const markdownContent = editor.value;
+            const markdownContent = editor.getValue();
             const blob = new Blob([markdownContent], { type: 'text/markdown' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -329,7 +334,7 @@
         }
 
         async function exportFile(format) {
-            const markdownContent = editor.value;
+            const markdownContent = editor.getValue();
             try {
                 const response = await fetch('/api/export', {
                     method: 'POST',
@@ -359,7 +364,7 @@
         }
 
         async function exportAllFiles() {
-            const markdownContent = editor.value;
+            const markdownContent = editor.getValue();
             try {
                 const response = await fetch('/api/export_all', {
                     method: 'POST',

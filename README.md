@@ -220,6 +220,8 @@ This project includes an optional, lightweight web server that provides a graphi
   - Export the diagram as a self-contained HTML file (with legend).
   - Export the full HTML analysis report.
 
+![Server Live Editor](output/example/server_live_editor.jpg)
+
 ### How to Use the Web Editor
 
 1.  **Install Flask (if you haven't already):**
