@@ -21,6 +21,7 @@ import sys
 import argparse
 import logging
 from typing import Dict, List, Any, Optional, Tuple
+from pathlib import Path
 
 # Import library modules
 from threat_analysis.core.models_module import ThreatModel
@@ -233,7 +234,7 @@ if __name__ == "__main__":
             sys.exit(1)
     else:
         framework = ThreatAnalysisFramework(
-            model_filepath=args.model_file,
+            model_filepath=Path(args.model_file),
             model_name=config.DEFAULT_MODEL_NAME,
             model_description=config.DEFAULT_MODEL_DESCRIPTION
         )

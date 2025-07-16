@@ -375,6 +375,12 @@ You can leverage and extend all PyTM features, including:
 
 ## Technical Debt / Refactoring Opportunities
 
+- **Centralize Model Creation Logic**: The logic for creating and parsing the `ThreatModel` is duplicated in `main_analysis.py` and `threat_analysis/server/server.py`. This could be centralized into a factory class or function to avoid redundancy and ensure consistency.
+- **Refactor DiagramGenerator**: The `DiagramGenerator` class contains complex logic for manually generating DOT code. This could be broken down into smaller, more specialized methods (e.g., `_generate_boundaries_dot`, `_generate_nodes_dot`, `_generate_dataflows_dot`) to improve readability and maintainability.
+- **Use a Template Engine for DOT Code**: Instead of building strings for DOT code, using a template engine like Jinja2 (already used for HTML reports) could make DOT generation cleaner, safer, and easier to maintain.
+
+- **Separate API Logic from Application Logic**: In `server.py`, the Flask API logic is tightly coupled with the report and diagram generation logic. Creating a separate service layer to handle the business logic would better separate concerns and make testing easier.
+
 
 ---
 

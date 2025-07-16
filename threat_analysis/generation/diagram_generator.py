@@ -16,10 +16,10 @@
 Enhanced Diagram generation module with protocol styles and boundary attributes support
 """
 import subprocess
-import os
 import re
 import logging
 from typing import Dict, List, Any, Optional
+from pathlib import Path
 from pytm import TM, Boundary, Actor, Server, Dataflow, Data
 
 class DiagramGenerator:
@@ -41,12 +41,15 @@ class DiagramGenerator:
             # Clean the DOT code
             cleaned_dot = self._clean_dot_code(dot_code)
 
-            # Ensure output directory exists
-            output_dir = os.path.dirname(output_file)
-            if output_dir and not os.path.exists(output_dir):
-                os.makedirs(output_dir)
+            # Convert output_file to Path object
+            output_path_obj = Path(output_file)
 
-            with open(output_file, "w", encoding="utf-8", newline='\n') as f:
+            # Ensure output directory exists
+            output_dir = output_path_obj.parent
+            if not output_dir.exists():
+                output_dir.mkdir(parents=True)
+
+            with open(str(output_path_obj), "w", encoding="utf-8", newline='\n') as f:
                 f.write(cleaned_dot)
             logging.info(f"✅ DOT file generated: {output_file}")
             return output_file
@@ -66,16 +69,19 @@ class DiagramGenerator:
             return None
             
         try:
+            # Convert output_file to Path object
+            output_path_obj = Path(output_file)
+
             # Ensure the output directory exists
-            output_dir = os.path.dirname(output_file)
-            if output_dir and not os.path.exists(output_dir):
-                os.makedirs(output_dir)
+            output_dir = output_path_obj.parent
+            if not output_dir.exists():
+                output_dir.mkdir(parents=True)
 
             # Construct the output path, avoiding double extensions
-            if output_file.endswith(f'.{format}'):
-                output_path = output_file
+            if output_path_obj.suffix == f'.{format}':
+                output_path = str(output_path_obj)
             else:
-                output_path = f"{output_file}.{format}"
+                output_path = str(output_path_obj.with_suffix(f'.{format}'))
             
             # Clean the DOT code before processing
             cleaned_dot = self._clean_dot_code(dot_code)
@@ -90,7 +96,7 @@ class DiagramGenerator:
                 check=True
             )
             
-            if os.path.exists(output_path):
+            if output_path_obj.exists(): # Use output_path_obj for existence check
                 
                 return output_path
             else:
@@ -692,7 +698,7 @@ class DiagramGenerator:
         
         return ''.join(legend_items)
    
-    def _generate_html_with_legend(self, svg_path: str, html_output_path: str, threat_model) -> Optional[str]:
+    def _generate_html_with_legend(self, svg_path: Path, html_output_path: Path, threat_model) -> Optional[Path]:
         """Generates HTML file with SVG and positioned legend."""
         try:
             # Read SVG content

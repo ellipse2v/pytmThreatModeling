@@ -1,5 +1,4 @@
-pandas
-jinja2
 pytm
-graphviz
 Flask
+Jinja2
+graphviz

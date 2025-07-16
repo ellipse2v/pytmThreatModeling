@@ -16,18 +16,18 @@
 Centralized configuration for the Threat Analysis Framework.
 """
 
-import os
+from pathlib import Path
 from datetime import datetime
 
 # --- Model Defaults ---
-DEFAULT_MODEL_FILEPATH = "threat_model.md"
+DEFAULT_MODEL_FILEPATH = Path("threat_model.md")
 DEFAULT_MODEL_NAME = "Enhanced DMZ Security Analysis"
 DEFAULT_MODEL_DESCRIPTION = "Advanced DMZ architecture with 8 external flows and command zone"
 
 # --- Output Path Management ---
 TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-OUTPUT_BASE_DIR = os.path.join("output", TIMESTAMP)
-TMP_DIR = os.path.join("output", "tmp")
+OUTPUT_BASE_DIR = Path("output") / TIMESTAMP
+TMP_DIR = Path("output") / "tmp"
 
 # --- Filename Templates ---
 # Note: These are templates; the timestamp will be added in the main script.

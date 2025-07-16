@@ -309,6 +309,29 @@ def test_generate_dot_file_from_model_exception(diagram_generator):
         result = diagram_generator.generate_dot_file_from_model(mock_threat_model, output_file)
         assert result is None
 
+def test_generate_dot_file_from_model_path_conversion(diagram_generator):
+    mock_threat_model = MagicMock()
+    mock_threat_model.boundaries = {}
+    mock_threat_model.actors = []
+    mock_threat_model.servers = []
+    mock_threat_model.dataflows = []
+
+    test_output_file_str = "/tmp/test_output.dot"
+
+    with patch('threat_analysis.generation.diagram_generator.Path') as mock_path_class:
+        mock_path_instance = MagicMock()
+        mock_path_class.return_value = mock_path_instance
+        mock_path_instance.parent.exists.return_value = False
+
+        with patch.object(diagram_generator, '_generate_manual_dot', return_value="digraph G {}"):
+            with patch('builtins.open', mock_open()):
+                result = diagram_generator.generate_dot_file_from_model(mock_threat_model, test_output_file_str)
+
+                mock_path_class.assert_called_once_with(test_output_file_str)
+                mock_path_instance.parent.exists.assert_called_once()
+                mock_path_instance.parent.mkdir.assert_called_once_with(parents=True)
+                assert result == test_output_file_str
+
 def test_generate_diagram_from_dot_success(diagram_generator):
     with patch('subprocess.run') as mock_run:
         mock_run.return_value = MagicMock(returncode=0)
@@ -336,7 +359,7 @@ def test_generate_diagram_from_dot_subprocess_error(diagram_generator):
 def test_generate_diagram_from_dot_output_file_not_created(diagram_generator):
     with patch('subprocess.run') as mock_run:
         mock_run.return_value = MagicMock(returncode=0)
-        with patch('os.path.exists', return_value=False):
+        with patch('pathlib.Path.exists', return_value=False):
             with patch.object(diagram_generator, 'check_graphviz_installation', return_value=True):
                 result = diagram_generator.generate_diagram_from_dot("digraph G {}", "output", "svg")
                 assert result is None

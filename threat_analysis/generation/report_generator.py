@@ -15,12 +15,12 @@
 """
 Report generation module
 """
-import os
 import re
 import json
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
+from pathlib import Path
 
 
 class ReportGenerator:
@@ -29,10 +29,10 @@ class ReportGenerator:
     def __init__(self, severity_calculator, mitre_mapping):
         self.severity_calculator = severity_calculator
         self.mitre_mapping = mitre_mapping
-        self.env = Environment(loader=FileSystemLoader(os.path.join(os.path.dirname(__file__), '..', 'templates')))
+        self.env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / 'templates'))
 
     def generate_html_report(self, threat_model, grouped_threats: Dict[str, List],
-                             output_file: str = "stride_mitre_report.html") -> str:
+                             output_file: Path = Path("stride_mitre_report.html")) -> Path:
         """Generates a complete HTML report with MITRE ATT&CK"""
 
         total_threats_analyzed = threat_model.mitre_analysis_results.get('total_threats', 0)
@@ -62,7 +62,7 @@ class ReportGenerator:
         return output_file
 
     def generate_json_export(self, threat_model, grouped_threats: Dict[str, List],
-                             output_file: str = "mitre_analysis.json") -> str:
+                             output_file: Path = Path("mitre_analysis.json")) -> Path:
         """Generates a JSON export of the analysis data"""
 
         export_data = {
@@ -86,7 +86,7 @@ class ReportGenerator:
 
         return output_file
 
-    def open_report_in_browser(self, html_file: str) -> bool:
+    def open_report_in_browser(self, html_file: Path) -> bool:
         """Opens the report in the browser"""
         try:
             webbrowser.open(html_file)
