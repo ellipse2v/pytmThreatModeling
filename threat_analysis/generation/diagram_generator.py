@@ -18,9 +18,9 @@ Enhanced Diagram generation module with protocol styles and boundary attributes 
 import subprocess
 import re
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Optional
 from pathlib import Path
-from pytm import TM, Boundary, Actor, Server, Dataflow, Data
+from jinja2 import Environment, FileSystemLoader
 
 class DiagramGenerator:
     """Enhanced class for threat model diagram generation with protocol styles and boundary attributes"""
@@ -28,6 +28,7 @@ class DiagramGenerator:
     def __init__(self):
         self.dot_executable = "dot"
         self.supported_formats = ["svg", "png", "pdf", "ps"]
+        self.template_env = Environment(loader=FileSystemLoader(Path(__file__).parent / "templates"))
     
     def generate_dot_file_from_model(self, threat_model, output_file: str) -> Optional[str]:
         """Generates a .dot file from the threat model and saves it."""
@@ -87,7 +88,8 @@ class DiagramGenerator:
             cleaned_dot = self._clean_dot_code(dot_code)
             
             # Run dot command to generate diagram
-            process = subprocess.run(
+            # process = subprocess.run(
+            subprocess.run(
                 [self.dot_executable, f"-T{format}", "-o", output_path],
                 input=cleaned_dot,
                 text=True,
@@ -110,6 +112,7 @@ class DiagramGenerator:
         except Exception as e:
             logging.error(f"❌ Unexpected error: {e}")
             return None
+
 
     def _get_edge_attributes_for_protocol(self, threat_model, protocol: Optional[str]) -> str:
         """
@@ -410,131 +413,112 @@ class DiagramGenerator:
         return dot_code
 
     def _generate_manual_dot(self, threat_model) -> str:
-        """Generates manual DOT code from ThreatModel components WITHOUT legend."""
-        dot_code = [
-            "digraph ThreatModel {",
-            "  rankdir=LR;",
-            "  node [shape=box, style=filled, fillcolor=lightblue];",
-            "  edge [fontsize=10];",
-            "  splines=true;",
-            "  overlap=false;",
-            "  nodesep=0.5;",
-            "  ranksep=0.6;",
-            "  charset=\"UTF-8\";",
-        ]
+        """Generates DOT code from ThreatModel components using Jinja2 template."""
+        template = self.template_env.get_template("threat_model.dot.j2")
 
-        # Generate boundaries as subgraphs
+        boundaries_data = self._prepare_boundaries_data(threat_model)
+        actors_outside_boundaries_data = self._prepare_nodes_data(threat_model, "actor")
+        servers_outside_boundaries_data = self._prepare_nodes_data(threat_model, "server")
+        dataflows_data = self._prepare_dataflows_data(threat_model)
+
+        context = {
+            "boundaries": boundaries_data,
+            "actors_outside_boundaries": actors_outside_boundaries_data,
+            "servers_outside_boundaries": servers_outside_boundaries_data,
+            "dataflows": dataflows_data,
+        }
+        return template.render(context)
+
+    def _prepare_boundaries_data(self, threat_model) -> List[Dict]:
+        """Prepares boundary data for the Jinja2 template."""
+        boundaries_data = []
         if hasattr(threat_model, 'boundaries') and threat_model.boundaries:
             for name, info in threat_model.boundaries.items():
                 safe_name = self._sanitize_name(name)
-                
-                # Extract boundary properties from your structure
                 boundary_obj = info.get('boundary')
                 color = info.get('color', 'lightgray')
                 is_trusted = info.get('isTrusted', False)
                 is_filled = info.get('isFilled', True)
                 line_style = info.get('line_style', 'solid')
-                
-                # Get display name from boundary object or use key name
-                if boundary_obj and hasattr(boundary_obj, 'name'):
-                    display_name = boundary_obj.name
-                else:
-                    display_name = name
-                
+
+                display_name = boundary_obj.name if boundary_obj and hasattr(boundary_obj, 'name') else name
                 escaped_name = self._escape_label(display_name)
-                dot_code.append(f"  subgraph cluster_{safe_name} {{")
-                dot_code.append(f"    label=\"{escaped_name}\";")
-                
-                # Adjust font size for untrusted boundaries
-                if not is_trusted:
-                    dot_code.append(f"    fontsize=10;")
-                
-                # Build style attribute with rounded corners and fill
+
                 style_parts = ["rounded"]
-                
                 if is_filled:
                     style_parts.append("filled")
-                    dot_code.append(f"    fillcolor=\"{color}\";")
-                
-                dot_code.append(f"    style=\"{','.join(style_parts)}\";")
-                
-                # Different border style for trusted/untrusted boundaries
-                if not is_trusted:
-                    dot_code.append(f"    color=black;")
-                else:
-                    dot_code.append(f"    color=red;")
-                    dot_code.append(f"    penwidth=3;") 
-                
-                # Apply line style
-                if line_style and line_style != 'solid':
-                    if line_style == 'dashed':
-                        dot_code.append(f"    style=\"{','.join(style_parts)},dashed\";")
-                    elif line_style == 'dotted':
-                        dot_code.append(f"    style=\"{','.join(style_parts)},dotted\";")
-                
-                # Add actors in this boundary
+
+                actors_in_boundary = []
                 if hasattr(threat_model, 'actors'):
                     for actor_info in threat_model.actors:
+                        actor_boundary_name = None
                         if isinstance(actor_info, dict):
                             actor_boundary = actor_info.get('boundary')
-                            if (actor_boundary and hasattr(actor_boundary, 'name') and 
-                                actor_boundary.name == name):
-                                escaped_actor_name = self._escape_label(actor_info['name'])
-                                node_attrs = self._get_node_attributes(actor_info, 'actor')
-                                dot_code.append(f"    \"{escaped_actor_name}\" {node_attrs};")
-                        elif (hasattr(actor_info, 'inBoundary') and actor_info.inBoundary and 
-                            hasattr(actor_info.inBoundary, 'name') and actor_info.inBoundary.name == name):
-                            escaped_actor_name = self._escape_label(actor_info.name)
-                            node_attrs = self._get_node_attributes(actor_info, 'actor')
-                            dot_code.append(f"    \"{escaped_actor_name}\" {node_attrs};")
-                
-                # Add servers in this boundary
+                            if actor_boundary and hasattr(actor_boundary, 'name'):
+                                actor_boundary_name = actor_boundary.name
+                        elif hasattr(actor_info, 'inBoundary') and actor_info.inBoundary and hasattr(actor_info.inBoundary, 'name'):
+                            actor_boundary_name = actor_info.inBoundary.name
+
+                        if actor_boundary_name == name:
+                            actors_in_boundary.append({
+                                "escaped_name": self._escape_label(self._get_element_name(actor_info)),
+                                "node_attrs": self._get_node_attributes(actor_info, 'actor')
+                            })
+
+                servers_in_boundary = []
                 if hasattr(threat_model, 'servers'):
                     for server_info in threat_model.servers:
+                        server_boundary_name = None
                         if isinstance(server_info, dict):
                             server_boundary = server_info.get('boundary')
-                            if (server_boundary and hasattr(server_boundary, 'name') and 
-                                server_boundary.name == name):
-                                escaped_server_name = self._escape_label(server_info['name'])
-                                node_attrs = self._get_node_attributes(server_info, 'server')
-                                dot_code.append(f"    \"{escaped_server_name}\" {node_attrs};")
-                        elif (hasattr(server_info, 'inBoundary') and server_info.inBoundary and 
-                              hasattr(server_info.inBoundary, 'name') and server_info.inBoundary.name == name):
-                            escaped_server_name = self._escape_label(server_info.name)
-                            node_attrs = self._get_node_attributes(server_info, 'server')
-                            dot_code.append(f"    \"{escaped_server_name}\" {node_attrs};")
-                
-                dot_code.append("  }")
-        
-        # Add actors not in boundaries
-        if hasattr(threat_model, 'actors'):
-            for actor_info in threat_model.actors:
-                if isinstance(actor_info, dict):
-                    if not actor_info.get('boundary'):
-                        escaped_actor_name = self._escape_label(actor_info['name'])
-                        node_attrs = self._get_node_attributes(actor_info, 'actor')
-                        dot_code.append(f"  \"{escaped_actor_name}\" {node_attrs};")
-                elif not hasattr(actor_info, 'inBoundary') or not actor_info.inBoundary:
-                    escaped_actor_name = self._escape_label(actor_info.name)
-                    node_attrs = self._get_node_attributes(actor_info, 'actor')
-                    dot_code.append(f"  \"{escaped_actor_name}\" {node_attrs};")
-        
-        # Add servers not in boundaries
-        if hasattr(threat_model, 'servers'):
-                    for server_info in threat_model.servers:
-                        if isinstance(server_info, dict):
-                            if not server_info.get('boundary'):
-                                escaped_server_name = self._escape_label(server_info['name'])
-                                node_attrs = self._get_node_attributes(server_info, 'server')
-                                dot_code.append(f"  \"{escaped_server_name}\" {node_attrs};")
-                        elif not hasattr(server_info, 'inBoundary') or not server_info.inBoundary:
-                            escaped_server_name = self._escape_label(server_info.name)
-                            node_attrs = self._get_node_attributes(server_info, 'server')
-                            dot_code.append(f"  \"{escaped_server_name}\" {node_attrs};")
+                            if server_boundary and hasattr(server_boundary, 'name'):
+                                server_boundary_name = server_boundary.name
+                        elif hasattr(server_info, 'inBoundary') and server_info.inBoundary and hasattr(server_info.inBoundary, 'name'):
+                            server_boundary_name = server_info.inBoundary.name
 
-        # Add dataflows
-        # Collect all dataflows as (src, dst, protocol, label, edge_attr)
+                        if server_boundary_name == name:
+                            servers_in_boundary.append({
+                                "escaped_name": self._escape_label(self._get_element_name(server_info)),
+                                "node_attrs": self._get_node_attributes(server_info, 'server')
+                            })
+
+                boundaries_data.append({
+                    "safe_name": safe_name,
+                    "escaped_name": escaped_name,
+                    "is_trusted": is_trusted,
+                    "is_filled": is_filled,
+                    "color": color,
+                    "line_style": line_style,
+                    "style_parts": style_parts,
+                    "actors": actors_in_boundary,
+                    "servers": servers_in_boundary
+                })
+        return boundaries_data
+
+    def _prepare_nodes_data(self, threat_model, node_type: str) -> List[Dict]:
+        """Prepares node data (actors/servers) not in boundaries for the Jinja2 template."""
+        nodes_data = []
+        elements = getattr(threat_model, f'{node_type}s', [])
+        for element_info in elements:
+            is_in_boundary = False
+            if isinstance(element_info, dict):
+                if element_info.get('boundary'):
+                    is_in_boundary = True
+            elif hasattr(element_info, 'inBoundary') and element_info.inBoundary:
+                is_in_boundary = True
+
+            if not is_in_boundary:
+                nodes_data.append({
+                    "escaped_name": self._escape_label(self._get_element_name(element_info)),
+                    "node_attrs": self._get_node_attributes(element_info, node_type)
+                })
+        return nodes_data
+
+    def _prepare_dataflows_data(self, threat_model) -> List[Dict]:
+        """Prepares dataflow data for the Jinja2 template."""
+        dataflows_data = []
         dataflow_map = {}
+
         if hasattr(threat_model, 'dataflows'):
             for df in threat_model.dataflows:
                 try:
@@ -543,10 +527,11 @@ class DiagramGenerator:
                     if not source_name or not dest_name:
                         logging.warning(f"⚠️ Skipping dataflow with missing source or destination")
                         continue
+
                     escaped_source = self._escape_label(source_name)
                     escaped_dest = self._escape_label(dest_name)
                     protocol = getattr(df, 'protocol', None)
-                    # Build label parts
+
                     label_parts = []
                     if hasattr(df, 'name') and df.name:
                         label_parts.append(self._escape_label(df.name))
@@ -565,9 +550,9 @@ class DiagramGenerator:
                         label_parts.append("🔒 Encrypted")
                     label = "\n".join(label_parts) if label_parts else "Data Flow"
                     edge_attributes = self._get_edge_attributes_for_protocol(threat_model, protocol)
-                    # Add a class attribute for JavaScript toggling
+
                     protocol_class = self._sanitize_name(protocol) if protocol else ''
-                    class_attribute = f'class="{protocol_class}"' if protocol_class else ''
+                    class_attribute = f'class=\"{protocol_class}\"' if protocol_class else ''
                     key = (escaped_source, escaped_dest, protocol)
                     dataflow_map[key] = {
                         "label": label,
@@ -578,31 +563,29 @@ class DiagramGenerator:
                     logging.warning(f"⚠️ Error processing dataflow: {e}")
                     continue
 
-        # Now, merge bidirectional flows
         processed = set()
         for (src, dst, proto), info in dataflow_map.items():
+            direction = ""
             if ((dst, src, proto) in dataflow_map) and ((dst, src, proto) not in processed):
-                # Bidirectional edge
-                label = info["label"]
-                edge_attributes = info["edge_attributes"]
-                class_attribute = info["class_attribute"]
-                label = f"{label}\n↔️ Bidirectional"
-                dot_code.append(f'  "{src}" -> "{dst}" [dir="both", label="{label}"{edge_attributes}, fontsize=7, {class_attribute}];')
+                label = f"{info['label']}\n↔️ Bidirectional"
+                direction = "dir=\"both\", "
                 processed.add((src, dst, proto))
                 processed.add((dst, src, proto))
             elif (src, dst, proto) not in processed:
-                # Unidirectional edge
                 label = info["label"]
-                edge_attributes = info["edge_attributes"]
-                class_attribute = info["class_attribute"]
-                dot_code.append(f'  "{src}" -> "{dst}" [label="{label}"{edge_attributes}, fontsize=7, {class_attribute}];')
                 processed.add((src, dst, proto))
+            else:
+                continue # Already processed as part of a bidirectional pair
 
-        # NOTE: No legend in DOT - it will be added in HTML
-        dot_code.append("}")
-        result = "\n".join(dot_code)
-        
-        return result
+            dataflows_data.append({
+                "escaped_source": src,
+                "escaped_dest": dst,
+                "label": label,
+                "edge_attributes": info["edge_attributes"],
+                "class_attribute": info["class_attribute"],
+                "direction": direction
+            })
+        return dataflows_data
 
     def _generate_legend_html(self, threat_model) -> str:
         """Generates HTML legend content."""

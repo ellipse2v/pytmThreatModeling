@@ -1,0 +1,21 @@
+[flake8]
+max-line-length = 120
+exclude =
+    .git,
+    __pycache__,
+    .pytest_cache,
+    output,
+    licence,
+    .vscode,
+    .idea,
+    .mypy_cache,
+    .venv,
+    .env,
+    .DS_Store,
+    .coverage,
+    README.md,
+    .flake8,
+    .gitignore,
+    developer.md,
+    requirements.txt,
+    threat_model.md

@@ -55,15 +55,15 @@ class ThreatGenerator:
 
             if "app server" in server_name.lower():
                 self._generate_app_server_threats(server_name)
-            elif "database" in server_name.lower():
+            if "database" in server_name.lower() or "db" in server_name.lower():
                 self._generate_database_threats(server_name)
-            elif "firewall" in server_name.lower():
+            if "firewall" in server_name.lower():
                 self._generate_firewall_threats(server_name)
-            elif "load balancer" in server_name.lower() or "gateway" in server_name.lower():
+            if "load balancer" in server_name.lower() or "gateway" in server_name.lower():
                 self._generate_load_balancer_threats(server_name)
-            elif "central server" in server_name.lower():
+            if "central server" in server_name.lower():
                 self._generate_central_server_threats(server_name)
-            elif "switch" in server_name.lower():
+            if "switch" in server_name.lower():
                 self._generate_switch_threats(server_name)
 
             if any(keyword in server_name.lower() for keyword in ["atm", "flight", "radar", "control"]):
