@@ -79,7 +79,7 @@ class MitreMapping:
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
         full_markdown_path = os.path.join(project_root, threat_model_path)
         if os.path.exists(full_markdown_path):
-            self.custom_mitre_mappings = self._load_custom_mitre_mappings_from_markdown(threat_model_path)
+            self.custom_mitre_mappings = self._load_custom_mitre_mappings_from_markdown(full_markdown_path)
         self.markdown_mitigations = {}
     def _load_custom_threats(self, threat_model) -> Dict[str, List[Dict[str, Any]]]:
         """Loads custom threats from the custom_threats module."""
@@ -94,11 +94,8 @@ class MitreMapping:
         Loads custom MITRE ATT&CK mappings from the '## Custom Mitre Mapping' section of a Markdown file.
         """
         custom_mappings = []
-        # Adjust path to look for threat_model.md in the project root
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-        full_markdown_path = os.path.join(project_root, markdown_file_path)
         try:
-            with open(full_markdown_path, 'r', encoding='utf-8') as f:
+            with open(markdown_file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             mapping_section_match = re.search(r'## Custom Mitre Mapping\n(.*?)(\n## |$)', content, re.DOTALL)
             if mapping_section_match:

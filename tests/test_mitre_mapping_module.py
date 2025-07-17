@@ -14,6 +14,7 @@
 # 
 
 import pytest
+import os
 from unittest.mock import MagicMock, patch, mock_open
 from threat_analysis.core.mitre_mapping_module import MitreMapping
 
@@ -67,8 +68,9 @@ def test_load_custom_mitre_mappings_from_markdown_success():
 """
     with patch('builtins.open', mock_open(read_data=mock_markdown_content)) as mock_file:
         with patch('os.path.exists', return_value=True): # Simulate file found
+            # Mock os.path.join to return the expected absolute path for the open call
             with patch('os.path.join', return_value='/fake/path/threat_model.md'):
-                mitre_mapping = MitreMapping(threat_model=MagicMock(), threat_model_path='/fake/path/threat_model.md')
+                mitre_mapping = MitreMapping(threat_model=MagicMock(), threat_model_path='threat_model.md')
                 assert len(mitre_mapping.custom_mitre_mappings) == 1
                 assert mitre_mapping.custom_mitre_mappings[0]['threat_name'] == 'Test Attack'
                 assert mitre_mapping.custom_mitre_mappings[0]['tactics'] == ['Test Tactic']

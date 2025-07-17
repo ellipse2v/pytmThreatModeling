@@ -1,8 +1,23 @@
+# Copyright 2025 ellipse2v
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import pytest
 import json
 import os
 from unittest.mock import patch, MagicMock, mock_open
 import base64
+from io import BytesIO
 
 # This is a bit tricky. We need to add the project root to the path
 # BEFORE we import the app, so the app can find its own modules.
@@ -10,7 +25,8 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Now we can import the app
-from threat_analysis.server.server import app, run_gui, DEFAULT_EMPTY_MARKDOWN
+from threat_analysis.server.server import app, run_gui, DEFAULT_EMPTY_MARKDOWN, threat_model_service
+from threat_analysis import config
 
 @pytest.fixture
 def client():
@@ -27,35 +43,32 @@ def test_index_route(client):
 
 def test_update_api_success(client):
     """Test the /api/update endpoint with valid markdown."""
-    # We patch the dependencies of the API endpoint to avoid running the full logic
-    with patch('threat_analysis.server.server.diagram_generator') as mock_diagram_gen:
-        # Configure the mocks to return expected values
-        mock_diagram_gen._generate_manual_dot.return_value = "digraph G {}"
-        mock_diagram_gen.generate_diagram_from_dot.return_value = "/fake/path/to/live_preview.svg"
-        mock_diagram_gen._generate_legend_html.return_value = "<div>Legend</div>"
-        mock_diagram_gen._create_complete_html.return_value = "<html>Diagram</html>"
-
-        # Mock the file system
-        with patch('json.load', return_value={}): # Mock json.load to prevent pytm from trying to read files
-             with patch('os.path.exists', return_value=True):
-                with patch('builtins.open', mock_open(read_data="<svg>mocked svg</svg>")):
-                    markdown_payload = {'markdown': """## Actors
+    with patch('threat_analysis.server.server.threat_model_service.update_diagram_logic') as mock_update_diagram_logic:
+        mock_update_diagram_logic.return_value = {
+            "diagram_html": "<html>Diagram</html>",
+            "diagram_svg": "<svg>mocked svg</svg>",
+            "legend_html": "<div>Legend</div>",
+        }
+        markdown_payload = {'markdown': """## Actors
 - User"""}
-                    response = client.post('/api/update', data=json.dumps(markdown_payload), content_type='application/json')
+        response = client.post('/api/update', data=json.dumps(markdown_payload), content_type='application/json')
 
-                assert response.status_code == 200
-                json_data = response.get_json()
-                assert 'diagram_html' in json_data
-                assert json_data['diagram_html'] == "<html>Diagram</html>"
+        assert response.status_code == 200
+        json_data = response.get_json()
+        assert 'diagram_html' in json_data
+        assert json_data['diagram_html'] == "<html>Diagram</html>"
+        mock_update_diagram_logic.assert_called_once_with(markdown_payload['markdown'])
 
 def test_update_api_empty_markdown(client):
     """Test the /api/update endpoint with empty markdown content."""
-    markdown_payload = {'markdown': ''}
-    response = client.post('/api/update', data=json.dumps(markdown_payload), content_type='application/json')
-    assert response.status_code == 400
-    json_data = response.get_json()
-    assert 'error' in json_data
-    assert json_data['error'] == 'Markdown content is empty'
+    with patch('threat_analysis.server.server.threat_model_service.update_diagram_logic') as mock_update_diagram_logic:
+        mock_update_diagram_logic.side_effect = ValueError("Markdown content is empty")
+        markdown_payload = {'markdown': ''}
+        response = client.post('/api/update', data=json.dumps(markdown_payload), content_type='application/json')
+        assert response.status_code == 400
+        json_data = response.get_json()
+        assert 'error' in json_data
+        assert json_data['error'] == 'Markdown content is empty'
 
 import sys
 
@@ -67,32 +80,34 @@ def test_export_api_success(client, export_format):
     sys.argv = [original_argv[0]] # Set to script name only
 
     try:
-        # We need to patch all generators and file system interactions
-        with patch('threat_analysis.server.server.diagram_generator'), \
-             patch('threat_analysis.server.server.report_generator'), \
-             patch('threat_analysis.server.server.send_from_directory') as mock_send, \
-             patch('os.makedirs'):
+        with patch('threat_analysis.server.server.threat_model_service.export_files_logic') as mock_export_files_logic, \
+             patch('threat_analysis.server.server.send_from_directory') as mock_send:
 
+            mock_export_files_logic.return_value = ("/fake/path/to/output", "mock_file.ext")
             mock_send.return_value = MagicMock(status_code=200)
-            markdown_payload = {'markdown': '## Actors\n- User', 'format': export_format}
+            markdown_payload = {'markdown': """## Actors
+- User""", 'format': export_format}
             response = client.post('/api/export', data=json.dumps(markdown_payload), content_type='application/json')
 
-            # The actual response is mocked by mock_send, but we can check if it was called
             assert response.status_code == 200
-            mock_send.assert_called()
+            mock_export_files_logic.assert_called_once_with(markdown_payload['markdown'], export_format)
+            mock_send.assert_called_once_with(config.OUTPUT_BASE_DIR, "mock_file.ext", as_attachment=True)
     finally:
         # Restore original sys.argv
         sys.argv = original_argv
 
-
 def test_export_api_invalid_format(client):
     """Test the /api/export endpoint with an invalid format."""
-    markdown_payload = {'markdown': '## Actors\n- User', 'format': 'invalid_format'}
-    response = client.post('/api/export', data=json.dumps(markdown_payload), content_type='application/json')
-    assert response.status_code == 400
-    json_data = response.get_json()
-    assert 'error' in json_data
-    assert json_data['error'] == 'Invalid export format'
+    with patch('threat_analysis.server.server.threat_model_service.export_files_logic') as mock_export_files_logic:
+        mock_export_files_logic.side_effect = ValueError("Invalid export format")
+        markdown_payload = {'markdown': """## Actors
+- User""", 'format': 'invalid_format'}
+        response = client.post('/api/export', data=json.dumps(markdown_payload), content_type='application/json')
+        assert response.status_code == 400
+        json_data = response.get_json()
+        assert 'error' in json_data
+        assert json_data['error'] == 'Invalid export format'
+        mock_export_files_logic.assert_called_once_with(markdown_payload['markdown'], markdown_payload['format'])
 
 def test_export_api_missing_data(client):
     """Test the /api/export endpoint with missing markdown or format."""
@@ -100,11 +115,19 @@ def test_export_api_missing_data(client):
     payload_no_format = {'markdown': 'some content'}
     response = client.post('/api/export', data=json.dumps(payload_no_format), content_type='application/json')
     assert response.status_code == 400
+    json_data = response.get_json()
+    assert 'error' in json_data
+    assert json_data['error'] == 'Missing markdown content or export format'
 
     # Missing markdown
     payload_no_markdown = {'format': 'svg'}
     response = client.post('/api/export', data=json.dumps(payload_no_markdown), content_type='application/json')
     assert response.status_code == 400
+    json_data = response.get_json()
+    assert 'error' in json_data
+    assert json_data['error'] == 'Missing markdown content or export format'
+
+
 
 def test_run_gui_with_no_model_file(client):
     """Test that run_gui starts with DEFAULT_EMPTY_MARKDOWN if no model file is provided."""
@@ -142,57 +165,28 @@ def test_run_gui_with_existing_model_file(client):
 def test_export_all_api_success(client):
     """Test the /api/export_all endpoint for successful ZIP file generation."""
     mock_markdown = "# Test Model"
-    with patch('os.makedirs'), \
-         patch('zipfile.ZipFile') as mock_zipfile, \
-         patch('shutil.rmtree'), \
-         patch('threat_analysis.server.server.send_file') as mock_send_file, \
-         patch('threat_analysis.server.server.create_threat_model') as mock_create_threat_model, \
-         patch('threat_analysis.server.server.diagram_generator') as mock_diagram_generator, \
-         patch('threat_analysis.server.server.report_generator') as mock_report_generator, \
-         patch('builtins.open', mock_open()):
+    with patch('threat_analysis.server.server.threat_model_service.export_all_files_logic') as mock_export_all_files_logic, \
+         patch('threat_analysis.server.server.send_file') as mock_send_file:
 
-        # Mock create_threat_model to return a mock threat_model object
-        mock_threat_model = MagicMock()
-        mock_threat_model.process_threats.return_value = {}
-        mock_create_threat_model.return_value = mock_threat_model
-
-        # Mock diagram_generator methods
-        mock_diagram_generator._generate_manual_dot.return_value = "digraph G {}"
-        mock_diagram_generator.generate_diagram_from_dot.return_value = "/fake/path/to/diagram.svg"
-        mock_diagram_generator._generate_html_with_legend.return_value = None
-
-        # Mock report_generator methods
-        mock_report_generator.generate_html_report.return_value = None
-        mock_report_generator.generate_json_analysis.return_value = None
-
-        # Mock the BytesIO object that zipfile.ZipFile will use
-        mock_zip_buffer = MagicMock()
-        mock_zipfile.return_value.__enter__.return_value = MagicMock()
-
-        # Mock send_file to return a dummy response
+        mock_export_all_files_logic.return_value = (BytesIO(b"zip_content"), "2025-01-01_12-00-00")
         mock_send_file.return_value = MagicMock(status_code=200, data=b'zip_content')
 
         markdown_payload = {'markdown': mock_markdown}
         response = client.post('/api/export_all', data=json.dumps(markdown_payload), content_type='application/json')
 
         assert response.status_code == 200
-        mock_create_threat_model.assert_called_once()
-        mock_diagram_generator._generate_manual_dot.assert_called_once()
-        mock_diagram_generator.generate_diagram_from_dot.assert_called_once()
-        mock_diagram_generator._generate_html_with_legend.assert_called_once()
-        mock_threat_model.process_threats.assert_called_once()
-        mock_report_generator.generate_html_report.assert_called_once()
-        mock_report_generator.generate_json_analysis.assert_called_once()
-        mock_zipfile.assert_called_once()
+        mock_export_all_files_logic.assert_called_once_with(mock_markdown)
         mock_send_file.assert_called_once()
 
 def test_export_all_api_missing_markdown(client):
     """Test the /api/export_all endpoint with missing markdown content."""
-    response = client.post('/api/export_all', data=json.dumps({}), content_type='application/json')
-    assert response.status_code == 400
-    json_data = response.get_json()
-    assert 'error' in json_data
-    assert json_data['error'] == 'Missing markdown content'
+    with patch('threat_analysis.server.server.threat_model_service.export_all_files_logic') as mock_export_all_files_logic:
+        mock_export_all_files_logic.side_effect = ValueError("Missing markdown content")
+        response = client.post('/api/export_all', data=json.dumps({}), content_type='application/json')
+        assert response.status_code == 400
+        json_data = response.get_json()
+        assert 'error' in json_data
+        assert json_data['error'] == 'Missing markdown content'
 
 def test_update_api_with_full_model_content(client):
     """Test the /api/update endpoint with a full threat model content (simulating paste)."""

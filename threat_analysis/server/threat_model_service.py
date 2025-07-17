@@ -1,0 +1,231 @@
+# Copyright 2025 ellipse2v
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import os
+import logging
+import base64
+import datetime
+import zipfile
+import shutil
+from io import BytesIO
+
+from threat_analysis.core.model_factory import create_threat_model
+from threat_analysis.core.mitre_mapping_module import MitreMapping
+from threat_analysis.severity_calculator_module import SeverityCalculator
+from threat_analysis.generation.report_generator import ReportGenerator
+from threat_analysis.generation.diagram_generator import DiagramGenerator
+from threat_analysis import config
+
+class ThreatModelService:
+    def __init__(self):
+        self.mitre_mapping = MitreMapping()
+        self.severity_calculator = SeverityCalculator()
+        self.diagram_generator = DiagramGenerator()
+        self.report_generator = ReportGenerator(self.severity_calculator, self.mitre_mapping)
+
+    def update_diagram_logic(self, markdown_content: str):
+        logging.info("Entering update_diagram_logic function.")
+        if not markdown_content:
+            raise ValueError("Markdown content is empty")
+
+        # Save the received markdown to a temporary file
+        tmp_md_path = os.path.join(config.TMP_DIR, "live_model.md")
+        os.makedirs(config.TMP_DIR, exist_ok=True)
+        with open(tmp_md_path, "w", encoding="utf-8") as f:
+            f.write(markdown_content)
+        logging.info(f"Saved live markdown to {tmp_md_path}")
+
+        # 1. Create a new ThreatModel instance for each request
+        threat_model = create_threat_model(
+            markdown_content=markdown_content,
+            model_name="WebThreatModel",
+            model_description="Live-updated threat model",
+            mitre_mapping=self.mitre_mapping,
+            validate=False,  # No need to validate on every update
+        )
+        if not threat_model:
+            raise RuntimeError("Failed to create threat model")
+
+        # 3. Generate the DOT code from the model
+        dot_code = self.diagram_generator._generate_manual_dot(threat_model)
+        logging.info(
+            f"Generated DOT code (first 500 chars): \n{dot_code[:500]}..."
+        )
+        if not dot_code:
+            raise RuntimeError("Failed to generate DOT code from model")
+
+        # 4. Generate the SVG from the DOT code
+        # We create a temporary file for the SVG output
+        temp_svg_path = os.path.join(config.TMP_DIR, "live_preview.svg")
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(temp_svg_path), exist_ok=True)
+        svg_path = self.diagram_generator.generate_diagram_from_dot(
+            dot_code, temp_svg_path, "svg"
+        )
+
+        if not svg_path or not os.path.exists(svg_path):
+            raise RuntimeError("Failed to generate SVG diagram")
+
+        # 5. Read the SVG content
+        with open(svg_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+
+        # 6. Generate the legend
+        legend_html = self.diagram_generator._generate_legend_html(threat_model)
+
+        # 7. Combine into a full HTML document for other purposes if needed
+        full_html = self.diagram_generator._create_complete_html(
+            svg_content, legend_html, threat_model
+        )
+
+        # 8. Return raw SVG, legend, and full HTML
+        return {
+            "diagram_html": full_html,
+            "diagram_svg": svg_content,
+            "legend_html": legend_html,
+        }
+
+    def export_files_logic(self, markdown_content: str, export_format: str):
+        logging.info(f"Entering export_files_logic function for format: {export_format}")
+
+        if not markdown_content or not export_format:
+            raise ValueError("Missing markdown content or export format")
+
+        threat_model = create_threat_model(
+            markdown_content=markdown_content,
+            model_name="ExportedThreatModel",
+            model_description="Exported from web interface",
+            mitre_mapping=self.mitre_mapping,
+            validate=True,
+        )
+        if not threat_model:
+            raise RuntimeError("Failed to create or validate threat model")
+
+        os.makedirs(config.OUTPUT_BASE_DIR, exist_ok=True)
+
+        if export_format == "svg":
+            dot_code = self.diagram_generator._generate_manual_dot(threat_model)
+            output_filename = "diagram.svg"
+            output_path = os.path.join(
+                config.OUTPUT_BASE_DIR, output_filename
+            )
+            generated_path = self.diagram_generator.generate_diagram_from_dot(
+                dot_code, output_path, "svg"
+            )
+            if not generated_path:
+                raise RuntimeError("Failed to generate SVG file")
+            return output_path, output_filename
+
+        elif export_format == "diagram":
+            dot_code = self.diagram_generator._generate_manual_dot(threat_model)
+            svg_path_temp = os.path.join(
+                config.OUTPUT_BASE_DIR, "temp_diagram.svg"
+            )
+            self.diagram_generator.generate_diagram_from_dot(
+                dot_code, svg_path_temp, "svg"
+            )
+
+            output_filename = "diagram.html"
+            output_path = os.path.join(
+                config.OUTPUT_BASE_DIR, output_filename
+            )
+            self.diagram_generator._generate_html_with_legend(
+                svg_path_temp, output_path, threat_model
+            )
+            return output_path, output_filename
+
+        elif export_format == "report":
+            grouped_threats = threat_model.process_threats()
+            output_filename = "threat_report.html"
+            output_path = os.path.join(
+                config.OUTPUT_BASE_DIR, output_filename
+            )
+            self.report_generator.generate_html_report(
+                threat_model, grouped_threats, output_path
+            )
+            return output_path, output_filename
+
+        else:
+            raise ValueError("Invalid export format")
+
+    def export_all_files_logic(self, markdown_content: str):
+        logging.info("Entering export_all_files_logic function.")
+        if not markdown_content:
+            raise ValueError("Missing markdown content")
+
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        export_dir_name = f"export_{timestamp}"
+        export_path = os.path.join(config.OUTPUT_BASE_DIR, export_dir_name)
+        os.makedirs(export_path, exist_ok=True)
+
+        threat_model = create_threat_model(
+            markdown_content=markdown_content,
+            model_name="ExportedThreatModel",
+            model_description="Exported from web interface",
+            mitre_mapping=self.mitre_mapping,
+            validate=True,
+        )
+        if not threat_model:
+            raise RuntimeError("Failed to create or validate threat model")
+
+        markdown_filename = "threat_model.md"
+        markdown_filepath = os.path.join(export_path, markdown_filename)
+        with open(markdown_filepath, "w", encoding="utf-8") as f:
+            f.write(markdown_content)
+
+        dot_code = self.diagram_generator._generate_manual_dot(threat_model)
+        svg_filename = "tm_diagram.svg"
+        svg_filepath = os.path.join(export_path, svg_filename)
+        self.diagram_generator.generate_diagram_from_dot(
+            dot_code, svg_filepath, "svg"
+        )
+
+        html_diagram_filename = "tm_diagram.html"
+        html_diagram_filepath = os.path.join(
+            export_path, html_diagram_filename
+        )
+        self.diagram_generator._generate_html_with_legend(
+            svg_filepath, html_diagram_filepath, threat_model
+        )
+
+        grouped_threats = threat_model.process_threats()
+        html_report_filename = "stride_mitre_report.html"
+        html_report_filepath = os.path.join(export_path, html_report_filename)
+        self.report_generator.generate_html_report(
+            threat_model, grouped_threats, html_report_filepath
+        )
+
+        json_analysis_filename = "mitre_analysis.json"
+        json_analysis_filepath = os.path.join(
+            export_path, json_analysis_filename
+        )
+        self.report_generator.generate_json_export(
+            threat_model, grouped_threats, json_analysis_filepath
+        )
+
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(
+            zip_buffer, "w", zipfile.ZIP_DEFLATED
+        ) as zf:
+            for root, _, files in os.walk(export_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    zf.write(
+                        file_path, os.path.relpath(file_path, export_path)
+                    )
+        zip_buffer.seek(0)
+
+        shutil.rmtree(export_path)
+
+        return zip_buffer, timestamp
