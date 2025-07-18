@@ -91,7 +91,7 @@ def test_export_api_success(client, export_format):
 
             assert response.status_code == 200
             mock_export_files_logic.assert_called_once_with(markdown_payload['markdown'], export_format)
-            mock_send.assert_called_once_with(config.OUTPUT_BASE_DIR, "mock_file.ext", as_attachment=True)
+            mock_send.assert_called_once_with("/fake/path/to", "mock_file.ext", as_attachment=True)
     finally:
         # Restore original sys.argv
         sys.argv = original_argv

@@ -156,8 +156,9 @@ def export_files():
 
     try:
         output_path, output_filename = threat_model_service.export_files_logic(markdown_content, export_format)
+        absolute_output_directory = os.path.join(project_root, os.path.dirname(output_path))
         return send_from_directory(
-            config.OUTPUT_BASE_DIR, output_filename, as_attachment=True
+            absolute_output_directory, output_filename, as_attachment=True
         )
 
     except ValueError as e:
