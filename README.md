@@ -165,6 +165,23 @@ A network with a DMZ, external/internal firewalls, and a command zone. The goal 
 - **Protocol Tampering**: tactics=["Impact", "Defense Evasion"], techniques=[{"id": "T1565", "name": "Data Manipulation"}]
 ```
 
+### Protocol Styles and Legends
+
+To ensure that protocols are correctly styled in diagrams and appear in the legend, you must define them in the `## Protocol Styles` section of your threat model. The system **intentionally does not** assign default colors to new protocols. This gives you full control over the final visualization.
+
+**How it works:**
+
+1.  **Use a protocol** in a `Dataflow`, e.g., `protocol="NEW_PROTO"`.
+2.  **Define its style** under `## Protocol Styles` to make it appear in the legend:
+    ```markdown
+    ## Protocol Styles
+    - **HTTPS**: color=darkgreen, line_style=solid
+    - **HTTP**: color=red, line_style=solid
+    - **NEW_PROTO**: color=cyan, line_style=dotted
+    ```
+
+If you skip step 2, the protocol will be drawn in the diagram with a default style, but it will **not** be included in the legend.
+
 ## Bidirectional Dataflow Visualization
 
 This makes bidirectional communications visually clear and reduces clutter in your architecture diagrams.
@@ -372,6 +389,12 @@ You can leverage and extend all PyTM features, including:
     - **Step 2: Create Initial Templates**: Develop basic templates for common architectures (e.g., "3-tier Web Application", "Simple IoT System").
     - **Step 3: Implement Loading Mechanism**: Add a function in `ThreatModel` or a new utility module to list and load selected templates.
     - **Step 4: CLI/GUI Integration**: Add a CLI option (e.g., `--template "web_app"`) or GUI elements (dropdowns, buttons) to select and load templates.
+
+### Using Pre-defined Templates
+
+To accelerate the creation of new threat models, the framework includes a set of pre-defined templates for common architectures. You can load these templates directly from the web interface.
+
+![Loading a template](output/example/template.gif)
 
 ## Technical Debt / Refactoring Opportunities
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -176,8 +176,10 @@
 <body>
 
     <div class="header">
-        <h1>Threat Model Editor</h1>
+        <h1>Threat Model Editor <span style="font-size: 0.6em; color: #555;">- {{ model_name }}</span></h1>
         <div class="button-group">
+            <button onclick="document.getElementById('loadFileInput').click()">Load Model (.md)</button>
+            <input type="file" id="loadFileInput" accept=".md" style="display: none;" onchange="loadMarkdownFile(event)">
             <button onclick="saveMarkdown()">Save Model (.md)</button>
             <button onclick="exportFile('svg')">Export SVG</button>
             <button onclick="exportFile('diagram')">Export Diagram (HTML)</button>
@@ -292,6 +294,12 @@
                 svgWrapper.innerHTML = data.diagram_svg;
                 legendContainer.innerHTML = data.legend_html;
 
+                // Update the model name in the header
+                const modelNameSpan = document.querySelector('.header h1 span');
+                if (modelNameSpan) {
+                    modelNameSpan.textContent = `- ${data.model_name}`;
+                }
+
                 // Apply current visibility state to the newly loaded SVG
                 applyProtocolVisibility();
 
@@ -391,6 +399,19 @@
                 console.error('Export All error:', error);
                 alert('An error occurred during export all.');
             }
+        }
+
+        // Function to load markdown from a file
+        function loadMarkdownFile(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                editor.setValue(e.target.result);
+            };
+            reader.readAsText(file);
         }
 
         // Initial empty state

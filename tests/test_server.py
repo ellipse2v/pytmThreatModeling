@@ -138,7 +138,7 @@ def test_run_gui_with_no_model_file(client):
                 # After run_gui, the global initial_markdown_content should be set
                 # We then make a request to the index route to get the rendered HTML
                 client.get('/') # This will call the real index route, which calls render_template
-                mock_render_template.assert_called_once_with('web_interface.html', initial_markdown=base64.b64encode(DEFAULT_EMPTY_MARKDOWN.encode('utf-8')).decode('utf-8'))
+                mock_render_template.assert_called_once_with('web_interface.html', initial_markdown=base64.b64encode(DEFAULT_EMPTY_MARKDOWN.encode('utf-8')).decode('utf-8'), model_name='New Model')
 
 def test_run_gui_with_non_existent_model_file(client):
     """Test that run_gui starts with DEFAULT_EMPTY_MARKDOWN if a non-existent model file is provided."""
@@ -147,7 +147,7 @@ def test_run_gui_with_non_existent_model_file(client):
             with patch('threat_analysis.server.server.render_template') as mock_render_template:
                 run_gui(model_filepath='/non/existent/path/to/model.md')
                 client.get('/') # This will call the real index route, which calls render_template
-                mock_render_template.assert_called_once_with('web_interface.html', initial_markdown=base64.b64encode(DEFAULT_EMPTY_MARKDOWN.encode('utf-8')).decode('utf-8'))
+                mock_render_template.assert_called_once_with('web_interface.html', initial_markdown=base64.b64encode(DEFAULT_EMPTY_MARKDOWN.encode('utf-8')).decode('utf-8'), model_name='New Model')
 
 def test_run_gui_with_existing_model_file(client):
     """Test that run_gui loads content from an existing model file."""
@@ -159,7 +159,7 @@ def test_run_gui_with_existing_model_file(client):
                     run_gui(model_filepath='/path/to/existing/model.md')
                     client.get('/')
                     expected_encoded_markdown = base64.b64encode(mock_file_content.encode('utf-8')).decode('utf-8')
-                    mock_render_template.assert_called_once_with('web_interface.html', initial_markdown=expected_encoded_markdown)
+                    mock_render_template.assert_called_once_with('web_interface.html', initial_markdown=expected_encoded_markdown, model_name='Test Model')
                     mock_file.assert_called_once_with('/path/to/existing/model.md', "r", encoding="utf-8")
 
 def test_export_all_api_success(client):

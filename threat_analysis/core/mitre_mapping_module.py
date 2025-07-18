@@ -1308,6 +1308,12 @@ class MitreMapping:
             "T1070.002": r"(?i)clear linux.*logs|clear mac.*logs",
             "T1562": r"(?i)impair defenses|disable.*security|functionality misuse|insecure security configuration|hardening",
             "T1562.001": r"(?i)firewall rule misconfiguration|disable or modify system firewall|firewall bypass",
+            # Custom Threats
+            "T-CUSTOM-APIKEY": r"(?i)api key exposure|hardcoded api key|insecure api key",
+            "T-CUSTOM-CONTAINER-ESCAPE": r"(?i)container escape|breakout container|container breakout",
+            "T-CUSTOM-SSRF": r"(?i)ssrf|server side request forgery",
+            "T-CUSTOM-DESERIALIZATION": r"(?i)deserialization vulnerability|insecure deserialization",
+            "T-CUSTOM-LOG-FORGERY": r"(?i)log forgery|log injection|audit log tampering",
             # PyTM STRIDE Categories
             "spoofing": "Spoofing",
             "tampering": "Tampering|unpatched.*vulnerabilities|sql.*injection|nosql.*injection|xss|cross.site scripting|data corruption|unauthorized write access|injection of false surveillance data|unauthorized access to or modification of flight plans|unpatched.*vulnerabilities",

@@ -16,6 +16,7 @@ import os
 import sys
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import logging
+import re
 
 from flask import Flask, render_template, request, jsonify, send_from_directory, send_file
 import logging
@@ -68,6 +69,13 @@ A new threat model. Describe your system here.
 """
 
 
+def get_model_name(markdown_content: str) -> str:
+    match = re.search(r"^# Threat Model: (.*)$", markdown_content, re.MULTILINE)
+    if match:
+        return match.group(1).strip()
+    return "Untitled Model"
+
+
 def run_gui(model_filepath: str = None):
     global initial_markdown_content
     if model_filepath and os.path.exists(model_filepath):
@@ -104,8 +112,11 @@ def index():
     encoded_markdown = base64.b64encode(
         initial_markdown_content.encode("utf-8")
     ).decode("utf-8")
+    model_name = get_model_name(initial_markdown_content)
     return render_template(
-        "web_interface.html", initial_markdown=encoded_markdown
+        "web_interface.html",
+        initial_markdown=encoded_markdown,
+        model_name=model_name,
     )
 
 
@@ -126,6 +137,8 @@ def update_diagram():
 
     try:
         result = threat_model_service.update_diagram_logic(markdown_content)
+        model_name = get_model_name(markdown_content)
+        result["model_name"] = model_name
         return jsonify(result)
 
     except ValueError as e:

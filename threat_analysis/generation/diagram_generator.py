@@ -247,7 +247,7 @@ class DiagramGenerator:
         elif 'database' in node_name_lower or 'db' in node_name_lower:
                 attributes.append('shape=cylinder')
                 icon = '🗄️ '
-                default_fillcolor = 'yelllightblueow'
+                default_fillcolor = 'lightblue'
         
         # Check for web server
         elif 'web' in node_name_lower and 'server' in node_name_lower:
@@ -1056,51 +1056,17 @@ class DiagramGenerator:
 
     def _get_protocol_styles_from_model(self, threat_model) -> Dict[str, Dict]:
         """
-        Extracts protocol styles from the threat model, ensuring all protocols from dataflows are included.
+        Extracts defined protocol styles from the threat model.
         """
-        all_protocols = set()
-        final_styles = {}
-
         try:
-            # 1. Get all unique protocols from dataflows
-            if hasattr(threat_model, 'dataflows'):
-                for df in threat_model.dataflows:
-                    if hasattr(df, 'protocol') and df.protocol:
-                        all_protocols.add(df.protocol)
-
-            # 2. Get any user-defined styles
-            user_defined_styles = {}
             if hasattr(threat_model, 'get_all_protocol_styles'):
-                user_defined_styles = threat_model.get_all_protocol_styles()
-            elif hasattr(threat_model, 'protocol_styles'):
-                user_defined_styles = threat_model.protocol_styles
-
-            # Add user-defined protocols to the set to ensure they appear even if not in a dataflow
-            for protocol in user_defined_styles.keys():
-                all_protocols.add(protocol)
-
-            # 3. Merge and assign default styles for missing ones
-            default_colors = [
-                '#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1',
-                '#20c997', '#fd7e14', '#6610f2', '#e83e8c', '#000000'
-            ]
-            
-            sorted_protocols = sorted(list(all_protocols))
-
-            for i, protocol in enumerate(sorted_protocols):
-                if protocol in user_defined_styles:
-                    final_styles[protocol] = user_defined_styles[protocol]
-                else:
-                    # Assign a default style
-                    final_styles[protocol] = {
-                        'color': default_colors[i % len(default_colors)],
-                        'line_style': 'solid'
-                    }
-
+                return threat_model.get_all_protocol_styles()
+            if hasattr(threat_model, 'protocol_styles'):
+                return threat_model.protocol_styles
         except Exception as e:
             logging.warning(f"⚠️ Error extracting protocol styles: {e}")
-
-        return final_styles
+        
+        return {}
 
     def check_graphviz_installation(self) -> bool:
         """Checks if Graphviz is installed"""
