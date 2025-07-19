@@ -123,6 +123,7 @@ class ThreatModel:
         data_obj = Data(name, **kwargs)  # Passes **kwargs to the Data constructor
         self.data_objects[name] = data_obj
         logging.info(f"   - Added Data: {name} (Props: {kwargs})")  # Debugging
+        logging.debug(f"DEBUG: Data object added with name: '{name}'") # New debug log
         return data_obj
 
     def add_dataflow(self, from_element: Any, to_element: Any, name :str,

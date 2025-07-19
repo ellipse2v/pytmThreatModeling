@@ -55,9 +55,9 @@ def test_initialize_d3fend_mapping_file_not_found(caplog):
 def test_load_custom_mitre_mappings_from_markdown_file_not_found(caplog):
     with patch('builtins.open', side_effect=FileNotFoundError):
         with patch('os.path.exists', return_value=False): # Ensure os.path.exists returns False
-            with patch('os.path.join', return_value='/fake/path/threat_model.md'):
+            with patch('os.path.join', return_value='/fake/path/threatModel_Template/threat_model.md'):
                 with caplog.at_level(1):
-                    mitre_mapping = MitreMapping(threat_model=MagicMock(), threat_model_path='/fake/path/threat_model.md')
+                    mitre_mapping = MitreMapping(threat_model=MagicMock(), threat_model_path='/fake/path/threatModel_Template/threat_model.md')
                     assert mitre_mapping.custom_mitre_mappings == []
                     assert "Warning: Custom MITRE mapping file not found" not in caplog.text # No warning expected
 
@@ -69,8 +69,8 @@ def test_load_custom_mitre_mappings_from_markdown_success():
     with patch('builtins.open', mock_open(read_data=mock_markdown_content)) as mock_file:
         with patch('os.path.exists', return_value=True): # Simulate file found
             # Mock os.path.join to return the expected absolute path for the open call
-            with patch('os.path.join', return_value='/fake/path/threat_model.md'):
-                mitre_mapping = MitreMapping(threat_model=MagicMock(), threat_model_path='threat_model.md')
+            with patch('os.path.join', return_value='/fake/path/threatModel_Template/threat_model.md'):
+                mitre_mapping = MitreMapping(threat_model=MagicMock(), threat_model_path='threatModel_Template/threat_model.md')
                 assert len(mitre_mapping.custom_mitre_mappings) == 1
                 assert mitre_mapping.custom_mitre_mappings[0]['threat_name'] == 'Test Attack'
                 assert mitre_mapping.custom_mitre_mappings[0]['tactics'] == ['Test Tactic']

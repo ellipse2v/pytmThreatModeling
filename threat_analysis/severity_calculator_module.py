@@ -23,7 +23,7 @@ import logging
 class SeverityCalculator:
     """Class for calculating threat severity"""
     
-    def __init__(self, markdown_file_path: str = "threat_model.md"):
+    def __init__(self, markdown_file_path: str = "threatModel_Template/threat_model.md"):
         self.base_scores = {
             "ElevationOfPrivilege": 9.0,
             "Tampering": 8.0,

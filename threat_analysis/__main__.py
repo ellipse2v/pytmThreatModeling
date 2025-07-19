@@ -22,6 +22,8 @@ import argparse
 import logging
 from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path
+import importlib.util
+import inspect
 
 # Import library modules
 from .core.models_module import ThreatModel
@@ -31,16 +33,17 @@ from .generation.report_generator import ReportGenerator
 from .generation.diagram_generator import DiagramGenerator
 from .core.model_factory import create_threat_model
 from . import config
+from .iac_plugins import IaCPlugin
 
 
 class ThreatAnalysisFramework:
     """Main framework for threat analysis"""
 
     def __init__(
-        self, model_filepath: str, model_name: str, model_description: str
+        self, markdown_content: str, model_name: str, model_description: str
     ):
         """Initializes the analysis framework"""
-        self.model_filepath = model_filepath
+        self.markdown_content = markdown_content
         self.model_name = model_name
         self.model_description = model_description
 
@@ -71,12 +74,12 @@ class ThreatAnalysisFramework:
 
         # Component initialization
         self.mitre_mapping = MitreMapping()
-        self.threat_model = self._load_and_validate_model()
+        self.threat_model = self._load_and_validate_model(self.markdown_content)
         if not self.threat_model:
             sys.exit(1)  # Exit if model loading fails
 
         self.severity_calculator = SeverityCalculator(
-            markdown_file_path=self.model_filepath
+            markdown_file_path=config.DEFAULT_MODEL_FILEPATH # Keep this for now, will adjust later if needed
         )
         self.report_generator = ReportGenerator(
             self.severity_calculator, self.mitre_mapping
@@ -104,13 +107,10 @@ class ThreatAnalysisFramework:
         self.custom_threats_list = []
         self.elements_with_custom_threats = set()
 
-    def _load_and_validate_model(self) -> Optional[ThreatModel]:
-        """Loads and validates the threat model from the Markdown DSL file."""
-        logging.info(f"⏳ Loading model from {self.model_filepath}...")
+    def _load_and_validate_model(self, markdown_content: str) -> Optional[ThreatModel]:
+        """Loads and validates the threat model from the Markdown DSL content."""
+        logging.info(f"⏳ Loading model from provided Markdown content...")
         try:
-            with open(self.model_filepath, "r", encoding="utf-8") as f:
-                markdown_content = f.read()
-
             return create_threat_model(
                 markdown_content=markdown_content,
                 model_name=self.model_name,
@@ -119,11 +119,6 @@ class ThreatAnalysisFramework:
                 validate=True,
             )
 
-        except FileNotFoundError:
-            logging.error(
-                f"❌ Error: Model file '{self.model_filepath}' not found."
-            )
-            return None
         except Exception as e:
             logging.error(f"❌ Error parsing or validating model: {e}")
             return None
@@ -232,14 +227,45 @@ class ThreatAnalysisFramework:
             pass
 
 
+def load_iac_plugins() -> Dict[str, IaCPlugin]:
+    """Dynamically loads IaC plugins from the iac_plugins directory.
+
+    Returns:
+        A dictionary mapping plugin names to their instantiated objects.
+    """
+    plugins = {}
+    plugins_dir = Path(__file__).parent / "iac_plugins"
+
+    for plugin_file in plugins_dir.glob("*_plugin.py"):
+        module_name = plugin_file.stem
+        spec = importlib.util.spec_from_file_location(module_name, plugin_file)
+        if spec and spec.loader:
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
+
+            for name, obj in inspect.getmembers(module, inspect.isclass):
+                if issubclass(obj, IaCPlugin) and obj is not IaCPlugin:
+                    try:
+                        plugin_instance = obj()
+                        plugins[plugin_instance.name] = plugin_instance
+                        logging.info(f"Loaded IaC plugin: {plugin_instance.name}")
+                    except TypeError as e:
+                        logging.error(f"Failed to instantiate plugin {name}: {e}")
+    return plugins
+
+
 class CustomArgumentParser:
-    def __init__(self):
+    def __init__(self, loaded_plugins: Dict[str, IaCPlugin]):
         self.parser = argparse.ArgumentParser(
             description="Threat Analysis Framework",
             epilog=(
                 "This script also accepts PyTM arguments. "
-                "Use --help with PyTM commands for more details."
+                "Use --help with PyTM commands for more details." +
+                "\n\nIaC Plugin Options: " +
+                "\n  " + "\n  ".join([f"--{name}-path <path> ({plugin.description})" for name, plugin in loaded_plugins.items()])
             ),
+            formatter_class=argparse.RawTextHelpFormatter # To preserve newlines in epilog
         )
         self.parser.add_argument(
             "--model-file",
@@ -251,21 +277,30 @@ class CustomArgumentParser:
             "--gui", action="store_true", help="Launch the web-based GUI editor."
         )
 
+        # Dynamically add arguments for IaC plugins
+        for name, plugin in loaded_plugins.items():
+            self.parser.add_argument(
+                f"--{name}-path",
+                type=str,
+                help=f"Path to the {plugin.name} configuration (e.g., project root, playbook).",
+            )
+
     def parse_args(self):
         return self.parser.parse_known_args()
 
 
 # --- Main entry point ---
 if __name__ == "__main__":
-    custom_parser = CustomArgumentParser()
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+
+    loaded_iac_plugins = load_iac_plugins()
+    custom_parser = CustomArgumentParser(loaded_iac_plugins)
     args, remaining_argv = custom_parser.parse_args()
 
     # Reconstruct sys.argv for PyTM
     sys.argv = [sys.argv[0]] + remaining_argv
-
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-    )
 
     if args.gui:
         try:
@@ -279,8 +314,32 @@ if __name__ == "__main__":
             )
             sys.exit(1)
     else:
+        # Read the base threat model content
+        base_model_filepath = Path(args.model_file)
+        if not base_model_filepath.exists():
+            logging.error(f"❌ Error: Base model file '{base_model_filepath}' not found.")
+            sys.exit(1)
+        with open(base_model_filepath, "r", encoding="utf-8") as f:
+            combined_markdown_content = f.read()
+
+        # Check for IaC plugin arguments and append generated content
+        for plugin_name, plugin_instance in loaded_iac_plugins.items():
+            arg_name = f"{plugin_name}_path"
+            if hasattr(args, arg_name) and getattr(args, arg_name):
+                logging.info(f"Processing IaC configuration with {plugin_name} plugin...")
+                config_path = getattr(args, arg_name)
+                try:
+                    parsed_data = plugin_instance.parse_iac_config(config_path)
+                    iac_model_content = plugin_instance.generate_threat_model_components(parsed_data)
+                    logging.info(f"Successfully generated threat model components from {plugin_name}.")
+                    combined_markdown_content += "\n" + iac_model_content
+                    break # Process only one IaC plugin at a time for now
+                except Exception as e:
+                    logging.error(f"❌ Error processing {plugin_name} config: {e}")
+                    sys.exit(1)
+
         framework = ThreatAnalysisFramework(
-            model_filepath=Path(args.model_file),
+            markdown_content=combined_markdown_content,
             model_name=config.DEFAULT_MODEL_NAME,
             model_description=config.DEFAULT_MODEL_DESCRIPTION,
         )

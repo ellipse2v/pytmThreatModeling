@@ -31,7 +31,7 @@ def analysis_pipeline():
     # Suppress verbose logging during performance testing
     logging.basicConfig(level=logging.CRITICAL)
     
-    framework = ThreatAnalysisFramework(model_filepath="threat_model.md")
+    framework = ThreatAnalysisFramework(model_filepath="threatModel_Template/threat_model.md")
     framework.run_analysis()
     framework.generate_reports()
     framework.generate_diagrams()

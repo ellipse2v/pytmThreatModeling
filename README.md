@@ -4,7 +4,7 @@
 
 This project is a Python-based, end-to-end STRIDE threat modeling and analysis framework with MITRE ATT&CK mapping. It enables you to:
 
-- **Model your system architecture** in Markdown (`threat_model.md`), including boundaries, actors, servers, data, and dataflows.
+- **Model your system architecture** in Markdown (`threatModel_Template/threat_model.md`), including boundaries, actors, servers, data, and dataflows.
 - **Automatically identify STRIDE threats** for each component and dataflow.
 - **Map threats to MITRE ATT&CK techniques** for actionable, real-world context.
 - **Calculate severity** using customizable base scores, target multipliers, and protocol adjustments.
@@ -70,16 +70,28 @@ This framework is designed to be used in a "Threat Model as Code" workflow. This
 
 Use the CLI mode for automated threat analysis, report generation, and diagram creation. This is ideal for integration into CI/CD pipelines or batch processing.
 
-1.  **Edit `threat_model.md`** to describe your architecture.
+1.  **Edit `threatModel_Template/threat_model.md`** to describe your architecture.
 2.  **Run the analysis:**
     ```bash
-    python -m threat_analysis --model-file threat_model.md
+    python -m threat_analysis --model-file threatModel_Template/threat_model.md
     ```
-    (You can omit `--model-file threat_model.md` if your model file is named `threat_model.md` and is in the root directory.)
+    (You can omit `--model-file threatModel_Template/threat_model.md` if your model file is named `threatModel_Template/threat_model.md` and is in the root directory.)
 3.  **View the results** in the generated `output/` folder:
     -   HTML report
     -   JSON export
     -   DOT/SVG/HTML diagrams
+
+### 3. Infrastructure as Code (IaC) Integration (Ansible Example)
+
+This framework can automatically generate threat model components from IaC configurations. Here's how to use the Ansible plugin with a sample playbook:
+
+1.  **Ensure you have the test playbook:** The sample Ansible playbook is located at `tests/ansible_playbooks/simple_web_server.yml`.
+2.  **Run the analysis with the Ansible plugin:**
+    ```bash
+    python -m threat_analysis --model-file threatModel_Template/threat_model.md --ansible-path tests/ansible_playbooks/simple_web_server.yml
+    ```
+    This command will combine the base threat model (`threatModel_Template/threat_model.md`) with components inferred from the Ansible playbook.
+3.  **View the results** in the generated `output/` folder, which will now include elements from your Ansible configuration.
 
 ### 2. Web-based Graphical User Interface (GUI) Mode (Optional)
 
@@ -95,7 +107,7 @@ Launch the interactive web editor to visualize your threat model in real-time, e
 
 ---
 
-## Threat Model DSL & Examples (`threat_model.md`)
+## Threat Model DSL & Examples (`threatModel_Template/threat_model.md`)
 
 ```markdown
 # Threat Model: Advanced DMZ Architecture
@@ -310,7 +322,7 @@ You can leverage and extend all PyTM features, including:
 
 ## Limitations
 
--   **Severity Multipliers** and **Custom MITRE Mapping** defined in `threat_model.md` are not yet parsed automatically (see logs for "ignored" messages). Programmatic customization is supported.
+-   **Severity Multipliers** and **Custom MITRE Mapping** defined in `threatModel_Template/threat_model.md` are not yet parsed automatically (see logs for "ignored" messages). Programmatic customization is supported.
 -   The default architecture is DMZ-oriented; adapt the model for your environment as needed.
 
 ---
@@ -327,12 +339,12 @@ You can leverage and extend all PyTM features, including:
     -   **Step 4: Report Display**: Modify `report_generator.py` to include a new section or column in the HTML report to display these enriched mitigations with proper links.
 -   **Interactive Web User Interface (GUI)**: Develop a lightweight web interface to visualize and interact with the threat model.
     -   **Step 1: Web Framework Selection**: Choose a Python web framework (e.g., Flask, FastAPI) for the backend and a frontend approach (e.g., Jinja2, Vue.js/React).
-    -   **Step 2: Backend API Development**: Create API endpoints for loading/saving `threat_model.md`, triggering analysis, and retrieving results.
-    -   **Step 3: Frontend (Model Editor)**: Build a web interface for editing `threat_model.md` with syntax highlighting and a button to run analysis.
+    -   **Step 2: Backend API Development**: Create API endpoints for loading/saving `threatModel_Template/threat_model.md`, triggering analysis, and retrieving results.
+    -   **Step 3: Frontend (Model Editor)**: Build a web interface for editing `threatModel_Template/threat_model.md` with syntax highlighting and a button to run analysis.
     -   **Step 4: Frontend (Results Visualization)**: Create views to display the generated HTML report, interactive SVG diagrams (clickable components), and sortable/filterable threat tables.
     -   **Step 5: Containerization (Optional)**: Use Docker for easy deployment and execution.
--   **Advanced Threat Model Validation**: Implement stricter checks for `threat_model.md` (syntax, consistency, undefined elements) with clear error messages.
-    -   **Step 1: Define Validation Rules**: List comprehensive validation rules for `threat_model.md` (e.g., valid element references, unique names, required attributes).
+-   **Advanced Threat Model Validation**: Implement stricter checks for `threatModel_Template/threat_model.md` (syntax, consistency, undefined elements) with clear error messages.
+    -   **Step 1: Define Validation Rules**: List comprehensive validation rules for `threatModel_Template/threat_model.md` (e.g., valid element references, unique names, required attributes).
     -   **Step 2: Implement Validation Module**: Create a new module (e.g., `threat_analysis/model_validator.py`) with validation functions.
     -   **Step 3: Integrate into Analysis Flow**: Call validation functions at the beginning of `ThreatModel.process_threats`. Stop analysis and return detailed errors if validation fails.
     -   **Step 4: Clear Error Reporting**: Ensure error messages are explicit, indicating file, line (if possible), and nature of the problem.
@@ -342,7 +354,7 @@ You can leverage and extend all PyTM features, including:
     -   **Step 3: CVE Data Retrieval and Processing**: Implement functions to query CVE databases using identified MITRE techniques. Store relevant CVE info (ID, description, CVSS score, links).
     -   **Step 4: Report Display**: Modify `report_generator.py` to include associated CVEs in HTML and JSON reports. Use CVSS scores to enhance severity prioritization.
 -   **Pre-defined Architecture Templates**: Offer a library of pre-built threat models for common architectures (web applications, microservices, IoT, etc.).
-    -   **Step 1: Define Template Structure**: Create a dedicated directory (e.g., `templates/`) for `threat_model.md` files and optional custom Python files.
+    -   **Step 1: Define Template Structure**: Create a dedicated directory (e.g., `templates/`) for `threatModel_Template/threat_model.md` files and optional custom Python files.
     -   **Step 2: Create Initial Templates**: Develop basic templates for common architectures (e.g., "3-tier Web Application", "Simple IoT System").
     -   **Step 3: Implement Loading Mechanism**: Add a function in `ThreatModel` or a new utility module to list and load selected templates.
     -   **Step 4: CLI/GUI Integration**: Add a CLI option (e.g., `--template "web_app"`) or GUI elements (dropdowns, buttons) to select and load templates.

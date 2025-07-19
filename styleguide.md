@@ -34,7 +34,7 @@ exclude =
     .gitignore,
     developer.md,
     requirements.txt,
-    threat_model.md
+    threatModel_Template/threat_model.md
 ```
 
 ### Run Flake8

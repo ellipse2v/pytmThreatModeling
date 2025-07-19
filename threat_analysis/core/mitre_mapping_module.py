@@ -70,7 +70,7 @@ attack_d3fend_mapping = {
 
 class MitreMapping:
     """Class for managing MITRE ATT&CK mapping with D3FEND mitigations"""
-    def __init__(self, threat_model=None, threat_model_path: str = '/mnt/d/dev/github/threatModelBypyTm/threat_model.md'):
+    def __init__(self, threat_model=None, threat_model_path: str = '/mnt/d/dev/github/threatModelBypyTm/threatModel_Template/threat_model.md'):
         self.d3fend_details = self._initialize_d3fend_mapping()
         self.mapping = self._initialize_mapping()
         self.threat_patterns = self._initialize_threat_patterns()

@@ -179,7 +179,7 @@ class ThreatModelService:
         if not threat_model:
             raise RuntimeError("Failed to create or validate threat model")
 
-        markdown_filename = "threat_model.md"
+        markdown_filename = "threatModel_Template/threat_model.md"
         markdown_filepath = os.path.join(export_path, markdown_filename)
         with open(markdown_filepath, "w", encoding="utf-8") as f:
             f.write(markdown_content)

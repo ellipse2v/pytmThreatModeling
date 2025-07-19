@@ -143,12 +143,12 @@ def test_parse_severity_multiplier(model_parser, threat_model):
     assert threat_model.severity_multipliers["CriticalData"] == 2.5
 
 def test_parse_custom_mitre(model_parser, threat_model):
-    line = "- **Phishing**: tactics=[\"Initial Access\"], techniques=[{\"id\": \"T1566\", \"name\": \"Phishing\"}]"
+    line = "- **Phishing**: {'tactics':['Initial Access'], 'techniques':[{'id': 'T1566', 'name': 'Phishing'}]}"
     model_parser._parse_custom_mitre(line)
     assert len(threat_model.custom_mitre_mappings) == 1
     mapping = threat_model.custom_mitre_mappings["Phishing"]
-    assert mapping["tactics"] == ["Initial Access"]
-    assert mapping["techniques"] == [{"id": "T1566", "name": "Phishing"}]
+    assert mapping['tactics'] == ['Initial Access']
+    assert mapping['techniques'] == [{'id': 'T1566', 'name': 'Phishing'}]
 
 def test_parse_key_value_params(model_parser):
     params_str = 'key1="value one", key2=True, key3=123, key4=#FF00FF, key5=unquoted_string'

@@ -20,6 +20,7 @@ from typing import List, Dict, Any, Callable, Optional, Tuple, Set
 from .models_module import ThreatModel, CustomThreat
 from .mitre_mapping_module import MitreMapping
 from pytm import Classification, Lifetime
+import ast
 
 
 class ModelParser:
@@ -61,33 +62,53 @@ class ModelParser:
 
     def parse_markdown(self, markdown_content: str):
         """
-        Parses Markdown content line by line.
+        Parses Markdown content in two passes: first for elements, then for relationships.
         """
         lines = markdown_content.splitlines()
+        
+        # First Pass: Parse Boundaries, Actors, Servers, and Data
+        element_sections = {
+            "## Boundaries": self._parse_boundary,
+            "## Actors": self._parse_actor,
+            "## Servers": self._parse_server,
+            "## Data": self._parse_data,
+        }
+        self._process_sections(lines, element_sections)
+
+        # Second Pass: Parse Dataflows, Protocol Styles, Severity Multipliers, Custom Mitre Mapping
+        # These sections rely on elements defined in the first pass.
+        relationship_sections = {
+            "## Dataflows": self._parse_dataflow,
+            "## Protocol Styles": self._parse_protocol_style,
+            "## Severity Multipliers": self._parse_severity_multiplier,
+            "## Custom Mitre Mapping": self._parse_custom_mitre,
+        }
+        self._process_sections(lines, relationship_sections)
+
+    def _process_sections(self, lines: List[str], parsers: Dict[str, Callable[[str], None]]):
+        """
+        Helper method to process specific sections of the Markdown content.
+        """
+        current_section = None
         for line in lines:
             stripped_line = line.strip()
             if not stripped_line:
                 continue
 
-            # Check if it's a section header (## or ###)
             if stripped_line.startswith("## ") or stripped_line.startswith("### "):
-                # Normalize the section title for matching
                 section_title = stripped_line
-                if section_title in self.section_parsers:
-                    self.current_section = section_title
-                    logging.info(f"⏳ Loading section: {self.current_section}")
+                if section_title in parsers:
+                    current_section = section_title
+                    logging.info(f"⏳ Loading section: {current_section}")
                 else:
-                    # Unrecognized section, ignore it but set current_section to None
-                    self.current_section = None
-                    logging.info(f"ℹ️ Section ignored: {section_title}")
+                    current_section = None
+                    # Only log ignored sections once per section type
+                    if section_title not in self.section_parsers: # Avoid re-logging already handled sections
+                        logging.info(f"ℹ️ Section ignored: {section_title}")
                 continue
 
-            # If we are in a recognized section, call the appropriate parser
-            if self.current_section and self.current_section in self.section_parsers:
-                self.section_parsers[self.current_section](stripped_line)
-            elif self.current_section:
-                # Ignore lines in explicitly unhandled sections
-                pass
+            if current_section and current_section in parsers:
+                parsers[current_section](stripped_line)
 
     def _parse_boundary(self, line: str):
         """Parses a boundary line with format: - **name**: color=value, isTrusted=bool, isFilled=bool"""
@@ -332,31 +353,15 @@ class ModelParser:
             attack_name = match.group(1).strip()
             params_str = match.group(2).strip()
             
-            # Parse tactics and techniques arrays (this is a simplified version)
-            tactics = []
-            techniques = []
-            
-            # Extract tactics array
-            tactics_match = re.search(r'tactics=\[(.*?)\]', params_str)
-            if tactics_match:
-                tactics_str = tactics_match.group(1)
-                # Extract quoted strings from the array
-                tactics = [t.strip('"') for t in re.findall(r'"([^"]*)"', tactics_str)]
-            
-            # Extract techniques array (simplified - just extract IDs and names)
-            techniques_match = re.search(r'techniques=\[(.*?)\]', params_str)
-            if techniques_match:
-                techniques_str = techniques_match.group(1)
-                # Find all technique objects
-                technique_objects = re.findall(r'\{[^}]*\}', techniques_str)
-                for tech_obj in technique_objects:
-                    id_match = re.search(r'"id":\s*"([^"]*)"', tech_obj)
-                    name_match = re.search(r'"name":\s*"([^"]*)"', tech_obj)
-                    if id_match and name_match:
-                        techniques.append({
-                            "id": id_match.group(1),
-                            "name": name_match.group(1)
-                        })
+            # Parse tactics and techniques arrays using ast.literal_eval
+            try:
+                parsed_mapping = ast.literal_eval(params_str)
+                tactics = parsed_mapping.get('tactics', [])
+                techniques = parsed_mapping.get('techniques', [])
+            except (SyntaxError, ValueError) as e:
+                logging.error(f"Error evaluating custom MITRE mapping for '{attack_name}': {e}")
+                tactics = []
+                techniques = []
             
             # Call add_custom_mitre_mapping method if it exists
             if hasattr(self.threat_model, 'add_custom_mitre_mapping'):
