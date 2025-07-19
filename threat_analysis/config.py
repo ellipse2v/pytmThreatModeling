@@ -21,6 +21,7 @@ from datetime import datetime
 
 # --- Model Defaults ---
 DEFAULT_MODEL_FILEPATH = Path("threatModel_Template/threat_model.md")
+BASE_PROTOCOL_STYLES_FILEPATH = Path("threatModel_Template/base_protocol_styles.md")
 DEFAULT_MODEL_NAME = "Enhanced DMZ Security Analysis"
 DEFAULT_MODEL_DESCRIPTION = "Advanced DMZ architecture with 8 external flows and command zone"
 

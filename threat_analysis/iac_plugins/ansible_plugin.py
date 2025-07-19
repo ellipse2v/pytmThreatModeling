@@ -92,7 +92,9 @@ class AnsiblePlugin(IaCPlugin):
 
         # Add Servers based on hosts
         if iac_data.get("hosts"):
-            markdown_output.append("## Servers")
+            markdown_output.append("## Actors")
+            markdown_output.append("- **External Client 1**: boundary=Internet")
+            markdown_output.append("\n## Servers")
             for host in iac_data["hosts"]:
                 markdown_output.append(f"- **{host.replace(' ', '_ ')}**: description=Server managed by Ansible, IaC_Source=Ansible")
 

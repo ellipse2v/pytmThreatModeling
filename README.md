@@ -83,14 +83,21 @@ Use the CLI mode for automated threat analysis, report generation, and diagram c
 
 ### 3. Infrastructure as Code (IaC) Integration (Ansible Example)
 
-This framework can automatically generate threat model components from IaC configurations. Here's how to use the Ansible plugin with a sample playbook:
+This framework can automatically generate a complete threat model directly from IaC configurations. It automatically includes a set of default protocol styles from `threatModel_Template/base_protocol_styles.md` to ensure consistent visualization.
+
+Here's how to use the Ansible plugin with a sample playbook:
 
 1.  **Ensure you have the test playbook:** The sample Ansible playbook is located at `tests/ansible_playbooks/simple_web_server.yml`.
 2.  **Run the analysis with the Ansible plugin:**
     ```bash
-    python -m threat_analysis --model-file threatModel_Template/threat_model.md --ansible-path tests/ansible_playbooks/simple_web_server.yml
+    python -m threat_analysis --ansible-path tests/ansible_playbooks/simple_web_server.yml
     ```
-    This command will combine the base threat model (`threatModel_Template/threat_model.md`) with components inferred from the Ansible playbook.
+    This command will generate a complete threat model based on the Ansible playbook. The generated Markdown model will be saved in the `output/` directory with a filename derived from your Ansible playbook (e.g., `simple_web_server.md`).
+
+    If you wish to specify a different output file for the generated model, you can use the `--model-file` option:
+    ```bash
+    python -m threat_analysis --ansible-path tests/ansible_playbooks/simple_web_server.yml --model-file my_generated_model.md
+    ```
 3.  **View the results** in the generated `output/` folder, which will now include elements from your Ansible configuration.
 
 ### 2. Web-based Graphical User Interface (GUI) Mode (Optional)
