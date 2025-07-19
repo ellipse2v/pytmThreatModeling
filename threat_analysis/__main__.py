@@ -24,13 +24,13 @@ from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path
 
 # Import library modules
-from threat_analysis.core.models_module import ThreatModel
-from threat_analysis.core.mitre_mapping_module import MitreMapping
-from threat_analysis.severity_calculator_module import SeverityCalculator
-from threat_analysis.generation.report_generator import ReportGenerator
-from threat_analysis.generation.diagram_generator import DiagramGenerator
-from threat_analysis.core.model_factory import create_threat_model
-from threat_analysis import config
+from .core.models_module import ThreatModel
+from .core.mitre_mapping_module import MitreMapping
+from .severity_calculator_module import SeverityCalculator
+from .generation.report_generator import ReportGenerator
+from .generation.diagram_generator import DiagramGenerator
+from .core.model_factory import create_threat_model
+from . import config
 
 
 class ThreatAnalysisFramework:
@@ -267,16 +267,9 @@ if __name__ == "__main__":
         level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
     )
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(current_dir)
-    if current_dir not in sys.path:
-        sys.path.insert(0, current_dir)
-    if project_root not in sys.path:
-        sys.path.insert(0, project_root)
-
     if args.gui:
         try:
-            from threat_analysis.server.server import run_gui
+            from .server.server import run_gui
 
             run_gui(args.model_file)
         except ImportError:
