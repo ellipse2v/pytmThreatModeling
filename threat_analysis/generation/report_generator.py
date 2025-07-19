@@ -140,13 +140,24 @@ class ReportGenerator:
     def _get_target_name_for_severity_calc(self, target: Any) -> str:
         """Determines the target name for severity calculation, handling different target types."""
         if isinstance(target, tuple):
+            # Handle dataflows (source, sink)
             if len(target) == 2:
-                source_name = self._extract_name_from_object(target[0])
-                dest_name = self._extract_name_from_object(target[1])
-                result = f"{source_name} → {dest_name}"
-                return result
-        result = self._extract_name_from_object(target)
-        return result
+                source, sink = target
+                # Check if source or sink is a Dataflow object itself
+                if hasattr(source, 'source') and hasattr(source, 'sink'): # It's a dataflow
+                    source_name = self._extract_name_from_object(source.source)
+                else:
+                    source_name = self._extract_name_from_object(source)
+
+                if hasattr(sink, 'source') and hasattr(sink, 'sink'): # It's a dataflow
+                    dest_name = self._extract_name_from_object(sink.sink)
+                else:
+                    dest_name = self._extract_name_from_object(sink)
+
+                return f"{source_name} → {dest_name}"
+        
+        # Handle single elements (Actors, Servers, Boundaries, etc.)
+        return self._extract_name_from_object(target)
 
     def _extract_name_from_object(self, obj: Any) -> str:
         # If the object is a tuple containing a single element, extract that element

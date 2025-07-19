@@ -67,6 +67,14 @@ class ThreatModel:
         """Adds a boundary to the model with additional properties"""
         boundary = Boundary(name)
         
+        # HACK: Add dummy attributes to Boundary objects to allow them to be
+        # used as sources/sinks in Dataflows. The underlying pytm library
+        # expects these attributes to exist on dataflow endpoints, which
+        # this patch provides.
+        boundary.protocol = None
+        boundary.port = None
+        boundary.data = None
+        
         # Store boundary with all properties including color and any additional kwargs
         boundary_props = {"boundary": boundary, "color": color}
         boundary_props.update(kwargs)  # Add any additional properties like isTrusted, isFilled
