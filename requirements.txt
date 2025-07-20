@@ -3,3 +3,4 @@ Flask
 Jinja2
 graphviz
 flake8
+pandas

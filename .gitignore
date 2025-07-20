@@ -192,4 +192,8 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
-\n# Ignore tmp directory and specific example files\noutput/tmp/\noutput/example/template.mp4
+
+# Ignore everything in the output directory except for the example and tmp subdirectories
+/output/*
+!/output/example/
+!/output/tmp/
