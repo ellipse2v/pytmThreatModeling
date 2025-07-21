@@ -1,0 +1,105 @@
+---
+- name: Deploy a three-tier web application
+  hosts: all
+  become: yes
+  vars:
+    nodejs_version: "18"
+
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+- name: Setup Web Server
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+    - name: Configure Nginx as a reverse proxy
+      ansible.builtin.template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/sites-available/default
+      notify: Restart Nginx
+
+    - name: Enable new site configuration
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/default
+        dest: /etc/nginx/sites-enabled/default
+        state: link
+      notify: Restart Nginx
+
+    - name: Allow HTTP traffic on port 80
+      ansible.builtin.ufw:
+        rule: allow
+        port: '80'
+        proto: tcp
+
+  handlers:
+    - name: Restart Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+
+- name: Setup Application Server
+  hosts: appservers
+  become: yes
+  tasks:
+    - name: Install Node.js and npm
+      ansible.builtin.shell: |
+        curl -fsSL https://deb.nodesource.com/setup_{{ nodejs_version }}.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+      args:
+        creates: /usr/bin/node
+
+    - name: Install application dependencies
+      ansible.builtin.npm:
+        path: /srv/app
+
+    - name: Create a simple Node.js application
+      ansible.builtin.copy:
+        dest: "/srv/app/index.js"
+        content: |
+          const http = require('http');
+          const port = 3000;
+
+          const server = http.createServer((req, res) => {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'text/plain');
+            res.end('Hello from the App Server!');
+          });
+
+          server.listen(port, () => {
+            console.log(`Server running at http://localhost:${port}/`);
+          });
+
+    - name: Start the application with pm2
+      ansible.builtin.npm:
+        name: pm2
+        global: yes
+        state: present
+      notify: Start Node.js app
+
+  handlers:
+    - name: Start Node.js app
+      ansible.builtin.command: pm2 start /srv/app/index.js
+      args:
+        chdir: /srv/app
+
+- name: Setup Database Server
+  hosts: dbservers
+  become: yes
+  tasks:
+    - name: Install PostgreSQL
+      ansible.builtin.apt:
+        name: postgresql
+        state: present
+
+    - name: Start and enable PostgreSQL service
+      ansible.builtin.service:
+        name: postgresql
+        state: started
+        enabled: yes

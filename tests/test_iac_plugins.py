@@ -14,97 +14,115 @@
 
 import pytest
 from pathlib import Path
-from unittest.mock import patch, mock_open, MagicMock
 import yaml
 
 from threat_analysis.iac_plugins.ansible_plugin import AnsiblePlugin
 
-# Path to the sample Ansible playbook for testing
-SAMPLE_ANSIBLE_PLAYBOOK = Path(__file__).parent / "ansible_playbooks" / "simple_web_server.yml"
+# Sample inventory content for tests
+SAMPLE_INVENTORY_CONTENT = """
+[webservers]
+web-01 ansible_host=192.168.1.10
+
+[dbservers]
+db-01 ansible_host=192.168.1.20
+"""
+
+# Sample playbook content for tests
+SAMPLE_PLAYBOOK_CONTENT = """
+- name: Configure web server
+  hosts: webservers
+  tasks:
+    - name: Install nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+"""
 
 @pytest.fixture
 def ansible_plugin():
+    """Fixture for the AnsiblePlugin."""
     return AnsiblePlugin()
 
-def test_ansible_plugin_name_and_description(ansible_plugin):
+@pytest.fixture
+def ansible_test_env(tmp_path):
+    """Creates a temporary ansible environment with a playbook and inventory."""
+    playbook_path = tmp_path / "playbook.yml"
+    inventory_path = tmp_path / "hosts.ini"
+
+    playbook_path.write_text(SAMPLE_PLAYBOOK_CONTENT)
+    inventory_path.write_text(SAMPLE_INVENTORY_CONTENT)
+    
+    return playbook_path
+
+def test_plugin_name_and_description(ansible_plugin):
+    """Tests the plugin's name and description."""
     assert ansible_plugin.name == "ansible"
-    assert "Ansible playbooks" in ansible_plugin.description
+    assert "Ansible playbooks and inventories" in ansible_plugin.description
 
-def test_parse_iac_config_success(ansible_plugin):
-    # Mock yaml.safe_load to return a predefined playbook structure
-    mock_playbook_content = [
-        {
-            'name': 'Setup a simple web server',
-            'hosts': 'webservers',
-            'become': True,
-            'tasks': [
-                {'name': 'Install Nginx', 'ansible.builtin.apt': {'name': 'nginx', 'state': 'present'}},
-                {'name': 'Allow HTTP traffic on port 80', 'ansible.builtin.ufw': {'rule': 'allow', 'port': '80', 'proto': 'tcp'}},
-                {'name': 'Allow HTTPS traffic on port 443', 'ansible.builtin.ufw': {'rule': 'allow', 'port': '443', 'proto': 'tcp'}},
-            ]
-        }
-    ]
+def test_parse_iac_config_success(ansible_plugin, ansible_test_env):
+    """Tests successful parsing of a playbook and its inventory."""
+    parsed_data = ansible_plugin.parse_iac_config(str(ansible_test_env))
 
-    # Create a mock Path object
-    mock_path_instance = MagicMock()
-    mock_path_instance.exists.return_value = True
-    mock_path_instance.is_file.return_value = True
-    mock_path_instance.suffix = '.yml'
+    assert "inventory" in parsed_data
+    assert "playbook" in parsed_data
 
-    with patch('builtins.open', mock_open(read_data=yaml.dump(mock_playbook_content))):
-        with patch('pathlib.Path', return_value=mock_path_instance) as mock_path_class:
-            # Ensure that Path(config_path) returns our mock_path_instance
-            mock_path_class.return_value = mock_path_instance
-            parsed_data = ansible_plugin.parse_iac_config(str(SAMPLE_ANSIBLE_PLAYBOOK))
+    # Check inventory parsing
+    inventory = parsed_data["inventory"]
+    assert "webservers" in inventory["groups"]
+    assert "dbservers" in inventory["groups"]
+    assert "web-01" in inventory["groups"]["webservers"]
+    assert "db-01" in inventory["hosts"]
+    assert inventory["hosts"]["db-01"]["group"] == "dbservers"
 
-            assert "hosts" in parsed_data
-            assert "packages" in parsed_data
-            assert "ports" in parsed_data
+    # Check playbook parsing
+    playbook = parsed_data["playbook"]
+    assert playbook[0]["name"] == "Configure web server"
 
-            assert "webservers" in parsed_data["hosts"]
-            assert "nginx" in parsed_data["packages"]
-            assert "80" in parsed_data["ports"]
-            assert "443" in parsed_data["ports"]
+def test_parse_iac_config_inventory_not_found(ansible_plugin, tmp_path):
+    """Tests that parsing fails if the inventory file is missing."""
+    playbook_path = tmp_path / "playbook.yml"
+    playbook_path.write_text(SAMPLE_PLAYBOOK_CONTENT)
+    
+    with pytest.raises(FileNotFoundError, match="Inventory file not found"):
+        ansible_plugin.parse_iac_config(str(playbook_path))
+
+def test_parse_iac_config_unsupported_file_type(ansible_plugin, tmp_path):
+    """Tests that parsing fails for unsupported playbook file types."""
+    unsupported_file = tmp_path / "playbook.txt"
+    unsupported_file.write_text("This is not a playbook.")
+
+    with pytest.raises(ValueError, match="Unsupported Ansible config path"):
+        ansible_plugin.parse_iac_config(str(unsupported_file))
 
 def test_generate_threat_model_components(ansible_plugin):
+    """Tests the generation of Markdown components from parsed data."""
     iac_data = {
-        "hosts": ["webservers"],
-        "packages": ["nginx"],
-        "ports": ["80", "443"]
+        "inventory": {
+            "groups": {
+                "webservers": ["web-01"],
+                "dbservers": ["db-01"],
+                "dmz": ["rev-proxy-01"]
+            },
+            "hosts": {
+                "web-01": {"group": "webservers"},
+                "db-01": {"group": "dbservers"},
+                "rev-proxy-01": {"group": "dmz"}
+            }
+        }
     }
+    
     generated_markdown = ansible_plugin.generate_threat_model_components(iac_data)
 
-    expected_markdown_parts = [
-        "## Servers",
-        "- **webservers**: description=Server managed by Ansible, IaC_Source=Ansible",
-        "## Dataflows",
-        "- **ExternalClientTowebserversPort80**: from=\"External Client 1\", to=\"webservers\", protocol=\"HTTP\", data=\"Traffic_on_port_80\"",
-        "- **ExternalClientTowebserversPort443**: from=\"External Client 1\", to=\"webservers\", protocol=\"HTTPS\", data=\"Traffic_on_port_443\"",
-        "## Data",
-        "- **nginxData**: description=\"nginx related data\", classification=\"PUBLIC\"",
-        "- **Traffic_on_port_80**: description=\"Network traffic on port 80\", classification=\"PUBLIC\"",
-        "- **Traffic_on_port_443**: description=\"Network traffic on port 443\", classification=\"PUBLIC\"",
-    ]
+    # Check for boundaries
+    assert "- **dmz**: color=khaki" in generated_markdown
+    assert "- **webservers**: color=lightgrey" in generated_markdown
+    
+    # Check for actors
+    assert "- **Admin**: boundary=Internet" in generated_markdown
 
-    for part in expected_markdown_parts:
-        assert part in generated_markdown
+    # Check for servers
+    assert "- **rev-proxy-01**: boundary=dmz, stereotype=Server" in generated_markdown
+    assert "- **web-01**: boundary=webservers, stereotype=Server" in generated_markdown
 
-def test_parse_iac_config_file_not_found(ansible_plugin):
-    mock_path_instance = MagicMock()
-    mock_path_instance.exists.return_value = False # Simulate file not found
-
-    with patch('pathlib.Path', return_value=mock_path_instance) as mock_path_class:
-        mock_path_class.return_value = mock_path_instance
-        with pytest.raises(FileNotFoundError, match="Ansible config path not found"):
-            ansible_plugin.parse_iac_config("/non/existent/path/playbook.yml")
-
-def test_parse_iac_config_unsupported_file_type(ansible_plugin):
-    mock_path_instance = MagicMock()
-    mock_path_instance.exists.return_value = True
-    mock_path_instance.is_file.return_value = True
-    mock_path_instance.suffix = '.txt' # Simulate unsupported file type
-
-    with patch('pathlib.Path', return_value=mock_path_instance) as mock_path_class:
-        mock_path_class.return_value = mock_path_instance
-        with pytest.raises(ValueError, match="Unsupported Ansible config path"):
-            ansible_plugin.parse_iac_config("/fake/path/config.txt")
+    # Check for dataflows
+    assert '- **Admin_to_web-01**: from="Admin", to="web-01", protocol="SSH", data="SSH_Admin"' in generated_markdown
