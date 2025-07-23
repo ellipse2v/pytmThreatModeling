@@ -430,69 +430,93 @@ class DiagramGenerator:
         return template.render(context)
 
     def _prepare_boundaries_data(self, threat_model) -> List[Dict]:
-        """Prepares boundary data for the Jinja2 template."""
+        """Prepares hierarchical boundary data for the Jinja2 template."""
         boundaries_data = []
-        if hasattr(threat_model, 'boundaries') and threat_model.boundaries:
-            for name, info in threat_model.boundaries.items():
-                safe_name = self._sanitize_name(name)
-                boundary_obj = info.get('boundary')
-                color = info.get('color', 'lightgray')
-                is_trusted = info.get('isTrusted', False)
-                is_filled = info.get('isFilled', True)
-                line_style = info.get('line_style', 'solid')
+        
+        # Build a dictionary of all boundaries, keyed by their PyTM object
+        all_boundaries_by_obj = {info['boundary']: {'name': name, 'info': info, 'children': []} 
+                                 for name, info in threat_model.boundaries.items()}
+        
+        # Identify root boundaries and populate children
+        root_boundaries = []
+        for name, info in threat_model.boundaries.items():
+            boundary_obj = info['boundary']
+            parent_obj = getattr(boundary_obj, 'inBoundary', None)
+            
+            if parent_obj and parent_obj in all_boundaries_by_obj:
+                all_boundaries_by_obj[parent_obj]['children'].append(all_boundaries_by_obj[boundary_obj])
+            else:
+                root_boundaries.append(all_boundaries_by_obj[boundary_obj])
 
-                display_name = boundary_obj.name if boundary_obj and hasattr(boundary_obj, 'name') else name
-                escaped_name = self._escape_label(display_name)
+        # Recursively prepare data for rendering
+        def _prepare_boundary_node(boundary_node):
+            name = boundary_node['name']
+            info = boundary_node['info']
+            boundary_obj = info.get('boundary')
+            color = info.get('color', 'lightgray')
+            is_trusted = info.get('isTrusted', False)
+            is_filled = info.get('isFilled', True)
+            line_style = info.get('line_style', 'solid')
 
-                style_parts = ["rounded"]
-                if is_filled:
-                    style_parts.append("filled")
+            display_name = boundary_obj.name if boundary_obj and hasattr(boundary_obj, 'name') else name
+            escaped_name = self._escape_label(display_name)
+            safe_name = self._sanitize_name(name)
 
-                actors_in_boundary = []
-                if hasattr(threat_model, 'actors'):
-                    for actor_info in threat_model.actors:
-                        actor_boundary_name = None
-                        if isinstance(actor_info, dict):
-                            actor_boundary = actor_info.get('boundary')
-                            if actor_boundary and hasattr(actor_boundary, 'name'):
-                                actor_boundary_name = actor_boundary.name
-                        elif hasattr(actor_info, 'inBoundary') and actor_info.inBoundary and hasattr(actor_info.inBoundary, 'name'):
-                            actor_boundary_name = actor_info.inBoundary.name
+            style_parts = ["rounded"]
+            if is_filled:
+                style_parts.append("filled")
 
-                        if actor_boundary_name == name:
-                            actors_in_boundary.append({
-                                "escaped_name": self._escape_label(self._get_element_name(actor_info)),
-                                "node_attrs": self._get_node_attributes(actor_info, 'actor')
-                            })
+            actors_in_boundary = []
+            if hasattr(threat_model, 'actors'):
+                for actor_info in threat_model.actors:
+                    actor_boundary_obj = None
+                    if isinstance(actor_info, dict):
+                        actor_boundary_obj = actor_info.get('boundary')
+                    elif hasattr(actor_info, 'inBoundary'):
+                        actor_boundary_obj = actor_info.inBoundary
 
-                servers_in_boundary = []
-                if hasattr(threat_model, 'servers'):
-                    for server_info in threat_model.servers:
-                        server_boundary_name = None
-                        if isinstance(server_info, dict):
-                            server_boundary = server_info.get('boundary')
-                            if server_boundary and hasattr(server_boundary, 'name'):
-                                server_boundary_name = server_boundary.name
-                        elif hasattr(server_info, 'inBoundary') and server_info.inBoundary and hasattr(server_info.inBoundary, 'name'):
-                            server_boundary_name = server_info.inBoundary.name
+                    if actor_boundary_obj == boundary_obj:
+                        actors_in_boundary.append({
+                            "escaped_name": self._escape_label(self._get_element_name(actor_info)),
+                            "node_attrs": self._get_node_attributes(actor_info, 'actor')
+                        })
 
-                        if server_boundary_name == name:
-                            servers_in_boundary.append({
-                                "escaped_name": self._escape_label(self._get_element_name(server_info)),
-                                "node_attrs": self._get_node_attributes(server_info, 'server')
-                            })
+            servers_in_boundary = []
+            if hasattr(threat_model, 'servers'):
+                for server_info in threat_model.servers:
+                    server_boundary_obj = None
+                    if isinstance(server_info, dict):
+                        server_boundary_obj = server_info.get('boundary')
+                    elif hasattr(server_info, 'inBoundary'):
+                        server_boundary_obj = server_info.inBoundary
 
-                boundaries_data.append({
-                    "safe_name": safe_name,
-                    "escaped_name": escaped_name,
-                    "is_trusted": is_trusted,
-                    "is_filled": is_filled,
-                    "color": color,
-                    "line_style": line_style,
-                    "style_parts": style_parts,
-                    "actors": actors_in_boundary,
-                    "servers": servers_in_boundary
-                })
+                    if server_boundary_obj == boundary_obj:
+                        servers_in_boundary.append({
+                            "escaped_name": self._escape_label(self._get_element_name(server_info)),
+                            "node_attrs": self._get_node_attributes(server_info, 'server')
+                        })
+            
+            # Recursively prepare child boundaries
+            child_boundaries_data = []
+            for child_node in boundary_node['children']:
+                child_boundaries_data.append(_prepare_boundary_node(child_node))
+
+            return {
+                "safe_name": safe_name,
+                "escaped_name": escaped_name,
+                "is_trusted": is_trusted,
+                "is_filled": is_filled,
+                "color": color,
+                "line_style": line_style,
+                "style_parts": style_parts,
+                "actors": actors_in_boundary,
+                "servers": servers_in_boundary,
+                "children": child_boundaries_data # Add children here
+            }
+
+        for root_node in root_boundaries:
+            boundaries_data.append(_prepare_boundary_node(root_node))
+            
         return boundaries_data
 
     def _prepare_nodes_data(self, threat_model, node_type: str) -> List[Dict]:

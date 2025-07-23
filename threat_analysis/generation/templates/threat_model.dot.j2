@@ -8,7 +8,7 @@ digraph ThreatModel {
   ranksep=0.6;
   charset="UTF-8";
 
-  {% for boundary in boundaries %}
+  {% macro render_boundary(boundary) %}
   subgraph cluster_{{ boundary.safe_name }} {
     label="{{ boundary.escaped_name }}";
     {% if not boundary.is_trusted %}
@@ -33,7 +33,14 @@ digraph ThreatModel {
     {% for server in boundary.servers %}
     "{{ server.escaped_name }}" {{ server.node_attrs }};
     {% endfor %}
+    {% for child_boundary in boundary.children %}
+      {{ render_boundary(child_boundary) }}
+    {% endfor %}
   }
+  {% endmacro %}
+
+  {% for boundary in boundaries %}
+    {{ render_boundary(boundary) }}
   {% endfor %}
 
   {% for actor in actors_outside_boundaries %}

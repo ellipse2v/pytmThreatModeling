@@ -63,10 +63,20 @@ class ThreatModel:
         self.mitre_analysis_results = {}
         self.threat_mitre_mapping = {}
 
-    def add_boundary(self, name: str, color: str = "lightgray", **kwargs) -> Boundary:
-        """Adds a boundary to the model with additional properties"""
+    def add_boundary(self, name: str, color: str = "lightgray", parent_name: Optional[str] = None, **kwargs) -> Boundary:
+        """Adds a boundary to the model with additional properties, including an optional parent.
+
+        Args:
+            name (str): The name of the boundary.
+            color (str, optional): The color of the boundary. Defaults to "lightgray".
+            parent_name (Optional[str], optional): The name of the parent boundary. Defaults to None.
+            **kwargs: Additional properties for the boundary.
+
+        Returns:
+            Boundary: The created Boundary object.
+        """
         boundary = Boundary(name)
-        
+
         # HACK: Add dummy attributes to Boundary objects to allow them to be
         # used as sources/sinks in Dataflows. The underlying pytm library
         # expects these attributes to exist on dataflow endpoints, which
@@ -74,11 +84,18 @@ class ThreatModel:
         boundary.protocol = None
         boundary.port = None
         boundary.data = None
-        
+
+        if parent_name:
+            parent_boundary_info = self.boundaries.get(parent_name)
+            if parent_boundary_info:
+                boundary.inBoundary = parent_boundary_info["boundary"]
+            else:
+                logging.warning(f"⚠️ Warning: Parent boundary '{parent_name}' not found for boundary '{name}'.")
+
         # Store boundary with all properties including color and any additional kwargs
         boundary_props = {"boundary": boundary, "color": color}
         boundary_props.update(kwargs)  # Add any additional properties like isTrusted, isFilled
-        
+
         self.boundaries[name] = boundary_props
         self._elements_by_name[name] = boundary
         return boundary

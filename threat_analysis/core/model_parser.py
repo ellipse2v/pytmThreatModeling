@@ -125,14 +125,15 @@ class ModelParser:
             if 'color' not in boundary_kwargs:
                 boundary_kwargs['color'] = 'lightgray'
             
-            self.threat_model.add_boundary(name, **boundary_kwargs)
+            parent_name = boundary_kwargs.pop('parent', None)
+            self.threat_model.add_boundary(name, parent_name=parent_name, **boundary_kwargs)
             
             # Create a nice log message
             params_display = []
             for key, value in boundary_kwargs.items():
                 params_display.append(f"{key.capitalize()}: {value}")
             
-            logging.info(f"   - Added Boundary: {name} ({', '.join(params_display)})")
+            logging.info(f"   - Added Boundary: {name} (Color: {boundary_kwargs['color']}, Is_trusted: {boundary_kwargs.get('is_trusted', False)}, Parent: {parent_name})")
         else:
             logging.warning(f"⚠️ Warning: Malformed boundary line: {line}")
 
@@ -190,7 +191,7 @@ class ModelParser:
             r'(?:'                         # non-capturing group for value
                 r'"([^"]*)"'               #   "quoted string"
                 r'|'
-                r'(#?\w+)'                 #   unquoted value (including #hex)
+                r'([^,]+)'                  #   unquoted value (anything until comma or end of string)
             r')'
         )
         for m in param_pattern.finditer(params_str):
