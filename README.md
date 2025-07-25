@@ -329,43 +329,13 @@ You can leverage and extend all PyTM features, including:
 
 ## Limitations
 
--   **Severity Multipliers** and **Custom MITRE Mapping** defined in `threatModel_Template/threat_model.md` are not yet parsed automatically (see logs for "ignored" messages). Programmatic customization is supported.
+
 -   The default architecture is DMZ-oriented; adapt the model for your environment as needed.
 
 ---
 
-## Roadmap / TODO / Technical Debt
-
--   Add more realistic threats to the `custom_threats.py` module.
--   Improve threat generation to specifically account for special boundaries like DMZ and Gateway, and the components within them.
--   Enhance MITRE ATT&CK mapping in `mitre_mapping_module.py` to include more techniques per threat where applicable.
--   **Automated and Enriched Mitigation Suggestions**: Propose mitigations based on recognized frameworks (OWASP ASVS, NIST, CIS Controls) for each identified MITRE ATT&CK technique.
-    -   **Step 1: Research and Data Acquisition**: Identify relevant mitigation frameworks (OWASP ASVS, NIST SP 800-53, CIS Controls). Research existing mappings to MITRE ATT&CK or define a strategy to create them. Acquire mitigation data (ID, name, description, official links).
-    -   **Step 2: Data Integration**: Create new data structures (e.g., in `mitre_mapping_module.py` or a new module) to store enriched mitigations. Modify initialization functions to load this data.
-    -   **Step 3: Mapping Logic Update**: Extend `map_threat_to_mitre` logic to associate identified MITRE ATT&CK techniques with relevant enriched mitigations.
-    -   **Step 4: Report Display**: Modify `report_generator.py` to include a new section or column in the HTML report to display these enriched mitigations with proper links.
--   **Interactive Web User Interface (GUI)**: Develop a lightweight web interface to visualize and interact with the threat model.
-    -   **Step 1: Web Framework Selection**: Choose a Python web framework (e.g., Flask, FastAPI) for the backend and a frontend approach (e.g., Jinja2, Vue.js/React).
-    -   **Step 2: Backend API Development**: Create API endpoints for loading/saving `threatModel_Template/threat_model.md`, triggering analysis, and retrieving results.
-    -   **Step 3: Frontend (Model Editor)**: Build a web interface for editing `threatModel_Template/threat_model.md` with syntax highlighting and a button to run analysis.
-    -   **Step 4: Frontend (Results Visualization)**: Create views to display the generated HTML report, interactive SVG diagrams (clickable components), and sortable/filterable threat tables.
-    -   **Step 5: Containerization (Optional)**: Use Docker for easy deployment and execution.
--   **Advanced Threat Model Validation**: Implement stricter checks for `threatModel_Template/threat_model.md` (syntax, consistency, undefined elements) with clear error messages.
-    -   **Step 1: Define Validation Rules**: List comprehensive validation rules for `threatModel_Template/threat_model.md` (e.g., valid element references, unique names, required attributes).
-    -   **Step 2: Implement Validation Module**: Create a new module (e.g., `threat_analysis/model_validator.py`) with validation functions.
-    -   **Step 3: Integrate into Analysis Flow**: Call validation functions at the beginning of `ThreatModel.process_threats`. Stop analysis and return detailed errors if validation fails.
-    -   **Step 4: Clear Error Reporting**: Ensure error messages are explicit, indicating file, line (if possible), and nature of the problem.
--   **Integration with Vulnerability Databases (CVE)**: Link identified MITRE ATT&CK techniques to known CVEs or common vulnerabilities (e.g., OWASP Top 10).
-    -   **Step 1: Research CVE Data Sources**: Identify reliable CVE sources (e.g., NVD API) and understand their data formats.
-    -   **Step 2: MITRE ATT&CK to CVE Mapping**: Research existing mappings or develop logic to infer potential CVEs from threat descriptions/MITRE techniques.
-    -   **Step 3: CVE Data Retrieval and Processing**: Implement functions to query CVE databases using identified MITRE techniques. Store relevant CVE info (ID, description, CVSS score, links).
-    -   **Step 4: Report Display**: Modify `report_generator.py` to include associated CVEs in HTML and JSON reports. Use CVSS scores to enhance severity prioritization.
--   **Pre-defined Architecture Templates**: Offer a library of pre-built threat models for common architectures (web applications, microservices, IoT, etc.).
-    -   **Step 1: Define Template Structure**: Create a dedicated directory (e.g., `templates/`) for `threatModel_Template/threat_model.md` files and optional custom Python files.
-    -   **Step 2: Create Initial Templates**: Develop basic templates for common architectures (e.g., "3-tier Web Application", "Simple IoT System").
-    -   **Step 3: Implement Loading Mechanism**: Add a function in `ThreatModel` or a new utility module to list and load selected templates.
-    -   **Step 4: CLI/GUI Integration**: Add a CLI option (e.g., `--template "web_app"`) or GUI elements (dropdowns, buttons) to select and load templates.
-
+## Roadmap
+[roadmap link](https://github.com/ellipse2v/pytmThreatModeling/wiki/roadmap)
 ---
 
 ## License
