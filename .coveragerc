@@ -1,3 +1,6 @@
 [run]
 omit =
     tests/*
+    /usr/lib/python3/dist-packages/pytz/*
+    /usr/lib/python3/dist-packages/six.py
+    /usr/lib/python3/dist-packages/yaml/*

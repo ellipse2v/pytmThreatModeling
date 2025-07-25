@@ -35,32 +35,41 @@ class AnsiblePlugin(IaCPlugin):
         return "Integrates with Ansible playbooks and inventories to generate threat model components."
 
     def _parse_inventory(self, inventory_path: Path) -> Dict[str, Any]:
-        """Parses an Ansible inventory file (.ini format)."""
+        """Parses an Ansible inventory file (.ini format) manually to extract host variables."""
         if not inventory_path.exists():
             raise FileNotFoundError(f"Inventory file not found: {inventory_path}")
 
-        parser = configparser.ConfigParser(allow_no_value=True, delimiters=(' ', '='))
-        parser.read(inventory_path)
-
         inventory_data = {"groups": {}, "hosts": {}}
+        current_group = None
+
+        with open(inventory_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+
+                if line.startswith('['):
+                    if line.endswith(':children]'):
+                        group_name = line[1:-9]
+                        inventory_data["groups"].setdefault(group_name, [])
+                        # Children are handled implicitly by adding hosts to their groups
+                    else:
+                        current_group = line[1:-1]
+                        inventory_data["groups"].setdefault(current_group, [])
+                else:
+                    if current_group:
+                        parts = line.split()
+                        host_name = parts[0]
+                        inventory_data["groups"][current_group].append(host_name)
+                        
+                        host_vars = {"group": current_group}
+                        for part in parts[1:]:
+                            if '=' in part:
+                                key, value = part.split('=', 1)
+                                host_vars[key] = value
+                        inventory_data["hosts"][host_name] = host_vars
         
-        for section in parser.sections():
-            if section.endswith(':children'):
-                group_name = section.split(':')[0]
-                inventory_data["groups"][group_name] = parser.options(section)
-            else:
-                hosts = []
-                for host, _ in parser.items(section):
-                    host_parts = host.split(' ')
-                    clean_host = host_parts[0]
-                    hosts.append(clean_host)
-                    host_vars = {"group": section}
-                    for part in host_parts[1:]:
-                        if '=' in part:
-                            key, value = part.split('=', 1)
-                            host_vars[key] = value
-                    inventory_data["hosts"][clean_host] = host_vars
-                inventory_data["groups"][section] = hosts
+        return inventory_data
         
         return inventory_data
 

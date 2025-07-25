@@ -21,6 +21,8 @@ import datetime
 from threat_analysis.server.threat_model_service import ThreatModelService
 from threat_analysis.core.model_factory import create_threat_model
 from threat_analysis import config
+from threat_analysis.core.models_module import ThreatModel, CustomThreat
+from pytm import TM, Boundary, Actor, Server, Dataflow, Data
 
 # Mock the config.OUTPUT_BASE_DIR for testing purposes
 @pytest.fixture(autouse=True)

@@ -134,6 +134,19 @@ def test_parse_dataflow_missing_elements(model_parser, threat_model):
         assert len(threat_model.dataflows) == 0
         mock_warn.assert_called_once()
 
+def test_parse_dataflow_missing_data_object(model_parser, threat_model):
+    with patch('logging.warning') as mock_warn:
+        # Source and sink elements exist, but data object does not
+        threat_model.add_actor("User", "Default Boundary")
+        threat_model.add_server("WebServer", "Default Boundary")
+        line = "- **FlowWithMissingData**: from=\"User\", to=\"WebServer\", protocol=\"HTTP\", data=\"NonExistentData\""
+        model_parser._parse_dataflow(line)
+        assert len(threat_model.dataflows) == 1 # Dataflow should still be added
+        dataflow = threat_model.dataflows[0]
+        assert dataflow.name == "FlowWithMissingData"
+        assert not dataflow.data # Data list should be empty
+        mock_warn.assert_called_once_with("⚠️ Warning: Data object 'nonexistentdata' not found for dataflow 'FlowWithMissingData'.")
+
 def test_parse_protocol_style(model_parser, threat_model):
     line = "- **HTTPS**: color=blue, line_style=dotted, width=2.0"
     model_parser._parse_protocol_style(line)
