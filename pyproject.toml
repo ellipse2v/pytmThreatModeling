@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "threatmodelbypytm"
+version = "0.3.0-alpha"
+authors = [
+  { name="ellipse2v", email="your.email@example.com" }, # Placeholder email
+]
+description = "A STRIDE threat analysis framework with MITRE ATT&CK integration based on PyTM."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = [
+    "pytm",
+    "Flask",
+    "Jinja2",
+    "graphviz",
+    "pandas",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/ellipse2v/threatModelBypyTm"
+"Bug Tracker" = "https://github.com/ellipse2v/threatModelBypyTm/issues"
+
+[tool.setuptools.packages.find]
+where = ["."] # Search for packages in the current directory
+include = ["threat_analysis*"] # Include threat_analysis and its subpackages
