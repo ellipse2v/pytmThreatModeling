@@ -51,9 +51,15 @@ class AnsiblePlugin(IaCPlugin):
             else:
                 hosts = []
                 for host, _ in parser.items(section):
-                    clean_host = host.split(' ')[0]
+                    host_parts = host.split(' ')
+                    clean_host = host_parts[0]
                     hosts.append(clean_host)
-                    inventory_data["hosts"][clean_host] = {"group": section}
+                    host_vars = {"group": section}
+                    for part in host_parts[1:]:
+                        if '=' in part:
+                            key, value = part.split('=', 1)
+                            host_vars[key] = value
+                    inventory_data["hosts"][clean_host] = host_vars
                 inventory_data["groups"][section] = hosts
         
         return inventory_data
@@ -113,7 +119,10 @@ class AnsiblePlugin(IaCPlugin):
         if "components" in metadata:
             markdown.append("## Servers")
             for component in metadata["components"]:
-                props = ", ".join([f"{k}={v}" for k, v in component.items() if k != "name"])
+                props_list = [f"{k}={v}" for k, v in component.items() if k != "name"]
+                if "ansible_host" in component:
+                    props_list.append(f"ip={component['ansible_host']}")
+                props = ", ".join(props_list)
                 markdown.append(f"- **{component['name']}**: {props}")
             markdown.append("")
 
