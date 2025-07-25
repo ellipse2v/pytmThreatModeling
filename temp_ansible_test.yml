@@ -1,0 +1,25 @@
+---
+- name: Test Play with Embedded Metadata
+  hosts: localhost
+  vars:
+    threat_model_metadata:
+      version: 1.0
+      description: "This should be ignored by Ansible during execution, but readable by the plugin."
+      zones:
+        - name: "RIE"
+          type: "External"
+          trust_level: "Untrusted"
+        - name: "infra_boundary"
+          type: "DMZ"
+          trust_level: "Trusted"
+          sub_zones:
+            - name: "main"
+              type: "Internal"
+              trust_level: "Trusted"
+            - name: "fallback"
+              type: "Internal"
+              trust_level: "Trusted"
+  tasks:
+    - name: Echo a message
+      ansible.builtin.debug:
+        msg: "Hello from Ansible!"

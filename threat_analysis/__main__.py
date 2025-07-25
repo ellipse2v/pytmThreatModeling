@@ -26,14 +26,14 @@ import importlib.util
 import inspect
 
 # Import library modules
-from .core.models_module import ThreatModel
-from .core.mitre_mapping_module import MitreMapping
-from .severity_calculator_module import SeverityCalculator
-from .generation.report_generator import ReportGenerator
-from .generation.diagram_generator import DiagramGenerator
-from .core.model_factory import create_threat_model
-from . import config
-from .iac_plugins import IaCPlugin
+from threat_analysis.core.models_module import ThreatModel
+from threat_analysis.core.mitre_mapping_module import MitreMapping
+from threat_analysis.severity_calculator_module import SeverityCalculator
+from threat_analysis.generation.report_generator import ReportGenerator
+from threat_analysis.generation.diagram_generator import DiagramGenerator
+from threat_analysis.core.model_factory import create_threat_model
+from threat_analysis import config
+from threat_analysis.iac_plugins import IaCPlugin
 
 
 class ThreatAnalysisFramework:

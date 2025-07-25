@@ -85,21 +85,28 @@ class ModelParser:
         }
         self._process_sections(lines, relationship_sections)
 
-    def _process_sections(self, lines: List[str], parsers: Dict[str, Callable[[str], None]]):
+    def _process_sections(self, lines: List[str], parsers: Dict[str, Callable[[str, int], None]]):
         """
         Helper method to process specific sections of the Markdown content.
         """
         current_section = None
+        # Stack to keep track of parent boundaries for nested structures
+        boundary_stack: List[Tuple[str, int]] = [] # (boundary_name, indentation_level)
+
         for line in lines:
             stripped_line = line.strip()
             if not stripped_line:
                 continue
+
+            indentation = len(line) - len(line.lstrip())
 
             if stripped_line.startswith("## ") or stripped_line.startswith("### "):
                 section_title = stripped_line
                 if section_title in parsers:
                     current_section = section_title
                     logging.info(f"⏳ Loading section: {current_section}")
+                    # Reset boundary stack when a new section starts
+                    boundary_stack = []
                 else:
                     current_section = None
                     # Only log ignored sections once per section type
@@ -108,34 +115,29 @@ class ModelParser:
                 continue
 
             if current_section and current_section in parsers:
-                parsers[current_section](stripped_line)
+                if current_section == "## Boundaries":
+                    self._parse_boundary(line, indentation, boundary_stack)
+                else:
+                    # For other sections, just pass the stripped line
+                    parsers[current_section](stripped_line)
 
-    def _parse_boundary(self, line: str):
+    def _parse_boundary(self, line: str, indentation: int, boundary_stack: List[Tuple[str, int]]):
         """Parses a boundary line with format: - **name**: color=value, isTrusted=bool, isFilled=bool"""
-        # Updated regex to capture name and all parameters
-        match = re.match(r'^- \*\*([^\*:]+)\*\*:\s*(.*)', line)
+        match = re.match(r'^- \*\*([^\*:]+)\*\*:\s*(.*)', line.strip())
         if match:
             name = match.group(1).strip()
             params_str = match.group(2).strip()
-            
-            # Parse all key=value parameters
             boundary_kwargs = self._parse_key_value_params(params_str)
-            
-            # Set default color if not specified
             if 'color' not in boundary_kwargs:
                 boundary_kwargs['color'] = 'lightgray'
-            
-            parent_name = boundary_kwargs.pop('parent', None)
-            self.threat_model.add_boundary(name, parent_name=parent_name, **boundary_kwargs)
-            
-            # Create a nice log message
-            params_display = []
-            for key, value in boundary_kwargs.items():
-                params_display.append(f"{key.capitalize()}: {value}")
-            
-            logging.info(f"   - Added Boundary: {name} (Color: {boundary_kwargs['color']}, Is_trusted: {boundary_kwargs.get('is_trusted', False)}, Parent: {parent_name})")
-        else:
-            logging.warning(f"⚠️ Warning: Malformed boundary line: {line}")
+            parent_obj = None
+            while boundary_stack and boundary_stack[-1][1] >= indentation:
+                boundary_stack.pop()
+            if boundary_stack:
+                parent_name = boundary_stack[-1][0]
+                parent_obj = self.threat_model.boundaries.get(parent_name, {}).get('boundary')
+            self.threat_model.add_boundary(name, parent_boundary_obj=parent_obj, **boundary_kwargs)
+            boundary_stack.append((name, indentation))
 
     def _parse_actor(self, line: str):
         """Parses an actor line with flexible key=value attributes."""
@@ -144,15 +146,8 @@ class ModelParser:
             actor_name = match.group(1).strip()
             params_str = match.group(2).strip()
             actor_kwargs = self._parse_key_value_params(params_str)
-            boundary_name = actor_kwargs.pop('boundary', "")
-            color = actor_kwargs.pop('color', None)
-            is_filled = actor_kwargs.pop('isFilled', None)
-            self.threat_model.add_actor(
-                actor_name,
-                boundary_name,
-                color=color,
-                is_filled=is_filled
-            )
+            boundary_name = actor_kwargs.pop('boundary', None)
+            self.threat_model.add_actor(actor_name, boundary_name=boundary_name, **actor_kwargs)
         else:
             logging.warning(f"⚠️ Warning: Malformed actor line: {line}")
 
@@ -165,17 +160,9 @@ class ModelParser:
             params_str = match.group(2).strip()
             # Parse all key=value parameters
             server_kwargs = self._parse_key_value_params(params_str)
-            boundary_name = server_kwargs.pop('boundary', "")
-            color = server_kwargs.pop('color', None)
-            is_filled = server_kwargs.pop('isFilled', None)
-            # Call add_server with extracted parameters
-            self.threat_model.add_server(
-                name,
-                boundary_name,
-                color=color,
-                is_filled=is_filled
-            )
-            logging.info(f"   - Added Server: {name} (Boundary: {boundary_name}, Color: {color}, Filled: {is_filled})")
+            boundary_name = server_kwargs.pop('boundary', None)
+            self.threat_model.add_server(name, boundary_name=boundary_name, **server_kwargs)
+            logging.info(f"   - Added Server: {name} (Boundary: {boundary_name}, Props: {server_kwargs})")
         else:
             logging.warning(f"⚠️ Warning: Malformed server line: {line}")
             
@@ -255,7 +242,6 @@ class ModelParser:
 
     def _parse_dataflow(self, line: str):
         """Parses a dataflow line with flexible named arguments."""
-        # First, extract the dataflow name
         name_match = re.match(r'^- \*\*([^\*]+)\*\*:\s*(.*)', line)
         if not name_match:
             logging.warning(f"⚠️ Warning: Malformed dataflow line (missing name): {line}")
@@ -263,25 +249,12 @@ class ModelParser:
 
         name = name_match.group(1).strip()
         params_str = name_match.group(2).strip()
+        params = self._parse_key_value_params(params_str)
 
-        # Parse key="value" or key=True/False pairs
-        params = {}
-        # Regex to find key="value" (groups 1,2) OR key=True/False (groups 3,4)
-        param_pattern = re.compile(r'(\w+)="([^"]*)"|\s*(\w+)=(True|False)')
-        for m in param_pattern.finditer(params_str):
-            if m.group(1):  # Matches key="value"
-                key = m.group(1)
-                value = m.group(2)
-            else:  # Matches key=True/False
-                key = m.group(3)
-                value = (m.group(4) == 'True')  # Convert to actual boolean
-
-            params[key] = value
-
-        from_name = params.get("from")
-        to_name = params.get("to")
+        from_name = params.get("from").lower().replace("actor:", "").replace("component:", "").replace("zone:", "")
+        to_name = params.get("to").lower().replace("actor:", "").replace("component:", "").replace("zone:", "")
         protocol = params.get("protocol")
-        data_name = params.get("data")  # Extract the data argument
+        data_name = params.get("data")
         is_authenticated = params.get("is_authenticated", False)
         is_encrypted = params.get("is_encrypted", False)
 
@@ -289,20 +262,17 @@ class ModelParser:
             logging.warning(f"⚠️ Warning: Dataflow '{name}' is missing mandatory parameters (from, to, protocol).")
             return
 
-        from_elem = self.threat_model.get_element_by_name(from_name)
-        to_elem = self.threat_model.get_element_by_name(to_name)
+        from_elem = self.threat_model.get_element_by_name(from_name) or self.threat_model.boundaries.get(from_name, {}).get('boundary')
+        to_elem = self.threat_model.get_element_by_name(to_name) or self.threat_model.boundaries.get(to_name, {}).get('boundary')
 
         if from_elem and to_elem:
             self.threat_model.add_dataflow(
                 from_elem, to_elem, name, protocol,
-                data_name=data_name,  # Pass data_name
+                data_name=data_name.lower(),
                 is_authenticated=is_authenticated,
                 is_encrypted=is_encrypted
             )
-            logging.info(f"   - Added Dataflow: {name} ({from_name} -> {to_name}, Proto: {protocol}" +
-                      (f", Data: {data_name}" if data_name else "") +
-                      (f", Authenticated: {is_authenticated}" if is_authenticated else "") +
-                      (f", Encrypted: {is_encrypted}" if is_encrypted else "") + ")")
+            logging.info(f"   - Added Dataflow: {name} ({from_name} -> {to_name}, Proto: {protocol}, Data: {data_name})")
         else:
             logging.warning(f"⚠️ Warning: Elements '{from_name}' or '{to_name}' not found for dataflow '{name}'.")
             

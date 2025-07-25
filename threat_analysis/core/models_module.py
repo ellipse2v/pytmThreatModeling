@@ -15,10 +15,12 @@
 """
 Threat Model Definition Module with MITRE ATT&CK Integration
 """
-from pytm import TM, Boundary, Actor, Server, Dataflow, Data
+from pytm import TM, Boundary, Actor, Server, Dataflow, Data, Classification, Lifetime
 from collections import defaultdict
 from typing import List, Dict, Any, Optional, Tuple
 import logging
+from enum import Enum
+
 from .mitre_mapping_module import MitreMapping
 
 class CustomThreat:
@@ -63,19 +65,23 @@ class ThreatModel:
         self.mitre_analysis_results = {}
         self.threat_mitre_mapping = {}
 
-    def add_boundary(self, name: str, color: str = "lightgray", parent_name: Optional[str] = None, **kwargs) -> Boundary:
+    def add_boundary(self, name: str, color: str = "lightgray", parent_boundary_obj: Optional[Boundary] = None, **kwargs) -> Boundary:
         """Adds a boundary to the model with additional properties, including an optional parent.
 
         Args:
             name (str): The name of the boundary.
             color (str, optional): The color of the boundary. Defaults to "lightgray".
-            parent_name (Optional[str], optional): The name of the parent boundary. Defaults to None.
+            parent_boundary_obj (Optional[Boundary], optional): The parent Boundary object. Defaults to None.
             **kwargs: Additional properties for the boundary.
 
         Returns:
             Boundary: The created Boundary object.
         """
         boundary = Boundary(name)
+
+        # Explicitly set isTrusted on the pytm.Boundary object if provided in kwargs
+        if 'isTrusted' in kwargs:
+            boundary.isTrusted = kwargs['isTrusted']
 
         # HACK: Add dummy attributes to Boundary objects to allow them to be
         # used as sources/sinks in Dataflows. The underlying pytm library
@@ -85,51 +91,44 @@ class ThreatModel:
         boundary.port = None
         boundary.data = None
 
-        if parent_name:
-            parent_boundary_info = self.boundaries.get(parent_name)
-            if parent_boundary_info:
-                boundary.inBoundary = parent_boundary_info["boundary"]
-            else:
-                logging.warning(f"⚠️ Warning: Parent boundary '{parent_name}' not found for boundary '{name}'.")
+        if parent_boundary_obj:
+            boundary.inBoundary = parent_boundary_obj
 
         # Store boundary with all properties including color and any additional kwargs
         boundary_props = {"boundary": boundary, "color": color}
         boundary_props.update(kwargs)  # Add any additional properties like isTrusted, isFilled
 
-        self.boundaries[name] = boundary_props
-        self._elements_by_name[name] = boundary
+        self.boundaries[name.lower()] = boundary_props
+        self._elements_by_name[name.lower()] = boundary
         return boundary
 
-    def add_actor(self, name: str, boundary_name: str, color: Optional[str] = None, is_filled: bool = True) -> Actor:
+    def add_actor(self, name: str, boundary_name: Optional[str] = None, **kwargs) -> Actor:
         """Adds an actor to the model"""
         actor = Actor(name)
         boundary_obj = None
-        if boundary_name and boundary_name in self.boundaries:
-            boundary_obj = self.boundaries[boundary_name]["boundary"]
+        if boundary_name and boundary_name.lower() in self.boundaries:
+            boundary_obj = self.boundaries[boundary_name.lower()]["boundary"]
         if boundary_obj:
             actor.inBoundary = boundary_obj
-        self.actors.append({'name': name, 'object': actor, 'boundary': boundary_obj, 'color': color, 'is_filled': is_filled})
-        self._elements_by_name[name] = actor
+        actor_props = {'name': name, 'object': actor, 'boundary': boundary_obj}
+        actor_props.update(kwargs)
+        self.actors.append(actor_props)
+        self._elements_by_name[name.lower()] = actor
         return actor
 
-    def add_server(self, name: str, boundary_name: str, color: Optional[str] = None, is_filled: bool = True) -> Server:
+    def add_server(self, name: str, boundary_name: Optional[str] = None, **kwargs) -> Server:
         """Adds a server to the model with optional color and is_filled attributes."""
         boundary_obj = None
-        if boundary_name and boundary_name in self.boundaries:
-            boundary_obj = self.boundaries[boundary_name]["boundary"]
+        if boundary_name and boundary_name.lower() in self.boundaries:
+            boundary_obj = self.boundaries[boundary_name.lower()]["boundary"]
         
         server = Server(name)
         if boundary_obj:
             server.inBoundary = boundary_obj
-        # Store as dict for easy attribute access (like add_actor)
-        self.servers.append({
-            'name': name,
-            'object': server,
-            'boundary': boundary_obj,
-            'color': color,
-            'is_filled': is_filled
-        })
-        self._elements_by_name[name] = server
+        server_props = {'name': name, 'object': server, 'boundary': boundary_obj}
+        server_props.update(kwargs)
+        self.servers.append(server_props)
+        self._elements_by_name[name.lower()] = server
         return server
 
     def add_data(self, name: str, **kwargs) -> Data:
@@ -138,7 +137,7 @@ class ThreatModel:
         directly to the pytm.Data constructor.
         """
         data_obj = Data(name, **kwargs)  # Passes **kwargs to the Data constructor
-        self.data_objects[name] = data_obj
+        self.data_objects[name.lower()] = data_obj
         logging.info(f"   - Added Data: {name} (Props: {kwargs})")  # Debugging
         logging.debug(f"DEBUG: Data object added with name: '{name}'") # New debug log
         return data_obj
@@ -211,10 +210,14 @@ class ThreatModel:
 
     def get_element_by_name(self, name: str) -> Optional[Any]:
         """Retrieves an element (Actor, Server, Boundary) by its name."""
-        element = self._elements_by_name.get(name)
+        element = self._elements_by_name.get(name.lower())
         if element:
             return element
-        return self.data_objects.get(name)
+        # Also check boundaries
+        boundary_info = self.boundaries.get(name.lower())
+        if boundary_info:
+            return boundary_info.get('boundary')
+        return self.data_objects.get(name.lower())
 
     def process_threats(self) -> Dict[str, List[Tuple[Any, Any]]]:
         """Executes PyTM threat analysis, filters, and groups the results with MITRE mapping."""

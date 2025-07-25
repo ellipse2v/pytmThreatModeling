@@ -45,21 +45,27 @@ def test_parse_markdown_unrecognized_section(model_parser, threat_model):
     assert model_parser.current_section is None
 
 def test_parse_boundary(model_parser, threat_model):
-    line = "- **Internet**: color=red, isTrusted=False, isFilled=True, line_style=dashed"
-    model_parser._parse_boundary(line)
-    assert len(threat_model.boundaries) == 2
-    boundary = threat_model.boundaries["Internet"]["boundary"]
+    markdown = """
+## Boundaries
+- **Internet**: color=red, isTrusted=False, isFilled=True, line_style=dashed
+"""
+    model_parser.parse_markdown(markdown)
+    assert len(threat_model.boundaries) == 2 # Default boundary + Internet
+    boundary = threat_model.boundaries["internet"]["boundary"]
     assert boundary.name == "Internet"
-    assert threat_model.boundaries["Internet"]["color"] == "red"
-    assert threat_model.boundaries["Internet"]["isTrusted"] is False
-    assert threat_model.boundaries["Internet"]["isFilled"] is True
-    assert threat_model.boundaries["Internet"]["line_style"] == "dashed"
+    assert threat_model.boundaries["internet"]["color"] == "red"
+    assert threat_model.boundaries["internet"]["isTrusted"] is False
+    assert threat_model.boundaries["internet"]["isFilled"] is True
+    assert threat_model.boundaries["internet"]["line_style"] == "dashed"
 
 def test_parse_boundary_default_color(model_parser, threat_model):
-    line = "- **Internal Network**: isTrusted=True"
-    model_parser._parse_boundary(line)
-    assert len(threat_model.boundaries) == 2
-    assert threat_model.boundaries["Internal Network"]["color"] == "lightgray"
+    markdown = """
+## Boundaries
+- **Internal Network**: isTrusted=True
+"""
+    model_parser.parse_markdown(markdown)
+    assert len(threat_model.boundaries) == 2 # Default boundary + Internal Network
+    assert threat_model.boundaries["internal network"]["color"] == "lightgray"
 
 def test_parse_actor(model_parser, threat_model):
     threat_model.add_boundary("Internet")
@@ -68,9 +74,9 @@ def test_parse_actor(model_parser, threat_model):
     assert len(threat_model.actors) == 1
     actor = threat_model.actors[0]
     assert actor['object'].name == "User"
-    assert actor['boundary'].name == "Internet"
+    assert actor['boundary'].name.lower() == "internet"
     assert actor['color'] == "blue"
-    assert actor['is_filled'] is True
+    assert actor['isFilled'] is True
 
 def test_parse_server(model_parser, threat_model):
     threat_model.add_boundary("Internal Network")
@@ -82,13 +88,13 @@ def test_parse_server(model_parser, threat_model):
     assert server.name == "WebServer"
     assert server_info['boundary'].name == "Internal Network"
     assert server_info["color"] == "green"
-    assert server_info["is_filled"] is False
+    assert server_info["isFilled"] is False
 
 def test_parse_data(model_parser, threat_model):
     line = "- **CreditCardData**: classification=TOP_SECRET, credentialsLife=LONG"
     model_parser._parse_data(line)
     assert len(threat_model.data_objects) == 1
-    data_obj = threat_model.data_objects["CreditCardData"]
+    data_obj = threat_model.data_objects["creditcarddata"]
     assert data_obj.name == "CreditCardData"
     assert data_obj.classification == Classification.TOP_SECRET
     assert data_obj.credentialsLife == Lifetime.LONG
@@ -98,7 +104,7 @@ def test_parse_data_unrecognized_enum(model_parser, threat_model):
         line = "- **InvalidData**: classification=INVALID_CLASS, credentialsLife=INVALID_LIFE"
         model_parser._parse_data(line)
         assert len(threat_model.data_objects) == 1
-        data_obj = threat_model.data_objects["InvalidData"]
+        data_obj = threat_model.data_objects["invaliddata"]
         assert data_obj.name == "InvalidData"
         assert data_obj.classification == Classification.UNKNOWN
         assert data_obj.credentialsLife == Lifetime.UNKNOWN

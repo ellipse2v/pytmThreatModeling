@@ -254,7 +254,7 @@ def test_generate_manual_dot_basic(diagram_generator):
     dot_code = diagram_generator._generate_manual_dot(mock_threat_model)
     assert "digraph ThreatModel" in dot_code
     assert "rankdir=LR;" in dot_code
-    assert "node [shape=box, style=filled, fillcolor=lightblue];" in dot_code
+    assert "node [shape=box]" in dot_code
     assert "edge [fontsize=10];" in dot_code
     assert "}" in dot_code
 

@@ -15,7 +15,9 @@
 import yaml
 import configparser
 from pathlib import Path
-from typing import Dict, Any, List, Set
+from typing import Dict, Any, List
+import logging
+import subprocess
 
 from threat_analysis.iac_plugins import IaCPlugin
 
@@ -49,7 +51,6 @@ class AnsiblePlugin(IaCPlugin):
             else:
                 hosts = []
                 for host, _ in parser.items(section):
-                    # Remove ansible vars from host string
                     clean_host = host.split(' ')[0]
                     hosts.append(clean_host)
                     inventory_data["hosts"][clean_host] = {"group": section}
@@ -73,78 +74,70 @@ class AnsiblePlugin(IaCPlugin):
         with open(playbook_path, 'r') as f:
             playbook_content = yaml.safe_load(f)
 
-        # For simplicity, we're focusing on the inventory structure.
-        # A more advanced implementation would map tasks from the playbook to hosts.
-        
+        threat_model_metadata = {}
+        if isinstance(playbook_content, list):
+            for play in playbook_content:
+                if isinstance(play, dict) and "vars" in play and "threat_model_metadata" in play["vars"]:
+                    threat_model_metadata = play["vars"]["threat_model_metadata"]
+                    break
+
         return {
             "inventory": inventory,
-            "playbook": playbook_content
+            "playbook": playbook_content,
+            "threat_model_metadata": threat_model_metadata
         }
 
     def generate_threat_model_components(self, iac_data: Dict[str, Any]) -> str:
         """Generates Markdown threat model components from parsed Ansible data."""
-        inventory = iac_data.get("inventory", {})
-        hosts_info = inventory.get("hosts", {})
-        groups = inventory.get("groups", {})
-
+        metadata = iac_data.get("threat_model_metadata", {})
         markdown = []
 
-        # 1. Define Boundaries from top-level groups
-        markdown.append("## Boundaries")
-        boundary_colors = {"dmz": "khaki", "internal_network": "lightgreen", "billing": "lightblue", "network_infra": "lightgray"}
-        
-        # Define boundaries for groups that contain hosts, not just other groups
-        host_groups = {details['group'] for details in hosts_info.values()}
-        for group in host_groups:
-            color = boundary_colors.get(group, "lightgrey")
-            markdown.append(f"- **{group}**: color={color}")
-        markdown.append("- **Internet**: color=lightcoral")
-        markdown.append("")
+        if "zones" in metadata:
+            markdown.append("## Boundaries")
+            for zone in metadata["zones"]:
+                props = ", ".join([f"{k}={v}" for k, v in zone.items() if k not in ["name", "sub_zones"]])
+                markdown.append(f"- **{zone['name']}**: {props}")
+                if "sub_zones" in zone:
+                    for sub_zone in zone["sub_zones"]:
+                        sub_props = ", ".join([f"{k}={v}" for k, v in sub_zone.items() if k != "name"])
+                        markdown.append(f"  - **{sub_zone['name']}**: {sub_props}")
+            markdown.append("")
 
-        # 2. Define Actors
-        markdown.append("## Actors")
-        markdown.append("- **External_Client**: boundary=Internet, description=Represents external users.")
-        markdown.append("- **Admin**: boundary=Internet, description=System administrators managing the infrastructure.")
-        markdown.append("")
+        if "actors" in metadata:
+            markdown.append("## Actors")
+            for actor in metadata["actors"]:
+                props = ", ".join([f"{k}={v}" for k, v in actor.items() if k != "name"])
+                markdown.append(f"- **{actor['name']}**: {props}")
+            markdown.append("")
 
-        # 3. Define Servers and Network Gear from inventory hosts
-        markdown.append("## Servers")
-        for host, details in hosts_info.items():
-            group = details.get("group", "default")
-            stereotype = "Network" if group in ["switches", "routers"] else "Server"
-            markdown.append(f"- **{host}**: boundary={group}, stereotype={stereotype}")
-        markdown.append("")
+        if "components" in metadata:
+            markdown.append("## Servers")
+            for component in metadata["components"]:
+                props = ", ".join([f"{k}={v}" for k, v in component.items() if k != "name"])
+                markdown.append(f"- **{component['name']}**: {props}")
+            markdown.append("")
 
-        # 4. Define Data and Protocols
-        markdown.append("## Data")
-        markdown.append("- **Web_Traffic**: classification=public")
-        markdown.append("- **App_Data**: classification=restricted")
-        markdown.append("- **DB_Data**: classification=secret")
-        markdown.append("- **SSH_Admin**: classification=secret")
-        markdown.append("")
+        if "data" in metadata:
+            markdown.append("## Data")
+            for data_item in metadata["data"]:
+                props = ", ".join([f"{k}={v}" for k, v in data_item.items() if k != "name"])
+                markdown.append(f"- **{data_item['name']}**: {props}")
+            markdown.append("")
 
-        # 5. Define logical Dataflows
-        markdown.append("## Dataflows")
-        # External client to DMZ
-        markdown.append('- **Client_to_DMZ**: from="External_Client", to="rev-proxy-01", protocol="HTTPS", data="Web_Traffic"')
-        
-        # DMZ to internal web
-        if 'dmz' in groups and 'internal_web' in groups:
-            for proxy in groups['dmz']:
-                for web_server in groups['internal_web']:
-                     markdown.append(f'- **DMZ_to_WebApp_{proxy}_{web_server}**: from="{proxy}", to="{web_server}", protocol="HTTP", data="App_Data"')
+        if "data_flows" in metadata:
+            markdown.append("## Dataflows")
+            for flow in metadata["data_flows"]:
+                props_list = [
+                    f'from="{flow["source"]}"',
+                    f'to="{flow["destination"]}"',
+                    f'protocol="{flow["protocol"]}"',
+                    f'data="{flow["data"]}"'
+                ]
+                if "description" in flow:
+                    props_list.append(f'description="{flow["description"]}"')
+                
+                props = ", ".join(props_list)
+                markdown.append(f"- **{flow['name']}**: {props}")
+            markdown.append("")
 
-        # Internal web to DB
-        if 'internal_web' in groups and 'internal_db' in groups:
-            for web_server in groups['internal_web']:
-                for db_server in groups['internal_db']:
-                    markdown.append(f'- **WebApp_to_DB_{web_server}_{db_server}**: from="{web_server}", to="{db_server}", protocol="SQL", data="DB_Data"')
-
-        # Admin access
-        for host in hosts_info:
-            markdown.append(f'- **Admin_to_{host}**: from="Admin", to="{host}", protocol="SSH", data="SSH_Admin"')
-            
-        # Billing to Internet (conceptual)
-        markdown.append('- **Billing_to_Internet**: from="billing-server-01", to="External_Client", protocol="HTTPS", data="Web_Traffic", description="Represents billing communication with external payment gateways or users."')
-        
         return "\n".join(markdown)

@@ -1,7 +1,7 @@
 ## Boundaries
 - **Infrastructure_Zone**: color=lightblue, is_trusted=True
-- **Main_SubZone**: parent=Infrastructure_Zone, color=lightcyan, is_trusted=True
-- **Fallback_SubZone**: parent=Infrastructure_Zone, color=lightyellow, is_trusted=True
+ - **Main_SubZone**: color=lightcyan, is_trusted=True
+ - **Fallback_SubZone**: color=lightyellow, is_trusted=True
 
 ## Servers
 - **Server_Main_01**: boundary=Main_SubZone, stereotype=WebServer

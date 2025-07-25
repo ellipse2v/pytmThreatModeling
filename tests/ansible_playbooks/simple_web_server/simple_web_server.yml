@@ -1,0 +1,76 @@
+---
+- name: Setup a simple web server
+  hosts: webservers
+  become: yes
+  vars:
+    threat_model_metadata:
+      zones:
+        - name: "Internet"
+          type: "External"
+          isTrusted: False
+        - name: "DMZ"
+          type: "Internal"
+          isTrusted: True
+          components: ["WebServer"]
+
+      actors:
+        - name: "External User"
+          isHuman: True
+          boundary: "Internet"
+
+      components:
+        - name: "WebServer"
+          stereotype: "Server"
+          boundary: "DMZ"
+          services: ["web"]
+
+      data:
+        - name: "Web Traffic"
+          classification: "PUBLIC"
+          lifetime: "TRANSIENT"
+
+      data_flows:
+        - name: "User to WebServer HTTP"
+          source: "actor:External User"
+          destination: "component:WebServer"
+          protocol: "HTTP"
+          data: "Web Traffic"
+          description: "External user accesses web server over HTTP"
+        - name: "User to WebServer HTTPS"
+          source: "actor:External User"
+          destination: "component:WebServer"
+          protocol: "HTTPS"
+          data: "Web Traffic"
+          description: "External user accesses web server over HTTPS"
+
+  tasks:
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+
+    - name: Start Nginx service
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Allow HTTP traffic on port 80
+      ansible.builtin.ufw:
+        rule: allow
+        port: '80'
+        proto: tcp
+        comment: 'Allow HTTP traffic'
+
+    - name: Allow HTTPS traffic on port 443
+      ansible.builtin.ufw:
+        rule: allow
+        port: '443'
+        proto: tcp
+        comment: 'Allow HTTPS traffic'
+
+    - name: Deploy a simple index.html
+      ansible.builtin.copy:
+        content: "<h1>Welcome to your Ansible-deployed Web Server!</h1>"
+        dest: /var/www/html/index.html
+        mode: '0644'

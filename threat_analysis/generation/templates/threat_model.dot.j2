@@ -1,6 +1,6 @@
 digraph ThreatModel {
   rankdir=LR;
-  node [shape=box, style=filled, fillcolor=lightblue];
+  node [shape=box];
   edge [fontsize=10];
   splines=true;
   overlap=false;
@@ -17,15 +17,14 @@ digraph ThreatModel {
     style="{{ boundary.style_parts | join(',') }}";
     {% if boundary.is_filled %}
     fillcolor="{{ boundary.color }}";
+    {% else %}
+    fillcolor="none";
     {% endif %}
     {% if not boundary.is_trusted %}
     color=black;
     {% else %}
     color=red;
     penwidth=3;
-    {% endif %}
-    {% if boundary.line_style and boundary.line_style != 'solid' %}
-    style="{{ boundary.style_parts | join(',') }},{{ boundary.line_style }}";
     {% endif %}
     {% for actor in boundary.actors %}
     "{{ actor.escaped_name }}" {{ actor.node_attrs }};
