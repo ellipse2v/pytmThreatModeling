@@ -37,7 +37,7 @@ def test_validator_with_valid_model(sample_threat_model):
     sample_threat_model.add_dataflow(user, webserver, "Valid Flow", "HTTPS")
 
     validator = ModelValidator(sample_threat_model)
-    assert validator.validate() is True
+    assert not validator.validate()
     assert not validator.errors
 
 def test_validator_with_invalid_dataflow_source(sample_threat_model):
@@ -51,9 +51,9 @@ def test_validator_with_invalid_dataflow_source(sample_threat_model):
     sample_threat_model.dataflows.append(invalid_df)
 
     validator = ModelValidator(sample_threat_model)
-    assert validator.validate() is False
+    assert validator.validate()
     assert len(validator.errors) == 1
-    assert "source 'Fake Actor' is not a defined element" in validator.errors[0]
+    assert "Dataflow 'Invalid Source Flow' refers to a non-existent 'from' element: 'Fake Actor'." in validator.errors[0]
 
 def test_validator_with_invalid_dataflow_sink(sample_threat_model):
     """Tests that a dataflow with an undefined sink fails validation."""
@@ -66,6 +66,6 @@ def test_validator_with_invalid_dataflow_sink(sample_threat_model):
     sample_threat_model.dataflows.append(invalid_df)
 
     validator = ModelValidator(sample_threat_model)
-    assert validator.validate() is False
+    assert validator.validate()
     assert len(validator.errors) == 1
-    assert "sink 'Fake Server' is not a defined element" in validator.errors[0]
+    assert "Dataflow 'Invalid Sink Flow' refers to a non-existent 'to' element: 'Fake Server'." in validator.errors[0]

@@ -384,6 +384,15 @@ if __name__ == "__main__":
 
         threats = framework.run_analysis()
 
+        if not threats:
+            logging.error("Threat analysis failed. Please check the logs for validation errors.")
+            if framework.threat_model:
+                validator = ModelValidator(framework.threat_model)
+                errors = validator.validate()
+                for error in errors:
+                    logging.error(f"- {error}")
+            sys.exit(1)
+
         reports = framework.generate_reports()
 
         diagrams = framework.generate_diagrams()

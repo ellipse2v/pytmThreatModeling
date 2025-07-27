@@ -23,6 +23,7 @@ from enum import Enum
 
 from .mitre_mapping_module import MitreMapping
 from threat_analysis.severity_calculator_module import SeverityCalculator
+from .model_validator import ModelValidator
 
 class CustomThreat:
     """A simple class to represent a custom threat."""
@@ -226,6 +227,15 @@ class ThreatModel:
     def process_threats(self) -> Dict[str, List[Tuple[Any, Any]]]:
         """Executes PyTM threat analysis, filters, and groups the results with MITRE mapping."""
         
+        # --- Model Validation ---
+        validator = ModelValidator(self)
+        errors = validator.validate()
+        if errors:
+            for error in errors:
+                logging.error(f"❌ Model Validation Error: {error}")
+            # Stop processing if validation fails
+            return {}
+
         self.tm.process()
 
         pytm_raw_threats = []

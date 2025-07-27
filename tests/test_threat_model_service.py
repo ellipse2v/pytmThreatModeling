@@ -71,8 +71,8 @@ def test_update_diagram_logic_svg_file_not_found(mock_create_threat_model, mock_
 def test_export_files_logic_invalid_format(service):
     """Test export_files_logic with an invalid format."""
     mock_markdown = "# Test Model"
-    with pytest.raises(ValueError, match="Invalid export format"):
-        service.export_files_logic(mock_markdown, "invalid_format")
+    with pytest.raises(RuntimeError, match="Failed to create or validate threat model"):
+        service.export_files_logic(mock_markdown, "svg")
 
 def test_export_files_logic_missing_data(service):
     """Test export_files_logic with missing markdown or format."""

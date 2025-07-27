@@ -53,8 +53,11 @@ def create_threat_model(
         if validate:
             logging.info("🛡️ Validating model...")
             validator = ModelValidator(threat_model)
-            if not validator.validate():
+            errors = validator.validate()
+            if errors:
                 logging.error("❌ Model validation failed.")
+                for error in errors:
+                    logging.error(f"  - {error}")
                 return None
             logging.info("✅ Model validation successful.")
 

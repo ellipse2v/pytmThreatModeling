@@ -19,13 +19,14 @@ import datetime
 import zipfile
 import shutil
 from io import BytesIO
+from threat_analysis import config
 
 from threat_analysis.core.model_factory import create_threat_model
 from threat_analysis.core.mitre_mapping_module import MitreMapping
 from threat_analysis.severity_calculator_module import SeverityCalculator
 from threat_analysis.generation.report_generator import ReportGenerator
 from threat_analysis.generation.diagram_generator import DiagramGenerator
-from threat_analysis import config
+from threat_analysis.core.model_validator import ModelValidator
 
 class ThreatModelService:
     def __init__(self):
@@ -56,6 +57,22 @@ class ThreatModelService:
         )
         if not threat_model:
             raise RuntimeError("Failed to create threat model")
+
+        # --- Model Validation ---
+        validator = ModelValidator(threat_model)
+        errors = validator.validate()
+        if errors:
+            # Return errors to the frontend
+            error_html = "<div class='validation-errors'><h3>Validation Errors:</h3><ul>"
+            for error in errors:
+                error_html += f"<li>{error}</li>"
+            error_html += "</ul></div>"
+            return {
+                "diagram_html": error_html,
+                "diagram_svg": "",
+                "legend_html": "",
+                "validation_errors": errors
+            }
 
         # 3. Generate the DOT code from the model
         dot_code = self.diagram_generator._generate_manual_dot(threat_model)
@@ -111,6 +128,13 @@ class ThreatModelService:
         )
         if not threat_model:
             raise RuntimeError("Failed to create or validate threat model")
+
+        # --- Model Validation ---
+        validator = ModelValidator(threat_model)
+        errors = validator.validate()
+        if errors:
+            raise ValueError("Validation failed: " + ", ".join(errors))
+
 
         os.makedirs(config.OUTPUT_BASE_DIR, exist_ok=True)
 
@@ -178,6 +202,13 @@ class ThreatModelService:
         )
         if not threat_model:
             raise RuntimeError("Failed to create or validate threat model")
+
+        # --- Model Validation ---
+        validator = ModelValidator(threat_model)
+        errors = validator.validate()
+        if errors:
+            raise ValueError("Validation failed: " + ", ".join(errors))
+
 
         markdown_filename = "threatModel_Template/threat_model.md"
         markdown_filepath = os.path.join(export_path, markdown_filename)
