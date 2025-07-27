@@ -53,7 +53,8 @@ class ReportGenerator:
             stride_distribution=stride_distribution,
             summary_stats=summary_stats,
             all_threats=all_detailed_threats_with_mitre,
-            stride_categories=stride_categories
+            stride_categories=stride_categories,
+            severity_calculation_note=self.severity_calculator.get_calculation_explanation()
         )
 
         with open(output_file, "w", encoding="utf-8") as f:
@@ -115,7 +116,11 @@ class ReportGenerator:
                 if hasattr(threat, 'target') and hasattr(threat.target, 'data') and hasattr(threat.target.data, 'classification'):
                     data_classification = threat.target.data.classification.name
                 
-                severity_info = self.severity_calculator.get_severity_info(stride_category, target_name, classification=data_classification)
+                # Extract impact and likelihood from the threat object if available
+                threat_impact = getattr(threat, 'impact', None)
+                threat_likelihood = getattr(threat, 'likelihood', None)
+
+                severity_info = self.severity_calculator.get_severity_info(stride_category, target_name, classification=data_classification, impact=threat_impact, likelihood=threat_likelihood)
                 mitre_techniques = self.mitre_mapping.map_threat_to_mitre(threat_description)
 
                 for tech in mitre_techniques:

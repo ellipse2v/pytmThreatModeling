@@ -139,3 +139,18 @@ class SeverityCalculator:
     def update_target_multipliers(self, new_multipliers: Dict[str, float]):
         """Updates target multipliers"""
         self.target_multipliers.update(new_multipliers)
+
+    def get_calculation_explanation(self) -> str:
+        """
+        Returns a detailed explanation of how severity scores are calculated.
+        """
+        explanation = (
+            "Threat severity is calculated on a scale of 1.0 to 10.0 using the following factors:\n\n"
+            "1.  **Base Score**: Each STRIDE threat category (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege) has a predefined base score.\n"
+            "2.  **Impact and Likelihood**: If provided, impact and likelihood (on a scale of 1 to 5) are multiplied and added to the base score. A higher value indicates a more severe threat.\n"
+            "3.  **Target Multipliers**: Certain elements in the model (servers, actors, etc.) can have severity multipliers defined in the 'Severity Multipliers' section of the threat model. These multipliers are added to the score if the threat targets the corresponding element.\n"
+            "4.  **Protocol Adjustments**: Specific protocols (e.g., SSH, HTTPS, HTTP) can have predefined adjustments (positive or negative) that modify the score. For example, using HTTPS might reduce severity.\n"
+            "5.  **Data Classification Multipliers**: The data classification (PUBLIC, RESTRICTED, SECRET, TOP_SECRET) associated with a dataflow can multiply the severity score. More sensitive data increases severity.\n\n"
+            "The final score is then normalized to remain between 1.0 and 10.0 and is categorized into levels (INFORMATIONAL, LOW, MEDIUM, HIGH, CRITICAL) for better understanding."
+        )
+        return explanation
