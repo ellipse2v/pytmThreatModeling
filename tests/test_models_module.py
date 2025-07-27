@@ -69,7 +69,7 @@ def test_process_threats_full_flow(threat_model_instance):
 
     with patch('threat_analysis.custom_threats.get_custom_threats') as mock_get_custom_threats:
         mock_get_custom_threats.return_value = [
-            {"component": "WebServer", "description": "Custom threat for server", "stride_category": "T", "severity": "High"}
+            {"component": "WebServer", "description": "Custom threat for server", "stride_category": "T", "impact": 4, "likelihood": 3}
         ]
 
         # Call the method under test

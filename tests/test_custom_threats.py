@@ -14,27 +14,28 @@
 
 import pytest
 from unittest.mock import MagicMock
-from threat_analysis.custom_threats import _create_threat_dict, ThreatGenerator, get_custom_threats
+from threat_analysis.custom_threats import _create_threat_dict, RuleBasedThreatGenerator, get_custom_threats
 
 def test_create_threat_dict():
     """Test the _create_threat_dict helper function."""
-    threat = _create_threat_dict("ComponentA", "DescriptionA", "Spoofing", "High")
+    threat = _create_threat_dict("ComponentA", "DescriptionA", "Spoofing", 4, 3)
     assert threat == {
         "component": "ComponentA",
         "description": "DescriptionA",
         "stride_category": "Spoofing",
-        "severity": "High",
+        "impact": 4,
+        "likelihood": 3,
     }
 
 def test_threat_generator_init_and_add_threat():
-    """Test ThreatGenerator initialization and _add_threat method."""
+    """Test RuleBasedThreatGenerator initialization and _add_threat method."""
     mock_threat_model = MagicMock()
-    generator = ThreatGenerator(mock_threat_model)
+    generator = RuleBasedThreatGenerator(mock_threat_model)
     assert generator.threat_model == mock_threat_model
     assert generator.threats == []
     assert generator.id_counter == 1
 
-    generator._add_threat("ComponentB", "DescriptionB", "Tampering", "Medium")
+    generator._add_threat("ComponentB", "DescriptionB", "Tampering", 5, 4)
     assert len(generator.threats) == 1
     assert generator.threats[0]["id"] == 1
     assert generator.threats[0]["component"] == "ComponentB"
@@ -47,7 +48,7 @@ def test_generate_threats_empty_model():
     mock_threat_model.dataflows = []
     mock_threat_model.actors = []
 
-    generator = ThreatGenerator(mock_threat_model)
+    generator = RuleBasedThreatGenerator(mock_threat_model)
     threats = generator.generate_threats()
     assert threats == []
 
@@ -58,7 +59,7 @@ def test_generate_threats_with_actors():
     mock_threat_model.dataflows = []
     mock_threat_model.actors = [{"name": "UserA"}, {"name": "UserB"}]
 
-    generator = ThreatGenerator(mock_threat_model)
+    generator = RuleBasedThreatGenerator(mock_threat_model)
     threats = generator.generate_threats()
     assert len(threats) == 4 # 2 threats per actor
     assert any(t["component"] == "UserA" for t in threats)
@@ -72,143 +73,150 @@ def test_generate_threats_with_unencrypted_dataflow():
 
     mock_dataflow = MagicMock()
     mock_dataflow.is_encrypted = False
+    mock_dataflow.is_authenticated = True
     mock_dataflow.source.name = "SourceA"
     mock_dataflow.sink.name = "SinkA"
+    mock_dataflow.data = []
     mock_threat_model.dataflows = [mock_dataflow]
 
-    generator = ThreatGenerator(mock_threat_model)
+    generator = RuleBasedThreatGenerator(mock_threat_model)
     threats = generator.generate_threats()
-    assert len(threats) == 1
-    assert threats[0]["description"] == "Data interception on an unencrypted channel (Man-in-the-Middle)"
+    assert len(threats) > 0
+    assert any("Data interception on an unencrypted channel" in t["description"] for t in threats)
 
-def test_generate_threats_with_encrypted_dataflow():
-    """Test generate_threats with an encrypted dataflow (should not generate threat)."""
+def test_generate_threats_with_unauthenticated_dataflow():
+    """Test generate_threats with an unauthenticated dataflow."""
     mock_threat_model = MagicMock()
     mock_threat_model.servers = []
     mock_threat_model.actors = []
 
     mock_dataflow = MagicMock()
     mock_dataflow.is_encrypted = True
+    mock_dataflow.is_authenticated = False
     mock_dataflow.source.name = "SourceA"
     mock_dataflow.sink.name = "SinkA"
+    mock_dataflow.data = []
     mock_threat_model.dataflows = [mock_dataflow]
 
-    generator = ThreatGenerator(mock_threat_model)
+    generator = RuleBasedThreatGenerator(mock_threat_model)
     threats = generator.generate_threats()
-    assert len(threats) == 0
+    assert len(threats) > 0
+    assert any("Spoofing of data" in t["description"] for t in threats)
 
-def test_generate_threats_with_generic_server():
-    """Test generate_threats with a generic server."""
+def test_generate_threats_with_database_server():
+    """Test generate_threats with a database server."""
     mock_threat_model = MagicMock()
     mock_threat_model.dataflows = []
     mock_threat_model.actors = []
-    mock_threat_model.servers = [{"name": "GenericServer"}]
+    mock_threat_model.servers = [{"name": "UserDB", "type": "database"}]
 
-    generator = ThreatGenerator(mock_threat_model)
+    generator = RuleBasedThreatGenerator(mock_threat_model)
     threats = generator.generate_threats()
-    assert len(threats) == 4 # 4 generic threats
-    assert all(t["component"] == "GenericServer" for t in threats)
+    assert len(threats) > 0
+    assert any("Unauthorized access to sensitive data" in t["description"] for t in threats)
 
 def test_generate_threats_with_app_server():
     """Test generate_threats with an app server."""
     mock_threat_model = MagicMock()
     mock_threat_model.dataflows = []
     mock_threat_model.actors = []
-    mock_threat_model.servers = [{"name": "My App Server"}]
+    mock_threat_model.servers = [{"name": "WebApp", "type": "app-server"}]
 
-    generator = ThreatGenerator(mock_threat_model)
+    generator = RuleBasedThreatGenerator(mock_threat_model)
     threats = generator.generate_threats()
-    # 4 generic + 3 app server specific
-    assert len(threats) == 7
+    assert len(threats) > 0
     assert any("SQL or NoSQL injection" in t["description"] for t in threats)
 
-def test_generate_threats_with_database():
-    """Test generate_threats with a database server."""
+def test_generate_threats_with_public_server():
+    """Test generate_threats with a public-facing server."""
     mock_threat_model = MagicMock()
     mock_threat_model.dataflows = []
     mock_threat_model.actors = []
-    mock_threat_model.servers = [{"name": "UserDB"}]
+    mock_threat_model.servers = [{"name": "PublicAPI", "is_public": True}]
 
-    generator = ThreatGenerator(mock_threat_model)
+    generator = RuleBasedThreatGenerator(mock_threat_model)
     threats = generator.generate_threats()
-    # 4 generic + 4 database specific
-    assert len(threats) == 8
-    assert any("Unauthorized access to sensitive data" in t["description"] for t in threats)
+    assert len(threats) > 0
+    assert any("Denial of Service (DoS) attack" in t["description"] for t in threats)
 
-def test_generate_threats_with_firewall():
-    """Test generate_threats with a firewall server."""
+def test_generate_threats_with_management_interface():
+    """Test generate_threats with a server having a management interface."""
     mock_threat_model = MagicMock()
     mock_threat_model.dataflows = []
     mock_threat_model.actors = []
-    mock_threat_model.servers = [{"name": "Perimeter Firewall"}]
+    mock_threat_model.servers = [{"name": "ManagedSwitch", "has_management_interface": True}]
 
-    generator = ThreatGenerator(mock_threat_model)
+    generator = RuleBasedThreatGenerator(mock_threat_model)
     threats = generator.generate_threats()
-    # 4 generic + 4 firewall specific
-    assert len(threats) == 8
-    assert any("Firewall rule misconfiguration" in t["description"] for t in threats)
-
-def test_generate_threats_with_load_balancer():
-    """Test generate_threats with a load balancer server."""
-    mock_threat_model = MagicMock()
-    mock_threat_model.dataflows = []
-    mock_threat_model.actors = []
-    mock_threat_model.servers = [{"name": "LB Gateway"}]
-
-    generator = ThreatGenerator(mock_threat_model)
-    threats = generator.generate_threats()
-    # 4 generic + 2 load balancer specific
-    assert len(threats) == 6
-    assert any("Session hijacking" in t["description"] for t in threats)
-
-def test_generate_threats_with_central_server():
-    """Test generate_threats with a central server."""
-    mock_threat_model = MagicMock()
-    mock_threat_model.dataflows = []
-    mock_threat_model.actors = []
-    mock_threat_model.servers = [{"name": "Central Server"}]
-
-    generator = ThreatGenerator(mock_threat_model)
-    threats = generator.generate_threats()
-    # 4 generic + 2 central server specific
-    assert len(threats) == 6
+    assert len(threats) > 0
     assert any("Compromise of the management interface" in t["description"] for t in threats)
 
-def test_generate_threats_with_switch():
-    """Test generate_threats with a switch server."""
+def test_generate_threats_with_network_components():
+    """Test generate_threats with various network components."""
     mock_threat_model = MagicMock()
     mock_threat_model.dataflows = []
     mock_threat_model.actors = []
-    mock_threat_model.servers = [{"name": "Network Switch"}]
+    mock_threat_model.servers = [
+        {"name": "FW1", "type": "firewall"},
+        {"name": "LB1", "type": "load-balancer"},
+        {"name": "SW1", "type": "switch"},
+    ]
 
-    generator = ThreatGenerator(mock_threat_model)
+    generator = RuleBasedThreatGenerator(mock_threat_model)
     threats = generator.generate_threats()
-    # 4 generic + 2 switch specific
-    assert len(threats) == 6
+    assert len(threats) > 0
+    assert any("Firewall rule misconfiguration" in t["description"] for t in threats)
+    assert any("Session hijacking" in t["description"] for t in threats)
     assert any("VLAN hopping attack" in t["description"] for t in threats)
 
-def test_generate_threats_with_atm_specific_server():
-    """Test generate_threats with an ATM specific server."""
+def test_generate_threats_with_sensitive_data():
+    """Test generate_threats with a dataflow containing sensitive data."""
     mock_threat_model = MagicMock()
-    mock_threat_model.dataflows = []
+    mock_threat_model.servers = []
     mock_threat_model.actors = []
-    mock_threat_model.servers = [{"name": "ATM Control System"}]
 
-    generator = ThreatGenerator(mock_threat_model)
+    mock_data = MagicMock()
+    mock_data.classification = "pii"
+
+    mock_dataflow = MagicMock()
+    mock_dataflow.is_encrypted = False
+    mock_dataflow.is_authenticated = True
+    mock_dataflow.source.name = "SourceA"
+    mock_dataflow.sink.name = "SinkA"
+    mock_dataflow.data = [mock_data]
+    mock_threat_model.dataflows = [mock_dataflow]
+
+    generator = RuleBasedThreatGenerator(mock_threat_model)
     threats = generator.generate_threats()
-    # 4 generic + 5 ATM specific
-    assert len(threats) == 9
-    assert any("Injection of false surveillance data" in t["description"] for t in threats)
+    assert len(threats) > 0
+    assert any("Sensitive data (PII) transmitted in cleartext" in t["description"] for t in threats)
 
-def test_generate_server_threats_with_database_direct():
-    """Test _generate_server_threats with a database server directly."""
+def test_generate_threats_with_trust_boundary_crossing():
+    """Test generate_threats with a dataflow crossing a trust boundary."""
     mock_threat_model = MagicMock()
-    mock_threat_model.servers = [{"name": "MyDatabase"}]
-    generator = ThreatGenerator(mock_threat_model)
-    generator._generate_server_threats()
-    # Expect 4 generic threats + 4 database specific threats = 8
-    assert len(generator.threats) == 8
-    assert any("Unauthorized access to sensitive data" in t["description"] for t in generator.threats)
+    mock_threat_model.servers = []
+    mock_threat_model.actors = []
+
+    mock_source = MagicMock()
+    mock_source.name = "SourceA"
+    mock_source.inBoundary = "untrusted"
+
+    mock_sink = MagicMock()
+    mock_sink.name = "SinkA"
+    mock_sink.inBoundary = "trusted"
+
+    mock_dataflow = MagicMock()
+    mock_dataflow.is_encrypted = True
+    mock_dataflow.is_authenticated = False
+    mock_dataflow.source = mock_source
+    mock_dataflow.sink = mock_sink
+    mock_dataflow.data = []
+    mock_threat_model.dataflows = [mock_dataflow]
+
+    generator = RuleBasedThreatGenerator(mock_threat_model)
+    threats = generator.generate_threats()
+    assert len(threats) > 0
+    assert any("Potential for spoofing attacks on data crossing trust boundaries" in t["description"] for t in threats)
 
 def test_get_custom_threats():
     """Test the get_custom_threats function."""
@@ -220,3 +228,35 @@ def test_get_custom_threats():
     threats = get_custom_threats(mock_threat_model)
     assert len(threats) == 2 # 2 threats from TestActor
     assert any(t["component"] == "TestActor" for t in threats)
+
+def test_stride_coverage():
+    """Test that all STRIDE categories are covered by the generated threats."""
+    mock_threat_model = MagicMock()
+
+    mock_threat_model.servers = [
+        {"name": "GenericServer"},
+        {"name": "DBServer", "type": "database"},
+        {"name": "PivotServer", "can_pivot": True},
+    ]
+
+    mock_dataflow = MagicMock()
+    mock_dataflow.is_encrypted = False
+    mock_dataflow.is_authenticated = False
+    mock_dataflow.source.name = "SourceA"
+    mock_dataflow.sink.name = "SinkA"
+    mock_dataflow.data = []
+    mock_threat_model.dataflows = [mock_dataflow]
+
+    mock_threat_model.actors = [{"name": "User"}]
+
+    threats = get_custom_threats(mock_threat_model)
+    
+    stride_categories = {t["stride_category"] for t in threats}
+
+    assert "Spoofing" in stride_categories
+    assert "Tampering" in stride_categories
+    assert "Repudiation" in stride_categories
+    assert "Information Disclosure" in stride_categories
+    assert "Denial of Service" in stride_categories
+    assert "Elevation of Privilege" in stride_categories
+

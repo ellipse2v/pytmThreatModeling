@@ -86,10 +86,15 @@ class SeverityCalculator:
             logging.error(f"Error loading severity multipliers from markdown: {e}")
         return multipliers
     
-    def calculate_score(self, threat_type: str, target_name: str, protocol: Optional[str] = None, classification: Optional[str] = None) -> float:
+    def calculate_score(self, threat_type: str, target_name: str, protocol: Optional[str] = None, classification: Optional[str] = None, impact: Optional[int] = None, likelihood: Optional[int] = None) -> float:
         """Calculates the severity score for a threat"""
         # Base score
         score = self.base_scores.get(threat_type, 5.0)
+        
+        # Incorporate impact and likelihood
+        if impact is not None and likelihood is not None:
+            # Simple multiplication for now, can be replaced with a more complex matrix lookup
+            score += (impact * likelihood) / 5.0 # Normalize to a reasonable range
         
         # Amplification factors based on target
         for target_key, multiplier in self.target_multipliers.items():
@@ -119,9 +124,9 @@ class SeverityCalculator:
                 return level_name, css_class
         return "INFORMATIONAL", "info"
     
-    def get_severity_info(self, threat_type: str, target_name: str, protocol: Optional[str] = None, classification: Optional[str] = None) -> Dict[str, any]:
+    def get_severity_info(self, threat_type: str, target_name: str, protocol: Optional[str] = None, classification: Optional[str] = None, impact: Optional[int] = None, likelihood: Optional[int] = None) -> Dict[str, any]:
         """Returns complete severity information"""
-        score = self.calculate_score(threat_type, target_name, protocol, classification)
+        score = self.calculate_score(threat_type, target_name, protocol, classification, impact, likelihood)
         level, css_class = self.get_severity_level(score)
         
         return {
@@ -134,6 +139,3 @@ class SeverityCalculator:
     def update_target_multipliers(self, new_multipliers: Dict[str, float]):
         """Updates target multipliers"""
         self.target_multipliers.update(new_multipliers)
-    
-    
-    

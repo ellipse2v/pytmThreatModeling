@@ -22,15 +22,18 @@ import logging
 from enum import Enum
 
 from .mitre_mapping_module import MitreMapping
+from threat_analysis.severity_calculator_module import SeverityCalculator
 
 class CustomThreat:
     """A simple class to represent a custom threat."""
-    def __init__(self, name, description, stride_category, mitre_technique_id, target):
+    def __init__(self, name, description, stride_category, impact, likelihood, target):
         self.name = name
         self.description = description
         self.stride_category = stride_category
-        self.mitre_technique_id = mitre_technique_id
+        self.impact = impact
+        self.likelihood = likelihood
         self.target = target
+        self.severity_info = None # To store calculated severity
 
     def __str__(self):
         return self.name
@@ -64,6 +67,7 @@ class ThreatModel:
         self.mitre_mapper = MitreMapping(self)
         self.mitre_analysis_results = {}
         self.threat_mitre_mapping = {}
+        self.severity_calculator = SeverityCalculator() # Instantiate SeverityCalculator
 
     def add_boundary(self, name: str, color: str = "lightgray", parent_boundary_obj: Optional[Boundary] = None, **kwargs) -> Boundary:
         """Adds a boundary to the model with additional properties, including an optional parent.
@@ -247,9 +251,30 @@ class ThreatModel:
                     name=threat_dict['description'],
                     description=threat_dict['description'],
                     stride_category=threat_dict['stride_category'],
-                    mitre_technique_id=None, # You can add this if you have it
+                    impact=threat_dict['impact'],
+                    likelihood=threat_dict['likelihood'],
                     target=target_obj
                 )
+                # Calculate and store severity for custom threats
+                threat_type = custom_threat.stride_category
+                target_name_for_severity = getattr(target_obj, 'name', 'Unknown')
+                protocol = getattr(target_obj, 'protocol', None) if isinstance(target_obj, Dataflow) else None
+                classification = None
+                if isinstance(target_obj, Dataflow) and hasattr(target_obj, 'data') and target_obj.data:
+                    # Assuming dataflows carry a single data object for simplicity in this context
+                    data_obj = target_obj.data[0]
+                    if hasattr(data_obj, 'classification'):
+                        classification = data_obj.classification.name # Get string representation of enum
+
+                custom_threat.severity_info = self.severity_calculator.get_severity_info(
+                    threat_type=threat_type,
+                    target_name=target_name_for_severity,
+                    protocol=protocol,
+                    classification=classification,
+                    impact=custom_threat.impact,
+                    likelihood=custom_threat.likelihood
+                )
+
                 custom_threats_tuples.append((custom_threat, target_obj))
 
         # Combine filtered PyTM threats with custom threats
@@ -337,7 +362,8 @@ class ThreatModel:
             self.threat_mitre_mapping[threat_key] = {
                 "stride_category": processed_threat["stride_category"],
                 "mitre_tactics": processed_threat["mitre_tactics"],
-                "mitre_techniques": processed_threat["mitre_techniques"]
+                "mitre_techniques": processed_threat["mitre_techniques"],
+                "severity_info": processed_threat.get("severity_info") # Add severity info to mapping
             }
 
     def get_statistics(self) -> Dict[str, int]:

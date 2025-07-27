@@ -207,38 +207,39 @@ class ModelParser:
         """Parses a line to define a Data object, extracting all properties."""
         # The regex captures the name between ** and the rest of the line as a parameter string
         match = re.match(r'^- \*\*([^\*]+)\*\*:\s*(.*)', line)
-        if match:
-            name = match.group(1).strip()
-            params_str = match.group(2).strip()
-            data_kwargs = self._parse_key_value_params(params_str) # Extract key=value
-
-            # Convert strings to PyTM enum objects
-            if "classification" in data_kwargs:
-                enum_str = data_kwargs["classification"].upper()
-                data_kwargs["classification"] = self.classification_map.get(enum_str, Classification.UNKNOWN)
-                if enum_str not in self.classification_map:
-                    logging.warning(f"⚠️ Warning: Classification '{enum_str}' not recognized for Data '{name}'. Set to UNKNOWN.")
-
-            if "credentialsLife" in data_kwargs:
-                enum_str = data_kwargs["credentialsLife"].upper()
-                data_kwargs["credentialsLife"] = self.lifetime_map.get(enum_str, Lifetime.UNKNOWN)
-                if enum_str not in self.lifetime_map:
-                    logging.warning(f"⚠️ Warning: Lifetime '{enum_str}' not recognized for Data '{name}'. Set to UNKNOWN.")
-            
-            # Call add_data by unpacking the properties dictionary
-            self.threat_model.add_data(name, **data_kwargs)
-            
-            # Create a nice log message
-            params_display = []
-            for key, value in data_kwargs.items():
-                if hasattr(value, 'name'):  # For enum objects
-                    params_display.append(f"{key}: {value.name}")
-                else:
-                    params_display.append(f"{key}: {value}")
-            
-            logging.info(f"   - Added Data: {name} ({', '.join(params_display)})")
-        else:
+        if not match:
             logging.warning(f"⚠️ Warning: Malformed data line: {line}")
+            return
+
+        name = match.group(1).strip()
+        params_str = match.group(2).strip()
+        data_kwargs = self._parse_key_value_params(params_str) # Extract key=value
+
+        # Convert strings to PyTM enum objects
+        if "classification" in data_kwargs:
+            enum_str = data_kwargs["classification"].upper()
+            data_kwargs["classification"] = self.classification_map.get(enum_str, Classification.UNKNOWN)
+            if enum_str not in self.classification_map:
+                logging.warning(f"⚠️ Warning: Classification '{enum_str}' not recognized for Data '{name}'. Set to UNKNOWN.")
+
+        if "credentialsLife" in data_kwargs:
+            enum_str = data_kwargs["credentialsLife"].upper()
+            data_kwargs["credentialsLife"] = self.lifetime_map.get(enum_str, Lifetime.UNKNOWN)
+            if enum_str not in self.lifetime_map:
+                logging.warning(f"⚠️ Warning: Lifetime '{enum_str}' not recognized for Data '{name}'. Set to UNKNOWN.")
+            
+        # Call add_data by unpacking the properties dictionary
+        self.threat_model.add_data(name, **data_kwargs)
+        
+        # Create a nice log message
+        params_display = []
+        for key, value in data_kwargs.items():
+            if hasattr(value, 'name'):  # For enum objects
+                params_display.append(f"{key}: {value.name}")
+            else:
+                params_display.append(f"{key}: {value}")
+        
+        logging.info(f"   - Added Data: {name} ({', '.join(params_display)})")
 
     def _parse_dataflow(self, line: str):
         """Parses a dataflow line with flexible named arguments."""
@@ -320,26 +321,27 @@ class ModelParser:
         """Parses a custom MITRE mapping line."""
         # Expected format: - **Attack Name**: tactics=["tactic1", "tactic2"], techniques=[{"id": "T1234", "name": "Attack Name"}]
         match = re.match(r'^- \*\*([^\*]+)\*\*:\s*(.*)', line)
-        if match:
-            attack_name = match.group(1).strip()
-            params_str = match.group(2).strip()
-            
-            # Parse tactics and techniques arrays using ast.literal_eval
-            try:
-                parsed_mapping = ast.literal_eval(params_str)
-                tactics = parsed_mapping.get('tactics', [])
-                techniques = parsed_mapping.get('techniques', [])
-            except (SyntaxError, ValueError) as e:
-                logging.error(f"Error evaluating custom MITRE mapping for '{attack_name}': {e}")
-                tactics = []
-                techniques = []
-            
-            # Call add_custom_mitre_mapping method if it exists
-            if hasattr(self.threat_model, 'add_custom_mitre_mapping'):
-                self.threat_model.add_custom_mitre_mapping(attack_name, tactics, techniques)
-                logging.info(f"   - Added Custom MITRE Mapping: {attack_name} (Tactics: {len(tactics)}, Techniques: {len(techniques)})")
-            else:
-                logging.warning(f"⚠️ Warning: Malformed custom MITRE mapping line: {line}")
+        if not match:
+            logging.warning(f"⚠️ Warning: Malformed custom MITRE mapping line: {line}")
+            return
+
+        attack_name = match.group(1).strip()
+        params_str = match.group(2).strip()
+        
+        # Parse tactics and techniques arrays using ast.literal_eval
+        try:
+            parsed_mapping = ast.literal_eval(params_str)
+            tactics = parsed_mapping.get('tactics', [])
+            techniques = parsed_mapping.get('techniques', [])
+        except (SyntaxError, ValueError) as e:
+            logging.error(f"Error evaluating custom MITRE mapping for '{attack_name}': {e}")
+            tactics = []
+            techniques = []
+        
+        # Call add_custom_mitre_mapping method if it exists
+        if hasattr(self.threat_model, 'add_custom_mitre_mapping'):
+            self.threat_model.add_custom_mitre_mapping(attack_name, tactics, techniques)
+            logging.info(f"   - Added Custom MITRE Mapping: {attack_name} (Tactics: {len(tactics)}, Techniques: {len(techniques)})")
         else:
             logging.warning(f"⚠️ Warning: Malformed custom MITRE mapping line: {line}")
             
@@ -358,13 +360,14 @@ class ModelParser:
         for server_info in self.threat_model.servers:
             server = server_info['object']
             for threat_template in custom_threat_definitions.get("servers", []):
-                threat_name = threat_template["name"].format(server_name=server.name)
+                threat_name = threat_template["description"].format(name=server.name)
                 
                 custom_threat = CustomThreat(
                     name=threat_name,
                     description=threat_template["description"],
                     stride_category=threat_template["stride_category"],
-                    mitre_technique_id=threat_template["mitre_technique_id"],
+                    impact=threat_template["impact"],
+                    likelihood=threat_template["likelihood"],
                     target=server # The target is the actual PyTM object
                 )
                 
@@ -375,18 +378,36 @@ class ModelParser:
         # Apply threats to dataflows
         for dataflow in self.threat_model.dataflows:
             for threat_template in custom_threat_definitions.get("dataflows", []):
-                threat_name = threat_template["name"].format(dataflow_name=dataflow.name)
+                threat_name = threat_template["description"].format(source=dataflow.source, sink=dataflow.sink)
                 
                 custom_threat = CustomThreat(
                     name=threat_name,
                     description=threat_template["description"],
                     stride_category=threat_template["stride_category"],
-                    mitre_technique_id=threat_template["mitre_technique_id"],
+                    impact=threat_template["impact"],
+                    likelihood=threat_template["likelihood"],
                     target=dataflow # The target is the actual PyTM object
                 )
                 
                 generated_custom_threats.append((custom_threat, dataflow))
                 elements_with_custom_threats.add(dataflow)
                 
+        # Apply threats to actors
+        for actor_info in self.threat_model.actors:
+            actor = actor_info['object']
+            for threat_template in custom_threat_definitions.get("actors", []):
+                threat_name = threat_template["description"].format(name=actor.name)
+
+                custom_threat = CustomThreat(
+                    name=threat_name,
+                    description=threat_template["description"],
+                    stride_category=threat_template["stride_category"],
+                    impact=threat_template["impact"],
+                    likelihood=threat_template["likelihood"],
+                    target=actor # The target is the actual PyTM object
+                )
+
+                generated_custom_threats.append((custom_threat, actor))
+                elements_with_custom_threats.add(actor)
         
         return generated_custom_threats, elements_with_custom_threats

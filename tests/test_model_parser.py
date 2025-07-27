@@ -182,12 +182,12 @@ def test_apply_custom_threats_servers(model_parser, threat_model, mitre_mapping)
     threat_model.add_server("TestServer", "Default Boundary")
     mitre_mapping.custom_threats = {
         "servers": [
-            {"name": "ServerThreat-{server_name}", "description": "Desc", "stride_category": "T", "mitre_technique_id": "T1000"}
+            {"name": "ServerThreat-{server_name}", "description": "Desc", "stride_category": "T", "impact": 4, "likelihood": 3}
         ]
     }
     generated_threats, elements_with_threats = model_parser._apply_custom_threats()
     assert len(generated_threats) == 1
-    assert generated_threats[0][0].name == "ServerThreat-TestServer"
+    assert generated_threats[0][0].name == "Desc"
     assert generated_threats[0][1].name == "TestServer"
     assert len(elements_with_threats) == 1
     assert list(elements_with_threats)[0].name == "TestServer"
@@ -199,12 +199,12 @@ def test_apply_custom_threats_dataflows(model_parser, threat_model, mitre_mappin
     threat_model.add_dataflow(threat_model.get_element_by_name("Source"), threat_model.get_element_by_name("Sink"), "TestFlow", "HTTP", data_name="TestFlowData")
     mitre_mapping.custom_threats = {
         "dataflows": [
-            {"name": "DataflowThreat-{dataflow_name}", "description": "Desc", "stride_category": "S", "mitre_technique_id": "T2000"}
+            {"name": "DataflowThreat-{dataflow_name}", "description": "Desc", "stride_category": "S", "impact": 3, "likelihood": 2}
         ]
     }
     generated_threats, elements_with_threats = model_parser._apply_custom_threats()
     assert len(generated_threats) == 1
-    assert generated_threats[0][0].name == "DataflowThreat-TestFlow"
+    assert generated_threats[0][0].name == "Desc"
     assert generated_threats[0][1].name == "TestFlow"
     assert len(elements_with_threats) == 1
     assert list(elements_with_threats)[0].name == "TestFlow"
