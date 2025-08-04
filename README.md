@@ -87,7 +87,7 @@ This framework can automatically generate a complete threat model directly from 
 
 Here's how to use the Ansible plugin with a sample playbook:
 
-1.  **Ensure you have the test playbook:** The sample Ansible playbook is located at `tests/ansible_playbooks/simple_web_server.yml`.
+1.  **Ensure you have the test playbook:** The sample Ansible playbook is located at `tests/ansible_playbooks/simple_web_server/simple_web_server.yml`.
 2.  **Run the analysis with the Ansible plugin:**
     ```bash
     python -m threat_analysis --ansible-path tests/ansible_playbooks/simple_web_server.yml
@@ -96,7 +96,7 @@ Here's how to use the Ansible plugin with a sample playbook:
 
     If you wish to specify a different output file for the generated model, you can use the `--model-file` option:
     ```bash
-    python -m threat_analysis --ansible-path tests/ansible_playbooks/simple_web_server.yml --model-file my_generated_model.md
+    python -m threat_analysis --ansible-path tests/ansible_playbooks/simple_web_server/simple_web_server.yml --model-file my_generated_model.md
     ```
 3.  **View the results** in the generated `output/` folder, which will now include elements from your Ansible configuration.
 
