@@ -252,16 +252,19 @@ class ModelParser:
         params_str = name_match.group(2).strip()
         params = self._parse_key_value_params(params_str)
 
-        from_name = params.get("from").lower().replace("actor:", "").replace("component:", "").replace("zone:", "")
-        to_name = params.get("to").lower().replace("actor:", "").replace("component:", "").replace("zone:", "")
+        from_name_raw = params.get("from")
+        to_name_raw = params.get("to")
         protocol = params.get("protocol")
         data_name = params.get("data")
         is_authenticated = params.get("is_authenticated", False)
         is_encrypted = params.get("is_encrypted", False)
 
-        if not all([from_name, to_name, protocol]):
+        if not all([from_name_raw, to_name_raw, protocol]):
             logging.warning(f"⚠️ Warning: Dataflow '{name}' is missing mandatory parameters (from, to, protocol).")
             return
+
+        from_name = from_name_raw.lower().replace("actor:", "").replace("component:", "").replace("zone:", "")
+        to_name = to_name_raw.lower().replace("actor:", "").replace("component:", "").replace("zone:", "")
 
         from_elem = self.threat_model.get_element_by_name(from_name) or self.threat_model.boundaries.get(from_name, {}).get('boundary')
         to_elem = self.threat_model.get_element_by_name(to_name) or self.threat_model.boundaries.get(to_name, {}).get('boundary')
@@ -269,7 +272,7 @@ class ModelParser:
         if from_elem and to_elem:
             self.threat_model.add_dataflow(
                 from_elem, to_elem, name, protocol,
-                data_name=data_name.lower(),
+                data_name=data_name.lower() if data_name else None,
                 is_authenticated=is_authenticated,
                 is_encrypted=is_encrypted
             )

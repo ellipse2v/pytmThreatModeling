@@ -90,7 +90,7 @@ Here's how to use the Ansible plugin with a sample playbook:
 1.  **Ensure you have the test playbook:** The sample Ansible playbook is located at `tests/ansible_playbooks/simple_web_server/simple_web_server.yml`.
 2.  **Run the analysis with the Ansible plugin:**
     ```bash
-    python -m threat_analysis --ansible-path tests/ansible_playbooks/simple_web_server.yml
+    python -m threat_analysis --ansible-path tests/ansible_playbooks/simple_web_server/simple_web_server.yml
     ```
     This command will generate a complete threat model based on the Ansible playbook. The generated Markdown model will be saved in the `output/` directory with a filename derived from your Ansible playbook (e.g., `simple_web_server.md`).
 

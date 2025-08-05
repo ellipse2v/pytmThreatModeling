@@ -147,6 +147,13 @@ def test_parse_dataflow_missing_data_object(model_parser, threat_model):
         assert not dataflow.data # Data list should be empty
         mock_warn.assert_called_once_with("⚠️ Warning: Data object 'nonexistentdata' not found for dataflow 'FlowWithMissingData'.")
 
+def test_parse_dataflow_malformed(model_parser, threat_model):
+    with patch('logging.warning') as mock_warn:
+        line = "- **MalformedFlow**: to=\"MyServer\", protocol=\"TCP\""
+        model_parser._parse_dataflow(line)
+        assert len(threat_model.dataflows) == 0
+        mock_warn.assert_called_once()
+
 def test_parse_protocol_style(model_parser, threat_model):
     line = "- **HTTPS**: color=blue, line_style=dotted, width=2.0"
     model_parser._parse_protocol_style(line)
