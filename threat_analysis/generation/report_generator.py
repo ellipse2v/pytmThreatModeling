@@ -21,6 +21,17 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
+import logging
+import sys
+
+# Add project root to sys.path to allow imports from other directories
+project_root = Path(__file__).resolve().parents[2]
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+from threat_analysis.core.model_factory import create_threat_model
+from threat_analysis.generation.diagram_generator import DiagramGenerator
+from threat_analysis.core.models_module import ThreatModel
 
 
 class ReportGenerator:
@@ -194,5 +205,81 @@ class ReportGenerator:
             "min_severity": min(all_scores),
             "severity_distribution": severity_distribution
         }
+
+    def generate_project_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[str]):
+        """
+        Recursively generates reports for a project.
+        """
+        logging.info(f"Generating report for: {model_path}")
+        with open(model_path, "r", encoding="utf-8") as f:
+            markdown_content = f.read()
+
+        threat_model = create_threat_model(
+            markdown_content=markdown_content,
+            model_name=model_path.stem,
+            model_description=f"Threat model for {model_path.stem}",
+            mitre_mapping=self.mitre_mapping,
+            validate=True
+        )
+        if not threat_model:
+            logging.error(f"Failed to create threat model for {model_path}")
+            return
+
+        diagram_generator = DiagramGenerator()
+        svg_file = output_dir / f"{model_path.stem}.svg"
+        dot_file_path = diagram_generator.generate_dot_file_from_model(threat_model, str(svg_file.with_suffix(".dot")))
+        if dot_file_path:
+            with open(dot_file_path, "r", encoding="utf-8") as f:
+                dot_code = f.read()
+            diagram_generator.generate_diagram_from_dot(dot_code, str(svg_file), "svg")
+
+        grouped_threats = threat_model.process_threats()
+        all_detailed_threats_with_mitre = self._get_all_threats_with_mitre_info(grouped_threats)
+        summary_stats = self.generate_summary_stats(all_detailed_threats_with_mitre)
+        stride_categories = sorted(list(set(threat['stride_category'] for threat in all_detailed_threats_with_mitre)))
+
+        with open(svg_file, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+
+        svg_content = diagram_generator.add_links_to_svg(svg_content, threat_model)
+
+        template = self.env.get_template('report_template.html')
+        html = template.render(
+            title=f"Threat Model Report: {model_path.stem}",
+            report_title=f"🛡️ Threat Model Report: {model_path.stem}",
+            total_threats_analyzed=summary_stats.get('total_threats', 0),
+            total_mitre_techniques_mapped=threat_model.get_statistics().get('mitre_techniques_count', 0),
+            stride_distribution=threat_model.mitre_analysis_results.get('stride_distribution', {}),
+            summary_stats=summary_stats,
+            all_threats=all_detailed_threats_with_mitre,
+            stride_categories=stride_categories,
+            severity_calculation_note=self.severity_calculator.get_calculation_explanation(),
+            svg_content=svg_content,
+            breadcrumb=breadcrumb,
+            back_link="../index.html" if len(breadcrumb) > 1 else None,
+            model_name=model_path.stem
+        )
+
+        report_file = output_dir / "index.html"
+        with open(report_file, "w", encoding="utf-8") as f:
+            f.write(html)
+        logging.info(f"Generated report: {report_file}")
+
+        for server in threat_model.servers:
+            if 'submodel' in server:
+                submodel_path_str = server['submodel']
+                submodel_path = (model_path.parent / submodel_path_str).resolve()
+
+                if submodel_path.exists():
+                    sub_output_dir = output_dir / Path(submodel_path_str).parent.name
+                    sub_output_dir.mkdir(exist_ok=True)
+                    new_breadcrumb = breadcrumb + [Path(submodel_path_str).parent.name]
+                    self.generate_project_reports(
+                        model_path=submodel_path,
+                        output_dir=sub_output_dir,
+                        breadcrumb=new_breadcrumb
+                    )
+                else:
+                    logging.warning(f"Submodel file not found: {submodel_path}")
 
     
