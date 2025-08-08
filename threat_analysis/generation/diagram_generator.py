@@ -58,8 +58,8 @@ class DiagramGenerator:
             logging.error(f"❌ Error during DOT file generation: {e}")
             return None
 
-    def generate_diagram_from_dot(self, dot_code: str, output_file: str, format: str = "svg") -> Optional[str]:
-        """Generates a diagram from DOT code using Graphviz."""
+    def generate_diagram_from_dot(self, dot_file_path: str, output_file: str, format: str = "svg") -> Optional[str]:
+        """Generates a diagram from a DOT file using Graphviz."""
         if format not in self.supported_formats:
             logging.error(f"❌ Unsupported format: {format}. Supported formats: {self.supported_formats}")
             return None
@@ -84,22 +84,16 @@ class DiagramGenerator:
             else:
                 output_path = str(output_path_obj.with_suffix(f'.{format}'))
             
-            # Clean the DOT code before processing
-            cleaned_dot = self._clean_dot_code(dot_code)
-            
             # Run dot command to generate diagram
-            # process = subprocess.run(
             subprocess.run(
-                [self.dot_executable, f"-T{format}", "-o", output_path],
-                input=cleaned_dot,
+                [self.dot_executable, f"-T{format}", dot_file_path, "-o", output_path],
                 text=True,
                 encoding='utf-8',
                 capture_output=True,
                 check=True
             )
             
-            if output_path_obj.exists(): # Use output_path_obj for existence check
-                
+            if output_path_obj.exists():
                 return output_path
             else:
                 logging.error("❌ Output file was not created")
@@ -107,7 +101,6 @@ class DiagramGenerator:
                 
         except subprocess.CalledProcessError as e:
             logging.error(f"❌ Graphviz error: {e.stderr}")
-            logging.error(f"DOT code preview: {cleaned_dot[:200]}...")
             return None
         except Exception as e:
             logging.error(f"❌ Unexpected error: {e}")
@@ -303,32 +296,7 @@ class DiagramGenerator:
         else:
             attributes.append(f'label="{escaped_name}"')
         
-        # Add id for easier lookup
-        attributes.append(f'id="{self._sanitize_name(node_name)}"')
-
-        if isinstance(element, dict) and 'submodel' in element:
-            submodel_path = Path(element['submodel'])
-            # The URL should be relative to the current model's output directory
-            url = f"{submodel_path.parent.name}/index.html"
-            attributes.append(f'URL="{url}"')
-            attributes.append('target="_parent"')
-
         return f'[{", ".join(attributes)}]'
-
-    def add_links_to_svg(self, svg_content: str, threat_model) -> str:
-        """
-        Adds hyperlinks to the SVG content for nodes with submodels.
-        """
-        for server in threat_model.servers:
-            if 'submodel' in server:
-                server_name = server['name']
-                submodel_path = Path(server['submodel'])
-                url = f"{submodel_path.parent.name}/index.html"
-
-                # Find the node group for the server by its title
-                pattern = re.compile(fr'(<g class="node".*?<title>{server_name}<\/title>.*?<\/g>)', re.DOTALL)
-                svg_content = pattern.sub(fr'<a xlink:href="{url}">\1</a>', svg_content)
-        return svg_content
 
     def _get_element_name(self, element) -> Optional[str]:
         """Safely extracts the name from a model element."""

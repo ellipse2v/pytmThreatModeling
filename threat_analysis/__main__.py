@@ -227,37 +227,6 @@ class ThreatAnalysisFramework:
             pass
 
 
-def handle_project_generation(project_path: str):
-    """
-    Handles the generation of reports for a hierarchical threat model project.
-    """
-    project_dir = Path(project_path)
-    main_model_file = project_dir / "main.md"
-
-    if not main_model_file.exists():
-        logging.error(f"Main model file 'main.md' not found in project directory: {project_dir}")
-        sys.exit(1)
-
-    # For now, we are not using severity_calculator and mitre_mapping
-    # but they are required by the ReportGenerator constructor.
-    # In a real implementation, you might need to initialize them properly.
-    from threat_analysis.severity_calculator_module import SeverityCalculator
-    from threat_analysis.core.mitre_mapping_module import MitreMapping
-    from threat_analysis.generation.report_generator import ReportGenerator
-
-    severity_calculator = SeverityCalculator(markdown_file_path=str(main_model_file))
-    mitre_mapping = MitreMapping()
-    report_generator = ReportGenerator(severity_calculator, mitre_mapping)
-
-    output_dir = Path(config.OUTPUT_BASE_DIR) / project_dir.name
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    report_generator.generate_project_reports(
-        model_path=main_model_file,
-        output_dir=output_dir,
-        breadcrumb=["main"]
-    )
-
 def load_iac_plugins() -> Dict[str, IaCPlugin]:
     """Dynamically loads IaC plugins from the iac_plugins directory.
 
@@ -349,9 +318,18 @@ if __name__ == "__main__":
             )
             sys.exit(1)
     elif args.project:
-        logging.info(f"Project mode activated for directory: {args.project}")
-        handle_project_generation(args.project)
-        sys.exit(0)
+        from threat_analysis.generation.report_generator import ReportGenerator
+        from threat_analysis.severity_calculator_module import SeverityCalculator
+        from threat_analysis.core.mitre_mapping_module import MitreMapping
+
+        project_path = Path(args.project)
+        output_dir = Path(config.OUTPUT_BASE_DIR) / project_path.name
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        severity_calculator = SeverityCalculator(markdown_file_path=str(project_path / "main.md"))
+        mitre_mapping = MitreMapping()
+        report_generator = ReportGenerator(severity_calculator, mitre_mapping)
+        report_generator.generate_project_reports(project_path, output_dir)
     else:
         markdown_content_for_analysis = ""
         iac_plugin_used = False

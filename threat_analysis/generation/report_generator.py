@@ -206,64 +206,65 @@ class ReportGenerator:
             "severity_distribution": severity_distribution
         }
 
-    def generate_project_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[str]):
+    def generate_project_reports(self, project_path: Path, output_dir: Path):
         """
-        Recursively generates reports for a project.
+        Generates all reports for a project.
         """
-        logging.info(f"Generating report for: {model_path}")
+        diagram_generator = DiagramGenerator()
+        models_data = self._recursively_generate_model_data(
+            model_path=project_path / "main.md",
+            output_dir=output_dir,
+            diagram_generator=diagram_generator,
+            breadcrumb=["main"]
+        )
+
+        template = self.env.get_template('navigable_diagram_template.html')
+        navigable_html = template.render(models=models_data)
+
+        navigable_html_path = output_dir / f"{project_path.name}_navigable.html"
+        with open(navigable_html_path, "w", encoding="utf-8") as f:
+            f.write(navigable_html)
+        logging.info(f"Generated navigable diagram: {navigable_html_path}")
+
+    def _recursively_generate_model_data(self, model_path: Path, output_dir: Path, diagram_generator: DiagramGenerator, breadcrumb: List[str]) -> List[Dict]:
+        """
+        Recursively generates data for each model in the project.
+        """
+        model_name = model_path.stem
+        logging.info(f"Processing model: {model_name}")
+
         with open(model_path, "r", encoding="utf-8") as f:
             markdown_content = f.read()
 
         threat_model = create_threat_model(
             markdown_content=markdown_content,
-            model_name=model_path.stem,
-            model_description=f"Threat model for {model_path.stem}",
+            model_name=model_name,
+            model_description=f"Threat model for {model_name}",
             mitre_mapping=self.mitre_mapping,
             validate=True
         )
         if not threat_model:
-            logging.error(f"Failed to create threat model for {model_path}")
-            return
+            return []
 
-        diagram_generator = DiagramGenerator()
-        svg_file = output_dir / f"{model_path.stem}.svg"
-        dot_file_path = diagram_generator.generate_dot_file_from_model(threat_model, str(svg_file.with_suffix(".dot")))
+        # Generate SVG
+        svg_path = output_dir / f"{model_name}.svg"
+        dot_file_path = diagram_generator.generate_dot_file_from_model(threat_model, str(svg_path.with_suffix('.dot')))
         if dot_file_path:
-            with open(dot_file_path, "r", encoding="utf-8") as f:
-                dot_code = f.read()
-            diagram_generator.generate_diagram_from_dot(dot_code, str(svg_file), "svg")
+            diagram_generator.generate_diagram_from_dot(dot_file_path, str(svg_path), "svg")
 
-        grouped_threats = threat_model.process_threats()
-        all_detailed_threats_with_mitre = self._get_all_threats_with_mitre_info(grouped_threats)
-        summary_stats = self.generate_summary_stats(all_detailed_threats_with_mitre)
-        stride_categories = sorted(list(set(threat['stride_category'] for threat in all_detailed_threats_with_mitre)))
+        # Generate threat report
+        report_path = output_dir / f"{model_name}_threat_report.html"
+        self.generate_html_report(threat_model, threat_model.process_threats(), report_path)
 
-        with open(svg_file, "r", encoding="utf-8") as f:
-            svg_content = f.read()
+        model_data = {
+            "id": model_name,
+            "svg_path": str(svg_path.relative_to(output_dir.parent)),
+            "report_path": str(report_path.relative_to(output_dir.parent)),
+            "breadcrumb": " → ".join(breadcrumb),
+            "parent_id": breadcrumb[-2] if len(breadcrumb) > 1 else "null"
+        }
 
-        svg_content = diagram_generator.add_links_to_svg(svg_content, threat_model)
-
-        template = self.env.get_template('report_template.html')
-        html = template.render(
-            title=f"Threat Model Report: {model_path.stem}",
-            report_title=f"🛡️ Threat Model Report: {model_path.stem}",
-            total_threats_analyzed=summary_stats.get('total_threats', 0),
-            total_mitre_techniques_mapped=threat_model.get_statistics().get('mitre_techniques_count', 0),
-            stride_distribution=threat_model.mitre_analysis_results.get('stride_distribution', {}),
-            summary_stats=summary_stats,
-            all_threats=all_detailed_threats_with_mitre,
-            stride_categories=stride_categories,
-            severity_calculation_note=self.severity_calculator.get_calculation_explanation(),
-            svg_content=svg_content,
-            breadcrumb=breadcrumb,
-            back_link="../index.html" if len(breadcrumb) > 1 else None,
-            model_name=model_path.stem
-        )
-
-        report_file = output_dir / "index.html"
-        with open(report_file, "w", encoding="utf-8") as f:
-            f.write(html)
-        logging.info(f"Generated report: {report_file}")
+        all_models_data = [model_data]
 
         for server in threat_model.servers:
             if 'submodel' in server:
@@ -274,12 +275,15 @@ class ReportGenerator:
                     sub_output_dir = output_dir / Path(submodel_path_str).parent.name
                     sub_output_dir.mkdir(exist_ok=True)
                     new_breadcrumb = breadcrumb + [Path(submodel_path_str).parent.name]
-                    self.generate_project_reports(
-                        model_path=submodel_path,
-                        output_dir=sub_output_dir,
-                        breadcrumb=new_breadcrumb
+                    all_models_data.extend(
+                        self._recursively_generate_model_data(
+                            model_path=submodel_path,
+                            output_dir=sub_output_dir,
+                            diagram_generator=diagram_generator,
+                            breadcrumb=new_breadcrumb
+                        )
                     )
                 else:
                     logging.warning(f"Submodel file not found: {submodel_path}")
 
-    
+        return all_models_data

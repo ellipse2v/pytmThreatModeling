@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrammes de Menaces Navigables - Threat Model</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .diagram-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .svg-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .svg-container.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .svg-container svg {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        }
+
+        /* Back Button */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1002;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            color: #333;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button.visible {
+            display: flex;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button:active {
+            transform: translateY(0);
+        }
+
+        /* Clickable elements in SVG */
+        .clickable-element {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clickable-element:hover {
+            filter: brightness(1.2);
+            transform: scale(1.05);
+        }
+
+        /* Legend styles */
+        .legend {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            min-width: 90px;
+            max-width: 140px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            cursor: move;
+        }
+
+        .legend:hover {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .legend-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #007acc;
+            background: rgba(0, 122, 204, 0.1);
+            border-radius: 6px 6px 0 0;
+        }
+
+        .legend-title {
+            font-weight: bold;
+            font-size: 10px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin: 0;
+        }
+
+        .legend-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 0;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 2px;
+            transition: background-color 0.2s;
+        }
+
+        .legend-toggle:hover {
+            background-color: rgba(0, 122, 204, 0.2);
+        }
+
+        .legend-content {
+            padding: 8px;
+            line-height: 1.2;
+            transition: all 0.3s ease;
+        }
+
+        .legend-content.hidden {
+            display: none;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3px;
+            padding: 1px 0;
+            font-size: 9px;
+        }
+
+        .legend.hidden {
+            display: none;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #666;
+            z-index: 1001;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .back-button {
+                top: 10px;
+                left: 10px;
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .legend {
+                right: 10px;
+                top: 10px;
+            }
+
+            .breadcrumb {
+                bottom: 10px;
+                left: 10px;
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="diagram-container">
+        <!-- Back Button -->
+        <div class="back-button" id="back-button" onclick="goBack()">
+            ← Retour
+        </div>
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb" id="breadcrumb">
+            🏠 Vue Principale
+        </div>
+
+        {% for model in models %}
+        <div id="{{ model.id }}-diagram" class="svg-container {% if loop.first %}active{% endif %}">
+            <object data="{{ model.svg_path }}" type="image/svg+xml"></object>
+        </div>
+        {% endfor %}
+
+        <!-- Legend -->
+        <div class="legend" id="legend">
+            <div class="legend-header">
+                <div class="legend-title">🔍 Légende</div>
+                <button class="legend-toggle" onclick="toggleLegendContent()" title="Réduire/Étendre">
+                    <span id="toggle-icon">−</span>
+                </button>
+            </div>
+            <div class="legend-content" id="legend-content">
+                <div class="legend-item">
+                    <div style="width: 12px; height: 8px; background-color: #FFFF99; border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
+                    <span>👤 Acteur</span>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 12px; height: 8px; background-color: #90EE90; border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
+                    <span>🖥️ Serveur</span>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 12px; height: 8px; background-color: #ADD8D6; border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
+                    <span>🗄️ Database</span>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 12px; height: 8px; background-color: #FF6B6B; border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
+                    <span>🔥 Firewall</span>
+                </div>
+                <div style="margin-top: 5px; font-weight: bold; font-size: 10px;">Protocoles:</div>
+                <div class="legend-item">
+                    <div style="width: 20px; height: 2px; background-color: blue; margin-right: 8px;"></div>
+                    <span>HTTPS</span>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 20px; height: 2px; background-color: red; margin-right: 8px;"></div>
+                    <span>HTTP</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDiagram = '{{ models[0].id }}';
+        let navigationHistory = ['{{ models[0].id }}'];
+
+        const diagrams = {
+            {% for model in models %}
+            '{{ model.id }}': {
+                element: '{{ model.id }}-diagram',
+                title: '{{ model.id }}',
+                breadcrumb: '{{ model.breadcrumb }}',
+                parent: '{{ model.parent_id }}'
+            },
+            {% endfor %}
+        };
+
+        function showDiagram(diagramId) {
+            if (!diagrams[diagramId]) return;
+
+            // Add to history if navigating forward
+            if (currentDiagram !== diagramId && !navigationHistory.includes(diagramId)) {
+                navigationHistory.push(diagramId);
+            }
+
+            // Hide all diagrams
+            document.querySelectorAll('.svg-container').forEach(container => {
+                container.classList.remove('active');
+            });
+
+            // Show target diagram
+            const targetElement = document.getElementById(diagrams[diagramId].element);
+            if (targetElement) {
+                setTimeout(() => {
+                    targetElement.classList.add('active');
+                }, 50);
+
+                // Update breadcrumb
+                document.getElementById('breadcrumb').textContent = diagrams[diagramId].breadcrumb;
+
+                // Update document title
+                document.title = `${diagrams[diagramId].title} - Threat Model`;
+
+                currentDiagram = diagramId;
+
+                // Show/hide back button
+                updateBackButton();
+
+                // Add to browser history
+                history.pushState({diagramId: diagramId}, '', `#${diagramId}`);
+            }
+        }
+
+        function goBack() {
+            const parentDiagram = diagrams[currentDiagram]?.parent;
+            if (parentDiagram) {
+                // Remove current from history
+                navigationHistory = navigationHistory.filter(id => id !== currentDiagram);
+                showDiagram(parentDiagram);
+            }
+        }
+
+        function updateBackButton() {
+            const backButton = document.getElementById('back-button');
+            const hasParent = diagrams[currentDiagram]?.parent !== null;
+
+            if (hasParent) {
+                backButton.classList.add('visible');
+            } else {
+                backButton.classList.remove('visible');
+            }
+        }
+
+        function toggleLegendContent() {
+            const content = document.getElementById('legend-content');
+            const icon = document.getElementById('toggle-icon');
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.textContent = '−';
+            } else {
+                content.classList.add('hidden');
+                icon.textContent = '+';
+            }
+        }
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', function(event) {
+            if (event.state && event.state.diagramId) {
+                currentDiagram = event.state.diagramId;
+                showDiagram(currentDiagram);
+            }
+        });
+
+        // Initialize from URL hash on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash.substring(1);
+            if (hash && diagrams[hash]) {
+                showDiagram(hash);
+            } else {
+                // Set initial state
+                updateBackButton();
+                history.replaceState({diagramId: 'main'}, '', '#main');
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                goBack();
+            }
+        });
+    </script>
+</body>
+</html>

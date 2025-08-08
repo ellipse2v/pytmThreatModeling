@@ -94,43 +94,11 @@
         .mitre-link:hover {
             text-decoration: underline;
         }
-        .diagram-container {
-            text-align: center;
-            margin: 2rem 0;
-        }
-        .diagram-container svg {
-            max-width: 100%;
-            height: auto;
-        }
-        .back-button {
-            display: inline-block;
-            margin-bottom: 1rem;
-            padding: 0.5rem 1rem;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 0.25rem;
-        }
-        .breadcrumb {
-            margin-top: 2rem;
-            padding: 0.75rem 1rem;
-            background-color: #e9ecef;
-            border-radius: 0.25rem;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>{{ report_title }}</h1>
-
-        {% if back_link %}
-        <a href="{{ back_link }}" class="back-button">← Back to Parent Model</a>
-        {% endif %}
-
-        <h2>Threat Model Diagram</h2>
-        <div class="diagram-container">
-            <object data="{{ model_name }}.svg" type="image/svg+xml"></object>
-        </div>
 
         <div class="summary-grid">
             <div class="card">
@@ -249,11 +217,5 @@
             evt.currentTarget.className += " active";
         }
     </script>
-
-    <div class="breadcrumb">
-        {% for item in breadcrumb %}
-            {{ item }} {% if not loop.last %} &gt; {% endif %}
-        {% endfor %}
-    </div>
 </body>
 </html>
