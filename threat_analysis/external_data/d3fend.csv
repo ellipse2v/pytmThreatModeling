@@ -63,7 +63,7 @@ D3-SCP,Harden,,System Configuration Permissions,,Restricting system configuratio
 D3-FE,Harden,,File Encryption,,Encrypting a file using a cryptographic key.
 D3-SU,Harden,,Software Update,,Replacing old software on a computer system component.
 D3-DLIC,Harden,,Driver Load Integrity Checking,,Ensuring the integrity of drivers loaded during initialization of the operating system.
-D3-AH,Harden,Application Hardening,,,
+D3-AH,Harden,Application Hardening,,,"Application Hardening makes an executable application more resilient to a class of exploits which either introduce new code or execute unwanted existing code. These techniques may be applied at compile-time or on an application binary."
 D3-SFCV,Harden,,Stack Frame Canary Validation,,Comparing a value stored in a stack frame with a known good value in order to prevent or detect a memory segment overwrite.
 D3-SAOR,Harden,,Segment Address Offset Randomization,,Randomizing the base (start) address of one or more segments of memory during the initialization of a process.
 D3-PSEP,Harden,,Process Segment Execution Prevention,,Preventing execution of any address in a memory region other than the code segment.
@@ -201,14 +201,14 @@ D3-HDL,Isolate,,,Homoglyph Denylisting,Blocking DNS queries that are deceptively
 D3-HDDL,Isolate,,,Hierarchical Domain Denylisting,Blocking the resolution of any subdomain of a specified domain name.
 D3-DNSAL,Isolate,,DNS Allowlisting,,Permitting only approved domains and their subdomains to be resolved.
 D3-BDI,Isolate,,Broadcast Domain Isolation,,Broadcast isolation restricts the number of computers a host can contact on their LAN.
-D3-DO,Deceive,Decoy Object,,,
+D3-DO,Deceive,Decoy Object,,,"A Decoy Object is created and deployed for the purposes of deceiving attackers."
 D3-DUC,Deceive,,Decoy User Credential,,A Credential created for the purpose of deceiving an adversary.
 D3-DST,Deceive,,Decoy Session Token,,An authentication token created for the purposes of deceiving an adversary.
 D3-DPR,Deceive,,Decoy Public Release,,Issuing publicly released media to deceive adversaries.
 D3-DP,Deceive,,Decoy Persona,,"Establishing a fake online identity to misdirect, deceive, and or interact with adversaries."
 D3-DNR,Deceive,,Decoy Network Resource,,Deploying a network resource for the purposes of deceiving an adversary.
 D3-DF,Deceive,,Decoy File,,A file created for the purposes of deceiving an adversary.
-D3-DE,Deceive,Decoy Environment,,,
+D3-DE,Deceive,Decoy Environment,,,"A Decoy Environment comprises hosts and networks for the purposes of deceiving an attacker."
 D3-SHN,Deceive,,Standalone Honeynet,,An environment created for the purpose of attracting attackers and eliciting their behaviors that is not connected to any production enterprise systems.
 D3-IHN,Deceive,,Integrated Honeynet,,The practice of setting decoys in a production environment to entice interaction from attackers.
 D3-CHN,Deceive,,Connected Honeynet,,"A decoy service, system, or environment, that is connected to the enterprise network, and simulates or emulates certain functionality to the network, without exposing full access to a production system."

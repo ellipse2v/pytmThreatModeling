@@ -180,3 +180,42 @@ def test_get_all_threats_with_mitre_info_handles_missing_url_friendly_name_sourc
     # Check that url_friendly_name was still generated, even if from an empty string
     assert 'url_friendly_name' in all_detailed_threats[0]['mitre_techniques'][0]['defend_mitigations'][0]
     assert all_detailed_threats[0]['mitre_techniques'][0]['defend_mitigations'][0]['url_friendly_name'] == ''
+
+def test_d3fend_mitigations_have_descriptions(report_generator):
+    """
+    Tests that D3FEND mitigations processed for the report include their
+    descriptions.
+    """
+    threat_mock = MagicMock(description="Test Threat", stride_category='S', target=MagicMock(data=MagicMock(classification=MagicMock(name='Public'))))
+    grouped_threats = {'Spoofing': [(threat_mock, MagicMock(name="Test Target"))]}
+
+    report_generator.severity_calculator.get_severity_info.return_value = {'level': 'Low', 'score': 1.0}
+
+    # Mock the MITRE mapping to return a technique with a D3FEND mitigation that has a description
+    report_generator.mitre_mapping.map_threat_to_mitre.return_value = [
+        {
+            'id': 'T1078',
+            'name': 'Valid Accounts',
+            'defend_mitigations': [
+                {
+                    'id': 'D3-DO',
+                    'name': 'Decoy Object',
+                    'description': 'A Decoy Object is created and deployed for the purposes of deceiving attackers.',
+                    'url_friendly_name_source': 'D3-DO Decoy Object'
+                }
+            ],
+            'mitre_mitigations': []
+        }
+    ]
+
+    # Call the internal method that processes the threats
+    all_detailed_threats = report_generator._get_all_threats_with_mitre_info(grouped_threats)
+
+    # Assert that the description is present
+    assert len(all_detailed_threats) == 1
+    mitre_techniques = all_detailed_threats[0]['mitre_techniques']
+    assert len(mitre_techniques) == 1
+    d3fend_mitigations = mitre_techniques[0]['defend_mitigations']
+    assert len(d3fend_mitigations) == 1
+    assert 'description' in d3fend_mitigations[0]
+    assert d3fend_mitigations[0]['description'] == 'A Decoy Object is created and deployed for the purposes of deceiving attackers.'

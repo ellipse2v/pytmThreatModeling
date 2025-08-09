@@ -30,7 +30,7 @@ def test_get_mitigation_suggestions_no_match():
 def test_get_mitigation_suggestions_single_match():
     """Test get_mitigation_suggestions with a single matching technique ID."""
     suggestions = get_mitigation_suggestions(["T1190"])
-    assert len(suggestions) == 3
+    assert len(suggestions) == 5
     assert any("OWASP" in s["name"] for s in suggestions)
     assert any("NIST" in s["name"] for s in suggestions)
     assert any("CIS" in s["name"] for s in suggestions)
@@ -38,8 +38,9 @@ def test_get_mitigation_suggestions_single_match():
 
 def test_get_mitigation_suggestions_multiple_matches():
     """Test get_mitigation_suggestions with multiple matching technique IDs."""
-    suggestions = get_mitigation_suggestions(["T1190", "T1566"])
-    assert len(suggestions) == 5  # 3 for T1190, 2 for T1566
+    # T1190 has 5, T1078 has 4
+    suggestions = get_mitigation_suggestions(["T1190", "T1078"])
+    assert len(suggestions) == 9
     assert any("OWASP" in s["name"] for s in suggestions)
     assert any("NIST" in s["name"] for s in suggestions)
     assert any("CIS" in s["name"] for s in suggestions)
