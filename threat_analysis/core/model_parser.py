@@ -200,6 +200,13 @@ class ModelParser:
                         value = value_unquoted
             else:
                 continue
+
+            # Normalize keys to handle case variations
+            if key.lower() == 'istrusted':
+                key = 'isTrusted'
+            elif key.lower() == 'isfilled':
+                key = 'isFilled'
+
             params[key] = value
         return params
 
