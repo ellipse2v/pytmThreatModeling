@@ -14,7 +14,8 @@
 
 from .threat_rules import THREAT_RULES
 
-def _create_threat_dict(component_name, description, stride_category, impact, likelihood):
+
+def _create_threat_dict(component_name, description, stride_category, impact, likelihood, mitigations=None):
     """Creates a threat dictionary with a placeholder for the ID."""
     return {
         "component": component_name,
@@ -22,7 +23,9 @@ def _create_threat_dict(component_name, description, stride_category, impact, li
         "stride_category": stride_category,
         "impact": impact,
         "likelihood": likelihood,
+        "mitigations": mitigations or [],
     }
+
 
 class RuleBasedThreatGenerator:
     """
@@ -34,19 +37,27 @@ class RuleBasedThreatGenerator:
         self.id_counter = 1
         self.rules = THREAT_RULES
 
-    def _add_threat(self, component_name, description, stride_category, impact, likelihood):
+    def _add_threat(self, component_name, description, stride_category, impact, likelihood, mitigations=None):
         """Adds a new threat to the list with a unique ID."""
-        threat = _create_threat_dict(component_name, description, stride_category, impact, likelihood)
+        threat = _create_threat_dict(component_name, description, stride_category, impact, likelihood, mitigations)
         threat["id"] = self.id_counter
         self.threats.append(threat)
         self.id_counter += 1
 
     def _matches(self, component_properties, conditions):
-        """Checks if a component's properties match the given conditions."""
+        """
+        Checks if a component's properties match the given conditions.
+        This check is case-insensitive for string comparisons.
+        """
         if not conditions:  # If conditions are empty, it's a match for any component
             return True
         for key, value in conditions.items():
-            if component_properties.get(key) != value:
+            prop_value = component_properties.get(key)
+            # Make string comparison case-insensitive
+            if isinstance(prop_value, str) and isinstance(value, str):
+                if prop_value.lower() != value.lower():
+                    return False
+            elif prop_value != value:
                 return False
         return True
 
@@ -70,11 +81,15 @@ class RuleBasedThreatGenerator:
                             threat_template["description"].format(name=server_info['name']),
                             threat_template["stride_category"],
                             threat_template["impact"],
-                            threat_template["likelihood"]
+                            threat_template["likelihood"],
+                            threat_template.get("mitigations")
                         )
 
     def _generate_dataflow_threats(self):
-        """Generates threats for all dataflows based on rules."""
+        """
+        Generates threats for all dataflows based on rules, including those
+        specific to network boundaries like DMZ and Gateway.
+        """
         for flow in self.threat_model.dataflows:
             contains_sensitive_data = False
             if hasattr(flow, 'data') and flow.data:
@@ -83,16 +98,23 @@ class RuleBasedThreatGenerator:
                         contains_sensitive_data = True
                         break
 
-            crosses_trust_boundary = False
-            if hasattr(flow.source, 'inBoundary') and hasattr(flow.sink, 'inBoundary'):
-                if flow.source.inBoundary != flow.sink.inBoundary:
-                    crosses_trust_boundary = True
+            source_boundary_name = None
+            if hasattr(flow.source, 'inBoundary') and flow.source.inBoundary:
+                source_boundary_name = flow.source.inBoundary.name
+
+            sink_boundary_name = None
+            if hasattr(flow.sink, 'inBoundary') and flow.sink.inBoundary:
+                sink_boundary_name = flow.sink.inBoundary.name
+
+            crosses_trust_boundary = source_boundary_name != sink_boundary_name
 
             flow_properties = {
                 "is_encrypted": flow.is_encrypted,
                 "is_authenticated": flow.is_authenticated,
                 "contains_sensitive_data": contains_sensitive_data,
                 "crosses_trust_boundary": crosses_trust_boundary,
+                "source_boundary": source_boundary_name,
+                "sink_boundary": sink_boundary_name,
             }
             for rule in self.rules.get("dataflows", []):
                 if self._matches(flow_properties, rule["conditions"]):
@@ -102,7 +124,8 @@ class RuleBasedThreatGenerator:
                             threat_template["description"].format(source=flow.source, sink=flow.sink),
                             threat_template["stride_category"],
                             threat_template["impact"],
-                            threat_template["likelihood"]
+                            threat_template["likelihood"],
+                            threat_template.get("mitigations")
                         )
 
     def _generate_actor_threats(self):
@@ -116,8 +139,10 @@ class RuleBasedThreatGenerator:
                             threat_template["description"].format(name=actor_info['name']),
                             threat_template["stride_category"],
                             threat_template["impact"],
-                            threat_template["likelihood"]
+                            threat_template["likelihood"],
+                            threat_template.get("mitigations")
                         )
+
 
 def get_custom_threats(threat_model):
     """

@@ -160,6 +160,10 @@
                         <th>MITRE Techniques</th>
                         <th>MITRE Mitigations</th>
                         <th>D3FEND Mitigations</th>
+                        <th>CIS Mitigations</th>
+                        <th>NIST Mitigations</th>
+                        <th>OWASP Mitigations</th>
+                        <th>Custom Mitigations</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -191,6 +195,34 @@
                                 {% for mitigation in tech.defend_mitigations %}
                                 <li><a href="https://d3fend.mitre.org/technique/d3f:{{ mitigation.url_friendly_name }}" target="_blank" class="mitre-link">{{ mitigation.id }}: {{ mitigation.description }}</a></li>
                                 {% endfor %}
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                            {% for mitigation in threat.cis_mitigations %}
+                                <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                            {% for mitigation in threat.nist_mitigations %}
+                                <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                            {% for mitigation in threat.owasp_mitigations %}
+                                <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                            {% for mitigation in threat.custom_mitigations %}
+                                <li>{{ mitigation }}</li>
                             {% endfor %}
                             </ul>
                         </td>

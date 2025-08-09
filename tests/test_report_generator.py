@@ -31,9 +31,12 @@ def test_generate_html_report(report_generator):
     }
     threat_model.tm.name = "Test Architecture"
 
+    threat_mock = MagicMock(description="Test Threat", stride_category='S', target=MagicMock(data=MagicMock(classification=MagicMock(name='Public'))))
+    threat_mock.mitigations = []
+
     grouped_threats = {
         'Spoofing': [
-            (MagicMock(description="Test Threat", stride_category='S', target=MagicMock(data=MagicMock(classification=MagicMock(name='Public')))), MagicMock(name="Test Target"))
+            (threat_mock, MagicMock(name="Test Target"))
         ]
     }
 
@@ -75,9 +78,12 @@ def test_generate_json_export(report_generator):
     threat_model = MagicMock()
     threat_model.tm.name = "Test Architecture"
 
+    threat_mock = MagicMock(description="Test Threat", stride_category='S', target=MagicMock(data=MagicMock(classification=MagicMock(name='Public'))))
+    threat_mock.mitigations = []
+
     grouped_threats = {
         'Spoofing': [
-            (MagicMock(description="Test Threat", stride_category='S', target=MagicMock(data=MagicMock(classification=MagicMock(name='Public')))), MagicMock(name="Test Target"))
+            (threat_mock, MagicMock(name="Test Target"))
         ]
     }
 

@@ -75,3 +75,17 @@ def test_load_custom_mitre_mappings_from_markdown_success():
                 assert mitre_mapping.custom_mitre_mappings[0]['threat_name'] == 'Test Attack'
                 assert mitre_mapping.custom_mitre_mappings[0]['tactics'] == ['Test Tactic']
                 assert mitre_mapping.custom_mitre_mappings[0]['techniques'] == [{'id': 'T9999', 'name': 'Test Technique'}]
+
+def test_technique_urls_are_present(mitre_mapping):
+    """Test that all techniques in the mapping have a URL."""
+    for category in mitre_mapping.mapping.values():
+        for technique in category.get("techniques", []):
+            assert "url" in technique
+            assert technique["url"].startswith("https://attack.mitre.org/techniques/")
+
+def test_new_technique_mapping(mitre_mapping):
+    """Test the mapping of a newly added technique."""
+    threat_description = "A trusted relationship was abused."
+    mitre_techniques = mitre_mapping.map_threat_to_mitre(threat_description)
+    assert len(mitre_techniques) > 0
+    assert any(t['id'] == 'T1199' for t in mitre_techniques)

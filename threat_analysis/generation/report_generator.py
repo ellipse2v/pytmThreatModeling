@@ -19,8 +19,10 @@ import re
 import json
 from typing import Dict, List, Any, Optional
 from datetime import datetime
+import webbrowser
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
+from threat_analysis.mitigation_suggestions import get_mitigation_suggestions
 
 
 class ReportGenerator:
@@ -108,6 +110,7 @@ class ReportGenerator:
                     target_name = self._get_target_name_for_severity_calc(target)
                     threat_description = getattr(threat, 'description', f"Threat of type {threat_type} affecting {target_name}")
                     stride_category = getattr(threat, 'stride_category', threat_type)
+                    custom_mitigations = getattr(threat, 'mitigations', [])
                 else:
                     continue
 
@@ -122,6 +125,13 @@ class ReportGenerator:
 
                 severity_info = self.severity_calculator.get_severity_info(stride_category, target_name, classification=data_classification, impact=threat_impact, likelihood=threat_likelihood)
                 mitre_techniques = self.mitre_mapping.map_threat_to_mitre(threat_description)
+
+                technique_ids = [tech['id'] for tech in mitre_techniques]
+                automated_mitigations = get_mitigation_suggestions(technique_ids)
+
+                owasp_mitigations = [m for m in automated_mitigations if m['framework'] == 'OWASP ASVS']
+                nist_mitigations = [m for m in automated_mitigations if m['framework'] == 'NIST']
+                cis_mitigations = [m for m in automated_mitigations if m['framework'] == 'CIS']
 
                 for tech in mitre_techniques:
                     if 'defend_mitigations' in tech and tech['defend_mitigations']:
@@ -138,7 +148,11 @@ class ReportGenerator:
                     "target": target_name,
                     "severity": severity_info,
                     "mitre_techniques": mitre_techniques,
-                    "stride_category": stride_category
+                    "stride_category": stride_category,
+                    "custom_mitigations": custom_mitigations,
+                    "owasp_mitigations": owasp_mitigations,
+                    "nist_mitigations": nist_mitigations,
+                    "cis_mitigations": cis_mitigations,
                 })
         return all_detailed_threats
 
