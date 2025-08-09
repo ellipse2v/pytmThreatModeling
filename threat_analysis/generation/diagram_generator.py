@@ -295,8 +295,28 @@ class DiagramGenerator:
             attributes.append(f'label="{icon}{escaped_name}"')
         else:
             attributes.append(f'label="{escaped_name}"')
+
+        # Add id for easier lookup
+        attributes.append(f'id="{self._sanitize_name(node_name)}"')
         
         return f'[{", ".join(attributes)}]'
+
+    def add_links_to_svg(self, svg_content: str, threat_model) -> str:
+        """
+        Adds hyperlinks to the SVG content for nodes with submodels.
+        """
+        for server in threat_model.servers:
+            if 'submodel' in server:
+                server_name = server['name']
+                sanitized_name = self._sanitize_name(server_name)
+
+                submodel_path = Path(server['submodel'])
+                submodel_id = submodel_path.stem
+
+                # Find the node group for the server and add an onclick attribute
+                pattern = re.compile(fr'(<g id="{sanitized_name}" class="node">)', re.DOTALL)
+                svg_content = pattern.sub(fr'<g id="{sanitized_name}" class="node clickable-element" onclick="showDiagram(\'{submodel_id}\')">', svg_content)
+        return svg_content
 
     def _get_element_name(self, element) -> Optional[str]:
         """Safely extracts the name from a model element."""

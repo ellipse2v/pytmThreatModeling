@@ -283,7 +283,7 @@
                 element: '{{ model.id }}-diagram',
                 title: '{{ model.id }}',
                 breadcrumb: '{{ model.breadcrumb }}',
-                parent: '{{ model.parent_id }}'
+                parent: {{ model.parent_id }}
             },
             {% endfor %}
         };
