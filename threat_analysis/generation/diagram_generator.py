@@ -819,7 +819,8 @@ class DiagramGenerator:
                     max-width: 140px;
                     z-index: 1000;
                     transition: all 0.3s ease;
-                    cursor: move;
+                    /* cursor: move; */ /* Désactivé pour empêcher le déplacement */
+                    pointer-events: none; /* Permet au zoom de passer à travers */
                 }}
                 .legend:hover {{
                     background: rgba(255, 255, 255, 0.98);
@@ -860,6 +861,7 @@ class DiagramGenerator:
                     justify-content: center;
                     border-radius: 2px;
                     transition: background-color 0.2s;
+                    pointer-events: auto; /* Réactiver les événements pour ce bouton */
                 }}
                 .legend-toggle:hover {{
                     background-color: rgba(0, 122, 204, 0.2);
@@ -905,6 +907,7 @@ class DiagramGenerator:
                     justify-content: center;
                     z-index: 1001;
                     transition: all 0.2s ease;
+                    pointer-events: auto; /* Assurez-vous que ce bouton reste cliquable */
                 }}
                 .legend-toggle-btn:hover {{
                     background: rgba(255, 255, 255, 1);
@@ -989,84 +992,7 @@ class DiagramGenerator:
             </div>
 
             <script>
-                // Variables pour le drag & drop
-                let isDragging = false;
-                let currentX;
-                let currentY;
-                let initialX;
-                let initialY;
-                let xOffset = 0;
-                let yOffset = 0;
-                
-                const legend = document.getElementById('legend');
-                
-                // Event listeners pour le drag & drop
-                legend.addEventListener('mousedown', dragStart);
-                document.addEventListener('mousemove', drag);
-                document.addEventListener('mouseup', dragEnd);
-                
-                // Touch events pour mobile
-                legend.addEventListener('touchstart', dragStart);
-                document.addEventListener('touchmove', drag);
-                document.addEventListener('touchend', dragEnd);
-                
-                function dragStart(e) {{
-                    if (e.target.closest('.legend-toggle') || e.target.closest('.legend-toggle-btn')) {{
-                        return;
-                    }}
-                    
-                    if (e.type === "touchstart") {{
-                        initialX = e.touches[0].clientX - xOffset;
-                        initialY = e.touches[0].clientY - yOffset;
-                    }} else {{
-                        initialX = e.clientX - xOffset;
-                        initialY = e.clientY - yOffset;
-                    }}
-                    
-                    if (e.target === legend || legend.contains(e.target)) {{
-                        isDragging = true;
-                        legend.classList.add('dragging');
-                    }}
-                }}
-                
-                function drag(e) {{
-                    if (isDragging) {{
-                        e.preventDefault();
-                        
-                        if (e.type === "touchmove") {{
-                            currentX = e.touches[0].clientX - initialX;
-                            currentY = e.touches[0].clientY - initialY;
-                        }} else {{
-                            currentX = e.clientX - initialX;
-                            currentY = e.clientY - initialY;
-                        }}
-                        
-                        xOffset = currentX;
-                        yOffset = currentY;
-                        
-                        // Contraindre la position dans la fenêtre
-                        const rect = legend.getBoundingClientRect();
-                        const maxX = window.innerWidth - rect.width;
-                        const maxY = window.innerHeight - rect.height;
-                        
-                        xOffset = Math.max(0, Math.min(maxX, xOffset));
-                        yOffset = Math.max(0, Math.min(maxY, yOffset));
-                        
-                        legend.style.transform = `translate(${{xOffset}}px, ${{yOffset}}px)`;
-                        legend.style.position = 'fixed';
-                        legend.style.bottom = 'auto';
-                        legend.style.left = 'auto';
-                        legend.style.top = '0';
-                        legend.style.right = 'auto';
-                    }}
-                }}
-                
-                function dragEnd(e) {{
-                    initialX = currentX;
-                    initialY = currentY;
-                    isDragging = false;
-                    legend.classList.remove('dragging');
-                }}
+                // La fonctionnalité de drag & drop a été supprimée.
                 
                 // Fonction pour masquer/afficher la légende
                 function toggleLegend() {{
@@ -1100,13 +1026,6 @@ class DiagramGenerator:
                         legend.classList.add('legend-collapsed');
                     }}
                 }}
-                
-                // Empêcher la sélection de texte pendant le drag
-                document.addEventListener('selectstart', function(e) {{
-                    if (isDragging) {{
-                        e.preventDefault();
-                    }}
-                }});
             </script>
         </body>
         </html>"""
