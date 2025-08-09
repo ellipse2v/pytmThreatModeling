@@ -22,7 +22,8 @@ def report_generator():
     mitre_mapping = MagicMock()
     return ReportGenerator(severity_calculator, mitre_mapping)
 
-def test_generate_html_report(report_generator):
+@patch('threat_analysis.generation.report_generator.get_mitigation_suggestions')
+def test_generate_html_report(mock_get_mitigations, report_generator):
     threat_model = MagicMock()
     threat_model.mitre_analysis_results = {
         'total_threats': 1,
@@ -31,8 +32,12 @@ def test_generate_html_report(report_generator):
     }
     threat_model.tm.name = "Test Architecture"
 
+    # Note: threat_mock no longer has a 'mitigations' attribute
     threat_mock = MagicMock(description="Test Threat", stride_category='S', target=MagicMock(data=MagicMock(classification=MagicMock(name='Public'))))
-    threat_mock.mitigations = []
+    # Remove the mitigations attribute since it's no longer used
+    if hasattr(threat_mock, 'mitigations'):
+        del threat_mock.mitigations
+
 
     grouped_threats = {
         'Spoofing': [
@@ -46,23 +51,21 @@ def test_generate_html_report(report_generator):
     }
     report_generator.mitre_mapping.map_threat_to_mitre.return_value = [
         {
-            'id': 'T1588.002',
-            'name': 'Tool',
-            'defend_mitigations': [
-                {
-                    'id': 'D3-SCA',
-                    'description': 'Software Component Analysis',
-                    'url_friendly_name_source': 'D3-SCA Software Component Analysis'
-                }
-            ],
-            'mitre_mitigations': [
-                {
-                    'id': 'M1051',
-                    'name': 'Update Software'
-                }
-            ]
+            'id': 'T1190',
+            'name': 'SQL Injection',
+            'defend_mitigations': [],
+            'mitre_mitigations': []
         }
     ]
+
+    # Mock the return value of the new mitigation suggestion function
+    mock_get_mitigations.return_value = [
+        {'framework': 'OWASP ASVS', 'name': 'OWASP Mitigation 1', 'url': 'http://owasp.org'},
+        {'framework': 'NIST', 'name': 'NIST Mitigation 1', 'url': 'http://nist.gov'},
+        {'framework': 'CIS', 'name': 'CIS Mitigation 1', 'url': 'http://cisecurity.org'},
+        {'framework': 'OWASP ASVS', 'name': 'OWASP Mitigation 2', 'url': 'http://owasp.org'},
+    ]
+
 
     output_file = "test_report.html"
     with patch.object(report_generator.env, 'get_template') as mock_get_template:
@@ -73,6 +76,30 @@ def test_generate_html_report(report_generator):
             mock_file.assert_called_once_with(output_file, "w", encoding="utf-8")
 
     assert result == output_file
+
+    # Capture the context passed to the template
+    render_context = mock_template.render.call_args[1]
+    rendered_threats = render_context['all_threats']
+
+    # Assertions
+    assert len(rendered_threats) == 1
+    threat_details = rendered_threats[0]
+
+    # Verify that custom_mitigations is gone
+    assert 'custom_mitigations' not in threat_details
+
+    # Verify the framework-based mitigations are present and correct
+    assert 'owasp_mitigations' in threat_details
+    assert len(threat_details['owasp_mitigations']) == 2
+    assert threat_details['owasp_mitigations'][0]['name'] == 'OWASP Mitigation 1'
+
+    assert 'nist_mitigations' in threat_details
+    assert len(threat_details['nist_mitigations']) == 1
+    assert threat_details['nist_mitigations'][0]['name'] == 'NIST Mitigation 1'
+
+    assert 'cis_mitigations' in threat_details
+    assert len(threat_details['cis_mitigations']) == 1
+    assert threat_details['cis_mitigations'][0]['name'] == 'CIS Mitigation 1'
 
 def test_generate_json_export(report_generator):
     threat_model = MagicMock()

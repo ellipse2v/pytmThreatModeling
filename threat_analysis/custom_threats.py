@@ -11,6 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+Custom Threat Generation Module
+
+This module defines a rule-based engine for generating threats based on the
+components and dataflows defined in a threat model. It uses a set of rules
+defined in `threat_rules.py` to identify potential threats.
+
+The `RuleBasedThreatGenerator` class is the core of this module, which
+iterates through the threat model's components (servers, dataflows, actors)
+and applies the corresponding rules to generate a list of threats.
+
+The threat generation logic for dataflows is particularly enhanced to be
+"boundary-aware", meaning it can generate specific threats for dataflows
+that cross between different network zones (e.g., from the internet to a DMZ).
+"""
 
 from .threat_rules import THREAT_RULES
 
@@ -87,8 +102,28 @@ class RuleBasedThreatGenerator:
 
     def _generate_dataflow_threats(self):
         """
-        Generates threats for all dataflows based on rules, including those
-        specific to network boundaries like DMZ and Gateway.
+        Generates threats for all dataflows based on a set of rules.
+
+        This function iterates through each dataflow in the threat model and
+        evaluates a set of properties against the defined rules. The properties
+        include:
+        - is_encrypted: Whether the dataflow uses encryption.
+        - is_authenticated: Whether the dataflow is authenticated.
+        - contains_sensitive_data: Whether the flow contains PII.
+        - crosses_trust_boundary: A boolean indicating if the source and sink
+          are in different network boundaries.
+
+        Boundary-Aware Threat Generation:
+        The function specifically checks for the network boundaries of the
+        source and sink components (e.g., 'DMZ', 'Internal', 'Public').
+        These boundary names are passed as `source_boundary` and
+        `sink_boundary` properties. A value of `None` for a boundary
+        typically represents the public internet.
+
+        This allows for the creation of targeted threat rules in
+        `threat_rules.py` that apply only when data flows between specific
+        zones, such as from the internet to a DMZ, or from a DMZ to an
+        internal network.
         """
         for flow in self.threat_model.dataflows:
             contains_sensitive_data = False

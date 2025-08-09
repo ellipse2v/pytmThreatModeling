@@ -163,7 +163,6 @@
                         <th>CIS Mitigations</th>
                         <th>NIST Mitigations</th>
                         <th>OWASP Mitigations</th>
-                        <th>Custom Mitigations</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -216,13 +215,6 @@
                             <ul>
                             {% for mitigation in threat.owasp_mitigations %}
                                 <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
-                            {% endfor %}
-                            </ul>
-                        </td>
-                        <td>
-                            <ul>
-                            {% for mitigation in threat.custom_mitigations %}
-                                <li>{{ mitigation }}</li>
                             {% endfor %}
                             </ul>
                         </td>

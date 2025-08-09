@@ -110,7 +110,6 @@ class ReportGenerator:
                     target_name = self._get_target_name_for_severity_calc(target)
                     threat_description = getattr(threat, 'description', f"Threat of type {threat_type} affecting {target_name}")
                     stride_category = getattr(threat, 'stride_category', threat_type)
-                    custom_mitigations = getattr(threat, 'mitigations', [])
                 else:
                     continue
 
@@ -149,7 +148,6 @@ class ReportGenerator:
                     "severity": severity_info,
                     "mitre_techniques": mitre_techniques,
                     "stride_category": stride_category,
-                    "custom_mitigations": custom_mitigations,
                     "owasp_mitigations": owasp_mitigations,
                     "nist_mitigations": nist_mitigations,
                     "cis_mitigations": cis_mitigations,
