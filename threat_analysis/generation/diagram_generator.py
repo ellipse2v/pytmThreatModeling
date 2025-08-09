@@ -672,6 +672,30 @@ class DiagramGenerator:
             })
         return dataflows_data
 
+    def _get_protocol_styles_from_model(self, threat_model) -> Dict[str, Dict]:
+        """
+        Extracts defined protocol styles from the threat model.
+        """
+        try:
+            if hasattr(threat_model, 'get_all_protocol_styles'):
+                return threat_model.get_all_protocol_styles()
+            if hasattr(threat_model, 'protocol_styles'):
+                return threat_model.protocol_styles
+        except Exception as e:
+            logging.warning(f"⚠️ Error extracting protocol styles: {e}")
+        
+        return {}
+
+    def _get_used_protocols(self, threat_model) -> set:
+        """Extracts all unique protocols used in the dataflows of a given model."""
+        used_protocols = set()
+        if hasattr(threat_model, 'dataflows'):
+            for df in threat_model.dataflows:
+                protocol = getattr(df, 'protocol', None)
+                if protocol:
+                    used_protocols.add(protocol)
+        return used_protocols
+
     def _generate_legend_html(self, threat_model) -> str:
         """Generates HTML legend content."""
         legend_items = []
@@ -751,18 +775,20 @@ class DiagramGenerator:
         
         # Protocol colors - extract from model
         protocol_styles = self._get_protocol_styles_from_model(threat_model)
+        used_protocols = self._get_used_protocols(threat_model)
+
         if protocol_styles:
             legend_items.append('<div style="margin-top: 5px; margin-bottom: 3px; font-weight: bold; font-size: 10px;">Protocoles:</div>')
-            for protocol, style in protocol_styles.items():
-                color = style.get('color', '#000000')
-                sanitized_protocol = self._sanitize_name(protocol)
-                legend_items.append(f"""
-                    <div class="legend-item" data-protocol="{sanitized_protocol}">
-                        <div style="width: 20px; height: 2px; background-color: {color};
-                                margin-right: 8px;"></div>
-                        <span style="font-size: 11px;">{protocol}</span>
-                    </div>
-                """)
+            for protocol, style in sorted(protocol_styles.items()):
+                if protocol in used_protocols:
+                    color = style.get('color', '#000000')
+                    sanitized_protocol = self._sanitize_name(protocol)
+                    legend_items.append(f"""
+                        <div class="legend-item" data-protocol="{sanitized_protocol}" style="display: flex; align-items: center; margin-bottom: 3px;">
+                            <div style="width: 20px; height: 2px; background-color: {color}; margin-right: 8px;"></div>
+                            <span style="font-size: 11px;">{protocol}</span>
+                        </div>
+                    """)
         
         return ''.join(legend_items)
    
