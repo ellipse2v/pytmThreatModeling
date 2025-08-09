@@ -159,6 +159,7 @@ class MitreMapping:
                         "id": "T1566",
                         "name": "Phishing",
                         "description": "Identity spoofing via phishing",
+                        "url": "https://attack.mitre.org/techniques/T1566/",
                         "mitre_mitigations": [
                             {"id": "M1056", "name": "User Training"},
                             {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -169,6 +170,7 @@ class MitreMapping:
                         "id": "T1036",
                         "name": "Masquerading",
                         "description": "Disguising malicious processes",
+                        "url": "https://attack.mitre.org/techniques/T1036/",
                         "mitre_mitigations": [
                             {"id": "M1049", "name": "Antivirus/Antimalware"},
                             {"id": "M1045", "name": "Code Signing"},
@@ -180,6 +182,7 @@ class MitreMapping:
                         "id": "T1134",
                         "name": "Access Token Manipulation",
                         "description": "Manipulation of access tokens",
+                        "url": "https://attack.mitre.org/techniques/T1134/",
                         "mitre_mitigations": [
                             {"id": "M1049", "name": "Antivirus/Antimalware"},
                             {"id": "M1043", "name": "Audit"},
@@ -192,6 +195,7 @@ class MitreMapping:
                         "id": "T1078",
                         "name": "Valid Accounts",
                         "description": "Use of valid accounts for access",
+                        "url": "https://attack.mitre.org/techniques/T1078/",
                         "mitre_mitigations": [
                             {"id": "M1049", "name": "Antivirus/Antimalware"},
                             {"id": "M1043", "name": "Audit"},
@@ -205,6 +209,7 @@ class MitreMapping:
                         "id": "T1078.003",
                         "name": "Local Accounts",
                         "description": "Abuse of local accounts",
+                        "url": "https://attack.mitre.org/techniques/T1078/003/",
                         "mitre_mitigations": [
                             {"id": "M1049", "name": "Antivirus/Antimalware"},
                             {"id": "M1043", "name": "Audit"},
@@ -218,6 +223,7 @@ class MitreMapping:
                         "id": "T1110",
                         "name": "Brute Force",
                         "description": "Attempting to guess or crack passwords",
+                        "url": "https://attack.mitre.org/techniques/T1110/",
                         "mitre_mitigations": [
                             {"id": "M1043", "name": "Audit"},
                             {"id": "M1029", "name": "Network Intrusion Prevention"},
@@ -228,6 +234,7 @@ class MitreMapping:
                         "id": "T1110.001",
                         "name": "Password Guessing",
                         "description": "Dictionary-based password attacks",
+                        "url": "https://attack.mitre.org/techniques/T1110/001/",
                         "mitre_mitigations": [
                             {"id": "M1043", "name": "Audit"},
                             {"id": "M1029", "name": "Network Intrusion Prevention"},
@@ -238,6 +245,7 @@ class MitreMapping:
                         "id": "T1110.003",
                         "name": "Password Spraying",
                         "description": "Low-and-slow password attack",
+                        "url": "https://attack.mitre.org/techniques/T1110/003/",
                         "mitre_mitigations": [
                             {"id": "M1043", "name": "Audit"},
                             {"id": "M1029", "name": "Network Intrusion Prevention"},
@@ -248,6 +256,7 @@ class MitreMapping:
                         "id": "T1110.004",
                         "name": "Credential Stuffing",
                         "description": "Using breached credential pairs",
+                        "url": "https://attack.mitre.org/techniques/T1110/004/",
                         "mitre_mitigations": [
                             {"id": "M1043", "name": "Audit"},
                             {"id": "M1029", "name": "Network Intrusion Prevention"},
@@ -258,6 +267,7 @@ class MitreMapping:
                         "id": "T1185",
                         "name": "Browser Session Hijacking",
                         "description": "Session hijacking attacks",
+                        "url": "https://attack.mitre.org/techniques/T1185/",
                         "mitre_mitigations": [
                             {"id": "M1028", "name": "Operating System Configuration"},
                             {"id": "M1017", "name": "User Account Management"}
@@ -267,6 +277,7 @@ class MitreMapping:
                         "id": "T1539",
                         "name": "Steal Web Session Cookie",
                         "description": "Steal Web Session Cookie",
+                        "url": "https://attack.mitre.org/techniques/T1539/",
                         "mitre_mitigations": [
                             {"id": "M1017", "name": "User Account Management"}
                         ]
@@ -275,6 +286,7 @@ class MitreMapping:
                         "id": "T1212",
                         "name": "Exploitation for Credential Access",
                         "description": "Exploiting vulnerabilities to access credentials",
+                        "url": "https://attack.mitre.org/techniques/T1212/",
                         "mitre_mitigations": [
                             {"id": "M1050", "name": "Exploit Protection"},
                             {"id": "M1048", "name": "Application Isolation and Sandboxing"},
@@ -286,6 +298,7 @@ class MitreMapping:
                         "id": "T1557",
                         "name": "Adversary-in-the-Middle",
                         "description": "Man-in-the-middle attacks",
+                        "url": "https://attack.mitre.org/techniques/T1557/",
                         "mitre_mitigations": [
                             {"id": "M1049", "name": "Antivirus/Antimalware"},
                             {"id": "M1043", "name": "Audit"},
@@ -297,6 +310,7 @@ class MitreMapping:
                         "id": "T1556",
                         "name": "Modify Authentication Process",
                         "description": "Authentication bypass techniques",
+                        "url": "https://attack.mitre.org/techniques/T1556/",
                         "mitre_mitigations": [
                             {"id": "M1043", "name": "Audit"},
                             {"id": "M1028", "name": "Operating System Configuration"},
@@ -307,6 +321,7 @@ class MitreMapping:
                         "id": "T1598",
                         "name": "Phishing for Information",
                         "description": "Cross Site Request Forgery attacks",
+                        "url": "https://attack.mitre.org/techniques/T1598/",
                         "mitre_mitigations": [
                             {"id": "M1056", "name": "User Training"}
                         ]
@@ -315,22 +330,34 @@ class MitreMapping:
                         "id": "T1213",
                         "name": "Data from Information Repositories",
                         "description": "Exploiting Trust in Client",
+                        "url": "https://attack.mitre.org/techniques/T1213/",
                         "mitre_mitigations": [
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
                            {"id": "M1043", "name": "Audit"},
                            {"id": "M1026", "name": "Privileged Account Management"},
                            {"id": "M1017", "name": "User Account Management"}
                         ]
+                    },
+                    {
+                        "id": "T1199",
+                        "name": "Trusted Relationship",
+                        "description": "Leveraging trusted third-party relationships to gain access",
+                        "url": "https://attack.mitre.org/techniques/T1199/",
+                        "mitre_mitigations": [
+                            {"id": "M1015", "name": "Active Directory Configuration"},
+                            {"id": "M1035", "name": "Limit Access to Resource Over Network"}
+                        ]
                     }
                 ]
             },
- "Tampering": {
+            "Tampering": {
                 "tactics": ["Defense Evasion", "Impact", "Initial Access", "Execution"],
                 "techniques": [
                     {
                         "id": "T1565",
                         "name": "Data Manipulation",
                         "description": "Unauthorized data modification",
+                        "url": "https://attack.mitre.org/techniques/T1565/",
                         "mitre_mitigations": [
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
                            {"id": "M1043", "name": "Audit"},
@@ -341,6 +368,7 @@ class MitreMapping:
                         "id": "T1070",
                         "name": "Indicator Removal",
                         "description": "Deletion of activity traces",
+                        "url": "https://attack.mitre.org/techniques/T1070/",
                         "mitre_mitigations": [
                            {"id": "M1054", "name": "Software Deployment Tools"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -352,6 +380,7 @@ class MitreMapping:
                         "id": "T1027",
                         "name": "Obfuscated Files or Information",
                         "description": "Obfuscation of malicious content",
+                        "url": "https://attack.mitre.org/techniques/T1027/",
                         "mitre_mitigations": [
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
                            {"id": "M1038", "name": "Execution Prevention"},
@@ -362,6 +391,7 @@ class MitreMapping:
                         "id": "T1190",
                         "name": "Exploit Public-Facing Application",
                         "description": "Web application vulnerabilities exploitation",
+                        "url": "https://attack.mitre.org/techniques/T1190/",
                         "mitre_mitigations": [
                            {"id": "M1050", "name": "Exploit Protection"},
                            {"id": "M1030", "name": "Network Segmentation"},
@@ -372,6 +402,7 @@ class MitreMapping:
                         "id": "T1059",
                         "name": "Command and Scripting Interpreter",
                         "description": "Command injection and execution",
+                        "url": "https://attack.mitre.org/techniques/T1059/",
                         "mitre_mitigations": [
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
                            {"id": "M1048", "name": "Application Isolation and Sandboxing"},
@@ -384,6 +415,7 @@ class MitreMapping:
                         "id": "T1059.007",
                         "name": "JavaScript",
                         "description": "JavaScript-based attacks including XSS",
+                        "url": "https://attack.mitre.org/techniques/T1059/007/",
                         "mitre_mitigations": [
                            {"id": "M1050", "name": "Exploit Protection"},
                            {"id": "M1048", "name": "Application Isolation and Sandboxing"},
@@ -394,6 +426,7 @@ class MitreMapping:
                         "id": "T1505.003",
                         "name": "Web Shell",
                         "description": "Web shell installation and usage",
+                        "url": "https://attack.mitre.org/techniques/T1505/003/",
                         "mitre_mitigations": [
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
                            {"id": "M1043", "name": "Audit"},
@@ -404,6 +437,7 @@ class MitreMapping:
                         "id": "T1105",
                         "name": "Ingress Tool Transfer",
                         "description": "Remote file inclusion and malicious file upload",
+                        "url": "https://attack.mitre.org/techniques/T1105/",
                         "mitre_mitigations": [
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
                            {"id": "M1048", "name": "Application Isolation and Sandboxing"},
@@ -416,6 +450,7 @@ class MitreMapping:
                         "id": "T1211",
                         "name": "Exploitation for Defense Evasion",
                         "description": "Exploiting vulnerabilities to evade defenses",
+                        "url": "https://attack.mitre.org/techniques/T1211/",
                         "mitre_mitigations": [
                            {"id": "M1050", "name": "Exploit Protection"},
                            {"id": "M1048", "name": "Application Isolation and Sandboxing"},
@@ -426,6 +461,7 @@ class MitreMapping:
                         "id": "T1055",
                         "name": "Process Injection",
                         "description": "Injecting code into privileged processes",
+                        "url": "https://attack.mitre.org/techniques/T1055/",
                         "mitre_mitigations": [
                            {"id": "M1050", "name": "Exploit Protection"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -438,6 +474,7 @@ class MitreMapping:
                         "id": "T1562",
                         "name": "Impair Defenses",
                         "description": "Disabling security controls",
+                        "url": "https://attack.mitre.org/techniques/T1562/",
                         "mitre_mitigations": [
                            {"id": "M1054", "name": "Software Deployment Tools"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -451,6 +488,7 @@ class MitreMapping:
                         "id": "T1562.001",
                         "name": "Disable or Modify System Firewall",
                         "description": "Firewall manipulation",
+                        "url": "https://attack.mitre.org/techniques/T1562/001/",
                         "mitre_mitigations": [
                            {"id": "M1054", "name": "Software Deployment Tools"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -464,6 +502,7 @@ class MitreMapping:
                         "id": "T1140",
                         "name": "Deobfuscate/Decode Files or Information",
                         "description": "Processing encoded/obfuscated content",
+                        "url": "https://attack.mitre.org/techniques/T1140/",
                         "mitre_mitigations": [
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
                            {"id": "M1048", "name": "Application Isolation and Sandboxing"},
@@ -474,12 +513,14 @@ class MitreMapping:
                         "id": "T1083",
                         "name": "File and Directory Discovery",
                         "description": "Discovery of sensitive files and directories",
+                        "url": "https://attack.mitre.org/techniques/T1083/",
                         "defend_mitigations": [{"id": "D3F-FDD"}]
                     },
                     {
                         "id": "T1574",
                         "name": "Hijack Execution Flow",
                         "description": "Execution flow manipulation",
+                        "url": "https://attack.mitre.org/techniques/T1574/",
                         "mitre_mitigations": [
                            {"id": "M1043", "name": "Audit"},
                            {"id": "M1038", "name": "Execution Prevention"},
@@ -491,6 +532,7 @@ class MitreMapping:
                         "id": "T1071",
                         "name": "Application Layer Protocol",
                         "description": "Protocol manipulation and smuggling",
+                        "url": "https://attack.mitre.org/techniques/T1071/",
                         "mitre_mitigations": [
                            {"id": "M1037", "name": "Filter Network Traffic"},
                            {"id": "M1029", "name": "Network Intrusion Prevention"}
@@ -500,6 +542,7 @@ class MitreMapping:
                         "id": "T1071.001",
                         "name": "Web Protocols",
                         "description": "HTTP/HTTPS protocol manipulation",
+                        "url": "https://attack.mitre.org/techniques/T1071/001/",
                         "mitre_mitigations": [
                            {"id": "M1037", "name": "Filter Network Traffic"},
                            {"id": "M1029", "name": "Network Intrusion Prevention"}
@@ -509,6 +552,7 @@ class MitreMapping:
                         "id": "T1112",
                         "name": "Modify Registry",
                         "description": "Registry manipulation and information tampering",
+                        "url": "https://attack.mitre.org/techniques/T1112/",
                         "mitre_mitigations": [
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
                            {"id": "M1043", "name": "Audit"},
@@ -520,6 +564,7 @@ class MitreMapping:
                         "id": "T1565.001",
                         "name": "Stored Data Manipulation",
                         "description": "XML Schema Poisoning and nested payload attacks",
+                        "url": "https://attack.mitre.org/techniques/T1565/001/",
                         "mitre_mitigations": [
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
                            {"id": "M1043", "name": "Audit"},
@@ -530,6 +575,7 @@ class MitreMapping:
                         "id": "T1621",
                         "name": "Multi-Factor Authentication Request Generation",
                         "description": "Removing Important Client Functionality",
+                        "url": "https://attack.mitre.org/techniques/T1621/",
                         "mitre_mitigations": [
                             {"id": "M1033", "name": "Limit Access to Resource Over Network"},
                             {"id": "M1017", "name": "User Account Management"}
@@ -539,10 +585,21 @@ class MitreMapping:
                         "id": "T1499.004",
                         "name": "Application or System Exploitation",
                         "description": "Buffer manipulation and overflow attacks",
+                        "url": "https://attack.mitre.org/techniques/T1499/004/",
                         "mitre_mitigations": [
                             {"id": "M1050", "name": "Exploit Protection"},
                             {"id": "M1048", "name": "Application Isolation and Sandboxing"},
                             {"id": "M1030", "name": "Network Segmentation"}
+                        ]
+                    },
+                    {
+                        "id": "T1485",
+                        "name": "Data Destruction",
+                        "description": "Permanently destroying data on a system.",
+                        "url": "https://attack.mitre.org/techniques/T1485/",
+                        "mitre_mitigations": [
+                            {"id": "M1053", "name": "Data Backup"},
+                            {"id": "M1028", "name": "Operating System Configuration"}
                         ]
                     }
                 ]
@@ -554,6 +611,7 @@ class MitreMapping:
                         "id": "T1499",
                         "name": "Endpoint Denial of Service",
                         "description": "Degrading or blocking the availability of services on an endpoint.",
+                        "url": "https://attack.mitre.org/techniques/T1499/",
                         "mitre_mitigations": [
                             {"id": "M1050", "name": "Exploit Protection"},
                             {"id": "M1048", "name": "Application Isolation and Sandboxing"},
@@ -564,9 +622,20 @@ class MitreMapping:
                         "id": "T1498",
                         "name": "Network Denial of Service",
                         "description": "Flooding a network with traffic to degrade or block the availability of services.",
+                        "url": "https://attack.mitre.org/techniques/T1498/",
                         "mitre_mitigations": [
                             {"id": "M1037", "name": "Filter Network Traffic"},
                             {"id": "M1030", "name": "Network Segmentation"}
+                        ]
+                    },
+                    {
+                        "id": "T1496",
+                        "name": "Resource Hijacking",
+                        "description": "Using system resources for unauthorized purposes like cryptocurrency mining.",
+                        "url": "https://attack.mitre.org/techniques/T1496/",
+                        "mitre_mitigations": [
+                            {"id": "M1049", "name": "Antivirus/Antimalware"},
+                            {"id": "M1040", "name": "Behavior Prevention on Endpoint"}
                         ]
                     }
                 ]
@@ -578,6 +647,7 @@ class MitreMapping:
                         "id": "T1068",
                         "name": "Exploitation for Privilege Escalation",
                         "description": "Exploiting software vulnerabilities to gain higher privileges.",
+                        "url": "https://attack.mitre.org/techniques/T1068/",
                         "mitre_mitigations": [
                             {"id": "M1050", "name": "Exploit Protection"},
                             {"id": "M1045", "name": "Code Signing"},
@@ -588,6 +658,7 @@ class MitreMapping:
                         "id": "T1548",
                         "name": "Abuse Elevation Control Mechanism",
                         "description": "Abusing built-in elevation control mechanisms to execute code with higher privileges.",
+                        "url": "https://attack.mitre.org/techniques/T1548/",
                         "mitre_mitigations": [
                             {"id": "M1043", "name": "Audit"},
                             {"id": "M1026", "name": "Privileged Account Management"},
@@ -598,6 +669,7 @@ class MitreMapping:
                         "id": "T1055",
                         "name": "Process Injection",
                         "description": "Injecting code into other processes to evade defenses and escalate privileges.",
+                        "url": "https://attack.mitre.org/techniques/T1055/",
                         "mitre_mitigations": [
                             {"id": "M1050", "name": "Exploit Protection"},
                             {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -608,21 +680,33 @@ class MitreMapping:
                         "id": "T1021",
                         "name": "Remote Services",
                         "description": "Using remote services to execute code on a remote system, potentially for lateral movement.",
+                        "url": "https://attack.mitre.org/techniques/T1021/",
                         "mitre_mitigations": [
                             {"id": "M1033", "name": "Limit Access to Resource Over Network"},
                             {"id": "M1030", "name": "Network Segmentation"},
                             {"id": "M1018", "name": "User Account Control"}
                         ]
+                    },
+                    {
+                        "id": "T1547",
+                        "name": "Boot or Logon Autostart Execution",
+                        "description": "Adding malicious code to autostart locations to run with higher privileges.",
+                        "url": "https://attack.mitre.org/techniques/T1547/",
+                        "mitre_mitigations": [
+                            {"id": "M1046", "name": "Boot Integrity"},
+                            {"id": "M1028", "name": "Operating System Configuration"}
+                        ]
                     }
                 ]
             },
-"Repudiation": {
+            "Repudiation": {
                 "tactics": ["Defense Evasion", "Impact"],
                 "techniques": [
                     {
                         "id": "T1070.001",
                         "name": "Clear Windows Event Logs",
                         "description": "Clearing Windows event logs",
+                        "url": "https://attack.mitre.org/techniques/T1070/001/",
                         "mitre_mitigations": [
                            {"id": "M1054", "name": "Software Deployment Tools"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -634,6 +718,7 @@ class MitreMapping:
                         "id": "T1070.002",
                         "name": "Clear Linux or Mac System Logs",
                         "description": "Clearing Unix/Linux system logs",
+                        "url": "https://attack.mitre.org/techniques/T1070/002/",
                         "mitre_mitigations": [
                            {"id": "M1054", "name": "Software Deployment Tools"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -645,6 +730,7 @@ class MitreMapping:
                         "id": "T1070.003",
                         "name": "Clear Command History",
                         "description": "Clearing command history",
+                        "url": "https://attack.mitre.org/techniques/T1070/003/",
                         "mitre_mitigations": [
                            {"id": "M1054", "name": "Software Deployment Tools"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -656,6 +742,7 @@ class MitreMapping:
                         "id": "T1070.004",
                         "name": "File Deletion",
                         "description": "Removing files to eliminate traces",
+                        "url": "https://attack.mitre.org/techniques/T1070/004/",
                         "mitre_mitigations": [
                            {"id": "M1054", "name": "Software Deployment Tools"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -667,6 +754,7 @@ class MitreMapping:
                         "id": "T1070.006",
                         "name": "Timestomp",
                         "description": "Modifying file timestamps",
+                        "url": "https://attack.mitre.org/techniques/T1070/006/",
                         "mitre_mitigations": [
                            {"id": "M1054", "name": "Software Deployment Tools"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -678,6 +766,7 @@ class MitreMapping:
                         "id": "T1562",
                         "name": "Impair Defenses",
                         "description": "Disabling logging and monitoring",
+                        "url": "https://attack.mitre.org/techniques/T1562/",
                         "mitre_mitigations": [
                            {"id": "M1054", "name": "Software Deployment Tools"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -691,6 +780,7 @@ class MitreMapping:
                         "id": "T1562.002",
                         "name": "Disable Windows Event Logging",
                         "description": "Disabling event logging",
+                        "url": "https://attack.mitre.org/techniques/T1562/002/",
                         "mitre_mitigations": [
                            {"id": "M1054", "name": "Software Deployment Tools"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -704,6 +794,7 @@ class MitreMapping:
                         "id": "T1562.006",
                         "name": "Indicator Blocking",
                         "description": "Blocking security indicators",
+                        "url": "https://attack.mitre.org/techniques/T1562/006/",
                         "mitre_mitigations": [
                            {"id": "M1054", "name": "Software Deployment Tools"},
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
@@ -717,10 +808,21 @@ class MitreMapping:
                         "id": "T1565.001",
                         "name": "Stored Data Manipulation",
                         "description": "Audit log manipulation",
+                        "url": "https://attack.mitre.org/techniques/T1565/001/",
                         "mitre_mitigations": [
                            {"id": "M1049", "name": "Antivirus/Antimalware"},
                            {"id": "M1043", "name": "Audit"},
                            {"id": "M1022", "name": "Restrict File and Directory Permissions"}
+                        ]
+                    },
+                    {
+                        "id": "T1204",
+                        "name": "User Execution",
+                        "description": "Tricking users into executing malicious code.",
+                        "url": "https://attack.mitre.org/techniques/T1204/",
+                        "mitre_mitigations": [
+                            {"id": "M1017", "name": "User Training"},
+                            {"id": "M1038", "name": "Execution Prevention"}
                         ]
                     }
                 ]
@@ -732,12 +834,14 @@ class MitreMapping:
                         "id": "T1005",
                         "name": "Data from Local System",
                         "description": "Collecting local sensitive data",
+                        "url": "https://attack.mitre.org/techniques/T1005/",
                         "defend_mitigations": [{"id": "D3F-DFLS"}]
                     },
                     {
                         "id": "T1041",
                         "name": "Exfiltration Over C2 Channel",
                         "description": "Data exfiltration via command and control",
+                        "url": "https://attack.mitre.org/techniques/T1041/",
                         "mitre_mitigations": [
                            {"id": "M1037", "name": "Filter Network Traffic"}
                         ]
@@ -746,24 +850,28 @@ class MitreMapping:
                         "id": "T1083",
                         "name": "File and Directory Discovery",
                         "description": "Discovery of sensitive files and directories",
+                        "url": "https://attack.mitre.org/techniques/T1083/",
                         "defend_mitigations": [{"id": "D3F-FDD"}]
                     },
                     {
                         "id": "T1040",
                         "name": "Network Sniffing",
                         "description": "Network traffic interception and sniffing",
+                        "url": "https://attack.mitre.org/techniques/T1040/",
                         "defend_mitigations": [{"id": "D3F-NS"}]
                     },
                     {
                         "id": "T1592",
                         "name": "Gather Victim Host Information",
                         "description": "Host information gathering and fingerprinting",
+                        "url": "https://attack.mitre.org/techniques/T1592/",
                         "defend_mitigations": [{"id": "D3F-GVHI"}]
                     },
                     {
                         "id": "T1592.002",
                         "name": "Software",
                         "description": "Software fingerprinting and enumeration",
+                        "url": "https://attack.mitre.org/techniques/T1592/002/",
                         "mitre_mitigations": [
                            {"id": "M1036", "name": "Disable or Remove Feature or Program"}
                         ]
@@ -772,12 +880,14 @@ class MitreMapping:
                         "id": "T1595",
                         "name": "Active Scanning",
                         "description": "Active reconnaissance and scanning",
+                        "url": "https://attack.mitre.org/techniques/T1595/",
                         "defend_mitigations": [{"id": "D3F-AS"}]
                     },
                     {
                         "id": "T1595.001",
                         "name": "Scanning IP Blocks",
                         "description": "Network scanning and enumeration",
+                        "url": "https://attack.mitre.org/techniques/T1595/001/",
                         "mitre_mitigations": [
                            {"id": "M1037", "name": "Filter Network Traffic"}
                         ]
@@ -786,6 +896,7 @@ class MitreMapping:
                         "id": "T1595.002",
                         "name": "Vulnerability Scanning",
                         "description": "Vulnerability assessment and scanning",
+                        "url": "https://attack.mitre.org/techniques/T1595/002/",
                         "mitre_mitigations": [
                            {"id": "M1037", "name": "Filter Network Traffic"}
                         ]
@@ -794,6 +905,7 @@ class MitreMapping:
                         "id": "T1589",
                         "name": "Gather Victim Identity Information",
                         "description": "Identity information gathering",
+                        "url": "https://attack.mitre.org/techniques/T1589/",
                         "mitre_mitigations": [
                            {"id": "M1056", "name": "User Training"},
                            {"id": "M1017", "name": "User Account Management"}
@@ -803,6 +915,7 @@ class MitreMapping:
                         "id": "T1590",
                         "name": "Gather Victim Network Information",
                         "description": "Network information reconnaissance",
+                        "url": "https://attack.mitre.org/techniques/T1590/",
                         "mitre_mitigations": [
                            {"id": "M1037", "name": "Filter Network Traffic"},
                            {"id": "M1030", "name": "Network Segmentation"}
@@ -812,6 +925,7 @@ class MitreMapping:
                         "id": "T1591",
                         "name": "Gather Victim Org Information",
                         "description": "Organizational information gathering",
+                        "url": "https://attack.mitre.org/techniques/T1591/",
                         "mitre_mitigations": [
                            {"id": "M1056", "name": "User Training"}
                         ]
@@ -820,6 +934,7 @@ class MitreMapping:
                         "id": "T1613",
                         "name": "Container and Resource Discovery",
                         "description": "Container and cloud resource discovery",
+                        "url": "https://attack.mitre.org/techniques/T1613/",
                         "mitre_mitigations": [
                            {"id": "M1043", "name": "Audit"},
                            {"id": "M1030", "name": "Network Segmentation"},
@@ -830,6 +945,7 @@ class MitreMapping:
                         "id": "T1046",
                         "name": "Network Service Discovery",
                         "description": "Service enumeration and discovery",
+                        "url": "https://attack.mitre.org/techniques/T1046/",
                         "mitre_mitigations": [
                            {"id": "M1043", "name": "Audit"},
                            {"id": "M1037", "name": "Filter Network Traffic"},
@@ -840,6 +956,7 @@ class MitreMapping:
                         "id": "T1087",
                         "name": "Account Discovery",
                         "description": "User and account enumeration",
+                        "url": "https://attack.mitre.org/techniques/T1087/",
                         "mitre_mitigations": [
                            {"id": "M1043", "name": "Audit"},
                            {"id": "M1033", "name": "Limit Access to Resource Over Network"},
@@ -851,6 +968,7 @@ class MitreMapping:
                         "id": "T1518",
                         "name": "Software Discovery",
                         "description": "Installed software discovery",
+                        "url": "https://attack.mitre.org/techniques/T1518/",
                         "mitre_mitigations": [
                            {"id": "M1043", "name": "Audit"},
                            {"id": "M1038", "name": "Execution Prevention"}
@@ -860,6 +978,7 @@ class MitreMapping:
                         "id": "T1082",
                         "name": "System Information Discovery",
                         "description": "System configuration discovery",
+                        "url": "https://attack.mitre.org/techniques/T1082/",
                         "mitre_mitigations": [
                            {"id": "M1043", "name": "Audit"},
                            {"id": "M1038", "name": "Execution Prevention"},
@@ -870,6 +989,7 @@ class MitreMapping:
                         "id": "T1213",
                         "name": "Data from Information Repositories",
                         "description": "Lifting sensitive data from caches and repositories",
+                        "url": "https://attack.mitre.org/techniques/T1213/",
                         "mitre_mitigations": [
                            {"id": "M1022", "name": "Restrict File and Directory Permissions"},
                            {"id": "M1017", "name": "User Account Management"}
@@ -879,6 +999,7 @@ class MitreMapping:
                         "id": "T1555",
                         "name": "Credentials from Password Stores",
                         "description": "Reverse engineering and white box analysis",
+                        "url": "https://attack.mitre.org/techniques/T1555/",
                         "mitre_mitigations": [
                            {"id": "M1028", "name": "Operating System Configuration"},
                            {"id": "M1026", "name": "Privileged Account Management"},
@@ -889,286 +1010,7 @@ class MitreMapping:
                         "id": "T1552",
                         "name": "Unsecured Credentials",
                         "description": "Exploiting incorrectly configured SSL/TLS",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1028", "name": "Operating System Configuration"}
-                        ]
-                    }
-                ]
-            },
- "Repudiation": {
-                "tactics": ["Defense Evasion", "Impact"],
-                "techniques": [
-                    {
-                        "id": "T1070.001",
-                        "name": "Clear Windows Event Logs",
-                        "description": "Clearing Windows event logs",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1070.002",
-                        "name": "Clear Linux or Mac System Logs",
-                        "description": "Clearing Unix/Linux system logs",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1070.003",
-                        "name": "Clear Command History",
-                        "description": "Clearing command history",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1070.004",
-                        "name": "File Deletion",
-                        "description": "Removing files to eliminate traces",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1070.006",
-                        "name": "Timestomp",
-                        "description": "Modifying file timestamps",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1562",
-                        "name": "Impair Defenses",
-                        "description": "Disabling logging and monitoring",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1028", "name": "Operating System Configuration"},
-                           {"id": "M1026", "name": "Privileged Account Management"},
-                           {"id": "M1018", "name": "User Account Control"}
-                        ]
-                    },
-                    {
-                        "id": "T1562.002",
-                        "name": "Disable Windows Event Logging",
-                        "description": "Disabling event logging",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1028", "name": "Operating System Configuration"},
-                           {"id": "M1026", "name": "Privileged Account Management"},
-                           {"id": "M1018", "name": "User Account Control"}
-                        ]
-                    },
-                    {
-                        "id": "T1562.006",
-                        "name": "Indicator Blocking",
-                        "description": "Blocking security indicators",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1028", "name": "Operating System Configuration"},
-                           {"id": "M1026", "name": "Privileged Account Management"},
-                           {"id": "M1018", "name": "User Account Control"}
-                        ]
-                    },
-                    {
-                        "id": "T1565.001",
-                        "name": "Stored Data Manipulation",
-                        "description": "Audit log manipulation",
-                        "mitre_mitigations": [
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    }
-                ]
-            },
-            "InformationDisclosure": {
-                "tactics": ["Collection", "Exfiltration", "Discovery", "Reconnaissance"],
-                "techniques": [
-                    {
-                        "id": "T1005",
-                        "name": "Data from Local System",
-                        "description": "Collecting local sensitive data",
-                        "defend_mitigations": [{"id": "D3F-DFLS"}]
-                    },
-                    {
-                        "id": "T1041",
-                        "name": "Exfiltration Over C2 Channel",
-                        "description": "Data exfiltration via command and control",
-                        "mitre_mitigations": [
-                           {"id": "M1037", "name": "Filter Network Traffic"}
-                        ]
-                    },
-                    {
-                        "id": "T1083",
-                        "name": "File and Directory Discovery",
-                        "description": "Discovery of sensitive files and directories",
-                        "defend_mitigations": [{"id": "D3F-FDD"}]
-                    },
-                    {
-                        "id": "T1040",
-                        "name": "Network Sniffing",
-                        "description": "Network traffic interception and sniffing",
-                        "defend_mitigations": [{"id": "D3F-NS"}]
-                    },
-                    {
-                        "id": "T1592",
-                        "name": "Gather Victim Host Information",
-                        "description": "Host information gathering and fingerprinting",
-                        "defend_mitigations": [{"id": "D3F-GVHI"}]
-                    },
-                    {
-                        "id": "T1592.002",
-                        "name": "Software",
-                        "description": "Software fingerprinting and enumeration",
-                        "mitre_mitigations": [
-                           {"id": "M1036", "name": "Disable or Remove Feature or Program"}
-                        ]
-                    },
-                    {
-                        "id": "T1595",
-                        "name": "Active Scanning",
-                        "description": "Active reconnaissance and scanning",
-                        "defend_mitigations": [{"id": "D3F-AS"}]
-                    },
-                    {
-                        "id": "T1595.001",
-                        "name": "Scanning IP Blocks",
-                        "description": "Network scanning and enumeration",
-                        "mitre_mitigations": [
-                           {"id": "M1037", "name": "Filter Network Traffic"}
-                        ]
-                    },
-                    {
-                        "id": "T1595.002",
-                        "name": "Vulnerability Scanning",
-                        "description": "Vulnerability assessment and scanning",
-                        "mitre_mitigations": [
-                           {"id": "M1037", "name": "Filter Network Traffic"}
-                        ]
-                    },
-                    {
-                        "id": "T1589",
-                        "name": "Gather Victim Identity Information",
-                        "description": "Identity information gathering",
-                        "mitre_mitigations": [
-                           {"id": "M1056", "name": "User Training"},
-                           {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1590",
-                        "name": "Gather Victim Network Information",
-                        "description": "Network information reconnaissance",
-                        "mitre_mitigations": [
-                           {"id": "M1037", "name": "Filter Network Traffic"},
-                           {"id": "M1030", "name": "Network Segmentation"}
-                        ]
-                    },
-                    {
-                        "id": "T1591",
-                        "name": "Gather Victim Org Information",
-                        "description": "Organizational information gathering",
-                        "mitre_mitigations": [
-                           {"id": "M1056", "name": "User Training"}
-                        ]
-                    },
-                    {
-                        "id": "T1613",
-                        "name": "Container and Resource Discovery",
-                        "description": "Container and cloud resource discovery",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1030", "name": "Network Segmentation"},
-                           {"id": "M1026", "name": "Privileged Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1046",
-                        "name": "Network Service Discovery",
-                        "description": "Service enumeration and discovery",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1037", "name": "Filter Network Traffic"},
-                           {"id": "M1030", "name": "Network Segmentation"}
-                        ]
-                    },
-                    {
-                        "id": "T1087",
-                        "name": "Account Discovery",
-                        "description": "User and account enumeration",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1033", "name": "Limit Access to Resource Over Network"},
-                           {"id": "M1030", "name": "Network Segmentation"},
-                           {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1518",
-                        "name": "Software Discovery",
-                        "description": "Installed software discovery",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1038", "name": "Execution Prevention"}
-                        ]
-                    },
-                    {
-                        "id": "T1082",
-                        "name": "System Information Discovery",
-                        "description": "System configuration discovery",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1038", "name": "Execution Prevention"},
-                           {"id": "M1026", "name": "Privileged Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1213",
-                        "name": "Data from Information Repositories",
-                        "description": "Lifting sensitive data from caches and repositories",
-                        "mitre_mitigations": [
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"},
-                           {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1555",
-                        "name": "Credentials from Password Stores",
-                        "description": "Reverse engineering and white box analysis",
-                        "mitre_mitigations": [
-                           {"id": "M1028", "name": "Operating System Configuration"},
-                           {"id": "M1026", "name": "Privileged Account Management"},
-                           {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1552",
-                        "name": "Unsecured Credentials",
-                        "description": "Exploiting incorrectly configured SSL/TLS",
+                        "url": "https://attack.mitre.org/techniques/T1552/",
                         "mitre_mitigations": [
                            {"id": "M1043", "name": "Audit"},
                            {"id": "M1028", "name": "Operating System Configuration"}
@@ -1314,6 +1156,11 @@ class MitreMapping:
             "T-CUSTOM-SSRF": r"(?i)ssrf|server side request forgery",
             "T-CUSTOM-DESERIALIZATION": r"(?i)deserialization vulnerability|insecure deserialization",
             "T-CUSTOM-LOG-FORGERY": r"(?i)log forgery|log injection|audit log tampering",
+            "T1199": r"(?i)trusted relationship|third-party trust",
+            "T1485": r"(?i)data destruction|delete files|wipe data",
+            "T1496": r"(?i)resource hijacking|cryptojacking|cryptomining",
+            "T1547": r"(?i)boot or logon autostart|autostart execution",
+            "T1204": r"(?i)user execution|trick user|social engineering",
             # PyTM STRIDE Categories
             "spoofing": "Spoofing",
             "tampering": "Tampering|unpatched.*vulnerabilities|sql.*injection|nosql.*injection|xss|cross.site scripting|data corruption|unauthorized write access|injection of false surveillance data|unauthorized access to or modification of flight plans|unpatched.*vulnerabilities",
