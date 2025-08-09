@@ -200,7 +200,7 @@ class ReportGenerator:
         except AttributeError:
             return "Unspecified"
 
-    def generate_diagram_html(self, threat_model: ThreatModel, output_dir: Path, breadcrumb: List[tuple[str, str]], models_data: List[Dict]):
+    def generate_diagram_html(self, threat_model: ThreatModel, output_dir: Path, breadcrumb: List[tuple[str, str]]):
         """
         Generates an HTML file containing just the diagram for navigation.
         """
@@ -217,15 +217,14 @@ class ReportGenerator:
         with open(svg_path, "r", encoding="utf-8") as f:
             svg_content = f.read()
 
-        svg_content = diagram_generator.add_links_to_svg(svg_content, threat_model)
+        svg_content = diagram_generator.add_links_to_svg(svg_content, threat_model, breadcrumb)
 
         template = self.env.get_template('navigable_diagram_template.html')
         html = template.render(
             title=f"Diagram - {model_name}",
             svg_content=svg_content,
             breadcrumb=breadcrumb,
-            parent_link=f"../{breadcrumb[-2][1]}" if len(breadcrumb) > 1 else None,
-            models=models_data
+            parent_link=f"../{breadcrumb[-2][1]}" if len(breadcrumb) > 1 else None
         )
 
         diagram_html_path = output_dir / f"{model_name}_diagram.html"
@@ -254,22 +253,13 @@ class ReportGenerator:
         """
         Generates all reports for a project.
         """
-        models_data = self._recursively_generate_reports(
+        self._recursively_generate_reports(
             model_path=project_path / "main.md",
             output_dir=output_dir,
             breadcrumb=[("main", "main_diagram.html")]
         )
 
-        # Generate the top-level navigable HTML
-        template = self.env.get_template('navigable_diagram_template.html')
-        navigable_html = template.render(models=models_data, title=f"{project_path.name} Navigable Threat Model")
-
-        navigable_html_path = output_dir / f"{project_path.name}_navigable.html"
-        with open(navigable_html_path, "w", encoding="utf-8") as f:
-            f.write(navigable_html)
-        logging.info(f"Generated navigable diagram: {navigable_html_path}")
-
-    def _recursively_generate_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[tuple[str, str]]) -> List[Dict]:
+    def _recursively_generate_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[tuple[str, str]]):
         """
         Recursively generates reports for each model in the project.
         """
@@ -287,26 +277,13 @@ class ReportGenerator:
             validate=True
         )
         if not threat_model:
-            return []
+            return
 
         diagram_generator = DiagramGenerator()
 
-        # Generate threat report with SVG
+        # Generate all files for the current model
         self.generate_html_report(threat_model, threat_model.process_threats(), output_dir / f"{model_name}_threat_report.html", include_svg=True)
-
-        all_models_data = [{
-            "id": model_name,
-            "svg_path": str((output_dir / f"{model_name}.svg").relative_to(output_dir)),
-            "report_path": str((output_dir / f"{model_name}_threat_report.html").relative_to(output_dir)),
-            "breadcrumb": " → ".join([item[0] for item in breadcrumb]),
-            "parent_id": breadcrumb[-2][0] if len(breadcrumb) > 1 else 'null'
-        }]
-
-        # Generate diagram-only HTML
-        models_data_for_diagram = all_models_data.copy()
-        self.generate_diagram_html(threat_model, output_dir, breadcrumb, models_data_for_diagram)
-
-        # Generate JSON
+        self.generate_diagram_html(threat_model, output_dir, breadcrumb)
         self.generate_json_export(threat_model, threat_model.process_threats(), output_dir / f"{model_name}.json")
 
         for server in threat_model.servers:
@@ -318,13 +295,11 @@ class ReportGenerator:
                     sub_output_dir = output_dir / Path(submodel_path_str).parent.name
                     sub_output_dir.mkdir(exist_ok=True)
                     new_breadcrumb = breadcrumb + [(Path(submodel_path_str).parent.name, f"{submodel_path.stem}_diagram.html")]
-                    all_models_data.extend(self._recursively_generate_reports(
+                    self._recursively_generate_reports(
                         model_path=submodel_path,
                         output_dir=sub_output_dir,
                         breadcrumb=new_breadcrumb
-                    ))
+                    )
                 else:
                     logging.warning(f"Submodel file not found: {submodel_path}")
-
-        return all_models_data
 

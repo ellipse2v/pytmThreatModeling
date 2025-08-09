@@ -18,9 +18,11 @@ Enhanced Diagram generation module with protocol styles and boundary attributes 
 import subprocess
 import re
 import logging
+import xml.etree.ElementTree as ET
 from typing import Dict, List, Optional
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
+from threat_analysis.core.models_module import ThreatModel
 
 class DiagramGenerator:
     """Enhanced class for threat model diagram generation with protocol styles and boundary attributes"""
@@ -28,7 +30,7 @@ class DiagramGenerator:
     def __init__(self):
         self.dot_executable = "dot"
         self.supported_formats = ["svg", "png", "pdf", "ps"]
-        self.template_env = Environment(loader=FileSystemLoader(Path(__file__).parent / "templates"))
+        self.template_env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / "templates"))
     
     def generate_dot_file_from_model(self, threat_model, output_file: str) -> Optional[str]:
         """Generates a .dot file from the threat model and saves it."""
@@ -248,11 +250,19 @@ class DiagramGenerator:
         
         # Check for web server
         elif 'web' in node_name_lower and 'server' in node_name_lower:
-            return '[shape=box, style=filled, fillcolor=lightgreen, label="🌐 ' + self._escape_label(node_name) + '"]'
+            attributes.append('shape=box')
+            attributes.append('style=filled')
+            attributes.append('fillcolor=lightgreen')
+            icon = '🌐 '
+            default_fillcolor = 'lightgreen'
         
         # Check for API
         elif 'api' in node_name_lower:
-            return '[shape=box, style=filled, fillcolor=lightyellow, label="🔌 ' + self._escape_label(node_name) + '"]'
+            attributes.append('shape=box')
+            attributes.append('style=filled')
+            attributes.append('fillcolor=lightyellow')
+            icon = '🔌 '
+            default_fillcolor = 'lightyellow'
         else:
             # Default shapes based on node type
             if node_type == 'actor':
@@ -301,10 +311,16 @@ class DiagramGenerator:
         
         return f'[{", ".join(attributes)}]'
 
-    def add_links_to_svg(self, svg_content: str, threat_model) -> str:
+    def add_links_to_svg(self, svg_content: str, threat_model: ThreatModel, breadcrumb: List[tuple[str, str]]) -> str:
         """
         Adds hyperlinks to the SVG content for nodes with submodels.
         """
+        # Register namespace to handle SVG parsing correctly
+        ET.register_namespace("", "http://www.w3.org/2000/svg")
+        ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
+
+        root = ET.fromstring(svg_content)
+
         for server in threat_model.servers:
             if 'submodel' in server:
                 server_name = server['name']
@@ -313,10 +329,21 @@ class DiagramGenerator:
                 submodel_path = Path(server['submodel'])
                 submodel_id = submodel_path.stem
 
-                # Find the node group for the server and add an onclick attribute
-                pattern = re.compile(fr'(<g id="{sanitized_name}" class="node">)', re.DOTALL)
-                svg_content = pattern.sub(fr'<g id="{sanitized_name}" class="node clickable-element" onclick="showDiagram(\'{submodel_id}\')">', svg_content)
-        return svg_content
+                # Find the node group for the server
+                for g in root.findall(f".//{{http://www.w3.org/2000/svg}}g[@id='{sanitized_name}']"):
+                    # Create a new <a> element
+                    link = ET.Element('a')
+                    link.set('xlink:href', f"{submodel_id}_diagram.html")
+
+                    # Move all children of g to the new link element
+                    for child in list(g):
+                        link.append(child)
+                        g.remove(child)
+
+                    # Append the link to the g element
+                    g.append(link)
+
+        return ET.tostring(root, encoding='unicode', method='xml')
 
     def _get_element_name(self, element) -> Optional[str]:
         """Safely extracts the name from a model element."""

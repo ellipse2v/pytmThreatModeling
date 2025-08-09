@@ -100,13 +100,6 @@
     <div class="container">
         <h1>{{ report_title }}</h1>
 
-        {% if svg_content %}
-        <h2>Threat Model Diagram</h2>
-        <div class="diagram-container">
-            {{ svg_content|safe }}
-        </div>
-        {% endif %}
-
         <div class="summary-grid">
             <div class="card">
                 <h3>Threat Statistics</h3>

@@ -220,20 +220,20 @@
 <body>
     <div class="diagram-container">
         <!-- Back Button -->
-        <div class="back-button" id="back-button" onclick="goBack()">
+        <a href="{{ parent_link }}" class="back-button {% if parent_link %}visible{% endif %}">
             ← Retour
-        </div>
+        </a>
 
         <!-- Breadcrumb -->
         <div class="breadcrumb" id="breadcrumb">
-            🏠 Vue Principale
+            {% for name, link in breadcrumb %}
+                {% set levels_up = (breadcrumb|length - 1) - loop.index0 %}
+                {% set prefix = '../' * levels_up %}
+                <a href="{{ prefix }}{{ link }}">{{ name }}</a>{% if not loop.last %} &gt; {% endif %}
+            {% endfor %}
         </div>
 
-        {% for model in models %}
-        <div id="{{ model.id }}-diagram" class="svg-container {% if loop.first %}active{% endif %}">
-            <object data="{{ model.svg_path }}" type="image/svg+xml"></object>
-        </div>
-        {% endfor %}
+        {{ svg_content|safe }}
 
         <!-- Legend -->
         <div class="legend" id="legend">
@@ -274,76 +274,6 @@
     </div>
 
     <script>
-        let currentDiagram = '{{ models[0].id }}';
-        let navigationHistory = ['{{ models[0].id }}'];
-
-        const diagrams = {
-            {% for model in models %}
-            '{{ model.id }}': {
-                element: '{{ model.id }}-diagram',
-                title: '{{ model.id }}',
-                breadcrumb: '{{ model.breadcrumb }}',
-                parent: {{ model.parent_id }}
-            },
-            {% endfor %}
-        };
-
-        function showDiagram(diagramId) {
-            if (!diagrams[diagramId]) return;
-
-            // Add to history if navigating forward
-            if (currentDiagram !== diagramId && !navigationHistory.includes(diagramId)) {
-                navigationHistory.push(diagramId);
-            }
-
-            // Hide all diagrams
-            document.querySelectorAll('.svg-container').forEach(container => {
-                container.classList.remove('active');
-            });
-
-            // Show target diagram
-            const targetElement = document.getElementById(diagrams[diagramId].element);
-            if (targetElement) {
-                setTimeout(() => {
-                    targetElement.classList.add('active');
-                }, 50);
-
-                // Update breadcrumb
-                document.getElementById('breadcrumb').textContent = diagrams[diagramId].breadcrumb;
-
-                // Update document title
-                document.title = `${diagrams[diagramId].title} - Threat Model`;
-
-                currentDiagram = diagramId;
-
-                // Show/hide back button
-                updateBackButton();
-
-                // Add to browser history
-                history.pushState({diagramId: diagramId}, '', `#${diagramId}`);
-            }
-        }
-
-        function goBack() {
-            const parentDiagram = diagrams[currentDiagram]?.parent;
-            if (parentDiagram) {
-                // Remove current from history
-                navigationHistory = navigationHistory.filter(id => id !== currentDiagram);
-                showDiagram(parentDiagram);
-            }
-        }
-
-        function updateBackButton() {
-            const backButton = document.getElementById('back-button');
-            const hasParent = diagrams[currentDiagram]?.parent !== null;
-
-            if (hasParent) {
-                backButton.classList.add('visible');
-            } else {
-                backButton.classList.remove('visible');
-            }
-        }
-
         function toggleLegendContent() {
             const content = document.getElementById('legend-content');
             const icon = document.getElementById('toggle-icon');
@@ -356,33 +286,6 @@
                 icon.textContent = '+';
             }
         }
-
-        // Handle browser back/forward
-        window.addEventListener('popstate', function(event) {
-            if (event.state && event.state.diagramId) {
-                currentDiagram = event.state.diagramId;
-                showDiagram(currentDiagram);
-            }
-        });
-
-        // Initialize from URL hash on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            const hash = window.location.hash.substring(1);
-            if (hash && diagrams[hash]) {
-                showDiagram(hash);
-            } else {
-                // Set initial state
-                updateBackButton();
-                history.replaceState({diagramId: 'main'}, '', '#main');
-            }
-        });
-
-        // Keyboard navigation
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape') {
-                goBack();
-            }
-        });
     </script>
 </body>
 </html>

@@ -321,6 +321,8 @@ if __name__ == "__main__":
         from threat_analysis.generation.report_generator import ReportGenerator
         from threat_analysis.severity_calculator_module import SeverityCalculator
         from threat_analysis.core.mitre_mapping_module import MitreMapping
+        from pathlib import Path
+        from threat_analysis import config
 
         project_path = Path(args.project)
         output_dir = Path(config.OUTPUT_BASE_DIR) / project_path.name
