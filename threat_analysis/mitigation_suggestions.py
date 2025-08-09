@@ -35,97 +35,271 @@ To add new mitigation suggestions:
 """
 
 MITIGATION_MAP = {
+    # T1190: Exploit Public-Facing Application (e.g., SQL Injection)
     "T1190": [
         {
-            "name": "OWASP ASVS V14.2.2: Input Validation",
-            "description": (
-                "Validate all incoming data to prevent injection attacks and "
-                "ensure it is safe to process."
-            ),
+            "name": "OWASP ASVS V5.3.3: Output Encoding",
+            "description": "Use output encoding to prevent injection attacks when rendering user-controllable data.",
             "framework": "OWASP ASVS",
             "url": "https://owasp.org/www-project-application-security-verification-standard/"
         },
         {
-            "name": "NIST SP 800-53 AC-3: Access Enforcement",
-            "description": (
-                "Enforce approved authorizations for logical access to "
-                "information and system resources in accordance with "
-                "applicable access control policies."
-            ),
+            "name": "NIST SP 800-53 SI-10: Information Input Validation",
+            "description": "Ensure that inputs are validated to detect and filter malicious content.",
             "framework": "NIST",
             "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
         },
         {
-            "name": "CIS Control 18: Application Software Security",
-            "description": (
-                "Manage the security life cycle of all in-house developed, "
-                "hosted, or acquired software to prevent, detect, and "
-                "correct security weaknesses."
-            ),
+            "name": "CIS Control 16: Application Software Security",
+            "description": "Implement security best practices in the software development lifecycle.",
             "framework": "CIS",
             "url": "https://www.cisecurity.org/controls/application-software-security"
         }
     ],
+    # T1059: Command and Scripting Interpreter (e.g., Command Injection)
+    "T1059": [
+        {
+            "name": "OWASP ASVS V5.3.1: Input Validation and Sanitization",
+            "description": "Validate and sanitize all user-supplied input to prevent command injection.",
+            "framework": "OWASP ASVS",
+            "url": "https://owasp.org/www-project-application-security-verification-standard/"
+        },
+        {
+            "name": "NIST SP 800-53 CM-7: Least Privilege",
+            "description": "Ensure that the application runs with the minimum level of privileges required.",
+            "framework": "NIST",
+            "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+        },
+        {
+            "name": "CIS Control 7: Continuous Vulnerability Management",
+            "description": "Regularly scan for and remediate vulnerabilities in applications and systems.",
+            "framework": "CIS",
+            "url": "https://www.cisecurity.org/controls/continuous-vulnerability-management"
+        }
+    ],
+    # T1059.007: JavaScript (e.g., XSS)
+    "T1059.007": [
+        {
+            "name": "OWASP ASVS V5.2.1: Content Security Policy (CSP)",
+            "description": "Implement a strong Content Security Policy to mitigate XSS attacks.",
+            "framework": "OWASP ASVS",
+            "url": "https://owasp.org/www-project-application-security-verification-standard/"
+        },
+        {
+            "name": "NIST SP 800-53 SI-10: Information Input Validation",
+            "description": "Validate and encode user input to prevent script injection.",
+            "framework": "NIST",
+            "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+        },
+        {
+            "name": "CIS Control 16.9: Use of Secure Libraries",
+            "description": "Use modern, secure libraries and frameworks that have built-in XSS protection.",
+            "framework": "CIS",
+            "url": "https://www.cisecurity.org/controls/application-software-security"
+        }
+    ],
+    # T1557: Adversary-in-the-Middle (e.g., weak TLS)
+    "T1557": [
+        {
+            "name": "OWASP ASVS V9.1.1: TLS Configuration",
+            "description": "Use strong, validated TLS configurations for all network communications.",
+            "framework": "OWASP ASVS",
+            "url": "https://owasp.org/www-project-application-security-verification-standard/"
+        },
+        {
+            "name": "NIST SP 800-53 SC-8: Transmission Confidentiality and Integrity",
+            "description": "Protect the confidentiality and integrity of transmitted information.",
+            "framework": "NIST",
+            "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+        },
+        {
+            "name": "CIS Control 9: Network Monitoring and Defense",
+            "description": "Monitor network traffic for signs of MITM attacks.",
+            "framework": "CIS",
+            "url": "https://www.cisecurity.org/controls/network-monitoring-and-defense"
+        }
+    ],
+    # T1078: Valid Accounts (e.g., weak passwords)
+    "T1078": [
+        {
+            "name": "OWASP ASVS V2.1.1: Password Strength",
+            "description": "Enforce strong password policies to prevent guessing.",
+            "framework": "OWASP ASVS",
+            "url": "https://owasp.org/www-project-application-security-verification-standard/"
+        },
+        {
+            "name": "NIST SP 800-53 IA-5: Authenticator Management",
+            "description": "Manage authenticators by defining strength mechanisms.",
+            "framework": "NIST",
+            "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+        },
+        {
+            "name": "CIS Control 5: Account Management",
+            "description": "Use processes and tools to manage the lifecycle of user accounts.",
+            "framework": "CIS",
+            "url": "https://www.cisecurity.org/controls/account-management"
+        }
+    ],
+    # T1110: Brute Force
+    "T1110": [
+        {
+            "name": "OWASP ASVS V2.2.1: Account Lockout",
+            "description": "Implement account lockout mechanisms after a set number of failed login attempts.",
+            "framework": "OWASP ASVS",
+            "url": "https://owasp.org/www-project-application-security-verification-standard/"
+        },
+        {
+            "name": "NIST SP 800-53 AC-7: Unsuccessful Logon Attempts",
+            "description": "Enforce a limit on the number of unsuccessful logon attempts.",
+            "framework": "NIST",
+            "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+        },
+        {
+            "name": "CIS Control 4: Secure Configuration",
+            "description": "Establish and maintain secure configurations for enterprise assets.",
+            "framework": "CIS",
+            "url": "https://www.cisecurity.org/controls/secure-configuration-of-enterprise-assets-and-software"
+        }
+    ],
+    # T1566: Phishing
     "T1566": [
         {
             "name": "CIS Control 14: Security Awareness and Skills Training",
-            "description": (
-                "Establish and maintain a security awareness program to "
-                "influence behavior among the workforce to be security "
-                "conscious and properly skilled."
-            ),
+            "description": "Establish and maintain a security awareness program to educate users about phishing.",
             "framework": "CIS",
             "url": "https://www.cisecurity.org/controls/security-awareness-and-skills-training"
         },
         {
             "name": "NIST SP 800-53 AT-2: Security Awareness Training",
-            "description": (
-                "Provide basic security awareness training to all system "
-                "users before authorizing access to the system, and "
-                "periodically thereafter."
-            ),
+            "description": "Provide security awareness training to all system users.",
             "framework": "NIST",
             "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
         }
     ],
-    "T1199": [
+    # T1068: Exploitation for Privilege Escalation
+    "T1068": [
         {
-            "name": "CIS Control 6: Access Control Management",
-            "description": "Use processes and tools to create, assign, manage, and revoke access credentials and privileges.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/access-control-management"
-        }
-    ],
-    "T1485": [
+            "name": "OWASP ASVS V1.1.1: Secure Software Development Lifecycle",
+            "description": "Integrate security throughout the software development lifecycle to prevent vulnerabilities.",
+            "framework": "OWASP ASVS",
+            "url": "https://owasp.org/www-project-application-security-verification-standard/"
+        },
         {
-            "name": "CIS Control 11: Data Recovery",
-            "description": "Establish and maintain a data recovery process and procedure to restore data.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/data-recovery"
-        }
-    ],
-    "T1496": [
+            "name": "NIST SP 800-53 SI-2: Flaw Remediation",
+            "description": "Identify, report, and correct system flaws in a timely manner.",
+            "framework": "NIST",
+            "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+        },
         {
             "name": "CIS Control 2: Inventory and Control of Software Assets",
-            "description": "Actively manage (inventory, track, and correct) all software on the network.",
+            "description": "Maintain an inventory of all software and remove unauthorized software.",
             "framework": "CIS",
             "url": "https://www.cisecurity.org/controls/inventory-and-control-of-software-assets"
         }
     ],
-    "T1547": [
+    # T1499: Endpoint Denial of Service
+    "T1499": [
         {
-            "name": "CIS Control 4: Secure Configuration of Enterprise Assets and Software",
-            "description": "Establish and maintain the secure configuration of enterprise assets and software.",
+            "name": "OWASP ASVS V13.2.1: Resource Limiting",
+            "description": "Implement rate limiting and resource controls to prevent resource exhaustion.",
+            "framework": "OWASP ASVS",
+            "url": "https://owasp.org/www-project-application-security-verification-standard/"
+        },
+        {
+            "name": "NIST SP 800-53 CP-7: Contingency Planning",
+            "description": "Develop a contingency plan to ensure the availability of essential services.",
+            "framework": "NIST",
+            "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+        },
+        {
+            "name": "CIS Control 12: Network Infrastructure Management",
+            "description": "Implement network infrastructure defenses to mitigate DoS attacks.",
             "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/secure-configuration-of-enterprise-assets-and-software"
+            "url": "https://www.cisecurity.org/controls/network-infrastructure-management"
         }
     ],
-    "T1204": [
+    # T1040: Network Sniffing
+    "T1040": [
         {
-            "name": "CIS Control 14: Security Awareness and Skills Training",
-            "description": "Establish and maintain a security awareness program.",
+            "name": "OWASP ASVS V9.1.1: Encrypted Communications",
+            "description": "Encrypt all network traffic to prevent sniffing and interception.",
+            "framework": "OWASP ASVS",
+            "url": "https://owasp.org/www-project-application-security-verification-standard/"
+        },
+        {
+            "name": "NIST SP 800-53 SC-12: Cryptographic Key Establishment and Management",
+            "description": "Manage cryptographic keys to ensure the security of encrypted communications.",
+            "framework": "NIST",
+            "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+        },
+        {
+            "name": "CIS Control 9: Network Monitoring",
+            "description": "Monitor network traffic for anomalies and signs of sniffing.",
             "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/security-awareness-and-skills-training"
+            "url": "https://www.cisecurity.org/controls/network-monitoring-and-defense"
+        }
+    ],
+    # T1083: File and Directory Discovery (Path Traversal)
+    "T1083": [
+        {
+            "name": "OWASP ASVS V5.3.8: Path Traversal Prevention",
+            "description": "Prevent path traversal by validating file paths and using canonical paths.",
+            "framework": "OWASP ASVS",
+            "url": "https://owasp.org/www-project-application-security-verification-standard/"
+        },
+        {
+            "name": "NIST SP 800-53 AC-3: Access Control Enforcement",
+            "description": "Enforce access controls to prevent unauthorized access to files and directories.",
+            "framework": "NIST",
+            "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+        },
+        {
+            "name": "CIS Control 3: Data Protection",
+            "description": "Implement data protection measures to secure sensitive files and directories.",
+            "framework": "CIS",
+            "url": "https://www.cisecurity.org/controls/data-protection"
+        }
+    ],
+    # T1213: Data from Information Repositories (IDOR)
+    "T1213": [
+        {
+            "name": "OWASP ASVS V4.1.2: Authorization Checks",
+            "description": "Verify that the user is authorized for the requested data in every request.",
+            "framework": "OWASP ASVS",
+            "url": "https://owasp.org/www-project-application-security-verification-standard/"
+        },
+        {
+            "name": "NIST SP 800-53 AC-16: Security Attributes",
+            "description": "Use security attributes to enforce access control decisions.",
+            "framework": "NIST",
+            "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+        },
+        {
+            "name": "CIS Control 6: Access Control Management",
+            "description": "Manage access credentials and privileges to prevent unauthorized data access.",
+            "framework": "CIS",
+            "url": "https://www.cisecurity.org/controls/access-control-management"
+        }
+    ],
+    # T1552: Unsecured Credentials
+    "T1552": [
+        {
+            "name": "OWASP ASVS V2.4.1: Credential Storage",
+            "description": "Store credentials securely using strong, salted hashing algorithms.",
+            "framework": "OWASP ASVS",
+            "url": "https://owasp.org/www-project-application-security-verification-standard/"
+        },
+        {
+            "name": "NIST SP 800-53 IA-5(1): Password-based Authentication",
+            "description": "Protect passwords from unauthorized disclosure and modification.",
+            "framework": "NIST",
+            "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+        },
+        {
+            "name": "CIS Control 5.4: Restrict Administrator Privileges",
+            "description": "Restrict and manage administrative privileges to limit exposure of powerful credentials.",
+            "framework": "CIS",
+            "url": "https://www.cisecurity.org/controls/account-management"
         }
     ]
 }
