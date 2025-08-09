@@ -306,36 +306,35 @@ def test_generate_dot_file_from_model_exception(diagram_generator):
         result = diagram_generator.generate_dot_file_from_model(mock_threat_model, output_file)
         assert result is None
 
-def test_generate_dot_file_from_model_path_conversion(diagram_generator):
+def test_generate_dot_file_from_model_returns_content(diagram_generator):
     mock_threat_model = MagicMock()
+    # Mock the necessary attributes on the threat model
     mock_threat_model.boundaries = {}
     mock_threat_model.actors = []
     mock_threat_model.servers = []
     mock_threat_model.dataflows = []
 
-    test_output_file_str = "/tmp/test_output.dot"
-
-    with patch('threat_analysis.generation.diagram_generator.Path') as mock_path_class:
-        mock_path_instance = MagicMock()
-        mock_path_class.return_value = mock_path_instance
-        mock_path_instance.parent.exists.return_value = False
-
-        with patch.object(diagram_generator, '_generate_manual_dot', return_value="digraph G {}"):
-            with patch('builtins.open', mock_open()):
-                result = diagram_generator.generate_dot_file_from_model(mock_threat_model, test_output_file_str)
-
-                mock_path_class.assert_called_once_with(test_output_file_str)
-                mock_path_instance.parent.exists.assert_called_once()
-                mock_path_instance.parent.mkdir.assert_called_once_with(parents=True)
-                assert result == test_output_file_str
+    dot_content = "digraph G {}"
+    with patch.object(diagram_generator, '_generate_manual_dot', return_value=dot_content):
+        with patch('builtins.open', mock_open()):
+            result = diagram_generator.generate_dot_file_from_model(mock_threat_model, "dummy_path.dot")
+            assert result == dot_content
 
 def test_generate_diagram_from_dot_success(diagram_generator):
-    with patch('subprocess.run') as mock_run:
+    with patch('subprocess.run') as mock_run, \
+         patch.object(diagram_generator, 'check_graphviz_installation', return_value=True):
         mock_run.return_value = MagicMock(returncode=0)
-        with patch('os.path.exists', return_value=True):
-            result = diagram_generator.generate_diagram_from_dot("digraph G {}", "output", "svg")
-            mock_run.assert_called() # Changed from assert_called_once()
-            assert result == "output.svg"
+        # We need to mock pathlib.Path's exists method
+        with patch('threat_analysis.generation.diagram_generator.Path') as mock_path_class:
+            mock_path_instance = mock_path_class.return_value
+            # Since we now create the output dir, the mock needs to handle the with_suffix call
+            mock_path_with_suffix = mock_path_instance.with_suffix.return_value
+            mock_path_with_suffix.exists.return_value = True
+
+            result = diagram_generator.generate_diagram_from_dot("digraph G {}", "output.svg", "svg")
+            mock_run.assert_called_once()
+            # The result should be the path to the output file
+            assert result == str(mock_path_with_suffix)
 
 def test_generate_diagram_from_dot_unsupported_format(diagram_generator):
     result = diagram_generator.generate_diagram_from_dot("digraph G {}", "output", "unsupported")

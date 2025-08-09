@@ -178,22 +178,18 @@ class ThreatAnalysisFramework:
         )
 
         # Generate DOT file
-        dot_path = self.diagram_generator.generate_dot_file_from_model(
+        dot_code = self.diagram_generator.generate_dot_file_from_model(
             self.threat_model, dot_output_full_path
         )
 
         svg_path = None
         html_path = None
 
-        if dot_path:  # If DOT file was successfully generated
+        if dot_code:
             try:
-                # Read DOT file content to pass to generate_diagram_from_dot
-                with open(dot_path, "r", encoding="utf-8") as f:
-                    dot_code_content = f.read()
-
                 # Generate SVG
                 svg_path = self.diagram_generator.generate_diagram_from_dot(
-                    dot_code_content, svg_output_full_path, "svg"
+                    dot_code, svg_output_full_path, "svg"
                 )
 
                 # Generate HTML with embedded SVG and positioned legend
@@ -205,10 +201,10 @@ class ThreatAnalysisFramework:
                     )
             except Exception as e:
                 logging.error(
-                    f"❌ Error reading DOT file to generate SVG/HTML: {e}"
+                    f"❌ Error generating diagram from DOT code: {e}"
                 )
 
-        return {"dot": dot_path, "svg": svg_path, "html": html_path}
+        return {"dot": dot_output_full_path, "svg": svg_path, "html": html_path}
 
     def open_report_in_browser(self, report_path: str):
         """Opens the HTML report in the default browser."""

@@ -22,6 +22,7 @@ import xml.etree.ElementTree as ET
 from typing import Dict, List, Optional
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
+
 from threat_analysis.core.models_module import ThreatModel
 
 class DiagramGenerator:
@@ -33,35 +34,31 @@ class DiagramGenerator:
         self.template_env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / "templates"))
     
     def generate_dot_file_from_model(self, threat_model, output_file: str) -> Optional[str]:
-        """Generates a .dot file from the threat model and saves it."""
+        """
+        Generates DOT code from the threat model, saves it to a file,
+        and returns the DOT code as a string.
+        """
         try:
-            dot_code = self._generate_manual_dot(threat_model) # Fallback to manual generation
+            dot_code = self._generate_manual_dot(threat_model)
             
-            if not dot_code or not dot_code.strip(): # Check if DOT code is empty or only whitespace
-                logging.error("❌ Unable to generate DOT code from model. DOT code is empty. Check model content.")
+            if not dot_code or not dot_code.strip():
+                logging.error("❌ Unable to generate DOT code from model. DOT code is empty.")
                 return None
 
-            # Clean the DOT code
             cleaned_dot = self._clean_dot_code(dot_code)
-
-            # Convert output_file to Path object
             output_path_obj = Path(output_file)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
 
-            # Ensure output directory exists
-            output_dir = output_path_obj.parent
-            if not output_dir.exists():
-                output_dir.mkdir(parents=True)
-
-            with open(str(output_path_obj), "w", encoding="utf-8", newline='\n') as f:
+            with open(output_path_obj, "w", encoding="utf-8", newline='\n') as f:
                 f.write(cleaned_dot)
             logging.info(f"✅ DOT file generated: {output_file}")
-            return output_file
+            return cleaned_dot  # Return the content
         except Exception as e:
             logging.error(f"❌ Error during DOT file generation: {e}")
             return None
 
-    def generate_diagram_from_dot(self, dot_file_path: str, output_file: str, format: str = "svg") -> Optional[str]:
-        """Generates a diagram from a DOT file using Graphviz."""
+    def generate_diagram_from_dot(self, dot_code: str, output_file: str, format: str = "svg") -> Optional[str]:
+        """Generates a diagram from a DOT string using Graphviz."""
         if format not in self.supported_formats:
             logging.error(f"❌ Unsupported format: {format}. Supported formats: {self.supported_formats}")
             return None
@@ -72,37 +69,30 @@ class DiagramGenerator:
             return None
             
         try:
-            # Convert output_file to Path object
             output_path_obj = Path(output_file)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+            output_path = str(output_path_obj.with_suffix(f'.{format}'))
 
-            # Ensure the output directory exists
-            output_dir = output_path_obj.parent
-            if not output_dir.exists():
-                output_dir.mkdir(parents=True)
-
-            # Construct the output path, avoiding double extensions
-            if output_path_obj.suffix == f'.{format}':
-                output_path = str(output_path_obj)
-            else:
-                output_path = str(output_path_obj.with_suffix(f'.{format}'))
+            cleaned_dot = self._clean_dot_code(dot_code)
             
-            # Run dot command to generate diagram
             subprocess.run(
-                [self.dot_executable, f"-T{format}", dot_file_path, "-o", output_path],
+                [self.dot_executable, f"-T{format}", "-o", output_path],
+                input=cleaned_dot,
                 text=True,
                 encoding='utf-8',
                 capture_output=True,
                 check=True
             )
             
-            if output_path_obj.exists():
+            if Path(output_path).exists():
                 return output_path
             else:
-                logging.error("❌ Output file was not created")
+                logging.error(f"❌ Output file was not created: {output_path}")
                 return None
                 
         except subprocess.CalledProcessError as e:
             logging.error(f"❌ Graphviz error: {e.stderr}")
+            logging.error(f"DOT code preview: {cleaned_dot[:200]}...")
             return None
         except Exception as e:
             logging.error(f"❌ Unexpected error: {e}")
@@ -311,11 +301,10 @@ class DiagramGenerator:
         
         return f'[{", ".join(attributes)}]'
 
-    def add_links_to_svg(self, svg_content: str, threat_model: ThreatModel, breadcrumb: List[tuple[str, str]]) -> str:
+    def add_links_to_svg(self, svg_content: str, threat_model: ThreatModel) -> str:
         """
         Adds hyperlinks to the SVG content for nodes with submodels.
         """
-        # Register namespace to handle SVG parsing correctly
         ET.register_namespace("", "http://www.w3.org/2000/svg")
         ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
 
@@ -327,20 +316,19 @@ class DiagramGenerator:
                 sanitized_name = self._sanitize_name(server_name)
 
                 submodel_path = Path(server['submodel'])
-                submodel_id = submodel_path.stem
+                # Correctly form the relative path for the link
+                link_href = f"{submodel_path.parent.name}/{submodel_path.stem}_diagram.html"
 
                 # Find the node group for the server
                 for g in root.findall(f".//{{http://www.w3.org/2000/svg}}g[@id='{sanitized_name}']"):
-                    # Create a new <a> element
                     link = ET.Element('a')
-                    link.set('xlink:href', f"{submodel_id}_diagram.html")
+                    link.set('xlink:href', link_href)
 
                     # Move all children of g to the new link element
                     for child in list(g):
                         link.append(child)
                         g.remove(child)
 
-                    # Append the link to the g element
                     g.append(link)
 
         return ET.tostring(root, encoding='unicode', method='xml')

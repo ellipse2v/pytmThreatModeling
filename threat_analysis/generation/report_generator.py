@@ -17,12 +17,12 @@ Report generation module
 """
 import re
 import json
+import logging
+import sys
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
-import logging
-import sys
 
 # Add project root to sys.path to allow imports from other directories
 project_root = Path(__file__).resolve().parents[2]
@@ -43,18 +43,8 @@ class ReportGenerator:
         self.env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / 'templates'))
 
     def generate_html_report(self, threat_model, grouped_threats: Dict[str, List],
-                             output_file: Path = Path("stride_mitre_report.html"), include_svg: bool = False) -> Path:
+                             output_file: Path = Path("stride_mitre_report.html")) -> Path:
         """Generates a complete HTML report with MITRE ATT&CK"""
-
-        svg_content = None
-        if include_svg:
-            diagram_generator = DiagramGenerator()
-            svg_path = output_file.parent / f"{threat_model.tm.name}.svg"
-            dot_file_path = diagram_generator.generate_dot_file_from_model(threat_model, str(svg_path.with_suffix('.dot')))
-            if dot_file_path:
-                diagram_generator.generate_diagram_from_dot(dot_file_path, str(svg_path), "svg")
-                with open(svg_path, "r", encoding="utf-8") as f:
-                    svg_content = f.read()
 
         total_threats_analyzed = threat_model.mitre_analysis_results.get('total_threats', 0)
         total_mitre_techniques_mapped = threat_model.mitre_analysis_results.get('mitre_techniques_count', 0)
@@ -75,8 +65,7 @@ class ReportGenerator:
             summary_stats=summary_stats,
             all_threats=all_detailed_threats_with_mitre,
             stride_categories=stride_categories,
-            severity_calculation_note=self.severity_calculator.get_calculation_explanation(),
-            svg_content=svg_content
+            severity_calculation_note=self.severity_calculator.get_calculation_explanation()
         )
 
         with open(output_file, "w", encoding="utf-8") as f:
@@ -200,38 +189,6 @@ class ReportGenerator:
         except AttributeError:
             return "Unspecified"
 
-    def generate_diagram_html(self, threat_model: ThreatModel, output_dir: Path, breadcrumb: List[tuple[str, str]]):
-        """
-        Generates an HTML file containing just the diagram for navigation.
-        """
-        diagram_generator = DiagramGenerator()
-        model_name = threat_model.tm.name
-        svg_path = output_dir / f"{model_name}.svg"
-
-        # Ensure SVG exists, if not, generate it
-        if not svg_path.exists():
-            dot_file_path = diagram_generator.generate_dot_file_from_model(threat_model, str(svg_path.with_suffix('.dot')))
-            if dot_file_path:
-                diagram_generator.generate_diagram_from_dot(dot_file_path, str(svg_path), "svg")
-
-        with open(svg_path, "r", encoding="utf-8") as f:
-            svg_content = f.read()
-
-        svg_content = diagram_generator.add_links_to_svg(svg_content, threat_model, breadcrumb)
-
-        template = self.env.get_template('navigable_diagram_template.html')
-        html = template.render(
-            title=f"Diagram - {model_name}",
-            svg_content=svg_content,
-            breadcrumb=breadcrumb,
-            parent_link=f"../{breadcrumb[-2][1]}" if len(breadcrumb) > 1 else None
-        )
-
-        diagram_html_path = output_dir / f"{model_name}_diagram.html"
-        with open(diagram_html_path, "w", encoding="utf-8") as f:
-            f.write(html)
-        logging.info(f"Generated diagram HTML: {diagram_html_path}")
-
     def generate_summary_stats(self, all_detailed_threats: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Generates summary statistics based on severity scores."""
         if not all_detailed_threats: return {}
@@ -253,10 +210,14 @@ class ReportGenerator:
         """
         Generates all reports for a project.
         """
+        # Ensure the initial output directory exists and is named after the project
+        project_output_dir = output_dir / project_path.name
+        project_output_dir.mkdir(parents=True, exist_ok=True)
+
         self._recursively_generate_reports(
             model_path=project_path / "main.md",
-            output_dir=output_dir,
-            breadcrumb=[("main", "main_diagram.html")]
+            output_dir=project_output_dir,
+            breadcrumb=[(project_path.name, "main_diagram.html")]
         )
 
     def _recursively_generate_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[tuple[str, str]]):
@@ -264,42 +225,93 @@ class ReportGenerator:
         Recursively generates reports for each model in the project.
         """
         model_name = model_path.stem
-        logging.info(f"Processing model: {model_name}")
+        logging.info(f"Processing model: {model_name} in {model_path.parent}")
 
-        with open(model_path, "r", encoding="utf-8") as f:
-            markdown_content = f.read()
+        try:
+            with open(model_path, "r", encoding="utf-8") as f:
+                markdown_content = f.read()
 
-        threat_model = create_threat_model(
-            markdown_content=markdown_content,
-            model_name=model_name,
-            model_description=f"Threat model for {model_name}",
-            mitre_mapping=self.mitre_mapping,
-            validate=True
-        )
-        if not threat_model:
+            threat_model = create_threat_model(
+                markdown_content=markdown_content,
+                model_name=model_name,
+                model_description=f"Threat model for {model_name}",
+                mitre_mapping=self.mitre_mapping,
+                validate=True
+            )
+            if not threat_model:
+                logging.error(f"Failed to create threat model for {model_path}")
+                return
+
+            # Generate all files for the current model
+            grouped_threats = threat_model.process_threats()
+            self.generate_html_report(threat_model, grouped_threats, output_dir / f"{model_name}_threat_report.html")
+            self.generate_json_export(threat_model, grouped_threats, output_dir / f"{model_name}.json")
+            self.generate_diagram_html(threat_model, output_dir, breadcrumb)
+
+            # Recurse into submodels
+            for server in threat_model.servers:
+                if 'submodel' in server:
+                    submodel_path_str = server['submodel']
+                    # Resolve path relative to the current model file
+                    submodel_path = (model_path.parent / submodel_path_str).resolve()
+
+                    if submodel_path.exists() and submodel_path.is_file():
+                        sub_dir_name = submodel_path.parent.name
+                        sub_output_dir = output_dir / sub_dir_name
+                        sub_output_dir.mkdir(exist_ok=True)
+
+                        new_breadcrumb = breadcrumb + [(sub_dir_name, f"{submodel_path.stem}_diagram.html")]
+
+                        self._recursively_generate_reports(
+                            model_path=submodel_path,
+                            output_dir=sub_output_dir,
+                            breadcrumb=new_breadcrumb
+                        )
+                    else:
+                        logging.warning(f"Submodel file not found: {submodel_path}")
+        except Exception as e:
+            logging.error(f"Error processing model at {model_path}: {e}", exc_info=True)
+
+    def generate_diagram_html(self, threat_model: ThreatModel, output_dir: Path, breadcrumb: List[tuple[str, str]]):
+        """
+        Generates an HTML file containing just the diagram for navigation.
+        """
+        diagram_generator = DiagramGenerator()
+        model_name = threat_model.tm.name
+
+        dot_code = diagram_generator.generate_dot_file_from_model(threat_model, output_dir / f"{model_name}.dot")
+        if not dot_code:
+            logging.error(f"Failed to generate DOT code for {model_name}")
             return
 
-        diagram_generator = DiagramGenerator()
+        svg_path = diagram_generator.generate_diagram_from_dot(dot_code, output_dir / f"{model_name}.svg", "svg")
+        if not svg_path:
+            logging.error(f"Failed to generate SVG for {model_name}")
+            return
 
-        # Generate all files for the current model
-        self.generate_html_report(threat_model, threat_model.process_threats(), output_dir / f"{model_name}_threat_report.html", include_svg=True)
-        self.generate_diagram_html(threat_model, output_dir, breadcrumb)
-        self.generate_json_export(threat_model, threat_model.process_threats(), output_dir / f"{model_name}.json")
+        with open(svg_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
 
-        for server in threat_model.servers:
-            if 'submodel' in server:
-                submodel_path_str = server['submodel']
-                submodel_path = (model_path.parent / submodel_path_str).resolve()
+        svg_content = diagram_generator.add_links_to_svg(svg_content, threat_model)
 
-                if submodel_path.exists():
-                    sub_output_dir = output_dir / Path(submodel_path_str).parent.name
-                    sub_output_dir.mkdir(exist_ok=True)
-                    new_breadcrumb = breadcrumb + [(Path(submodel_path_str).parent.name, f"{submodel_path.stem}_diagram.html")]
-                    self._recursively_generate_reports(
-                        model_path=submodel_path,
-                        output_dir=sub_output_dir,
-                        breadcrumb=new_breadcrumb
-                    )
-                else:
-                    logging.warning(f"Submodel file not found: {submodel_path}")
+        template = self.env.get_template('navigable_diagram_template.html')
+
+        # Determine parent link
+        parent_link = None
+        if len(breadcrumb) > 1:
+            # The parent is the second to last element.
+            # The link needs to go up one directory level.
+            parent_link = f"../{breadcrumb[-2][1]}"
+
+        html = template.render(
+            title=f"Diagram - {model_name}",
+            svg_content=svg_content,
+            breadcrumb=breadcrumb,
+            parent_link=parent_link
+        )
+
+        diagram_html_path = output_dir / f"{model_name}_diagram.html"
+        with open(diagram_html_path, "w", encoding="utf-8") as f:
+            f.write(html)
+        logging.info(f"Generated diagram HTML: {diagram_html_path}")
 
