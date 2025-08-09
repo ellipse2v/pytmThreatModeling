@@ -210,13 +210,11 @@ class ReportGenerator:
         """
         Generates all reports for a project.
         """
-        # Ensure the initial output directory exists and is named after the project
-        project_output_dir = output_dir / project_path.name
-        project_output_dir.mkdir(parents=True, exist_ok=True)
+        output_dir.mkdir(parents=True, exist_ok=True)
 
         self._recursively_generate_reports(
             model_path=project_path / "main.md",
-            output_dir=project_output_dir,
+            output_dir=output_dir,
             breadcrumb=[(project_path.name, "main_diagram.html")]
         )
 
@@ -225,7 +223,6 @@ class ReportGenerator:
         Recursively generates reports for each model in the project.
         """
         model_name = model_path.stem
-        logging.info(f"Processing model: {model_name} in {model_path.parent}")
 
         try:
             with open(model_path, "r", encoding="utf-8") as f:
@@ -303,11 +300,14 @@ class ReportGenerator:
             # The link needs to go up one directory level.
             parent_link = f"../{breadcrumb[-2][1]}"
 
+        legend_html = diagram_generator._generate_legend_html(threat_model)
+
         html = template.render(
             title=f"Diagram - {model_name}",
             svg_content=svg_content,
             breadcrumb=breadcrumb,
-            parent_link=parent_link
+            parent_link=parent_link,
+            legend_html=legend_html
         )
 
         diagram_html_path = output_dir / f"{model_name}_diagram.html"

@@ -15,6 +15,8 @@
 import unittest
 import tempfile
 import shutil
+import logging
+import sys
 from pathlib import Path
 
 from threat_analysis.generation.report_generator import ReportGenerator
@@ -25,115 +27,94 @@ from threat_analysis.core.mitre_mapping_module import MitreMapping
 class TestProjectGeneration(unittest.TestCase):
 
     def setUp(self):
-        # Create a temporary directory for the project source and output
         self.test_dir = tempfile.mkdtemp()
         self.project_path = Path(self.test_dir) / "test_project"
         self.output_path = Path(self.test_dir) / "output"
+        # Configure logging to be visible during tests
+        logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
-        # Create project structure
-        self.sub_project_path = self.project_path / "sub_project_A"
-        self.sub_project_path.mkdir(parents=True)
+    def tearDown(self):
+        shutil.rmtree(self.test_dir)
 
-        # Create main model file
+    def _run_generator(self):
+        severity_calculator = SeverityCalculator()
+        mitre_mapping = MitreMapping()
+        report_generator = ReportGenerator(severity_calculator, mitre_mapping)
+
+        import sys
+        original_argv = sys.argv
+        sys.argv = [original_argv[0]]
+        try:
+            report_generator.generate_project_reports(self.project_path, self.output_path)
+        finally:
+            sys.argv = original_argv
+
+    def test_single_level_project(self):
+        # Arrange
+        sub_project_path = self.project_path / "sub_A"
+        sub_project_path.mkdir(parents=True)
+        with open(self.project_path / "main.md", "w") as f:
+            f.write("## Servers\n- **WebApp**: submodel=./sub_A/model.md")
+        with open(sub_project_path / "model.md", "w") as f:
+            f.write("## Servers\n- **WebServer**:")
+
+        # Act
+        self._run_generator()
+
+        # Assert
+        main_html = self.output_path / "test_project" / "main_diagram.html"
+        sub_html = self.output_path / "test_project" / "sub_A" / "model_diagram.html"
+        self.assertTrue(main_html.exists())
+        self.assertTrue(sub_html.exists())
+
+        main_content = main_html.read_text()
+        self.assertIn('xlink:href="sub_A/model_diagram.html"', main_content)
+
+        sub_content = sub_html.read_text()
+        self.assertIn('href="../main_diagram.html"', sub_content) # Back button
+        self.assertIn('<a href="../main_diagram.html">test_project</a>', sub_content) # Breadcrumb
+        self.assertIn('<a href="model_diagram.html">sub_A</a>', sub_content) # Breadcrumb
+
+    def test_nested_project_and_dataflows(self):
+        # Arrange
+        frontend_path = self.project_path / "frontend"
+        backend_path = self.project_path / "backend"
+        db_path = backend_path / "database"
+        db_path.mkdir(parents=True)
+        frontend_path.mkdir()
+
         with open(self.project_path / "main.md", "w") as f:
             f.write("""
 ## Servers
-- **APIService**: submodel=./sub_project_A/model.md
-- **NormalService**:
+- **WebApp**: submodel=./frontend/model.md
+- **Backend**: submodel=./backend/model.md
+## Dataflows
+- **WebToBackend**: from=WebApp, to=Backend, protocol=TCP
             """)
-
-        # Create sub-model file
-        with open(self.sub_project_path / "model.md", "w") as f:
-            f.write("""
-## Servers
-- **Database**:
-            """)
-
-    def tearDown(self):
-        # Remove the temporary directory
-        shutil.rmtree(self.test_dir)
-
-    def test_project_generation_creates_files_and_links_correctly(self):
-        # Arrange
-        severity_calculator = SeverityCalculator()
-        mitre_mapping = MitreMapping()
-        report_generator = ReportGenerator(severity_calculator, mitre_mapping)
+        with open(frontend_path / "model.md", "w") as f:
+            f.write("## Servers\n- **WebServer**:")
+        with open(backend_path / "model.md", "w") as f:
+            f.write("## Servers\n- **APIGateway**:\n- **ProductDB**: submodel=./database/model.md")
+        with open(db_path / "model.md", "w") as f:
+            f.write("## Servers\n- **PrimaryDB**:")
 
         # Act
-        # HACK: The underlying pytm library inappropriately parses sys.argv.
-        # We need to temporarily clear them to avoid crashing pytest-cov.
-        import sys
-        original_argv = sys.argv
-        sys.argv = [original_argv[0]]
-        try:
-            report_generator.generate_project_reports(self.project_path, self.output_path)
-        finally:
-            sys.argv = original_argv
+        self._run_generator()
 
         # Assert
-        # Check that the output directories and files were created
-        main_diagram_html = self.output_path / "test_project" / "main_diagram.html"
-        sub_diagram_html = self.output_path / "test_project" / "sub_project_A" / "model_diagram.html"
+        backend_html = self.output_path / "test_project" / "backend" / "model_diagram.html"
+        db_html = self.output_path / "test_project" / "backend" / "database" / "model_diagram.html"
+        self.assertTrue(backend_html.exists())
+        self.assertTrue(db_html.exists())
 
-        self.assertTrue(main_diagram_html.exists())
-        self.assertTrue(sub_diagram_html.exists())
+        backend_content = backend_html.read_text()
+        self.assertIn('xlink:href="database/model_diagram.html"', backend_content) # Link to nested
 
-        # Check the link in the main diagram
-        with open(main_diagram_html, "r") as f:
-            main_html_content = f.read()
-            # Check for a link to the sub-project directory and file
-            self.assertIn('xlink:href="sub_project_A/model_diagram.html"', main_html_content)
-
-        # Check the back button and breadcrumbs in the sub-diagram
-        with open(sub_diagram_html, "r") as f:
-            sub_html_content = f.read()
-            # Check for the back button link
-            self.assertIn('href="../main_diagram.html"', sub_html_content)
-            # Check for the breadcrumb links
-            self.assertIn('<a href="../main_diagram.html">test_project</a>', sub_html_content)
-            self.assertIn('<a href="model_diagram.html">sub_project_A</a>', sub_html_content)
-
-    def test_nested_project_generation(self):
-        # Arrange
-        # Create a nested sub-project
-        nested_sub_path = self.sub_project_path / "nested_B"
-        nested_sub_path.mkdir()
-        with open(self.sub_project_path / "model.md", "w") as f:
-            f.write("""
-## Servers
-- **NestedService**: submodel=./nested_B/nested_model.md
-            """)
-        with open(nested_sub_path / "nested_model.md", "w") as f:
-            f.write("""
-## Servers
-- **FinalService**:
-            """)
-
-        severity_calculator = SeverityCalculator()
-        mitre_mapping = MitreMapping()
-        report_generator = ReportGenerator(severity_calculator, mitre_mapping)
-
-        # Act
-        import sys
-        original_argv = sys.argv
-        sys.argv = [original_argv[0]]
-        try:
-            report_generator.generate_project_reports(self.project_path, self.output_path)
-        finally:
-            sys.argv = original_argv
-
-        # Assert
-        nested_diagram_html = self.output_path / "test_project" / "sub_project_A" / "nested_B" / "nested_model_diagram.html"
-        self.assertTrue(nested_diagram_html.exists())
-
-        with open(nested_diagram_html, "r") as f:
-            nested_html = f.read()
-            # Check back button to level 2
-            self.assertIn('href="../model_diagram.html"', nested_html)
-            # Check breadcrumbs
-            self.assertIn('<a href="../../main_diagram.html">test_project</a>', nested_html)
-            self.assertIn('<a href="../model_diagram.html">sub_project_A</a>', nested_html)
-            self.assertIn('<a href="nested_model_diagram.html">nested_B</a>', nested_html)
+        db_content = db_html.read_text()
+        self.assertIn('href="../model_diagram.html"', db_content) # Back button
+        self.assertIn('<a href="../../main_diagram.html">test_project</a>', db_content)
+        self.assertIn('<a href="../model_diagram.html">backend</a>', db_content)
+        self.assertIn('<a href="model_diagram.html">database</a>', db_content)
 
 
 if __name__ == '__main__':
