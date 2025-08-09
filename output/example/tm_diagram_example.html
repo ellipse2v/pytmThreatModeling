@@ -630,12 +630,12 @@
 </svg>
 
                 </div>
-                
+
                 <!-- Toggle button for legend -->
                 <button class="legend-toggle-btn" onclick="toggleLegend()" title="Masquer/Afficher la légende">
                     👁️
                 </button>
-                
+
                 <div class="legend" id="legend">
                     <div class="legend-header">
                         <div class="legend-title">
@@ -646,37 +646,37 @@
                         </button>
                     </div>
                     <div class="legend-content" id="legend-content">
-                        
+
                 <div style="display: flex; align-items: center; margin-bottom: 3px;">
                     <div style="width: 12px; height: 8px; background-color: #ADD8E6;
                             border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
                     <span style="font-size: 9px;">👤 Acteur</span>
                 </div>
-            
+
                 <div style="display: flex; align-items: center; margin-bottom: 3px;">
                     <div style="width: 12px; height: 8px; background-color: #D3D3D3;
                             border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
                     <span style="font-size: 9px;">🔥 Firewall</span>
                 </div>
-            
+
                 <div style="display: flex; align-items: center; margin-bottom: 3px;">
                     <div style="width: 12px; height: 8px; background-color: #90EE90;
                             border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
                     <span style="font-size: 9px;">🖥️ Serveur</span>
                 </div>
-            
+
                 <div style="display: flex; align-items: center; margin-bottom: 3px;">
                     <div style="width: 12px; height: 8px; background-color: #FFDAB9;
                             border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
                     <span style="font-size: 9px;">🗄️ Database</span>
                 </div>
-            
+
                 <div style="display: flex; align-items: center; margin-bottom: 3px;">
                     <div style="width: 20px; height: 15px; border: 3px solid #FF0000;
                             margin-right: 8px; border-radius: 2px;"></div>
                     <span style="font-size: 11px;">Trust Boundaries</span>
                 </div>
-            
+
                 <div style="display: flex; align-items: center; margin-bottom: 3px;">
                     <div style="width: 20px; height: 15px; border: 1px solid #000000;
                             margin-right: 8px; border-radius: 2px;"></div>
@@ -688,37 +688,37 @@
                                 margin-right: 8px;"></div>
                         <span style="font-size: 11px;">HTTPS</span>
                     </div>
-                
+
                     <div style="display: flex; align-items: center; margin-bottom: 3px;">
                         <div style="width: 20px; height: 2px; background-color: red;
                                 margin-right: 8px;"></div>
                         <span style="font-size: 11px;">HTTP</span>
                     </div>
-                
+
                     <div style="display: flex; align-items: center; margin-bottom: 3px;">
                         <div style="width: 20px; height: 2px; background-color: blue;
                                 margin-right: 8px;"></div>
                         <span style="font-size: 11px;">SSH</span>
                     </div>
-                
+
                     <div style="display: flex; align-items: center; margin-bottom: 3px;">
                         <div style="width: 20px; height: 2px; background-color: purple;
                                 margin-right: 8px;"></div>
                         <span style="font-size: 11px;">SQL</span>
                     </div>
-                
+
                     <div style="display: flex; align-items: center; margin-bottom: 3px;">
                         <div style="width: 20px; height: 2px; background-color: teal;
                                 margin-right: 8px;"></div>
                         <span style="font-size: 11px;">LDAPS</span>
                     </div>
-                
+
                     <div style="display: flex; align-items: center; margin-bottom: 3px;">
                         <div style="width: 20px; height: 2px; background-color: teal;
                                 margin-right: 8px;"></div>
                         <span style="font-size: 11px;">MQTT</span>
                     </div>
-                
+
                     </div>
                 </div>
             </div>
@@ -732,24 +732,24 @@
                 let initialY;
                 let xOffset = 0;
                 let yOffset = 0;
-                
+
                 const legend = document.getElementById('legend');
-                
+
                 // Event listeners pour le drag & drop
                 legend.addEventListener('mousedown', dragStart);
                 document.addEventListener('mousemove', drag);
                 document.addEventListener('mouseup', dragEnd);
-                
+
                 // Touch events pour mobile
                 legend.addEventListener('touchstart', dragStart);
                 document.addEventListener('touchmove', drag);
                 document.addEventListener('touchend', dragEnd);
-                
+
                 function dragStart(e) {
                     if (e.target.closest('.legend-toggle') || e.target.closest('.legend-toggle-btn')) {
                         return;
                     }
-                    
+
                     if (e.type === "touchstart") {
                         initialX = e.touches[0].clientX - xOffset;
                         initialY = e.touches[0].clientY - yOffset;
@@ -757,17 +757,17 @@
                         initialX = e.clientX - xOffset;
                         initialY = e.clientY - yOffset;
                     }
-                    
+
                     if (e.target === legend || legend.contains(e.target)) {
                         isDragging = true;
                         legend.classList.add('dragging');
                     }
                 }
-                
+
                 function drag(e) {
                     if (isDragging) {
                         e.preventDefault();
-                        
+
                         if (e.type === "touchmove") {
                             currentX = e.touches[0].clientX - initialX;
                             currentY = e.touches[0].clientY - initialY;
@@ -775,18 +775,18 @@
                             currentX = e.clientX - initialX;
                             currentY = e.clientY - initialY;
                         }
-                        
+
                         xOffset = currentX;
                         yOffset = currentY;
-                        
+
                         // Contraindre la position dans la fenêtre
                         const rect = legend.getBoundingClientRect();
                         const maxX = window.innerWidth - rect.width;
                         const maxY = window.innerHeight - rect.height;
-                        
+
                         xOffset = Math.max(0, Math.min(maxX, xOffset));
                         yOffset = Math.max(0, Math.min(maxY, yOffset));
-                        
+
                         legend.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
                         legend.style.position = 'fixed';
                         legend.style.bottom = 'auto';
@@ -795,19 +795,19 @@
                         legend.style.right = 'auto';
                     }
                 }
-                
+
                 function dragEnd(e) {
                     initialX = currentX;
                     initialY = currentY;
                     isDragging = false;
                     legend.classList.remove('dragging');
                 }
-                
+
                 // Fonction pour masquer/afficher la légende
                 function toggleLegend() {
                     const legend = document.getElementById('legend');
                     const toggleBtn = document.querySelector('.legend-toggle-btn');
-                    
+
                     if (legend.classList.contains('hidden')) {
                         legend.classList.remove('hidden');
                         toggleBtn.innerHTML = '👁️';
@@ -818,13 +818,13 @@
                         toggleBtn.title = 'Afficher la légende';
                     }
                 }
-                
+
                 // Fonction pour réduire/étendre le contenu de la légende
                 function toggleLegendContent() {
                     const content = document.getElementById('legend-content');
                     const icon = document.getElementById('toggle-icon');
                     const legend = document.getElementById('legend');
-                    
+
                     if (content.classList.contains('hidden')) {
                         content.classList.remove('hidden');
                         icon.textContent = '−';
@@ -835,7 +835,7 @@
                         legend.classList.add('legend-collapsed');
                     }
                 }
-                
+
                 // Empêcher la sélection de texte pendant le drag
                 document.addEventListener('selectstart', function(e) {
                     if (isDragging) {
