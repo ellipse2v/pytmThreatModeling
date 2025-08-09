@@ -93,7 +93,7 @@ D3-ACA,Detect,,,Active Certificate Analysis,Actively collecting PKI certificates
 D3-MA,Detect,Message Analysis,,,
 D3-SRA,Detect,,Sender Reputation Analysis,,Ascertaining sender reputation based on information associated with a message (e.g. email/instant messaging).
 D3-SMRA,Detect,,Sender MTA Reputation Analysis,,Characterizing the reputation of mail transfer agents (MTA) to determine the security risk in emails.
-D3-PA,Detect,Process Analysis,,,
+D3-PA,Detect,Process Analysis,,,"Process Analysis consists of observing a running application process and analyzing it to watch for certain behaviors or conditions which may indicate adversary activity. Analysis can occur inside of the process or through a third-party monitoring application. Examples include monitoring system and privileged calls, monitoring process initiation chains, and memory boundary allocations."
 D3-FAPA,Detect,,File Access Pattern Analysis,,Analyzing the files accessed by a process to identify unauthorized activity.
 D3-DQSA,Detect,,Database Query String Analysis,,Analyzing database queries to detect [SQL Injection](https://capec.mitre.org/data/definitions/66.html).
 D3-SSC,Detect,,Shadow Stack Comparisons,,Comparing a call stack in system memory with a shadow call stack maintained by the processor to determine unauthorized shellcode activity.
