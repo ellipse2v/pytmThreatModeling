@@ -33,13 +33,13 @@ class DiagramGenerator:
         self.supported_formats = ["svg", "png", "pdf", "ps"]
         self.template_env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / "templates"))
     
-    def generate_dot_file_from_model(self, threat_model, output_file: str) -> Optional[str]:
+    def generate_dot_file_from_model(self, threat_model, output_file: str, project_protocol_styles: dict = None) -> Optional[str]:
         """
         Generates DOT code from the threat model, saves it to a file,
         and returns the DOT code as a string.
         """
         try:
-            dot_code = self._generate_manual_dot(threat_model)
+            dot_code = self._generate_manual_dot(threat_model, project_protocol_styles)
             
             if not dot_code or not dot_code.strip():
                 logging.error("❌ Unable to generate DOT code from model. DOT code is empty.")
@@ -103,21 +103,20 @@ class DiagramGenerator:
             return None
 
 
-    def _get_edge_attributes_for_protocol(self, threat_model, protocol: Optional[str]) -> str:
+    def _get_edge_attributes_for_protocol(self, threat_model, protocol: Optional[str], project_protocol_styles: dict = None) -> str:
         """
-        Returns DOT edge attributes based on protocol styling defined in the threat model.
-        
-        Args:
-            threat_model: The threat model containing protocol styles
-            protocol: The protocol name to get styling for
-            
-        Returns:
-            str: Additional DOT attributes for the edge
+        Returns DOT edge attributes based on protocol styling.
+        It uses project_protocol_styles if provided, otherwise falls back to the threat_model.
         """
-        if not protocol or not hasattr(threat_model, 'get_protocol_style'):
+        if not protocol:
             return ""
-        
-        protocol_style = threat_model.get_protocol_style(protocol)
+
+        protocol_style = None
+        if project_protocol_styles:
+            protocol_style = project_protocol_styles.get(protocol)
+        elif hasattr(threat_model, 'get_protocol_style'):
+            protocol_style = threat_model.get_protocol_style(protocol)
+
         if not protocol_style:
             return ""
         
@@ -448,14 +447,14 @@ class DiagramGenerator:
         
         return dot_code
 
-    def _generate_manual_dot(self, threat_model) -> str:
+    def _generate_manual_dot(self, threat_model, project_protocol_styles: dict = None) -> str:
         """Generates DOT code from ThreatModel components using Jinja2 template."""
         template = self.template_env.get_template("threat_model.dot.j2")
 
         boundaries_data = self._prepare_boundaries_data(threat_model)
         actors_outside_boundaries_data = self._prepare_nodes_data(threat_model, "actor")
         servers_outside_boundaries_data = self._prepare_nodes_data(threat_model, "server")
-        dataflows_data = self._prepare_dataflows_data(threat_model)
+        dataflows_data = self._prepare_dataflows_data(threat_model, project_protocol_styles)
 
         context = {
             "boundaries": boundaries_data,
@@ -580,7 +579,7 @@ class DiagramGenerator:
                 })
         return nodes_data
 
-    def _prepare_dataflows_data(self, threat_model) -> List[Dict]:
+    def _prepare_dataflows_data(self, threat_model, project_protocol_styles: dict = None) -> List[Dict]:
         dataflows_data = []
         dataflow_map = {}
         boundary_name_map = {name: info['boundary'] for name, info in threat_model.boundaries.items()}
@@ -596,7 +595,7 @@ class DiagramGenerator:
                         logging.warning(f"⚠️ Skipping dataflow with missing source or destination")
                         continue
 
-                    edge_attributes = self._get_edge_attributes_for_protocol(threat_model, getattr(df, 'protocol', None))
+                    edge_attributes = self._get_edge_attributes_for_protocol(threat_model, getattr(df, 'protocol', None), project_protocol_styles)
                     lhead = ltail = ''
 
                     # Handle source being a boundary
@@ -751,8 +750,10 @@ class DiagramGenerator:
             for protocol, style in sorted(protocol_styles_to_use.items()):
                 if protocol in used_protocols_to_use:
                     color = style.get('color', '#000000')
+                    line_style = style.get('line_style', 'solid')
+                    border_style = f"2px {line_style} {color}"
                     sanitized_protocol = self._sanitize_name(protocol)
-                    legend_items.append(f'''<div class="legend-item" data-protocol="{sanitized_protocol}" style="display: flex; align-items: center; margin-bottom: 3px;"><div style="width: 20px; height: 2px; background-color: {color}; margin-right: 8px;"></div><span style="font-size: 11px;">{protocol}</span></div>''')
+                    legend_items.append(f'''<div class="legend-item" data-protocol="{sanitized_protocol}" style="display: flex; align-items: center; margin-bottom: 3px;"><div style="width: 20px; height: 0; border-top: {border_style}; margin-right: 8px;"></div><span style="font-size: 11px;">{protocol}</span></div>''')
         
         return ''.join(legend_items)
    

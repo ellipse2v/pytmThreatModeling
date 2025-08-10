@@ -410,6 +410,21 @@ def test_generate_legend_html_with_protocol_styles(diagram_generator):
         assert "HTTPS" in legend_html
         assert "purple" in legend_html
 
+def test_generate_legend_html_with_line_styles(diagram_generator):
+    mock_threat_model = MagicMock()
+    mock_threat_model.actors = []
+    mock_threat_model.servers = []
+    mock_dataflow = MagicMock()
+    mock_dataflow.protocol = 'TCP'
+    mock_threat_model.dataflows = [mock_dataflow]
+    mock_threat_model.get_all_protocol_styles.return_value = {'TCP': {'color': 'blue', 'line_style': 'dashed'}}
+
+    with patch.object(diagram_generator, '_get_used_protocols', return_value={'TCP'}):
+        legend_html = diagram_generator._generate_legend_html(mock_threat_model)
+        assert "Protocoles:" in legend_html
+        assert "TCP" in legend_html
+        assert "border-top: 2px dashed blue;" in legend_html
+
 def test_generate_html_with_legend(diagram_generator):
     with patch('builtins.open', mock_open()) as mock_file_open:
         with patch.object(diagram_generator, '_generate_legend_html', return_value="<legend>Legend Content</legend>"):

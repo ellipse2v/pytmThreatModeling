@@ -349,7 +349,7 @@ class ReportGenerator:
         diagram_generator = DiagramGenerator()
         model_name = threat_model.tm.name
 
-        dot_code = diagram_generator.generate_dot_file_from_model(threat_model, output_dir / f"{model_name}.dot")
+        dot_code = diagram_generator.generate_dot_file_from_model(threat_model, output_dir / f"{model_name}.dot", project_protocol_styles)
         if not dot_code:
             logging.error(f"Failed to generate DOT code for {model_name}")
             return
