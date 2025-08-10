@@ -18,9 +18,12 @@ Enhanced Diagram generation module with protocol styles and boundary attributes 
 import subprocess
 import re
 import logging
+import xml.etree.ElementTree as ET
 from typing import Dict, List, Optional
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
+
+from threat_analysis.core.models_module import ThreatModel
 
 class DiagramGenerator:
     """Enhanced class for threat model diagram generation with protocol styles and boundary attributes"""
@@ -28,38 +31,34 @@ class DiagramGenerator:
     def __init__(self):
         self.dot_executable = "dot"
         self.supported_formats = ["svg", "png", "pdf", "ps"]
-        self.template_env = Environment(loader=FileSystemLoader(Path(__file__).parent / "templates"))
+        self.template_env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / "templates"))
     
-    def generate_dot_file_from_model(self, threat_model, output_file: str) -> Optional[str]:
-        """Generates a .dot file from the threat model and saves it."""
+    def generate_dot_file_from_model(self, threat_model, output_file: str, project_protocol_styles: dict = None) -> Optional[str]:
+        """
+        Generates DOT code from the threat model, saves it to a file,
+        and returns the DOT code as a string.
+        """
         try:
-            dot_code = self._generate_manual_dot(threat_model) # Fallback to manual generation
+            dot_code = self._generate_manual_dot(threat_model, project_protocol_styles)
             
-            if not dot_code or not dot_code.strip(): # Check if DOT code is empty or only whitespace
-                logging.error("❌ Unable to generate DOT code from model. DOT code is empty. Check model content.")
+            if not dot_code or not dot_code.strip():
+                logging.error("❌ Unable to generate DOT code from model. DOT code is empty.")
                 return None
 
-            # Clean the DOT code
             cleaned_dot = self._clean_dot_code(dot_code)
-
-            # Convert output_file to Path object
             output_path_obj = Path(output_file)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
 
-            # Ensure output directory exists
-            output_dir = output_path_obj.parent
-            if not output_dir.exists():
-                output_dir.mkdir(parents=True)
-
-            with open(str(output_path_obj), "w", encoding="utf-8", newline='\n') as f:
+            with open(output_path_obj, "w", encoding="utf-8", newline='\n') as f:
                 f.write(cleaned_dot)
             logging.info(f"✅ DOT file generated: {output_file}")
-            return output_file
+            return cleaned_dot  # Return the content
         except Exception as e:
             logging.error(f"❌ Error during DOT file generation: {e}")
             return None
 
     def generate_diagram_from_dot(self, dot_code: str, output_file: str, format: str = "svg") -> Optional[str]:
-        """Generates a diagram from DOT code using Graphviz."""
+        """Generates a diagram from a DOT string using Graphviz."""
         if format not in self.supported_formats:
             logging.error(f"❌ Unsupported format: {format}. Supported formats: {self.supported_formats}")
             return None
@@ -70,25 +69,12 @@ class DiagramGenerator:
             return None
             
         try:
-            # Convert output_file to Path object
             output_path_obj = Path(output_file)
+            output_path_obj.parent.mkdir(parents=True, exist_ok=True)
+            output_path = str(output_path_obj.with_suffix(f'.{format}'))
 
-            # Ensure the output directory exists
-            output_dir = output_path_obj.parent
-            if not output_dir.exists():
-                output_dir.mkdir(parents=True)
-
-            # Construct the output path, avoiding double extensions
-            if output_path_obj.suffix == f'.{format}':
-                output_path = str(output_path_obj)
-            else:
-                output_path = str(output_path_obj.with_suffix(f'.{format}'))
-            
-            # Clean the DOT code before processing
             cleaned_dot = self._clean_dot_code(dot_code)
             
-            # Run dot command to generate diagram
-            # process = subprocess.run(
             subprocess.run(
                 [self.dot_executable, f"-T{format}", "-o", output_path],
                 input=cleaned_dot,
@@ -98,37 +84,39 @@ class DiagramGenerator:
                 check=True
             )
             
-            if output_path_obj.exists(): # Use output_path_obj for existence check
-                
+            if Path(output_path).exists():
                 return output_path
             else:
-                logging.error("❌ Output file was not created")
+                logging.error(f"❌ Output file was not created: {output_path}")
                 return None
                 
         except subprocess.CalledProcessError as e:
+            with open("/tmp/graphviz_error.log", "w") as f:
+                f.write(e.stderr)
             logging.error(f"❌ Graphviz error: {e.stderr}")
+            print(f"Graphviz error: {e.stderr}")
             logging.error(f"DOT code preview: {cleaned_dot[:200]}...")
+            print(f"DOT code preview: {cleaned_dot[:200]}...")
             return None
         except Exception as e:
             logging.error(f"❌ Unexpected error: {e}")
             return None
 
 
-    def _get_edge_attributes_for_protocol(self, threat_model, protocol: Optional[str]) -> str:
+    def _get_edge_attributes_for_protocol(self, threat_model, protocol: Optional[str], project_protocol_styles: dict = None) -> str:
         """
-        Returns DOT edge attributes based on protocol styling defined in the threat model.
-        
-        Args:
-            threat_model: The threat model containing protocol styles
-            protocol: The protocol name to get styling for
-            
-        Returns:
-            str: Additional DOT attributes for the edge
+        Returns DOT edge attributes based on protocol styling.
+        It uses project_protocol_styles if provided, otherwise falls back to the threat_model.
         """
-        if not protocol or not hasattr(threat_model, 'get_protocol_style'):
+        if not protocol:
             return ""
-        
-        protocol_style = threat_model.get_protocol_style(protocol)
+
+        protocol_style = None
+        if project_protocol_styles:
+            protocol_style = project_protocol_styles.get(protocol)
+        elif hasattr(threat_model, 'get_protocol_style'):
+            protocol_style = threat_model.get_protocol_style(protocol)
+
         if not protocol_style:
             return ""
         
@@ -255,11 +243,19 @@ class DiagramGenerator:
         
         # Check for web server
         elif 'web' in node_name_lower and 'server' in node_name_lower:
-            return '[shape=box, style=filled, fillcolor=lightgreen, label="🌐 ' + self._escape_label(node_name) + '"]'
+            attributes.append('shape=box')
+            attributes.append('style=filled')
+            attributes.append('fillcolor=lightgreen')
+            icon = '🌐 '
+            default_fillcolor = 'lightgreen'
         
         # Check for API
         elif 'api' in node_name_lower:
-            return '[shape=box, style=filled, fillcolor=lightyellow, label="🔌 ' + self._escape_label(node_name) + '"]'
+            attributes.append('shape=box')
+            attributes.append('style=filled')
+            attributes.append('fillcolor=lightyellow')
+            icon = '🔌 '
+            default_fillcolor = 'lightyellow'
         else:
             # Default shapes based on node type
             if node_type == 'actor':
@@ -302,8 +298,43 @@ class DiagramGenerator:
             attributes.append(f'label="{icon}{escaped_name}"')
         else:
             attributes.append(f'label="{escaped_name}"')
+
+        # Add id for easier lookup
+        attributes.append(f'id="{self._sanitize_name(node_name)}"')
         
         return f'[{", ".join(attributes)}]'
+
+    def add_links_to_svg(self, svg_content: str, threat_model: ThreatModel) -> str:
+        """
+        Adds hyperlinks to the SVG content for nodes with submodels.
+        """
+        ET.register_namespace("", "http://www.w3.org/2000/svg")
+        ET.register_namespace("xlink", "http://www.w3.org/1999/xlink")
+
+        root = ET.fromstring(svg_content)
+
+        for server in threat_model.servers:
+            if 'submodel' in server:
+                server_name = server['name']
+                sanitized_name = self._sanitize_name(server_name)
+
+                submodel_path = Path(server['submodel'])
+                # Correctly form the relative path for the link
+                link_href = f"{submodel_path.parent.name}/{submodel_path.stem}_diagram.html"
+
+                # Find the node group for the server
+                for g in root.findall(f".//{{http://www.w3.org/2000/svg}}g[@id='{sanitized_name}']"):
+                    link = ET.Element('a')
+                    link.set('xlink:href', link_href)
+
+                    # Move all children of g to the new link element
+                    for child in list(g):
+                        link.append(child)
+                        g.remove(child)
+
+                    g.append(link)
+
+        return ET.tostring(root, encoding='unicode', method='xml')
 
     def _get_element_name(self, element) -> Optional[str]:
         """Safely extracts the name from a model element."""
@@ -416,14 +447,14 @@ class DiagramGenerator:
         
         return dot_code
 
-    def _generate_manual_dot(self, threat_model) -> str:
+    def _generate_manual_dot(self, threat_model, project_protocol_styles: dict = None) -> str:
         """Generates DOT code from ThreatModel components using Jinja2 template."""
         template = self.template_env.get_template("threat_model.dot.j2")
 
         boundaries_data = self._prepare_boundaries_data(threat_model)
         actors_outside_boundaries_data = self._prepare_nodes_data(threat_model, "actor")
         servers_outside_boundaries_data = self._prepare_nodes_data(threat_model, "server")
-        dataflows_data = self._prepare_dataflows_data(threat_model)
+        dataflows_data = self._prepare_dataflows_data(threat_model, project_protocol_styles)
 
         context = {
             "boundaries": boundaries_data,
@@ -548,7 +579,7 @@ class DiagramGenerator:
                 })
         return nodes_data
 
-    def _prepare_dataflows_data(self, threat_model) -> List[Dict]:
+    def _prepare_dataflows_data(self, threat_model, project_protocol_styles: dict = None) -> List[Dict]:
         dataflows_data = []
         dataflow_map = {}
         boundary_name_map = {name: info['boundary'] for name, info in threat_model.boundaries.items()}
@@ -564,7 +595,7 @@ class DiagramGenerator:
                         logging.warning(f"⚠️ Skipping dataflow with missing source or destination")
                         continue
 
-                    edge_attributes = self._get_edge_attributes_for_protocol(threat_model, getattr(df, 'protocol', None))
+                    edge_attributes = self._get_edge_attributes_for_protocol(threat_model, getattr(df, 'protocol', None), project_protocol_styles)
                     lhead = ltail = ''
 
                     # Handle source being a boundary
@@ -644,97 +675,85 @@ class DiagramGenerator:
             })
         return dataflows_data
 
-    def _generate_legend_html(self, threat_model) -> str:
-        """Generates HTML legend content."""
+    def _get_protocol_styles_from_model(self, threat_model) -> Dict[str, Dict]:
+        """
+        Extracts defined protocol styles from the threat model.
+        """
+        try:
+            if hasattr(threat_model, 'get_all_protocol_styles'):
+                return threat_model.get_all_protocol_styles()
+            if hasattr(threat_model, 'protocol_styles'):
+                return threat_model.protocol_styles
+        except Exception as e:
+            logging.warning(f"⚠️ Error extracting protocol styles: {e}")
+        
+        return {}
+
+    def _get_used_protocols(self, threat_model) -> set:
+        """Extracts all unique protocols used in the dataflows of a given model."""
+        used_protocols = set()
+        if hasattr(threat_model, 'dataflows'):
+            for df in threat_model.dataflows:
+                protocol = getattr(df, 'protocol', None)
+                if protocol:
+                    used_protocols.add(protocol)
+        return used_protocols
+
+    def _generate_legend_html(self, threat_model, project_protocols=None, project_protocol_styles=None) -> str:
+        """
+        Generates HTML legend content.
+        Uses project-wide protocol data if provided, otherwise falls back to the current model.
+        """
         legend_items = []
 
-        # Dynamically generate node types for the legend
+        # Node types legend (remains the same)
         legend_node_types = {}
-
-        # Process actors
         if hasattr(threat_model, 'actors'):
             for actor in threat_model.actors:
                 color = actor.get('color') or '#FFFF99'
                 if 'Acteur' not in legend_node_types:
                     legend_node_types['Acteur'] = ('👤 Acteur', color)
-
-        # Process servers to find one of each type for the legend
         if hasattr(threat_model, 'servers'):
             server_types_seen = set()
             for server in threat_model.servers:
                 name = server.get('name', '').lower()
                 color = server.get('color')
-
-                type_key = None
-                display_name = None
-
+                type_key, display_name = None, None
                 if 'firewall' in name and 'Firewall' not in server_types_seen:
-                    type_key = 'Firewall'
-                    display_name = '🔥 Firewall'
-                    color = color or '#FF6B6B'
+                    type_key, display_name, color = 'Firewall', '🔥 Firewall', color or '#FF6B6B'
                 elif ('database' in name or 'db' in name) and 'Database' not in server_types_seen:
-                    type_key = 'Database'
-                    display_name = '🗄️ Database'
-                    color = color or '#ADD8D6'
-                elif 'Serveur' not in server_types_seen: # Generic server as fallback
-                    type_key = 'Serveur'
-                    display_name = '🖥️ Serveur'
-                    color = color or '#90EE90'
-
+                    type_key, display_name, color = 'Database', '🗄️ Database', color or '#ADD8D6'
+                elif 'Serveur' not in server_types_seen:
+                    type_key, display_name, color = 'Serveur', '🖥️ Serveur', color or '#90EE90'
                 if type_key and type_key not in legend_node_types:
                     legend_node_types[type_key] = (display_name, color)
                     server_types_seen.add(type_key)
-
-        # Add any missing default types if they weren't found
-        default_types = {
-            'Acteur': ('👤 Acteur', '#FFFF99'),
-            'Serveur': ('🖥️ Serveur', '#90EE90'),
-            'Database': ('🗄️ Database', '#ADD8D6'),
-            'Firewall': ('🔥 Firewall', '#FF6B6B'),
-        }
+        default_types = {'Acteur': ('👤 Acteur', '#FFFF99'), 'Serveur': ('🖥️ Serveur', '#90EE90'), 'Database': ('🗄️ Database', '#ADD8D6'), 'Firewall': ('🔥 Firewall', '#FF6B6B')}
         for key, value in default_types.items():
             if key not in legend_node_types:
                 legend_node_types[key] = value
-
-        # Generate HTML for node types
         for _, (label, color) in legend_node_types.items():
-            legend_items.append(f"""
-                <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                    <div style="width: 12px; height: 8px; background-color: {color};
-                            border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
-                    <span style="font-size: 9px;">{label}</span>
-                </div>
-            """)
+            legend_items.append(f'''<div style="display: flex; align-items: center; margin-bottom: 3px;"><div style="width: 12px; height: 8px; background-color: {color}; border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div><span style="font-size: 9px;">{label}</span></div>''')
 
-        # Boundary types
-        boundary_types = [
-            ("Trust Boundaries", "#FF0000", "3px solid"),
-            ("Untrust Boundaries", "#000000", "1px solid"),
-        ]
-        
+        # Boundary types legend (remains the same)
+        boundary_types = [("Trust Boundaries", "#FF0000", "3px solid"), ("Untrust Boundaries", "#000000", "1px solid")]
         for label, color, border_style in boundary_types:
-            legend_items.append(f"""
-                <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                    <div style="width: 20px; height: 15px; border: {border_style} {color};
-                            margin-right: 8px; border-radius: 2px;"></div>
-                    <span style="font-size: 11px;">{label}</span>
-                </div>
-            """)
-        
-        # Protocol colors - extract from model
-        protocol_styles = self._get_protocol_styles_from_model(threat_model)
-        if protocol_styles:
+            legend_items.append(f'''<div style="display: flex; align-items: center; margin-bottom: 3px;"><div style="width: 20px; height: 15px; border: {border_style} {color}; margin-right: 8px; border-radius: 2px;"></div><span style="font-size: 11px;">{label}</span></div>''')
+
+        # Determine which protocol data to use
+        protocol_styles_to_use = project_protocol_styles if project_protocol_styles is not None else self._get_protocol_styles_from_model(threat_model)
+        used_protocols_to_use = project_protocols if project_protocols is not None else self._get_used_protocols(threat_model)
+
+        # Protocol colors legend
+        if protocol_styles_to_use:
             legend_items.append('<div style="margin-top: 5px; margin-bottom: 3px; font-weight: bold; font-size: 10px;">Protocoles:</div>')
-            for protocol, style in protocol_styles.items():
-                color = style.get('color', '#000000')
-                sanitized_protocol = self._sanitize_name(protocol)
-                legend_items.append(f"""
-                    <div class="legend-item" data-protocol="{sanitized_protocol}">
-                        <div style="width: 20px; height: 2px; background-color: {color};
-                                margin-right: 8px;"></div>
-                        <span style="font-size: 11px;">{protocol}</span>
-                    </div>
-                """)
+            for protocol, style in sorted(protocol_styles_to_use.items()):
+                if protocol in used_protocols_to_use:
+                    color = style.get('color', '#000000')
+                    line_style = style.get('line_style', 'solid')
+                    border_style = f"2px {line_style} {color}"
+                    sanitized_protocol = self._sanitize_name(protocol)
+                    legend_items.append(f'''<div class="legend-item" data-protocol="{sanitized_protocol}" style="display: flex; align-items: center; margin-bottom: 3px;"><div style="width: 20px; height: 0; border-top: {border_style}; margin-right: 8px;"></div><span style="font-size: 11px;">{protocol}</span></div>''')
         
         return ''.join(legend_items)
    
@@ -763,353 +782,14 @@ class DiagramGenerator:
             return None   
  
     def _create_complete_html(self, svg_content: str, legend_html: str, threat_model) -> str:
-            """Creates the complete HTML document with SVG and legend."""
-            return f"""<!DOCTYPE html>
-        <html lang="fr">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Diagramme de Menaces - {threat_model.name if hasattr(threat_model, 'name') else 'Threat Model'}</title>
-            <style>
-                body {{
-                    margin: 0;
-                    padding: 0;
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    background-color: #f5f5f5;
-                    overflow: hidden;
-                    user-select: none;
-                }}
-                .diagram-container {{
-                    position: relative;
-                    width: 100vw;
-                    height: 100vh;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }}
-                .svg-container {{
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    background: white;
-                    padding: 20px;
-                    box-sizing: border-box;
-                }}
-                .svg-container svg {{
-                    max-width: 100%;
-                    max-height: 100%;
-                    object-fit: contain;
-                    drop-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                }}
-                .legend {{
-                    position: absolute;
-                    top: 5px;
-                    right: 40px;
-                    background: rgba(255, 255, 255, 0.95);
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-                    backdrop-filter: blur(10px);
-                    min-width: 90px;
-                    max-width: 140px;
-                    z-index: 1000;
-                    transition: all 0.3s ease;
-                    cursor: move;
-                }}
-                .legend:hover {{
-                    background: rgba(255, 255, 255, 0.98);
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-                }}
-                .legend.dragging {{
-                    cursor: grabbing;
-                    transform: scale(1.05);
-                }}
-                .legend-header {{
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 8px;
-                    border-bottom: 1px solid #007acc;
-                    background: rgba(0, 122, 204, 0.1);
-                    border-radius: 6px 6px 0 0;
-                }}
-                .legend-title {{
-                    font-weight: bold;
-                    font-size: 10px;
-                    color: #333;
-                    display: flex;
-                    align-items: center;
-                    gap: 3px;
-                    margin: 0;
-                }}
-                .legend-toggle {{
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    font-size: 12px;
-                    padding: 0;
-                    width: 16px;
-                    height: 16px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 2px;
-                    transition: background-color 0.2s;
-                }}
-                .legend-toggle:hover {{
-                    background-color: rgba(0, 122, 204, 0.2);
-                }}
-                .legend-content {{
-                    padding: 8px;
-                    line-height: 1.2;
-                    transition: all 0.3s ease;
-                }}
-                .legend-content.hidden {{
-                    display: none;
-                }}
-                .legend-item {{
-                    display: flex;
-                    align-items: center;
-                    margin-bottom: 3px;
-                    padding: 1px 0;
-                    font-size: 9px;
-                }}
-                .legend-item:hover {{
-                    background-color: rgba(0, 122, 204, 0.1);
-                    border-radius: 2px;
-                    padding: 1px 2px;
-                }}
-                .legend-collapsed {{
-                    min-width: auto;
-                    max-width: auto;
-                }}
-                /* Toggle button */
-                .legend-toggle-btn {{
-                    position: absolute;
-                    top: 5px;
-                    right: 5px;
-                    background: rgba(255, 255, 255, 0.9);
-                    border: 1px solid #ddd;
-                    border-radius: 50%;
-                    width: 24px;
-                    height: 24px;
-                    cursor: pointer;
-                    font-size: 12px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1001;
-                    transition: all 0.2s ease;
-                }}
-                .legend-toggle-btn:hover {{
-                    background: rgba(255, 255, 255, 1);
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                }}
-                .legend.hidden {{
-                    display: none;
-                }}
-                /* Responsive adjustments */
-                @media (max-width: 768px) {{
-                    .legend {{
-                        min-width: 80px;
-                        max-width: 120px;
-                        right: 35px;
-                    }}
-                    .legend-title {{
-                        font-size: 9px;
-                    }}
-                    .legend-item {{
-                        font-size: 8px;
-                    }}
-                    .svg-container {{
-                        padding: 10px;
-                    }}
-                }}
-                @media (max-width: 480px) {{
-                    .legend {{
-                        min-width: 70px;
-                        max-width: 100px;
-                        right: 30px;
-                    }}
-                    .legend-title {{
-                        font-size: 8px;
-                    }}
-                    .legend-item {{
-                        font-size: 7px;
-                    }}
-                }}
-                /* Print styles */
-                @media print {{
-                    .legend {{
-                        position: static;
-                        float: left;
-                        margin: 10px;
-                        box-shadow: none;
-                        border: 1px solid #333;
-                    }}
-                    .legend-toggle-btn {{
-                        display: none;
-                    }}
-                    .diagram-container {{
-                        height: auto;
-                        page-break-inside: avoid;
-                    }}
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="diagram-container">
-                <div class="svg-container">
-                    {svg_content}
-                </div>
-                
-                <!-- Toggle button for legend -->
-                <button class="legend-toggle-btn" onclick="toggleLegend()" title="Masquer/Afficher la légende">
-                    👁️
-                </button>
-                
-                <div class="legend" id="legend">
-                    <div class="legend-header">
-                        <div class="legend-title">
-                            🔍 Légende
-                        </div>
-                        <button class="legend-toggle" onclick="toggleLegendContent()" title="Réduire/Étendre">
-                            <span id="toggle-icon">−</span>
-                        </button>
-                    </div>
-                    <div class="legend-content" id="legend-content">
-                        {legend_html}
-                    </div>
-                </div>
-            </div>
-
-            <script>
-                // Variables pour le drag & drop
-                let isDragging = false;
-                let currentX;
-                let currentY;
-                let initialX;
-                let initialY;
-                let xOffset = 0;
-                let yOffset = 0;
-                
-                const legend = document.getElementById('legend');
-                
-                // Event listeners pour le drag & drop
-                legend.addEventListener('mousedown', dragStart);
-                document.addEventListener('mousemove', drag);
-                document.addEventListener('mouseup', dragEnd);
-                
-                // Touch events pour mobile
-                legend.addEventListener('touchstart', dragStart);
-                document.addEventListener('touchmove', drag);
-                document.addEventListener('touchend', dragEnd);
-                
-                function dragStart(e) {{
-                    if (e.target.closest('.legend-toggle') || e.target.closest('.legend-toggle-btn')) {{
-                        return;
-                    }}
-                    
-                    if (e.type === "touchstart") {{
-                        initialX = e.touches[0].clientX - xOffset;
-                        initialY = e.touches[0].clientY - yOffset;
-                    }} else {{
-                        initialX = e.clientX - xOffset;
-                        initialY = e.clientY - yOffset;
-                    }}
-                    
-                    if (e.target === legend || legend.contains(e.target)) {{
-                        isDragging = true;
-                        legend.classList.add('dragging');
-                    }}
-                }}
-                
-                function drag(e) {{
-                    if (isDragging) {{
-                        e.preventDefault();
-                        
-                        if (e.type === "touchmove") {{
-                            currentX = e.touches[0].clientX - initialX;
-                            currentY = e.touches[0].clientY - initialY;
-                        }} else {{
-                            currentX = e.clientX - initialX;
-                            currentY = e.clientY - initialY;
-                        }}
-                        
-                        xOffset = currentX;
-                        yOffset = currentY;
-                        
-                        // Contraindre la position dans la fenêtre
-                        const rect = legend.getBoundingClientRect();
-                        const maxX = window.innerWidth - rect.width;
-                        const maxY = window.innerHeight - rect.height;
-                        
-                        xOffset = Math.max(0, Math.min(maxX, xOffset));
-                        yOffset = Math.max(0, Math.min(maxY, yOffset));
-                        
-                        legend.style.transform = `translate(${{xOffset}}px, ${{yOffset}}px)`;
-                        legend.style.position = 'fixed';
-                        legend.style.bottom = 'auto';
-                        legend.style.left = 'auto';
-                        legend.style.top = '0';
-                        legend.style.right = 'auto';
-                    }}
-                }}
-                
-                function dragEnd(e) {{
-                    initialX = currentX;
-                    initialY = currentY;
-                    isDragging = false;
-                    legend.classList.remove('dragging');
-                }}
-                
-                // Fonction pour masquer/afficher la légende
-                function toggleLegend() {{
-                    const legend = document.getElementById('legend');
-                    const toggleBtn = document.querySelector('.legend-toggle-btn');
-                    
-                    if (legend.classList.contains('hidden')) {{
-                        legend.classList.remove('hidden');
-                        toggleBtn.innerHTML = '👁️';
-                        toggleBtn.title = 'Masquer la légende';
-                    }} else {{
-                        legend.classList.add('hidden');
-                        toggleBtn.innerHTML = '👁️‍🗨️';
-                        toggleBtn.title = 'Afficher la légende';
-                    }}
-                }}
-                
-                // Fonction pour réduire/étendre le contenu de la légende
-                function toggleLegendContent() {{
-                    const content = document.getElementById('legend-content');
-                    const icon = document.getElementById('toggle-icon');
-                    const legend = document.getElementById('legend');
-                    
-                    if (content.classList.contains('hidden')) {{
-                        content.classList.remove('hidden');
-                        icon.textContent = '−';
-                        legend.classList.remove('legend-collapsed');
-                    }} else {{
-                        content.classList.add('hidden');
-                        icon.textContent = '+';
-                        legend.classList.add('legend-collapsed');
-                    }}
-                }}
-                
-                // Empêcher la sélection de texte pendant le drag
-                document.addEventListener('selectstart', function(e) {{
-                    if (isDragging) {{
-                        e.preventDefault();
-                    }}
-                }});
-            </script>
-        </body>
-        </html>"""
+        """Creates the complete HTML document with SVG and legend."""
+        template = self.template_env.get_template("diagram_template.html")
+        model_name = threat_model.name if hasattr(threat_model, 'name') else 'Threat Model'
+        return template.render(
+            title=f"Diagramme de Menaces - {model_name}",
+            svg_content=svg_content,
+            legend_html=legend_html
+        )
 
     def _get_protocol_styles_from_model(self, threat_model) -> Dict[str, Dict]:
         """

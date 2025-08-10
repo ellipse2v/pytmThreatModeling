@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrammes de Menaces Navigables - {{ title }}</title>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom/dist/svg-pan-zoom.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .diagram-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .svg-container {
+            width: 98%;
+            height: 98%;
+            border: 1px solid #ddd;
+            background-color: white;
+        }
+        .svg-container svg {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .navigation-ui {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        .back-button, .legend-toggle-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .legend-toggle-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 5px;
+        }
+        .zoom-btn {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .legend {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            max-width: 200px;
+            z-index: 1000;
+        }
+        .legend.hidden {
+            display: none;
+        }
+        .legend-header {
+            padding: 8px;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+        }
+        .legend-content {
+            padding: 8px;
+        }
+        .breadcrumb {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #666;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+    <div class="diagram-container">
+        <div id="svg-container" class="svg-container">
+            {{ svg_content|safe }}
+        </div>
+
+        <div class="navigation-ui">
+            {% if parent_link %}
+                <a href="{{ parent_link }}" class="back-button">← Retour</a>
+            {% endif %}
+            <button class="legend-toggle-btn" onclick="toggleLegend()" title="Légende">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 13c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z" fill="currentColor"/></svg>
+            </button>
+        </div>
+
+        <div class="zoom-controls">
+            <button class="zoom-btn" id="zoom-in">+</button>
+            <button class="zoom-btn" id="zoom-out">-</button>
+        </div>
+
+        <div class="breadcrumb">
+            {% for name, link in breadcrumb %}
+                {% set levels_up = (breadcrumb|length - 1) - loop.index0 %}
+                {% set prefix = '../' * levels_up %}
+                <a href="{{ prefix }}{{ link }}">{{ name }}</a>{% if not loop.last %} &gt; {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="legend hidden" id="legend">
+            <div class="legend-header">Légende</div>
+            <div class="legend-content">
+                {{ legend_html|safe }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleLegend() {
+            const legend = document.getElementById('legend');
+            legend.classList.toggle('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var svgElement = document.querySelector('#svg-container svg');
+            if (svgElement) {
+                var panZoom = svgPanZoom(svgElement, {
+                    zoomEnabled: true,
+                    controlIconsEnabled: false,
+                    fit: true,
+                    center: true,
+                    minZoom: 0.5,
+                    maxZoom: 10
+                });
+
+                document.getElementById('zoom-in').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    panZoom.zoomIn();
+                });
+
+                document.getElementById('zoom-out').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    panZoom.zoomOut();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

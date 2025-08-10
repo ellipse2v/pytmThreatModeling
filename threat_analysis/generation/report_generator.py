@@ -17,12 +17,23 @@ Report generation module
 """
 import re
 import json
+import logging
+import sys
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 import webbrowser
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
 from threat_analysis.mitigation_suggestions import get_mitigation_suggestions
+
+# Add project root to sys.path to allow imports from other directories
+project_root = Path(__file__).resolve().parents[2]
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+from threat_analysis.core.model_factory import create_threat_model
+from threat_analysis.generation.diagram_generator import DiagramGenerator
+from threat_analysis.core.models_module import ThreatModel
 
 
 class ReportGenerator:
@@ -207,4 +218,175 @@ class ReportGenerator:
             "severity_distribution": severity_distribution
         }
 
-    
+    def generate_project_reports(self, project_path: Path, output_dir: Path):
+        """
+        Generates all reports for a project, ensuring a consistent legend across all diagrams.
+        """
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        # 1. Discover and parse all models in the project
+        all_models = self._get_all_project_models(project_path)
+        if not all_models:
+            logging.error("No threat models found in the project. Aborting.")
+            return
+
+        # 2. Aggregate data from all models for consistent legends
+        project_protocols, project_protocol_styles = self._aggregate_project_data(all_models)
+
+        # 3. Start the recursive generation process
+        self._recursively_generate_reports(
+            model_path=project_path / "main.md",
+            output_dir=output_dir,
+            breadcrumb=[(project_path.name, "main_diagram.html")],
+            project_protocols=project_protocols,
+            project_protocol_styles=project_protocol_styles
+        )
+
+    def _get_all_project_models(self, project_path: Path) -> List[ThreatModel]:
+        """
+        Recursively finds and parses all 'model.md' or 'main.md' files in a project directory.
+        """
+        all_models = []
+        model_files = list(project_path.glob("**/model.md")) + list(project_path.glob("**/main.md"))
+
+        for model_path in model_files:
+            try:
+                with open(model_path, "r", encoding="utf-8") as f:
+                    markdown_content = f.read()
+
+                threat_model = create_threat_model(
+                    markdown_content=markdown_content,
+                    model_name=model_path.stem,
+                    model_description=f"Threat model for {model_path.stem}",
+                    mitre_mapping=self.mitre_mapping,
+                    validate=False  # Validate later if needed
+                )
+                if threat_model:
+                    all_models.append(threat_model)
+            except Exception as e:
+                logging.error(f"Error parsing model file {model_path}: {e}")
+        return all_models
+
+    def _aggregate_project_data(self, all_models: List[ThreatModel]) -> tuple[set, dict]:
+        """
+        Aggregates used protocols and protocol styles from a list of threat models.
+        """
+        project_protocols = set()
+        project_protocol_styles = {}
+
+        for model in all_models:
+            # Aggregate used protocols
+            if hasattr(model, 'dataflows'):
+                for df in model.dataflows:
+                    protocol = getattr(df, 'protocol', None)
+                    if protocol:
+                        project_protocols.add(protocol)
+
+            # Aggregate protocol styles, allowing overrides
+            if hasattr(model, 'get_all_protocol_styles'):
+                styles = model.get_all_protocol_styles()
+                project_protocol_styles.update(styles)
+
+        return project_protocols, project_protocol_styles
+
+    def _recursively_generate_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[tuple[str, str]], project_protocols: set, project_protocol_styles: dict):
+        """
+        Recursively generates reports for each model in the project.
+        """
+        model_name = model_path.stem
+
+        try:
+            with open(model_path, "r", encoding="utf-8") as f:
+                markdown_content = f.read()
+
+            threat_model = create_threat_model(
+                markdown_content=markdown_content,
+                model_name=model_name,
+                model_description=f"Threat model for {model_name}",
+                mitre_mapping=self.mitre_mapping,
+                validate=True
+            )
+            if not threat_model:
+                logging.error(f"Failed to create threat model for {model_path}")
+                return
+
+            # Generate all files for the current model
+            grouped_threats = threat_model.process_threats()
+            self.generate_html_report(threat_model, grouped_threats, output_dir / f"{model_name}_threat_report.html")
+            self.generate_json_export(threat_model, grouped_threats, output_dir / f"{model_name}.json")
+            self.generate_diagram_html(threat_model, output_dir, breadcrumb, project_protocols, project_protocol_styles)
+
+            # Recurse into submodels
+            for server in threat_model.servers:
+                if 'submodel' in server:
+                    submodel_path_str = server['submodel']
+                    # Resolve path relative to the current model file
+                    submodel_path = (model_path.parent / submodel_path_str).resolve()
+
+                    if submodel_path.exists() and submodel_path.is_file():
+                        sub_dir_name = submodel_path.parent.name
+                        sub_output_dir = output_dir / sub_dir_name
+                        sub_output_dir.mkdir(exist_ok=True)
+
+                        new_breadcrumb = breadcrumb + [(sub_dir_name, f"{submodel_path.stem}_diagram.html")]
+
+                        self._recursively_generate_reports(
+                            model_path=submodel_path,
+                            output_dir=sub_output_dir,
+                            breadcrumb=new_breadcrumb,
+                            project_protocols=project_protocols,
+                            project_protocol_styles=project_protocol_styles
+                        )
+                    else:
+                        logging.warning(f"Submodel file not found: {submodel_path}")
+        except Exception as e:
+            logging.error(f"Error processing model at {model_path}: {e}", exc_info=True)
+
+    def generate_diagram_html(self, threat_model: ThreatModel, output_dir: Path, breadcrumb: List[tuple[str, str]], project_protocols: set, project_protocol_styles: dict):
+        """
+        Generates an HTML file containing just the diagram for navigation.
+        """
+        diagram_generator = DiagramGenerator()
+        model_name = threat_model.tm.name
+
+        dot_code = diagram_generator.generate_dot_file_from_model(threat_model, output_dir / f"{model_name}.dot", project_protocol_styles)
+        if not dot_code:
+            logging.error(f"Failed to generate DOT code for {model_name}")
+            return
+
+        svg_path = diagram_generator.generate_diagram_from_dot(dot_code, output_dir / f"{model_name}.svg", "svg")
+        if not svg_path:
+            logging.error(f"Failed to generate SVG for {model_name}")
+            return
+
+        with open(svg_path, "r", encoding="utf-8") as f:
+            svg_content = f.read()
+
+        svg_content = diagram_generator.add_links_to_svg(svg_content, threat_model)
+
+        template = self.env.get_template('navigable_diagram_template.html')
+
+        # Determine parent link
+        parent_link = None
+        if len(breadcrumb) > 1:
+            parent_link = f"../{breadcrumb[-2][1]}"
+
+        legend_html = diagram_generator._generate_legend_html(
+            threat_model,
+            project_protocols=project_protocols,
+            project_protocol_styles=project_protocol_styles
+        )
+
+        html = template.render(
+            title=f"Diagram - {model_name}",
+            svg_content=svg_content,
+            breadcrumb=breadcrumb,
+            parent_link=parent_link,
+            legend_html=legend_html
+        )
+
+        diagram_html_path = output_dir / f"{model_name}_diagram.html"
+        with open(diagram_html_path, "w", encoding="utf-8") as f:
+            f.write(html)
+        logging.info(f"Generated diagram HTML: {diagram_html_path}")
+

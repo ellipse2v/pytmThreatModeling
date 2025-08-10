@@ -178,22 +178,18 @@ class ThreatAnalysisFramework:
         )
 
         # Generate DOT file
-        dot_path = self.diagram_generator.generate_dot_file_from_model(
+        dot_code = self.diagram_generator.generate_dot_file_from_model(
             self.threat_model, dot_output_full_path
         )
 
         svg_path = None
         html_path = None
 
-        if dot_path:  # If DOT file was successfully generated
+        if dot_code:
             try:
-                # Read DOT file content to pass to generate_diagram_from_dot
-                with open(dot_path, "r", encoding="utf-8") as f:
-                    dot_code_content = f.read()
-
                 # Generate SVG
                 svg_path = self.diagram_generator.generate_diagram_from_dot(
-                    dot_code_content, svg_output_full_path, "svg"
+                    dot_code, svg_output_full_path, "svg"
                 )
 
                 # Generate HTML with embedded SVG and positioned legend
@@ -205,10 +201,10 @@ class ThreatAnalysisFramework:
                     )
             except Exception as e:
                 logging.error(
-                    f"❌ Error reading DOT file to generate SVG/HTML: {e}"
+                    f"❌ Error generating diagram from DOT code: {e}"
                 )
 
-        return {"dot": dot_path, "svg": svg_path, "html": html_path}
+        return {"dot": dot_output_full_path, "svg": svg_path, "html": html_path}
 
     def open_report_in_browser(self, report_path: str):
         """Opens the HTML report in the default browser."""
@@ -276,6 +272,11 @@ class CustomArgumentParser:
         self.parser.add_argument(
             "--gui", action="store_true", help="Launch the web-based GUI editor."
         )
+        self.parser.add_argument(
+            "--project",
+            type=str,
+            help="Path to the project directory for hierarchical threat models.",
+        )
 
         # Dynamically add arguments for IaC plugins
         for name, plugin in loaded_plugins.items():
@@ -312,6 +313,21 @@ if __name__ == "__main__":
                 "pip install Flask"
             )
             sys.exit(1)
+    elif args.project:
+        from threat_analysis.generation.report_generator import ReportGenerator
+        from threat_analysis.severity_calculator_module import SeverityCalculator
+        from threat_analysis.core.mitre_mapping_module import MitreMapping
+        from pathlib import Path
+        from threat_analysis import config
+
+        project_path = Path(args.project)
+        output_dir = Path(config.OUTPUT_BASE_DIR) / project_path.name
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        severity_calculator = SeverityCalculator(markdown_file_path=str(project_path / "main.md"))
+        mitre_mapping = MitreMapping()
+        report_generator = ReportGenerator(severity_calculator, mitre_mapping)
+        report_generator.generate_project_reports(project_path, output_dir)
     else:
         markdown_content_for_analysis = ""
         iac_plugin_used = False
