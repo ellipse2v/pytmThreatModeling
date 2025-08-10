@@ -15,6 +15,7 @@
 """
 Report generation module
 """
+import shutil
 import re
 import json
 import logging
@@ -223,6 +224,19 @@ class ReportGenerator:
         Generates all reports for a project, ensuring a consistent legend across all diagrams.
         """
         output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Copy static files to the root of the output directory
+        static_src_dir = Path(__file__).parent.parent / 'server' / 'static'
+        static_dest_dir = output_dir / 'static'
+        if static_src_dir.exists():
+            # Remove existing static dir in output to ensure it's up-to-date
+            if static_dest_dir.exists():
+                shutil.rmtree(static_dest_dir)
+            try:
+                shutil.copytree(static_src_dir, static_dest_dir)
+                logging.info(f"Copied static files to {static_dest_dir}")
+            except Exception as e:
+                logging.error(f"Failed to copy static files: {e}")
 
         # 1. Discover and parse all models in the project
         all_models = self._get_all_project_models(project_path)

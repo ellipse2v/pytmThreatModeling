@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagrammes de Menaces Navigables - {{ title }}</title>
-    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom/dist/svg-pan-zoom.min.js"></script>
     <style>
         body, html {
             margin: 0;
@@ -113,6 +106,34 @@
             color: #666;
             z-index: 1001;
         }
+
+        /* --- Hover effect styles --- */
+        g > a > polygon,
+        g > a > rect,
+        g > a > ellipse,
+        g > a > circle,
+        g > a > path {
+            transition: stroke-width 0.2s ease-in-out;
+        }
+
+        g.hover-effect {
+            transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
+            transform-origin: center; /* Fallback */
+        }
+
+        g.hover-effect.hovered {
+            transform: scale(1.05);
+            filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4)) brightness(1.1);
+        }
+
+        g.hover-effect.hovered > a > polygon,
+        g.hover-effect.hovered > a > rect,
+        g.hover-effect.hovered > a > ellipse,
+        g.hover-effect.hovered > a > circle,
+        g.hover-effect.hovered > a > path {
+            stroke-width: 3px !important;
+        }
+
     </style>
 </head>
 <body>
@@ -151,6 +172,7 @@
         </div>
     </div>
 
+    <script src="{{ '../' * (breadcrumb|length - 1) }}static/js/svg-pan-zoom.min.js"></script>
     <script>
         function toggleLegend() {
             const legend = document.getElementById('legend');
@@ -178,8 +200,40 @@
                     e.preventDefault();
                     panZoom.zoomOut();
                 });
+
+                // --- Hover effect logic ---
+                var clickableLinks = document.querySelectorAll('#svg-container svg a');
+                console.log('Found ' + clickableLinks.length + ' clickable links for hover effect.');
+
+                clickableLinks.forEach(function(link) {
+                    var group = link.parentElement;
+                    if (group && group.tagName.toLowerCase() === 'g') {
+                        try {
+                            // Add a class to the group for CSS targeting
+                            group.classList.add('hover-effect');
+                            group.style.cursor = 'pointer';
+
+                            // Set transform-origin dynamically for accurate scaling
+                            var bbox = group.getBBox();
+                            var cx = bbox.x + bbox.width / 2;
+                            var cy = bbox.y + bbox.height / 2;
+                            group.style.transformOrigin = cx + 'px ' + cy + 'px';
+
+                            group.addEventListener('mouseover', function() {
+                                group.classList.add('hovered');
+                            });
+
+                            group.addEventListener('mouseout', function() {
+                                group.classList.remove('hovered');
+                            });
+                        } catch (e) {
+                            console.error('Could not apply hover effect to group:', group.id, e);
+                        }
+                    }
+                });
             }
         });
     </script>
 </body>
 </html>
+

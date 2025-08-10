@@ -26,6 +26,10 @@ This project is a Python-based, end-to-end STRIDE threat modeling and analysis f
   - JSON export for integration or further analysis.
 - **Visual Diagrams**:
   - DOT, SVG, and HTML diagrams with threat highlights.
+- **Navigable Project Reports**:
+  - Generate a unified, navigable HTML report for complex projects with multiple nested threat models.
+  - Diagrams are interactive, with hover effects (zoom, shadow) on clickable elements.
+  - Fully self-contained and works offline, with all necessary assets (like `svg-pan-zoom.js`) included locally.
 - **Real-time Markdown Editing**: Edit your threat model in Markdown with live diagram preview.
 - **Extensible**: All mappings and calculations are modular and easy to override.
 - **PyTM Compatibility**: Supports PyTM's model structure and can be extended with PyTM's features.
@@ -80,6 +84,17 @@ Use the CLI mode for automated threat analysis, report generation, and diagram c
     -   HTML report
     -   JSON export
     -   DOT/SVG/HTML diagrams
+
+### 2. Project Mode: Hierarchical Threat Models
+
+The framework excels at handling complex projects with multiple, nested threat models. By structuring your models in directories (e.g., `projects/my_app/main.md`, `projects/my_app/backend/model.md`), you can generate a unified, navigable report.
+
+1.  **Organize your project** in the `threatModel_Template/projects/` directory (see examples).
+2.  **Run the analysis on the project folder:**
+    ```bash
+    python -m threat_analysis --project-path threatModel_Template/projects/example_1
+    ```
+3.  **Explore the output:** A fully interactive, cross-linked HTML report will be generated in the `output/` directory. Diagrams for sub-models are placed in corresponding sub-directories, with all links and asset paths adjusted automatically.
 
 ### 3. Infrastructure as Code (IaC) Integration (Ansible Example)
 
