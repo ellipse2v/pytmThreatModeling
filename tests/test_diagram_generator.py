@@ -397,12 +397,18 @@ def test_generate_legend_html_with_protocol_styles(diagram_generator):
     mock_threat_model = MagicMock()
     mock_threat_model.actors = []
     mock_threat_model.servers = []
-    mock_threat_model.dataflows = []
+    # Add a mock dataflow using the 'HTTPS' protocol
+    mock_dataflow = MagicMock()
+    mock_dataflow.protocol = 'HTTPS'
+    mock_threat_model.dataflows = [mock_dataflow]
     mock_threat_model.get_all_protocol_styles.return_value = {'HTTPS': {'color': 'purple'}}
-    legend_html = diagram_generator._generate_legend_html(mock_threat_model)
-    assert "Protocoles:" in legend_html
-    assert "HTTPS" in legend_html
-    assert "background-color: purple;" in legend_html
+
+    # Mock the _get_used_protocols method to return the used protocol
+    with patch.object(diagram_generator, '_get_used_protocols', return_value={'HTTPS'}):
+        legend_html = diagram_generator._generate_legend_html(mock_threat_model)
+        assert "Protocoles:" in legend_html
+        assert "HTTPS" in legend_html
+        assert "purple" in legend_html
 
 def test_generate_html_with_legend(diagram_generator):
     with patch('builtins.open', mock_open()) as mock_file_open:

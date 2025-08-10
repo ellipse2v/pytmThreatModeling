@@ -91,8 +91,12 @@ class DiagramGenerator:
                 return None
                 
         except subprocess.CalledProcessError as e:
+            with open("/tmp/graphviz_error.log", "w") as f:
+                f.write(e.stderr)
             logging.error(f"❌ Graphviz error: {e.stderr}")
+            print(f"Graphviz error: {e.stderr}")
             logging.error(f"DOT code preview: {cleaned_dot[:200]}...")
+            print(f"DOT code preview: {cleaned_dot[:200]}...")
             return None
         except Exception as e:
             logging.error(f"❌ Unexpected error: {e}")
@@ -696,99 +700,59 @@ class DiagramGenerator:
                     used_protocols.add(protocol)
         return used_protocols
 
-    def _generate_legend_html(self, threat_model) -> str:
-        """Generates HTML legend content."""
+    def _generate_legend_html(self, threat_model, project_protocols=None, project_protocol_styles=None) -> str:
+        """
+        Generates HTML legend content.
+        Uses project-wide protocol data if provided, otherwise falls back to the current model.
+        """
         legend_items = []
 
-        # Dynamically generate node types for the legend
+        # Node types legend (remains the same)
         legend_node_types = {}
-
-        # Process actors
         if hasattr(threat_model, 'actors'):
             for actor in threat_model.actors:
                 color = actor.get('color') or '#FFFF99'
                 if 'Acteur' not in legend_node_types:
                     legend_node_types['Acteur'] = ('👤 Acteur', color)
-
-        # Process servers to find one of each type for the legend
         if hasattr(threat_model, 'servers'):
             server_types_seen = set()
             for server in threat_model.servers:
                 name = server.get('name', '').lower()
                 color = server.get('color')
-
-                type_key = None
-                display_name = None
-
+                type_key, display_name = None, None
                 if 'firewall' in name and 'Firewall' not in server_types_seen:
-                    type_key = 'Firewall'
-                    display_name = '🔥 Firewall'
-                    color = color or '#FF6B6B'
+                    type_key, display_name, color = 'Firewall', '🔥 Firewall', color or '#FF6B6B'
                 elif ('database' in name or 'db' in name) and 'Database' not in server_types_seen:
-                    type_key = 'Database'
-                    display_name = '🗄️ Database'
-                    color = color or '#ADD8D6'
-                elif 'Serveur' not in server_types_seen: # Generic server as fallback
-                    type_key = 'Serveur'
-                    display_name = '🖥️ Serveur'
-                    color = color or '#90EE90'
-
+                    type_key, display_name, color = 'Database', '🗄️ Database', color or '#ADD8D6'
+                elif 'Serveur' not in server_types_seen:
+                    type_key, display_name, color = 'Serveur', '🖥️ Serveur', color or '#90EE90'
                 if type_key and type_key not in legend_node_types:
                     legend_node_types[type_key] = (display_name, color)
                     server_types_seen.add(type_key)
-
-        # Add any missing default types if they weren't found
-        default_types = {
-            'Acteur': ('👤 Acteur', '#FFFF99'),
-            'Serveur': ('🖥️ Serveur', '#90EE90'),
-            'Database': ('🗄️ Database', '#ADD8D6'),
-            'Firewall': ('🔥 Firewall', '#FF6B6B'),
-        }
+        default_types = {'Acteur': ('👤 Acteur', '#FFFF99'), 'Serveur': ('🖥️ Serveur', '#90EE90'), 'Database': ('🗄️ Database', '#ADD8D6'), 'Firewall': ('🔥 Firewall', '#FF6B6B')}
         for key, value in default_types.items():
             if key not in legend_node_types:
                 legend_node_types[key] = value
-
-        # Generate HTML for node types
         for _, (label, color) in legend_node_types.items():
-            legend_items.append(f"""
-                <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                    <div style="width: 12px; height: 8px; background-color: {color};
-                            border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div>
-                    <span style="font-size: 9px;">{label}</span>
-                </div>
-            """)
+            legend_items.append(f'''<div style="display: flex; align-items: center; margin-bottom: 3px;"><div style="width: 12px; height: 8px; background-color: {color}; border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div><span style="font-size: 9px;">{label}</span></div>''')
 
-        # Boundary types
-        boundary_types = [
-            ("Trust Boundaries", "#FF0000", "3px solid"),
-            ("Untrust Boundaries", "#000000", "1px solid"),
-        ]
-        
+        # Boundary types legend (remains the same)
+        boundary_types = [("Trust Boundaries", "#FF0000", "3px solid"), ("Untrust Boundaries", "#000000", "1px solid")]
         for label, color, border_style in boundary_types:
-            legend_items.append(f"""
-                <div style="display: flex; align-items: center; margin-bottom: 3px;">
-                    <div style="width: 20px; height: 15px; border: {border_style} {color};
-                            margin-right: 8px; border-radius: 2px;"></div>
-                    <span style="font-size: 11px;">{label}</span>
-                </div>
-            """)
-        
-        # Protocol colors - extract from model
-        protocol_styles = self._get_protocol_styles_from_model(threat_model)
-        used_protocols = self._get_used_protocols(threat_model)
+            legend_items.append(f'''<div style="display: flex; align-items: center; margin-bottom: 3px;"><div style="width: 20px; height: 15px; border: {border_style} {color}; margin-right: 8px; border-radius: 2px;"></div><span style="font-size: 11px;">{label}</span></div>''')
 
-        if protocol_styles:
+        # Determine which protocol data to use
+        protocol_styles_to_use = project_protocol_styles if project_protocol_styles is not None else self._get_protocol_styles_from_model(threat_model)
+        used_protocols_to_use = project_protocols if project_protocols is not None else self._get_used_protocols(threat_model)
+
+        # Protocol colors legend
+        if protocol_styles_to_use:
             legend_items.append('<div style="margin-top: 5px; margin-bottom: 3px; font-weight: bold; font-size: 10px;">Protocoles:</div>')
-            for protocol, style in sorted(protocol_styles.items()):
-                if protocol in used_protocols:
+            for protocol, style in sorted(protocol_styles_to_use.items()):
+                if protocol in used_protocols_to_use:
                     color = style.get('color', '#000000')
                     sanitized_protocol = self._sanitize_name(protocol)
-                    legend_items.append(f"""
-                        <div class="legend-item" data-protocol="{sanitized_protocol}" style="display: flex; align-items: center; margin-bottom: 3px;">
-                            <div style="width: 20px; height: 2px; background-color: {color}; margin-right: 8px;"></div>
-                            <span style="font-size: 11px;">{protocol}</span>
-                        </div>
-                    """)
+                    legend_items.append(f'''<div class="legend-item" data-protocol="{sanitized_protocol}" style="display: flex; align-items: center; margin-bottom: 3px;"><div style="width: 20px; height: 2px; background-color: {color}; margin-right: 8px;"></div><span style="font-size: 11px;">{protocol}</span></div>''')
         
         return ''.join(legend_items)
    

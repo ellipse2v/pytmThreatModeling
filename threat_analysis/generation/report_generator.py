@@ -220,17 +220,76 @@ class ReportGenerator:
 
     def generate_project_reports(self, project_path: Path, output_dir: Path):
         """
-        Generates all reports for a project.
+        Generates all reports for a project, ensuring a consistent legend across all diagrams.
         """
         output_dir.mkdir(parents=True, exist_ok=True)
 
+        # 1. Discover and parse all models in the project
+        all_models = self._get_all_project_models(project_path)
+        if not all_models:
+            logging.error("No threat models found in the project. Aborting.")
+            return
+
+        # 2. Aggregate data from all models for consistent legends
+        project_protocols, project_protocol_styles = self._aggregate_project_data(all_models)
+
+        # 3. Start the recursive generation process
         self._recursively_generate_reports(
             model_path=project_path / "main.md",
             output_dir=output_dir,
-            breadcrumb=[(project_path.name, "main_diagram.html")]
+            breadcrumb=[(project_path.name, "main_diagram.html")],
+            project_protocols=project_protocols,
+            project_protocol_styles=project_protocol_styles
         )
 
-    def _recursively_generate_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[tuple[str, str]]):
+    def _get_all_project_models(self, project_path: Path) -> List[ThreatModel]:
+        """
+        Recursively finds and parses all 'model.md' or 'main.md' files in a project directory.
+        """
+        all_models = []
+        model_files = list(project_path.glob("**/model.md")) + list(project_path.glob("**/main.md"))
+
+        for model_path in model_files:
+            try:
+                with open(model_path, "r", encoding="utf-8") as f:
+                    markdown_content = f.read()
+
+                threat_model = create_threat_model(
+                    markdown_content=markdown_content,
+                    model_name=model_path.stem,
+                    model_description=f"Threat model for {model_path.stem}",
+                    mitre_mapping=self.mitre_mapping,
+                    validate=False  # Validate later if needed
+                )
+                if threat_model:
+                    all_models.append(threat_model)
+            except Exception as e:
+                logging.error(f"Error parsing model file {model_path}: {e}")
+        return all_models
+
+    def _aggregate_project_data(self, all_models: List[ThreatModel]) -> tuple[set, dict]:
+        """
+        Aggregates used protocols and protocol styles from a list of threat models.
+        """
+        project_protocols = set()
+        project_protocol_styles = {}
+
+        for model in all_models:
+            # Aggregate used protocols
+            if hasattr(model, 'dataflows'):
+                for df in model.dataflows:
+                    protocol = getattr(df, 'protocol', None)
+                    if protocol:
+                        project_protocols.add(protocol)
+
+            # Aggregate protocol styles, allowing overrides
+            if hasattr(model, 'get_all_protocol_styles'):
+                styles = model.get_all_protocol_styles()
+                project_protocol_styles.update(styles)
+
+        return project_protocols, project_protocol_styles
+
+    def _recursively_generate_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[tuple[str, str]], project_protocols: set, project_protocol_styles: dict):
         """
         Recursively generates reports for each model in the project.
         """
@@ -255,7 +314,7 @@ class ReportGenerator:
             grouped_threats = threat_model.process_threats()
             self.generate_html_report(threat_model, grouped_threats, output_dir / f"{model_name}_threat_report.html")
             self.generate_json_export(threat_model, grouped_threats, output_dir / f"{model_name}.json")
-            self.generate_diagram_html(threat_model, output_dir, breadcrumb)
+            self.generate_diagram_html(threat_model, output_dir, breadcrumb, project_protocols, project_protocol_styles)
 
             # Recurse into submodels
             for server in threat_model.servers:
@@ -274,14 +333,16 @@ class ReportGenerator:
                         self._recursively_generate_reports(
                             model_path=submodel_path,
                             output_dir=sub_output_dir,
-                            breadcrumb=new_breadcrumb
+                            breadcrumb=new_breadcrumb,
+                            project_protocols=project_protocols,
+                            project_protocol_styles=project_protocol_styles
                         )
                     else:
                         logging.warning(f"Submodel file not found: {submodel_path}")
         except Exception as e:
             logging.error(f"Error processing model at {model_path}: {e}", exc_info=True)
 
-    def generate_diagram_html(self, threat_model: ThreatModel, output_dir: Path, breadcrumb: List[tuple[str, str]]):
+    def generate_diagram_html(self, threat_model: ThreatModel, output_dir: Path, breadcrumb: List[tuple[str, str]], project_protocols: set, project_protocol_styles: dict):
         """
         Generates an HTML file containing just the diagram for navigation.
         """
@@ -308,11 +369,13 @@ class ReportGenerator:
         # Determine parent link
         parent_link = None
         if len(breadcrumb) > 1:
-            # The parent is the second to last element.
-            # The link needs to go up one directory level.
             parent_link = f"../{breadcrumb[-2][1]}"
 
-        legend_html = diagram_generator._generate_legend_html(threat_model)
+        legend_html = diagram_generator._generate_legend_html(
+            threat_model,
+            project_protocols=project_protocols,
+            project_protocol_styles=project_protocol_styles
+        )
 
         html = template.render(
             title=f"Diagram - {model_name}",
