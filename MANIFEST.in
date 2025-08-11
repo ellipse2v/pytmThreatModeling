@@ -1,0 +1,2 @@
+graft threat_analysis/server/static
+graft threat_analysis/server/templates

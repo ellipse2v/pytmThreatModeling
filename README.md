@@ -46,8 +46,16 @@ This project is a Python-based, end-to-end STRIDE threat modeling and analysis f
 
 2.  **Install Python dependencies:**
     ```bash
-    pip install pytm Flask
+    pip install -e .
     ```
+    This command installs all project dependencies and sets up the project in "editable" mode, which is recommended for development.
+    For a standard installation (e.g., for deployment), you can use:
+    ```bash
+    pip install .
+    ```
+    **Note on Installation Modes:**
+    - `pip install -e .`: Installs the project in "editable" mode. This is recommended for development as any changes you make to the source code in your project directory are immediately reflected without needing to reinstall.
+    - `pip install .`: Performs a standard installation, copying the project files into your Python environment. Use this for deployment or when using the package as a dependency.
 
 3.  **Install Graphviz (for diagram generation):**
     -   Windows: [https://graphviz.org/download/](https://graphviz.org/download/)
