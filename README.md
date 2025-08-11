@@ -92,7 +92,7 @@ The framework excels at handling complex projects with multiple, nested threat m
 1.  **Organize your project** in the `threatModel_Template/projects/` directory (see examples).
 2.  **Run the analysis on the project folder:**
     ```bash
-    python -m threat_analysis --project-path threatModel_Template/projects/example_1
+    python -m threat_analysis --project threatModel_Template/projects/example_2
     ```
 3.  **Explore the output:** A fully interactive, cross-linked HTML report will be generated in the `output/` directory. Diagrams for sub-models are placed in corresponding sub-directories, with all links and asset paths adjusted automatically.
 
