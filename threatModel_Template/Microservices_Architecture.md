@@ -48,11 +48,5 @@ This threat model explores a microservices-based architecture, where an applicat
 - **JDBC/ODBC/API**: color=purple
 
 ## Severity Multipliers
-# Example:
-# - **API Gateway**: 1.8 (single point of entry, critical for routing and security enforcement)
-# - **Message Broker (Kafka/RabbitMQ)**: 1.6 (sensitive data in transit, potential for message tampering)
 
 ## Custom Mitre Mapping
-# Example:
-# - **Service Mesh Evasion**: tactics=["Defense Evasion"], techniques=[{"id": "T1562", "name": "Impair Defenses"}]
-# - **Insecure Inter-Service Communication**: tactics=["Lateral Movement"], techniques=[{"id": "T1570", "name": "Web Service"}]

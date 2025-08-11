@@ -3,6 +3,9 @@
  - **Main_SubZone**: color=lightcyan, is_trusted=True
  - **Fallback_SubZone**: color=lightyellow, is_trusted=True
 
+## Actors
+- **External_Client**:
+
 ## Servers
 - **Server_Main_01**: boundary=Main_SubZone, stereotype=WebServer
 - **Server_Main_02**: boundary=Main_SubZone, stereotype=AppServer

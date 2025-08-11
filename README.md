@@ -139,6 +139,8 @@ Launch the interactive web editor to visualize your threat model in real-time, e
 
 ## Threat Model DSL & Examples (`threatModel_Template/threat_model.md`)
 
+This framework leverages PyTM's modeling primitives. For a comprehensive reference of all available attributes and their usage, please refer to the [PyTM Documentation](https://owasp.github.io/PyTM/Threat-Model-as-Code/). Note that this framework may extend PyTM with additional attributes or behaviors.
+
 ```markdown
 # Threat Model: Advanced DMZ Architecture
 
@@ -173,6 +175,26 @@ A network with a DMZ, external/internal firewalls, and a command zone. The goal 
 ## Custom Mitre Mapping
 - **Protocol Tampering**: tactics=["Impact", "Defense Evasion"], techniques=[{"id": "T1565", "name": "Data Manipulation"}]
 ```
+
+### Common Attributes
+
+Several elements in the threat model DSL support common attributes to enhance their representation and behavior:
+
+-   **`color`**: Specifies the color of the element in the generated diagrams.
+    -   **Applies to**: Boundaries, Actors, Dataflows, Protocol Styles.
+    -   **Values**: Can be a standard HTML color name (e.g., `red`, `blue`, `lightgray`), or a hexadecimal color code (e.g., `#FF0000`).
+
+-   **`line_style`**: Defines the style of lines for dataflows or protocols in diagrams.
+    -   **Applies to**: Protocol Styles.
+    -   **Values**: `solid`, `dashed`, `dotted`.
+
+-   **`is_trusted`**: Indicates whether a Boundary is considered trusted. This can influence threat analysis.
+    -   **Applies to**: Boundaries.
+    -   **Values**: `True` or `False`.
+
+-   **`is_encrypted`**: Specifies whether a Dataflow is encrypted. This is crucial for information disclosure threat analysis.
+    -   **Applies to**: Dataflows.
+    -   **Values**: `True` or `False`.
 
 ### Protocol Styles and Legends
 
