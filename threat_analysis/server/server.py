@@ -14,15 +14,10 @@
 
 import os
 import sys
-from flask import Flask, render_template, request, jsonify, send_from_directory
+import base64
 import logging
 import re
-
 from flask import Flask, render_template, request, jsonify, send_from_directory, send_file
-import logging
-import os
-import sys
-import base64
 
 from threat_analysis.server.threat_model_service import ThreatModelService
 from threat_analysis import config

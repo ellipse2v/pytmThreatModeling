@@ -29,12 +29,18 @@ import inspect
 from threat_analysis.core.models_module import ThreatModel
 from threat_analysis.core.mitre_mapping_module import MitreMapping
 from threat_analysis.severity_calculator_module import SeverityCalculator
-from threat_analysis.generation.report_generator import ReportGenerator
 from threat_analysis.generation.diagram_generator import DiagramGenerator
 from threat_analysis.core.model_factory import create_threat_model
 from threat_analysis import config
 from threat_analysis.iac_plugins import IaCPlugin
+from threat_analysis.generation.report_generator import ReportGenerator
+from threat_analysis.utils import _validate_path_within_project
+from threat_analysis.server.server import run_gui
 
+# Add project root to sys.path
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 class ThreatAnalysisFramework:
     """Main framework for threat analysis"""
@@ -305,7 +311,6 @@ if __name__ == "__main__":
 
     if args.gui:
         try:
-            from .server.server import run_gui
             run_gui(args.model_file)
         except ImportError:
             logging.error(
@@ -314,13 +319,8 @@ if __name__ == "__main__":
             )
             sys.exit(1)
     elif args.project:
-        from threat_analysis.generation.report_generator import ReportGenerator
-        from threat_analysis.severity_calculator_module import SeverityCalculator
-        from threat_analysis.core.mitre_mapping_module import MitreMapping
-        from pathlib import Path
-        from threat_analysis import config
 
-        project_path = Path(args.project)
+        project_path = _validate_path_within_project(args.project)
         output_dir = Path(config.OUTPUT_BASE_DIR) / project_path.name
         output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -338,10 +338,10 @@ if __name__ == "__main__":
             arg_name = f"{plugin_name}_path"
             if hasattr(args, arg_name) and getattr(args, arg_name):
                 logging.info(f"Processing IaC configuration with {plugin_name} plugin...")
-                config_path = getattr(args, arg_name)
-                iac_input_filename = Path(config_path).stem # Get filename without extension
+                config_path = _validate_path_within_project(getattr(args, arg_name))
+                iac_input_filename = config_path.stem # Get filename without extension
                 try:
-                    parsed_data = plugin_instance.parse_iac_config(config_path)
+                    parsed_data = plugin_instance.parse_iac_config(str(config_path)) # Pass as string
                     iac_generated_content = plugin_instance.generate_threat_model_components(parsed_data)
                     logging.info(f"Successfully generated threat model components from {plugin_name}.")
                     iac_plugin_used = True
@@ -363,10 +363,7 @@ if __name__ == "__main__":
 
         if not iac_plugin_used:
             # If no IaC plugin was used, read from the specified model file
-            base_model_filepath = Path(args.model_file)
-            if not base_model_filepath.exists():
-                logging.error(f"❌ Error: Model file '{base_model_filepath}' not found.")
-                sys.exit(1)
+            base_model_filepath = _validate_path_within_project(args.model_file)
             with open(base_model_filepath, "r", encoding="utf-8") as f:
                 markdown_content_for_analysis = f.read()
         else:

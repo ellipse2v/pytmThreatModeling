@@ -24,6 +24,7 @@ from enum import Enum
 from .mitre_mapping_module import MitreMapping
 from threat_analysis.severity_calculator_module import SeverityCalculator
 from .model_validator import ModelValidator
+from threat_analysis.custom_threats import get_custom_threats
 
 class CustomThreat:
     """A simple class to represent a custom threat."""
@@ -154,7 +155,7 @@ class ThreatModel:
         """Adds a dataflow to the model"""
         data_objects = []
         if data_name:
-            data_object = self.data_objects.get(data_name)
+            data_object = self.data_objects.get(data_name.lower())
             if data_object:
                 data_objects.append(data_object)
             else:
@@ -170,6 +171,7 @@ class ThreatModel:
             is_encrypted=is_encrypted
         )
         self.dataflows.append(dataflow)
+        self._elements_by_name[name.lower()] = dataflow # Add dataflow to elements by name
         return dataflow
 
     def add_protocol_style(self, protocol_name: str, **style_kwargs):
@@ -248,7 +250,7 @@ class ThreatModel:
         expanded_pytm_threats = self._expand_class_targets(pytm_raw_threats)
 
         # --- Generate and add custom threats ---
-        from threat_analysis.custom_threats import get_custom_threats
+
         custom_threats_list = get_custom_threats(self)
         
         # Convert custom threats to (threat, target) tuples
@@ -272,7 +274,7 @@ class ThreatModel:
                 classification = None
                 if isinstance(target_obj, Dataflow) and hasattr(target_obj, 'data') and target_obj.data:
                     # Assuming dataflows carry a single data object for simplicity in this context
-                    data_obj = target_obj.data[0]
+                    data_obj = next(iter(target_obj.data)) # Get the first data object from the DataSet
                     if hasattr(data_obj, 'classification'):
                         classification = data_obj.classification.name # Get string representation of enum
 
@@ -407,4 +409,4 @@ class ThreatModel:
         }
         
 
-# The get_pytm_class_by_name and expand_threat_targets functions are no longer needed.
+    # The get_pytm_class_by_name and expand_threat_targets functions are no longer needed.

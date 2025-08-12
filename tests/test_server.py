@@ -16,8 +16,9 @@ import pytest
 import json
 import os
 from unittest.mock import patch, MagicMock, mock_open
-import base64
 from io import BytesIO
+import base64
+import sys
 
 # This is a bit tricky. We need to add the project root to the path
 # BEFORE we import the app, so the app can find its own modules.
@@ -69,8 +70,6 @@ def test_update_api_empty_markdown(client):
         json_data = response.get_json()
         assert 'error' in json_data
         assert json_data['error'] == 'Markdown content is empty'
-
-import sys
 
 @pytest.mark.parametrize("export_format", ["svg", "diagram", "report"])
 def test_export_api_success(client, export_format):

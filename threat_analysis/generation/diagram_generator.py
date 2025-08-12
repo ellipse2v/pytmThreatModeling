@@ -15,10 +15,12 @@
 """
 Enhanced Diagram generation module with protocol styles and boundary attributes support
 """
+import html # Added line
 import subprocess
 import re
 import logging
 import xml.etree.ElementTree as ET
+from urllib.parse import urlparse # Added line
 from typing import Dict, List, Optional
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
@@ -408,21 +410,19 @@ class DiagramGenerator:
         return sanitized or "unnamed"
 
     def _escape_label(self, text: str) -> str:
-        """Escapes text for use in DOT labels."""
+        """Escapes text for use in DOT labels and HTML contexts."""
         if not text:
             return ""
         
-        # Convert to string and handle encoding
         text = str(text)
         
-        # Remove or replace problematic characters
-        text = text.replace('"', '\\"')  # Escape quotes
-        text = text.replace('\n', '\\n')  # Escape newlines
-        text = text.replace('\r', '')     # Remove carriage returns
-        text = text.replace('\t', ' ')    # Replace tabs with spaces
-        
-        # Remove non-printable characters except basic ones
-        text = re.sub(r'[^\x20-\x7E\u00A0-\uFFFF]', '', text)
+        # Escape HTML special characters first
+        text = html.escape(text)
+
+        # Handle newlines for DOT (DOT uses \n for newlines)
+        text = text.replace('\n', '\\n')
+        text = text.replace('\r', '')
+        text = text.replace('\t', ' ')
         
         # Limit length to prevent overly long labels
         if len(text) > 100:
@@ -446,6 +446,25 @@ class DiagramGenerator:
         dot_code = dot_code.replace('\r\n', '\n').replace('\r', '\n')
         
         return dot_code
+
+    def _is_safe_url(self, url: str) -> bool: # Added function
+        """
+        Checks if a URL is safe for use in hyperlinks.
+        Allows relative paths and http/https schemes.
+        """
+        if not url:
+            return False
+        
+        # Allow relative paths (do not start with scheme://)
+        if not re.match(r'^[a-zA-Z]+://', url):
+            return True # Assume relative paths are safe within the application context
+
+        # Allow only http and https schemes
+        parsed_url = urlparse(url)
+        if parsed_url.scheme in ['http', 'https']:
+            return True
+        
+        return False
 
     def _generate_manual_dot(self, threat_model, project_protocol_styles: dict = None) -> str:
         """Generates DOT code from ThreatModel components using Jinja2 template."""

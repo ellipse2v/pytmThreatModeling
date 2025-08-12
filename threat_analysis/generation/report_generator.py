@@ -25,6 +25,7 @@ from datetime import datetime
 import webbrowser
 from jinja2 import Environment, FileSystemLoader
 from pathlib import Path
+from threat_analysis.utils import _validate_path_within_project
 from threat_analysis.mitigation_suggestions import get_mitigation_suggestions
 
 # Add project root to sys.path to allow imports from other directories
@@ -334,10 +335,10 @@ class ReportGenerator:
             for server in threat_model.servers:
                 if 'submodel' in server:
                     submodel_path_str = server['submodel']
-                    # Resolve path relative to the current model file
-                    submodel_path = (model_path.parent / submodel_path_str).resolve()
+                    # Resolve path relative to the current model file and validate
+                    submodel_path = _validate_path_within_project(str(model_path.parent / submodel_path_str))
 
-                    if submodel_path.exists() and submodel_path.is_file():
+                    if submodel_path.is_file(): # .exists() is checked by _validate_path_within_project
                         sub_dir_name = submodel_path.parent.name
                         sub_output_dir = output_dir / sub_dir_name
                         sub_output_dir.mkdir(exist_ok=True)

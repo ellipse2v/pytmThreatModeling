@@ -3,6 +3,10 @@ from threat_analysis.iac_plugins.ansible_plugin import AnsiblePlugin
 from unittest.mock import patch, mock_open
 
 @pytest.fixture
+def project_tmp_path(tmp_path_factory):
+    return tmp_path_factory.mktemp("iac_tests", numbered=True)
+
+@pytest.fixture
 def ansible_plugin():
     """Fixture for the AnsiblePlugin."""
     return AnsiblePlugin()
@@ -58,10 +62,10 @@ SAMPLE_PLAYBOOK_CONTENT = """
 """
 
 @pytest.fixture
-def ansible_test_env(tmp_path):
+def ansible_test_env(project_tmp_path):
     """Creates a temporary ansible environment with a playbook and inventory."""
-    playbook_path = tmp_path / "playbook.yml"
-    inventory_path = tmp_path / "hosts.ini"
+    playbook_path = project_tmp_path / "playbook.yml"
+    inventory_path = project_tmp_path / "hosts.ini"
 
     playbook_path.write_text(SAMPLE_PLAYBOOK_CONTENT)
     inventory_path.write_text(SAMPLE_INVENTORY_CONTENT_WITH_VARS)
@@ -73,9 +77,10 @@ def test_plugin_name_and_description(ansible_plugin):
     assert ansible_plugin.name == "ansible"
     assert "Ansible playbooks and inventories" in ansible_plugin.description
 
-def test_parse_iac_config_success_with_vars(ansible_plugin, ansible_test_env):
+def test_parse_iac_config_success_with_vars(ansible_plugin, ansible_test_env, project_tmp_path):
     """Tests successful parsing of a playbook and its inventory including host variables."""
-    parsed_data = ansible_plugin.parse_iac_config(str(ansible_test_env))
+    with patch("threat_analysis.iac_plugins.ansible_plugin._validate_path_within_project", return_value=ansible_test_env) as mock_validate:
+        parsed_data = ansible_plugin.parse_iac_config(str(ansible_test_env))
 
     assert "inventory" in parsed_data
     assert "playbook" in parsed_data
@@ -92,21 +97,23 @@ def test_parse_iac_config_success_with_vars(ansible_plugin, ansible_test_env):
     playbook = parsed_data["playbook"]
     assert playbook[0]["name"] == "Configure web server"
 
-def test_parse_iac_config_inventory_not_found(ansible_plugin, tmp_path):
+def test_parse_iac_config_inventory_not_found(ansible_plugin, project_tmp_path):
     """Tests that parsing fails if the inventory file is missing."""
-    playbook_path = tmp_path / "playbook.yml"
+    playbook_path = project_tmp_path / "playbook.yml"
     playbook_path.write_text(SAMPLE_PLAYBOOK_CONTENT)
     
-    with pytest.raises(FileNotFoundError, match="Inventory file not found"):
-        ansible_plugin.parse_iac_config(str(playbook_path))
+    with patch("threat_analysis.iac_plugins.ansible_plugin._validate_path_within_project", return_value=playbook_path) as mock_validate:
+        with pytest.raises(FileNotFoundError, match="Inventory file not found"):
+            ansible_plugin.parse_iac_config(str(playbook_path))
 
-def test_parse_iac_config_unsupported_file_type(ansible_plugin, tmp_path):
+def test_parse_iac_config_unsupported_file_type(ansible_plugin, project_tmp_path):
     """Tests that parsing fails for unsupported playbook file types."""
-    unsupported_file = tmp_path / "playbook.txt"
+    unsupported_file = project_tmp_path / "playbook.txt"
     unsupported_file.write_text("This is not a playbook.")
 
-    with pytest.raises(ValueError, match="Unsupported Ansible config path"):
-        ansible_plugin.parse_iac_config(str(unsupported_file))
+    with patch("threat_analysis.iac_plugins.ansible_plugin._validate_path_within_project", return_value=unsupported_file) as mock_validate:
+        with pytest.raises(ValueError, match="Unsupported Ansible config path"):
+            ansible_plugin.parse_iac_config(str(unsupported_file))
 
 def test_generate_threat_model_components(ansible_plugin):
     """Tests the generation of Markdown components from parsed data."""

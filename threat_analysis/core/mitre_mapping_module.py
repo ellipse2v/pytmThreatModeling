@@ -15,11 +15,10 @@
 MITRE ATT&CK mapping module with D3FEND mitigations
 """
 import os
-import ast # Added for safe evaluation of literal structures
-
 import logging
 from typing import Dict, List, Any
 import re
+import ast
 import pandas as pd
 from threat_analysis.custom_threats import get_custom_threats
 

@@ -22,7 +22,6 @@ from .mitre_mapping_module import MitreMapping
 from pytm import Classification, Lifetime
 import ast
 
-
 class ModelParser:
     """
     Parses a threat model defined in Markdown and constructs a ThreatModel object.

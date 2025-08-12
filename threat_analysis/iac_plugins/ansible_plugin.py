@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Dict, Any, List
 import logging
 import subprocess
+from threat_analysis.utils import _validate_path_within_project
 
 from threat_analysis.iac_plugins import IaCPlugin
 
@@ -78,7 +79,9 @@ class AnsiblePlugin(IaCPlugin):
         Parses an Ansible playbook and its corresponding inventory.
         Assumes inventory is named 'hosts.ini' and located in the same directory.
         """
-        playbook_path = Path(config_path)
+        # Validate config_path
+        validated_config_path = _validate_path_within_project(config_path)
+        playbook_path = validated_config_path
         inventory_path = playbook_path.parent / 'hosts.ini'
 
         if not playbook_path.is_file() or playbook_path.suffix not in ['.yml', '.yaml']:
