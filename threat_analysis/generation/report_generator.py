@@ -35,6 +35,7 @@ if str(project_root) not in sys.path:
 
 from threat_analysis.core.model_factory import create_threat_model
 from threat_analysis.generation.diagram_generator import DiagramGenerator
+from threat_analysis.generation.stix_generator import StixGenerator
 from threat_analysis.core.models_module import ThreatModel
 
 
@@ -99,6 +100,25 @@ class ReportGenerator:
 
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(export_data, f, indent=2, ensure_ascii=False)
+
+        return output_file
+
+    def generate_stix_export(self, threat_model, grouped_threats: Dict[str, List],
+                             output_dir: Path = Path("output/STIX_Export")) -> Path:
+        """Generates a STIX export of the analysis data"""
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        all_detailed_threats = self._get_all_threats_with_mitre_info(grouped_threats)
+
+        stix_generator = StixGenerator(threat_model, all_detailed_threats)
+        stix_bundle = stix_generator.generate_stix_bundle()
+
+        output_file = output_dir / f"{threat_model.tm.name}_stix_attack_flow.json"
+
+        with open(output_file, "w", encoding="utf-8") as f:
+            json.dump(stix_bundle, f, indent=2, ensure_ascii=False)
+
+        logging.info(f"STIX report generated at {output_file}")
 
         return output_file
 
