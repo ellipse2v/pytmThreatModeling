@@ -164,6 +164,25 @@ class ThreatAnalysisFramework:
         logging.info("✅ Reports generated.")
         return {"html": html_report_path, "json": json_report_path}
 
+    def generate_stix_report(self) -> Optional[str]:
+        """Generates STIX report in the timestamped directory."""
+        if not self.analysis_completed:
+            logging.warning(
+                "⚠️ Analysis has not been run. Execute run_analysis() first."
+            )
+            return None
+
+        logging.info("📊 Generating STIX report...")
+
+        stix_output_dir = Path(self.output_base_dir)
+
+        stix_report_path = self.report_generator.generate_stix_export(
+            self.threat_model, self.grouped_threats, stix_output_dir
+        )
+
+        logging.info("✅ STIX report generated.")
+        return stix_report_path
+
     def generate_diagrams(self) -> Dict[str, Optional[str]]:
         """Generates DOT, SVG and HTML diagrams in the timestamped directory."""
         logging.info("🖼️ Generating diagrams...")
@@ -407,6 +426,7 @@ if __name__ == "__main__":
             sys.exit(1)
 
         reports = framework.generate_reports()
+        framework.generate_stix_report()
 
         diagrams = framework.generate_diagrams()
 
