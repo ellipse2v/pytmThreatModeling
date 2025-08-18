@@ -197,3 +197,5 @@ cython_debug/
 /output/*
 !/output/example/
 !/output/tmp/
+docnotforgit/technical_documentation.md
+docnotforgit/advanced threat modeling.pdf

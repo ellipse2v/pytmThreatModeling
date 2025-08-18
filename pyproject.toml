@@ -37,3 +37,6 @@ dependencies = [
 [tool.setuptools.packages.find]
 where = ["."] # Search for packages in the current directory
 include = ["threat_analysis*"] # Include threat_analysis and its subpackages
+
+[tool.coverage.run]
+omit = ["tests/*"]
