@@ -94,6 +94,11 @@
         .mitre-link:hover {
             text-decoration: underline;
         }
+        .scrollable-cell {
+            max-height: 250px;
+            overflow-y: auto;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -157,6 +162,7 @@
                         <th>Target</th>
                         <th>Description</th>
                         <th>Severity</th>
+                        <th>CAPEC</th>
                         <th>MITRE Techniques</th>
                         <th>MITRE Mitigations</th>
                         <th>D3FEND Mitigations</th>
@@ -173,13 +179,27 @@
                         <td>{{ threat.description }}</td>
                         <td class="severity-{{ threat.severity.level.lower() }}">{{ threat.severity.level }} ({{ threat.severity.score }})</td>
                         <td>
+                            <div class="scrollable-cell">
+                            {% if threat.capecs %}
+                                <ul>
+                                {% for capec in threat.capecs %}
+                                    <li><a href="https://capec.mitre.org/data/definitions/{{ capec.capec_id.split('-')[1] }}.html" target="_blank">{{ capec.capec_id }}: {{ capec.description }}</a></li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="scrollable-cell">
                             <ul>
                             {% for tech in threat.mitre_techniques %}
                                 <li><a href="https://attack.mitre.org/techniques/{{ tech.id }}" target="_blank" class="mitre-link">{{ tech.id }}: {{ tech.name }}</a></li>
                             {% endfor %}
                             </ul>
+                            </div>
                         </td>
                         <td>
+                            <div class="scrollable-cell">
                             <ul>
                             {% for tech in threat.mitre_techniques if tech.mitre_mitigations %}
                                 {% for mitigation in tech.mitre_mitigations %}
@@ -187,8 +207,10 @@
                                 {% endfor %}
                             {% endfor %}
                             </ul>
+                            </div>
                         </td>
                         <td>
+                            <div class="scrollable-cell">
                             <ul>
                             {% for tech in threat.mitre_techniques if tech.defend_mitigations %}
                                 {% for mitigation in tech.defend_mitigations %}
@@ -196,27 +218,34 @@
                                 {% endfor %}
                             {% endfor %}
                             </ul>
+                            </div>
                         </td>
                         <td>
+                            <div class="scrollable-cell">
                             <ul>
                             {% for mitigation in threat.cis_mitigations %}
                                 <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
                             {% endfor %}
                             </ul>
+                            </div>
                         </td>
                         <td>
+                            <div class="scrollable-cell">
                             <ul>
                             {% for mitigation in threat.nist_mitigations %}
                                 <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
                             {% endfor %}
                             </ul>
+                            </div>
                         </td>
                         <td>
+                            <div class="scrollable-cell">
                             <ul>
                             {% for mitigation in threat.owasp_mitigations %}
                                 <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
                             {% endfor %}
                             </ul>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}

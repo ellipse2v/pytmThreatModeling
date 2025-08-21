@@ -173,7 +173,7 @@ def test_add_data_with_classification_and_lifetime(threat_model_instance):
     data = tm.add_data("PII", classification=Classification.SECRET, lifetime=Lifetime.SHORT)
     assert isinstance(data, Data)
     assert data.name == "PII"
-    assert data.classification == Classification.SECRET
+    assert data.classification == Classification.SECRE
     assert data.lifetime == Lifetime.SHORT
     assert "pii" in tm.data_objects
     assert tm.data_objects["pii"] == data

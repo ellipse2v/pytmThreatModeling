@@ -1,1609 +1,2238 @@
-
 {
-  "Spoofing": [
-    "CAPEC-148",
-    "CAPEC-151",
-    "CAPEC-203",
-    "CAPEC-204",
-    "CAPEC-205",
-    "CAPEC-206",
-    "CAPEC-207",
-    "CAPEC-89",
-    "CAPEC-94",
-    "CAPEC-120",
-    "CAPEC-121",
-    "CAPEC-122",
-    "CAPEC-176",
-    "CAPEC-195",
-    "CAPEC-474",
-    "CAPEC-475",
-    "CAPEC-556"
-  ],
-  "Tampering": [
-    "CAPEC-1",
-    "CAPEC-2",
-    "CAPEC-7",
-    "CAPEC-8",
-    "CAPEC-15",
-    "CAPEC-21",
-    "CAPEC-24",
-    "CAPEC-26",
-    "CAPEC-27",
-    "CAPEC-30",
-    "CAPEC-31",
-    "CAPEC-32",
-    "CAPEC-33",
-    "CAPEC-34",
-    "CAPEC-35",
-    "CAPEC-36",
-    "CAPEC-37",
-    "CAPEC-58",
-    "CAPEC-59",
-    "CAPEC-60",
-    "CAPEC-61",
-    "CAPEC-62",
-    "CAPEC-63",
-    "CAPEC-64",
-    "CAPEC-65",
-    "CAPEC-78",
-    "CAPEC-79",
-    "CAPEC-80",
-    "CAPEC-81",
-    "CAPEC-82",
-    "CAPEC-83",
-    "CAPEC-84",
-    "CAPEC-85",
-    "CAPEC-94",
-    "CAPEC-123",
-    "CAPEC-124",
-    "CAPEC-129",
-    "CAPEC-130",
-    "CAPEC-131",
-    "CAPEC-132",
-    "CAPEC-133",
-    "CAPEC-134",
-    "CAPEC-135",
-    "CAPEC-136",
-    "CAPEC-137",
-    "CAPEC-138",
-    "CAPEC-139",
-    "CAPEC-140",
-    "CAPEC-141",
-    "CAPEC-142",
-    "CAPEC-143",
-    "CAPEC-144",
-    "CAPEC-145",
-    "CAPEC-146",
-    "CAPEC-147",
-    "CAPEC-153",
-    "CAPEC-177",
-    "CAPEC-268",
-    "CAPEC-272",
-    "CAPEC-273",
-    "CAPEC-274",
-    "CAPEC-275",
-    "CAPEC-276",
-    "CAPEC-277",
-    "CAPEC-278",
-    "CAPEC-279",
-    "CAPEC-280",
-    "CAPEC-281",
-    "CAPEC-282",
-    "CAPEC-283",
-    "CAPEC-284",
-    "CAPEC-285",
-    "CAPEC-286",
-    "CAPEC-287",
-    "CAPEC-288",
-    "CAPEC-289",
-    "CAPEC-290",
-    "CAPEC-461",
-    "CAPEC-462",
-    "CAPEC-463",
-    "CAPEC-464",
-    "CAPEC-465",
-    "CAPEC-466",
-    "CAPEC-467",
-    "CAPEC-468",
-    "CAPEC-469",
-    "CAPEC-470",
-    "CAPEC-471",
-    "CAPEC-472",
-    "CAPEC-473",
-    "CAPEC-557",
-    "CAPEC-558",
-    "CAPEC-559",
-    "CAPEC-560",
-    "CAPEC-561",
-    "CAPEC-562",
-    "CAPEC-563",
-    "CAPEC-564",
-    "CAPEC-565",
-    "CAPEC-566",
-    "CAPEC-567",
-    "CAPEC-568",
-    "CAPEC-569",
-    "CAPEC-570",
-    "CAPEC-571",
-    "CAPEC-572",
-    "CAPEC-573",
-    "CAPEC-574",
-    "CAPEC-575",
-    "CAPEC-576",
-    "CAPEC-577",
-    "CAPEC-578",
-    "CAPEC-579",
-    "CAPEC-580",
-    "CAPEC-581",
-    "CAPEC-582",
-    "CAPEC-583",
-    "CAPEC-584",
-    "CAPEC-585",
-    "CAPEC-586",
-    "CAPEC-587",
-    "CAPEC-588",
-    "CAPEC-589",
-    "CAPEC-590",
-    "CAPEC-591",
-    "CAPEC-592",
-    "CAPEC-593",
-    "CAPEC-594",
-    "CAPEC-595",
-    "CAPEC-596",
-    "CAPEC-597",
-    "CAPEC-598",
-    "CAPEC-599",
-    "CAPEC-600",
-    "CAPEC-601",
-    "CAPEC-602",
-    "CAPEC-603",
-    "CAPEC-604",
-    "CAPEC-605",
-    "CAPEC-606",
-    "CAPEC-607",
-    "CAPEC-608",
-    "CAPEC-609",
-    "CAPEC-610",
-    "CAPEC-611",
-    "CAPEC-612",
-    "CAPEC-613",
-    "CAPEC-614",
-    "CAPEC-615",
-    "CAPEC-616",
-    "CAPEC-617",
-    "CAPEC-618",
-    "CAPEC-619",
-    "CAPEC-620",
-    "CAPEC-621",
-    "CAPEC-622",
-    "CAPEC-623",
-    "CAPEC-624",
-    "CAPEC-625",
-    "CAPEC-626",
-    "CAPEC-627",
-    "CAPEC-628",
-    "CAPEC-629",
-    "CAPEC-630",
-    "CAPEC-631",
-    "CAPEC-632",
-    "CAPEC-633",
-    "CAPEC-634",
-    "CAPEC-635",
-    "CAPEC-636",
-    "CAPEC-637",
-    "CAPEC-638",
-    "CAPEC-639",
-    "CAPEC-640",
-    "CAPEC-641",
-    "CAPEC-642",
-    "CAPEC-643",
-    "CAPEC-644",
-    "CAPEC-645",
-    "CAPEC-646",
-    "CAPEC-647",
-    "CAPEC-648",
-    "CAPEC-649",
-    "CAPEC-650",
-    "CAPEC-651",
-    "CAPEC-652",
-    "CAPEC-653",
-    "CAPEC-654",
-    "CAPEC-655",
-    "CAPEC-656",
-    "CAPEC-657",
-    "CAPEC-658",
-    "CAPEC-659",
-    "CAPEC-660",
-    "CAPEC-661",
-    "CAPEC-662",
-    "CAPEC-663",
-    "CAPEC-664",
-    "CAPEC-665",
-    "CAPEC-666",
-    "CAPEC-667",
-    "CAPEC-668",
-    "CAPEC-669",
-    "CAPEC-670",
-    "CAPEC-671",
-    "CAPEC-672",
-    "CAPEC-673",
-    "CAPEC-674",
-    "CAPEC-675",
-    "CAPEC-676",
-    "CAPEC-677",
-    "CAPEC-678",
-    "CAPEC-679",
-    "CAPEC-680",
-    "CAPEC-681",
-    "CAPEC-682",
-    "CAPEC-683",
-    "CAPEC-684",
-    "CAPEC-685",
-    "CAPEC-686",
-    "CAPEC-687",
-    "CAPEC-688",
-    "CAPEC-689",
-    "CAPEC-690",
-    "CAPEC-691",
-    "CAPEC-692",
-    "CAPEC-693",
-    "CAPEC-694",
-    "CAPEC-695",
-    "CAPEC-696",
-    "CAPEC-697",
-    "CAPEC-698",
-    "CAPEC-699",
-    "CAPEC-700"
-  ],
-  "Repudiation": [
-    "CAPEC-268",
-    "CAPEC-195"
-  ],
-  "Information Disclosure": [
-    "CAPEC-7",
-    "CAPEC-16",
-    "CAPEC-17",
-    "CAPEC-18",
-    "CAPEC-19",
-    "CAPEC-20",
-    "CAPEC-21",
-    "CAPEC-22",
-    "CAPEC-23",
-    "CAPEC-24",
-    "CAPEC-25",
-    "CAPEC-26",
-    "CAPEC-27",
-    "CAPEC-28",
-    "CAPEC-29",
-    "CAPEC-30",
-    "CAPEC-31",
-    "CAPEC-32",
-    "CAPEC-33",
-    "CAPEC-34",
-    "CAPEC-35",
-    "CAPEC-36",
-    "CAPEC-37",
-    "CAPEC-58",
-    "CAPEC-59",
-    "CAPEC-60",
-    "CAPEC-61",
-    "CAPEC-62",
-    "CAPEC-63",
-    "CAPEC-64",
-    "CAPEC-65",
-    "CAPEC-78",
-    "CAPEC-79",
-    "CAPEC-80",
-    "CAPEC-81",
-    "CAPEC-82",
-    "CAPEC-83",
-    "CAPEC-84",
-    "CAPEC-85",
-    "CAPEC-94",
-    "CAPEC-116",
-    "CAPEC-117",
-    "CAPEC-129",
-    "CAPEC-130",
-    "CAPEC-131",
-    "CAPEC-132",
-    "CAPEC-133",
-    "CAPEC-134",
-    "CAPEC-135",
-    "CAPEC-136",
-    "CAPEC-137",
-    "CAPEC-138",
-    "CAPEC-139",
-    "CAPEC-140",
-    "CAPEC-141",
-    "CAPEC-142",
-    "CAPEC-143",
-    "CAPEC-144",
-    "CAPEC-145",
-    "CAPEC-146",
-    "CAPEC-147",
-    "CAPEC-153",
-    "CAPEC-169",
-    "CAPEC-177",
-    "CAPEC-198",
-    "CAPEC-200",
-    "CAPEC-210",
-    "CAPEC-211",
-    "CAPEC-212",
-    "CAPEC-213",
-    "CAPEC-214",
-    "CAPEC-215",
-    "CAPEC-216",
-    "CAPEC-217",
-    "CAPEC-218",
-    "CAPEC-219",
-    "CAPEC-220",
-    "CAPEC-221",
-    "CAPEC-222",
-    "CAPEC-223",
-    "CAPEC-224",
-    "CAPEC-225",
-    "CAPEC-226",
-    "CAPEC-227",
-    "CAPEC-228",
-    "CAPEC-229",
-    "CAPEC-230",
-    "CAPEC-231",
-    "CAPEC-232",
-    "CAPEC-233",
-    "CAPEC-234",
-    "CAPEC-235",
-    "CAPEC-236",
-    "CAPEC-237",
-    "CAPEC-238",
-    "CAPEC-239",
-    "CAPEC-240",
-    "CAPEC-241",
-    "CAPEC-242",
-    "CAPEC-243",
-    "CAPEC-244",
-    "CAPEC-245",
-    "CAPEC-246",
-    "CAPEC-247",
-    "CAPEC-248",
-    "CAPEC-249",
-    "CAPEC-250",
-    "CAPEC-251",
-    "CAPEC-252",
-    "CAPEC-253",
-    "CAPEC-254",
-    "CAPEC-255",
-    "CAPEC-256",
-    "CAPEC-257",
-    "CAPEC-258",
-    "CAPEC-259",
-    "CAPEC-260",
-    "CAPEC-261",
-    "CAPEC-262",
-    "CAPEC-263",
-    "CAPEC-264",
-    "CAPEC-265",
-    "CAPEC-266",
-    "CAPEC-267",
-    "CAPEC-268",
-    "CAPEC-269",
-    "CAPEC-270",
-    "CAPEC-271",
-    "CAPEC-272",
-    "CAPEC-273",
-    "CAPEC-274",
-    "CAPEC-275",
-    "CAPEC-276",
-    "CAPEC-277",
-    "CAPEC-278",
-    "CAPEC-279",
-    "CAPEC-280",
-    "CAPEC-281",
-    "CAPEC-282",
-    "CAPEC-283",
-    "CAPEC-284",
-    "CAPEC-285",
-    "CAPEC-286",
-    "CAPEC-287",
-    "CAPEC-288",
-    "CAPEC-289",
-    "CAPEC-290",
-    "CAPEC-309",
-    "CAPEC-310",
-    "CAPEC-311",
-    "CAPEC-312",
-    "CAPEC-313",
-    "CAPEC-314",
-    "CAPEC-315",
-    "CAPEC-316",
-    "CAPEC-317",
-    "CAPEC-318",
-    "CAPEC-319",
-    "CAPEC-320",
-    "CAPEC-321",
-    "CAPEC-322",
-    "CAPEC-323",
-    "CAPEC-324",
-    "CAPEC-325",
-    "CAPEC-326",
-    "CAPEC-327",
-    "CAPEC-328",
-    "CAPEC-329",
-    "CAPEC-330",
-    "CAPEC-331",
-    "CAPEC-332",
-    "CAPEC-333",
-    "CAPEC-334",
-    "CAPEC-335",
-    "CAPEC-336",
-    "CAPEC-337",
-    "CAPEC-338",
-    "CAPEC-339",
-    "CAPEC-340",
-    "CAPEC-341",
-    "CAPEC-342",
-    "CAPEC-343",
-    "CAPEC-344",
-    "CAPEC-345",
-    "CAPEC-346",
-    "CAPEC-347",
-    "CAPEC-348",
-    "CAPEC-349",
-    "CAPEC-350",
-    "CAPEC-351",
-    "CAPEC-352",
-    "CAPEC-353",
-    "CAPEC-354",
-    "CAPEC-355",
-    "CAPEC-356",
-    "CAPEC-357",
-    "CAPEC-358",
-    "CAPEC-359",
-    "CAPEC-360",
-    "CAPEC-361",
-    "CAPEC-362",
-    "CAPEC-363",
-    "CAPEC-364",
-    "CAPEC-365",
-    "CAPEC-366",
-    "CAPEC-367",
-    "CAPEC-368",
-    "CAPEC-369",
-    "CAPEC-370",
-    "CAPEC-371",
-    "CAPEC-372",
-    "CAPEC-373",
-    "CAPEC-374",
-    "CAPEC-375",
-    "CAPEC-376",
-    "CAPEC-377",
-    "CAPEC-378",
-    "CAPEC-379",
-    "CAPEC-380",
-    "CAPEC-381",
-    "CAPEC-382",
-    "CAPEC-383",
-    "CAPEC-384",
-    "CAPEC-385",
-    "CAPEC-386",
-    "CAPEC-387",
-    "CAPEC-388",
-    "CAPEC-389",
-    "CAPEC-390",
-    "CAPEC-391",
-    "CAPEC-392",
-    "CAPEC-393",
-    "CAPEC-394",
-    "CAPEC-395",
-    "CAPEC-396",
-    "CAPEC-397",
-    "CAPEC-398",
-    "CAPEC-399",
-    "CAPEC-400",
-    "CAPEC-401",
-    "CAPEC-402",
-    "CAPEC-403",
-    "CAPEC-404",
-    "CAPEC-405",
-    "CAPEC-406",
-    "CAPEC-407",
-    "CAPEC-408",
-    "CAPEC-409",
-    "CAPEC-410",
-    "CAPEC-411",
-    "CAPEC-412",
-    "CAPEC-413",
-    "CAPEC-414",
-    "CAPEC-415",
-    "CAPEC-416",
-    "CAPEC-417",
-    "CAPEC-418",
-    "CAPEC-419",
-    "CAPEC-420",
-    "CAPEC-421",
-    "CAPEC-422",
-    "CAPEC-423",
-    "CAPEC-424",
-    "CAPEC-425",
-    "CAPEC-426",
-    "CAPEC-427",
-    "CAPEC-428",
-    "CAPEC-429",
-    "CAPEC-430",
-    "CAPEC-431",
-    "CAPEC-432",
-    "CAPEC-433",
-    "CAPEC-434",
-    "CAPEC-435",
-    "CAPEC-436",
-    "CAPEC-437",
-    "CAPEC-438",
-    "CAPEC-439",
-    "CAPEC-440",
-    "CAPEC-441",
-    "CAPEC-442",
-    "CAPEC-443",
-    "CAPEC-444",
-    "CAPEC-445",
-    "CAPEC-446",
-    "CAPEC-447",
-    "CAPEC-448",
-    "CAPEC-449",
-    "CAPEC-450",
-    "CAPEC-451",
-    "CAPEC-452",
-    "CAPEC-453",
-    "CAPEC-454",
-    "CAPEC-455",
-    "CAPEC-456",
-    "CAPEC-457",
-    "CAPEC-458",
-    "CAPEC-459",
-    "CAPEC-460",
-    "CAPEC-461",
-    "CAPEC-462",
-    "CAPEC-463",
-    "CAPEC-464",
-    "CAPEC-465",
-    "CAPEC-466",
-    "CAPEC-467",
-    "CAPEC-468",
-    "CAPEC-469",
-    "CAPEC-470",
-    "CAPEC-471",
-    "CAPEC-472",
-    "CAPEC-473",
-    "CAPEC-474",
-    "CAPEC-475",
-    "CAPEC-476",
-    "CAPEC-477",
-    "CAPEC-478",
-    "CAPEC-479",
-    "CAPEC-480",
-    "CAPEC-481",
-    "CAPEC-482",
-    "CAPEC-483",
-    "CAPEC-484",
-    "CAPEC-485",
-    "CAPEC-486",
-    "CAPEC-487",
-    "CAPEC-488",
-    "CAPEC-489",
-    "CAPEC-490",
-    "CAPEC-491",
-    "CAPEC-492",
-    "CAPEC-493",
-    "CAPEC-494",
-    "CAPEC-495",
-    "CAPEC-496",
-    "CAPEC-497",
-    "CAPEC-498",
-    "CAPEC-499",
-    "CAPEC-500",
-    "CAPEC-501",
-    "CAPEC-502",
-    "CAPEC-503",
-    "CAPEC-504",
-    "CAPEC-505",
-    "CAPEC-506",
-    "CAPEC-507",
-    "CAPEC-508",
-    "CAPEC-509",
-    "CAPEC-510",
-    "CAPEC-511",
-    "CAPEC-512",
-    "CAPEC-513",
-    "CAPEC-514",
-    "CAPEC-515",
-    "CAPEC-516",
-    "CAPEC-517",
-    "CAPEC-518",
-    "CAPEC-519",
-    "CAPEC-520",
-    "CAPEC-521",
-    "CAPEC-522",
-    "CAPEC-523",
-    "CAPEC-524",
-    "CAPEC-525",
-    "CAPEC-526",
-    "CAPEC-527",
-    "CAPEC-528",
-    "CAPEC-529",
-    "CAPEC-530",
-    "CAPEC-531",
-    "CAPEC-532",
-    "CAPEC-533",
-    "CAPEC-534",
-    "CAPEC-535",
-    "CAPEC-536",
-    "CAPEC-537",
-    "CAPEC-538",
-    "CAPEC-539",
-    "CAPEC-540",
-    "CAPEC-541",
-    "CAPEC-542",
-    "CAPEC-543",
-    "CAPEC-544",
-    "CAPEC-545",
-    "CAPEC-546",
-    "CAPEC-547",
-    "CAPEC-548",
-    "CAPEC-549",
-    "CAPEC-550",
-    "CAPEC-551",
-    "CAPEC-552",
-    "CAPEC-553",
-    "CAPEC-554",
-    "CAPEC-555",
-    "CAPEC-556",
-    "CAPEC-557",
-    "CAPEC-558",
-    "CAPEC-559",
-    "CAPEC-560",
-    "CAPEC-561",
-    "CAPEC-562",
-    "CAPEC-563",
-    "CAPEC-564",
-    "CAPEC-565",
-    "CAPEC-566",
-    "CAPEC-567",
-    "CAPEC-568",
-    "CAPEC-569",
-    "CAPEC-570",
-    "CAPEC-571",
-    "CAPEC-572",
-    "CAPEC-573",
-    "CAPEC-574",
-    "CAPEC-575",
-    "CAPEC-576",
-    "CAPEC-577",
-    "CAPEC-578",
-    "CAPEC-579",
-    "CAPEC-580",
-    "CAPEC-581",
-    "CAPEC-582",
-    "CAPEC-583",
-    "CAPEC-584",
-    "CAPEC-585",
-    "CAPEC-586",
-    "CAPEC-587",
-    "CAPEC-588",
-    "CAPEC-589",
-    "CAPEC-590",
-    "CAPEC-591",
-    "CAPEC-592",
-    "CAPEC-593",
-    "CAPEC-594",
-    "CAPEC-595",
-    "CAPEC-596",
-    "CAPEC-597",
-    "CAPEC-598",
-    "CAPEC-599",
-    "CAPEC-600",
-    "CAPEC-601",
-    "CAPEC-602",
-    "CAPEC-603",
-    "CAPEC-604",
-    "CAPEC-605",
-    "CAPEC-606",
-    "CAPEC-607",
-    "CAPEC-608",
-    "CAPEC-609",
-    "CAPEC-610",
-    "CAPEC-611",
-    "CAPEC-612",
-    "CAPEC-613",
-    "CAPEC-614",
-    "CAPEC-615",
-    "CAPEC-616",
-    "CAPEC-617",
-    "CAPEC-618",
-    "CAPEC-619",
-    "CAPEC-620",
-    "CAPEC-621",
-    "CAPEC-622",
-    "CAPEC-623",
-    "CAPEC-624",
-    "CAPEC-625",
-    "CAPEC-626",
-    "CAPEC-627",
-    "CAPEC-628",
-    "CAPEC-629",
-    "CAPEC-630",
-    "CAPEC-631",
-    "CAPEC-632",
-    "CAPEC-633",
-    "CAPEC-634",
-    "CAPEC-635",
-    "CAPEC-636",
-    "CAPEC-637",
-    "CAPEC-638",
-    "CAPEC-639",
-    "CAPEC-640",
-    "CAPEC-641",
-    "CAPEC-642",
-    "CAPEC-643",
-    "CAPEC-644",
-    "CAPEC-645",
-    "CAPEC-646",
-    "CAPEC-647",
-    "CAPEC-648",
-    "CAPEC-649",
-    "CAPEC-650",
-    "CAPEC-651",
-    "CAPEC-652",
-    "CAPEC-653",
-    "CAPEC-654",
-    "CAPEC-655",
-    "CAPEC-656",
-    "CAPEC-657",
-    "CAPEC-658",
-    "CAPEC-659",
-    "CAPEC-660",
-    "CAPEC-661",
-    "CAPEC-662",
-    "CAPEC-663",
-    "CAPEC-664",
-    "CAPEC-665",
-    "CAPEC-666",
-    "CAPEC-667",
-    "CAPEC-668",
-    "CAPEC-669",
-    "CAPEC-670",
-    "CAPEC-671",
-    "CAPEC-672",
-    "CAPEC-673",
-    "CAPEC-674",
-    "CAPEC-675",
-    "CAPEC-676",
-    "CAPEC-677",
-    "CAPEC-678",
-    "CAPEC-679",
-    "CAPEC-680",
-    "CAPEC-681",
-    "CAPEC-682",
-    "CAPEC-683",
-    "CAPEC-684",
-    "CAPEC-685",
-    "CAPEC-686",
-    "CAPEC-687",
-    "CAPEC-688",
-    "CAPEC-689",
-    "CAPEC-690",
-    "CAPEC-691",
-    "CAPEC-692",
-    "CAPEC-693",
-    "CAPEC-694",
-    "CAPEC-695",
-    "CAPEC-696",
-    "CAPEC-697",
-    "CAPEC-698",
-    "CAPEC-699",
-    "CAPEC-700"
-  ],
-  "Denial of Service": [
-    "CAPEC-125",
-    "CAPEC-130",
-    "CAPEC-131",
-    "CAPEC-132",
-    "CAPEC-133",
-    "CAPEC-134",
-    "CAPEC-135",
-    "CAPEC-136",
-    "CAPEC-137",
-    "CAPEC-138",
-    "CAPEC-139",
-    "CAPEC-140",
-    "CAPEC-141",
-    "CAPEC-142",
-    "CAPEC-143",
-    "CAPEC-144",
-    "CAPEC-145",
-    "CAPEC-146",
-    "CAPEC-147",
-    "CAPEC-148",
-    "CAPEC-149",
-    "CAPEC-150",
-    "CAPEC-151",
-    "CAPEC-152",
-    "CAPEC-153",
-    "CAPEC-154",
-    "CAPEC-155",
-    "CAPEC-156",
-    "CAPEC-157",
-    "CAPEC-158",
-    "CAPEC-159",
-    "CAPEC-160",
-    "CAPEC-161",
-    "CAPEC-162",
-    "CAPEC-163",
-    "CAPEC-164",
-    "CAPEC-165",
-    "CAPEC-166",
-    "CAPEC-167",
-    "CAPEC-168",
-    "CAPEC-169",
-    "CAPEC-170",
-    "CAPEC-171",
-    "CAPEC-172",
-    "CAPEC-173",
-    "CAPEC-174",
-    "CAPEC-175",
-    "CAPEC-176",
-    "CAPEC-177",
-    "CAPEC-178",
-    "CAPEC-179",
-    "CAPEC-180",
-    "CAPEC-181",
-    "CAPEC-182",
-    "CAPEC-183",
-    "CAPEC-184",
-    "CAPEC-185",
-    "CAPEC-186",
-    "CAPEC-187",
-    "CAPEC-188",
-    "CAPEC-189",
-    "CAPEC-190",
-    "CAPEC-191",
-    "CAPEC-192",
-    "CAPEC-193",
-    "CAPEC-194",
-    "CAPEC-195",
-    "CAPEC-196",
-    "CAPEC-197",
-    "CAPEC-198",
-    "CAPEC-199",
-    "CAPEC-200",
-    "CAPEC-201",
-    "CAPEC-202",
-    "CAPEC-203",
-    "CAPEC-204",
-    "CAPEC-205",
-    "CAPEC-206",
-    "CAPEC-207",
-    "CAPEC-208",
-    "CAPEC-209",
-    "CAPEC-210",
-    "CAPEC-211",
-    "CAPEC-212",
-    "CAPEC-213",
-    "CAPEC-214",
-    "CAPEC-215",
-    "CAPEC-216",
-    "CAPEC-217",
-    "CAPEC-218",
-    "CAPEC-219",
-    "CAPEC-220",
-    "CAPEC-221",
-    "CAPEC-222",
-    "CAPEC-223",
-    "CAPEC-224",
-    "CAPEC-225",
-    "CAPEC-226",
-    "CAPEC-227",
-    "CAPEC-228",
-    "CAPEC-229",
-    "CAPEC-230",
-    "CAPEC-231",
-    "CAPEC-232",
-    "CAPEC-233",
-    "CAPEC-234",
-    "CAPEC-235",
-    "CAPEC-236",
-    "CAPEC-237",
-    "CAPEC-238",
-    "CAPEC-239",
-    "CAPEC-240",
-    "CAPEC-241",
-    "CAPEC-242",
-    "CAPEC-243",
-    "CAPEC-244",
-    "CAPEC-245",
-    "CAPEC-246",
-    "CAPEC-247",
-    "CAPEC-248",
-    "CAPEC-249",
-    "CAPEC-250",
-    "CAPEC-251",
-    "CAPEC-252",
-    "CAPEC-253",
-    "CAPEC-254",
-    "CAPEC-255",
-    "CAPEC-256",
-    "CAPEC-257",
-    "CAPEC-258",
-    "CAPEC-259",
-    "CAPEC-260",
-    "CAPEC-261",
-    "CAPEC-262",
-    "CAPEC-263",
-    "CAPEC-264",
-    "CAPEC-265",
-    "CAPEC-266",
-    "CAPEC-267",
-    "CAPEC-268",
-    "CAPEC-269",
-    "CAPEC-270",
-    "CAPEC-271",
-    "CAPEC-272",
-    "CAPEC-273",
-    "CAPEC-274",
-    "CAPEC-275",
-    "CAPEC-276",
-    "CAPEC-277",
-    "CAPEC-278",
-    "CAPEC-279",
-    "CAPEC-280",
-    "CAPEC-281",
-    "CAPEC-282",
-    "CAPEC-283",
-    "CAPEC-284",
-    "CAPEC-285",
-    "CAPEC-286",
-    "CAPEC-287",
-    "CAPEC-288",
-    "CAPEC-289",
-    "CAPEC-290",
-    "CAPEC-291",
-    "CAPEC-292",
-    "CAPEC-293",
-    "CAPEC-294",
-    "CAPEC-295",
-    "CAPEC-296",
-    "CAPEC-297",
-    "CAPEC-298",
-    "CAPEC-299",
-    "CAPEC-300",
-    "CAPEC-301",
-    "CAPEC-302",
-    "CAPEC-303",
-    "CAPEC-304",
-    "CAPEC-305",
-    "CAPEC-306",
-    "CAPEC-307",
-    "CAPEC-308",
-    "CAPEC-309",
-    "CAPEC-310",
-    "CAPEC-311",
-    "CAPEC-312",
-    "CAPEC-313",
-    "CAPEC-314",
-    "CAPEC-315",
-    "CAPEC-316",
-    "CAPEC-317",
-    "CAPEC-318",
-    "CAPEC-319",
-    "CAPEC-320",
-    "CAPEC-321",
-    "CAPEC-322",
-    "CAPEC-323",
-    "CAPEC-324",
-    "CAPEC-325",
-    "CAPEC-326",
-    "CAPEC-327",
-    "CAPEC-328",
-    "CAPEC-329",
-    "CAPEC-330",
-    "CAPEC-331",
-    "CAPEC-332",
-    "CAPEC-333",
-    "CAPEC-334",
-    "CAPEC-335",
-    "CAPEC-336",
-    "CAPEC-337",
-    "CAPEC-338",
-    "CAPEC-339",
-    "CAPEC-340",
-    "CAPEC-341",
-    "CAPEC-342",
-    "CAPEC-343",
-    "CAPEC-344",
-    "CAPEC-345",
-    "CAPEC-346",
-    "CAPEC-347",
-    "CAPEC-348",
-    "CAPEC-349",
-    "CAPEC-350",
-    "CAPEC-351",
-    "CAPEC-352",
-    "CAPEC-353",
-    "CAPEC-354",
-    "CAPEC-355",
-    "CAPEC-356",
-    "CAPEC-357",
-    "CAPEC-358",
-    "CAPEC-359",
-    "CAPEC-360",
-    "CAPEC-361",
-    "CAPEC-362",
-    "CAPEC-363",
-    "CAPEC-364",
-    "CAPEC-365",
-    "CAPEC-366",
-    "CAPEC-367",
-    "CAPEC-368",
-    "CAPEC-369",
-    "CAPEC-370",
-    "CAPEC-371",
-    "CAPEC-372",
-    "CAPEC-373",
-    "CAPEC-374",
-    "CAPEC-375",
-    "CAPEC-376",
-    "CAPEC-377",
-    "CAPEC-378",
-    "CAPEC-379",
-    "CAPEC-380",
-    "CAPEC-381",
-    "CAPEC-382",
-    "CAPEC-383",
-    "CAPEC-384",
-    "CAPEC-385",
-    "CAPEC-386",
-    "CAPEC-387",
-    "CAPEC-388",
-    "CAPEC-389",
-    "CAPEC-390",
-    "CAPEC-391",
-    "CAPEC-392",
-    "CAPEC-393",
-    "CAPEC-394",
-    "CAPEC-395",
-    "CAPEC-396",
-    "CAPEC-397",
-    "CAPEC-398",
-    "CAPEC-399",
-    "CAPEC-400",
-    "CAPEC-401",
-    "CAPEC-402",
-    "CAPEC-403",
-    "CAPEC-404",
-    "CAPEC-405",
-    "CAPEC-406",
-    "CAPEC-407",
-    "CAPEC-408",
-    "CAPEC-409",
-    "CAPEC-410",
-    "CAPEC-411",
-    "CAPEC-412",
-    "CAPEC-413",
-    "CAPEC-414",
-    "CAPEC-415",
-    "CAPEC-416",
-    "CAPEC-417",
-    "CAPEC-418",
-    "CAPEC-419",
-    "CAPEC-420",
-    "CAPEC-421",
-    "CAPEC-422",
-    "CAPEC-423",
-    "CAPEC-424",
-    "CAPEC-425",
-    "CAPEC-426",
-    "CAPEC-427",
-    "CAPEC-428",
-    "CAPEC-429",
-    "CAPEC-430",
-    "CAPEC-431",
-    "CAPEC-432",
-    "CAPEC-433",
-    "CAPEC-434",
-    "CAPEC-435",
-    "CAPEC-436",
-    "CAPEC-437",
-    "CAPEC-438",
-    "CAPEC-439",
-    "CAPEC-440",
-    "CAPEC-441",
-    "CAPEC-442",
-    "CAPEC-443",
-    "CAPEC-444",
-    "CAPEC-445",
-    "CAPEC-446",
-    "CAPEC-447",
-    "CAPEC-448",
-    "CAPEC-449",
-    "CAPEC-450",
-    "CAPEC-451",
-    "CAPEC-452",
-    "CAPEC-453",
-    "CAPEC-454",
-    "CAPEC-455",
-    "CAPEC-456",
-    "CAPEC-457",
-    "CAPEC-458",
-    "CAPEC-459",
-    "CAPEC-460",
-    "CAPEC-461",
-    "CAPEC-462",
-    "CAPEC-463",
-    "CAPEC-464",
-    "CAPEC-465",
-    "CAPEC-466",
-    "CAPEC-467",
-    "CAPEC-468",
-    "CAPEC-469",
-    "CAPEC-470",
-    "CAPEC-471",
-    "CAPEC-472",
-    "CAPEC-473",
-    "CAPEC-474",
-    "CAPEC-475",
-    "CAPEC-476",
-    "CAPEC-477",
-    "CAPEC-478",
-    "CAPEC-479",
-    "CAPEC-480",
-    "CAPEC-481",
-    "CAPEC-482",
-    "CAPEC-483",
-    "CAPEC-484",
-    "CAPEC-485",
-    "CAPEC-486",
-    "CAPEC-487",
-    "CAPEC-488",
-    "CAPEC-489",
-    "CAPEC-490",
-    "CAPEC-491",
-    "CAPEC-492",
-    "CAPEC-493",
-    "CAPEC-494",
-    "CAPEC-495",
-    "CAPEC-496",
-    "CAPEC-497",
-    "CAPEC-498",
-    "CAPEC-499",
-    "CAPEC-500",
-    "CAPEC-501",
-    "CAPEC-502",
-    "CAPEC-503",
-    "CAPEC-504",
-    "CAPEC-505",
-    "CAPEC-506",
-    "CAPEC-507",
-    "CAPEC-508",
-    "CAPEC-509",
-    "CAPEC-510",
-    "CAPEC-511",
-    "CAPEC-512",
-    "CAPEC-513",
-    "CAPEC-514",
-    "CAPEC-515",
-    "CAPEC-516",
-    "CAPEC-517",
-    "CAPEC-518",
-    "CAPEC-519",
-    "CAPEC-520",
-    "CAPEC-521",
-    "CAPEC-522",
-    "CAPEC-523",
-    "CAPEC-524",
-    "CAPEC-525",
-    "CAPEC-526",
-    "CAPEC-527",
-    "CAPEC-528",
-    "CAPEC-529",
-    "CAPEC-530",
-    "CAPEC-531",
-    "CAPEC-532",
-    "CAPEC-533",
-    "CAPEC-534",
-    "CAPEC-535",
-    "CAPEC-536",
-    "CAPEC-537",
-    "CAPEC-538",
-    "CAPEC-539",
-    "CAPEC-540",
-    "CAPEC-541",
-    "CAPEC-542",
-    "CAPEC-543",
-    "CAPEC-544",
-    "CAPEC-545",
-    "CAPEC-546",
-    "CAPEC-547",
-    "CAPEC-548",
-    "CAPEC-549",
-    "CAPEC-550",
-    "CAPEC-551",
-    "CAPEC-552",
-    "CAPEC-553",
-    "CAPEC-554",
-    "CAPEC-555",
-    "CAPEC-556",
-    "CAPEC-557",
-    "CAPEC-558",
-    "CAPEC-559",
-    "CAPEC-560",
-    "CAPEC-561",
-    "CAPEC-562",
-    "CAPEC-563",
-    "CAPEC-564",
-    "CAPEC-565",
-    "CAPEC-566",
-    "CAPEC-567",
-    "CAPEC-568",
-    "CAPEC-569",
-    "CAPEC-570",
-    "CAPEC-571",
-    "CAPEC-572",
-    "CAPEC-573",
-    "CAPEC-574",
-    "CAPEC-575",
-    "CAPEC-576",
-    "CAPEC-577",
-    "CAPEC-578",
-    "CAPEC-579",
-    "CAPEC-580",
-    "CAPEC-581",
-    "CAPEC-582",
-    "CAPEC-583",
-    "CAPEC-584",
-    "CAPEC-585",
-    "CAPEC-586",
-    "CAPEC-587",
-    "CAPEC-588",
-    "CAPEC-589",
-    "CAPEC-590",
-    "CAPEC-591",
-    "CAPEC-592",
-    "CAPEC-593",
-    "CAPEC-594",
-    "CAPEC-595",
-    "CAPEC-596",
-    "CAPEC-597",
-    "CAPEC-598",
-    "CAPEC-599",
-    "CAPEC-600",
-    "CAPEC-601",
-    "CAPEC-602",
-    "CAPEC-603",
-    "CAPEC-604",
-    "CAPEC-605",
-    "CAPEC-606",
-    "CAPEC-607",
-    "CAPEC-608",
-    "CAPEC-609",
-    "CAPEC-610",
-    "CAPEC-611",
-    "CAPEC-612",
-    "CAPEC-613",
-    "CAPEC-614",
-    "CAPEC-615",
-    "CAPEC-616",
-    "CAPEC-617",
-    "CAPEC-618",
-    "CAPEC-619",
-    "CAPEC-620",
-    "CAPEC-621",
-    "CAPEC-622",
-    "CAPEC-623",
-    "CAPEC-624",
-    "CAPEC-625",
-    "CAPEC-626",
-    "CAPEC-627",
-    "CAPEC-628",
-    "CAPEC-629",
-    "CAPEC-630",
-    "CAPEC-631",
-    "CAPEC-632",
-    "CAPEC-633",
-    "CAPEC-634",
-    "CAPEC-635",
-    "CAPEC-636",
-    "CAPEC-637",
-    "CAPEC-638",
-    "CAPEC-639",
-    "CAPEC-640",
-    "CAPEC-641",
-    "CAPEC-642",
-    "CAPEC-643",
-    "CAPEC-644",
-    "CAPEC-645",
-    "CAPEC-646",
-    "CAPEC-647",
-    "CAPEC-648",
-    "CAPEC-649",
-    "CAPEC-650",
-    "CAPEC-651",
-    "CAPEC-652",
-    "CAPEC-653",
-    "CAPEC-654",
-    "CAPEC-655",
-    "CAPEC-656",
-    "CAPEC-657",
-    "CAPEC-658",
-    "CAPEC-659",
-    "CAPEC-660",
-    "CAPEC-661",
-    "CAPEC-662",
-    "CAPEC-663",
-    "CAPEC-664",
-    "CAPEC-665",
-    "CAPEC-666",
-    "CAPEC-667",
-    "CAPEC-668",
-    "CAPEC-669",
-    "CAPEC-670",
-    "CAPEC-671",
-    "CAPEC-672",
-    "CAPEC-673",
-    "CAPEC-674",
-    "CAPEC-675",
-    "CAPEC-676",
-    "CAPEC-677",
-    "CAPEC-678",
-    "CAPEC-679",
-    "CAPEC-680",
-    "CAPEC-681",
-    "CAPEC-682",
-    "CAPEC-683",
-    "CAPEC-684",
-    "CAPEC-685",
-    "CAPEC-686",
-    "CAPEC-687",
-    "CAPEC-688",
-    "CAPEC-689",
-    "CAPEC-690",
-    "CAPEC-691",
-    "CAPEC-692",
-    "CAPEC-693",
-    "CAPEC-694",
-    "CAPEC-695",
-    "CAPEC-696",
-    "CAPEC-697",
-    "CAPEC-698",
-    "CAPEC-699",
-    "CAPEC-700"
-  ],
-  "Elevation of Privilege": [
-    "CAPEC-21",
-    "CAPEC-24",
-    "CAPEC-26",
-    "CAPEC-27",
-    "CAPEC-30",
-    "CAPEC-31",
-    "CAPEC-32",
-    "CAPEC-33",
-    "CAPEC-34",
-    "CAPEC-35",
-    "CAPEC-36",
-    "CAPEC-37",
-    "CAPEC-58",
-    "CAPEC-59",
-    "CAPEC-60",
-    "CAPEC-61",
-    "CAPEC-62",
-    "CAPEC-63",
-    "CAPEC-64",
-    "CAPEC-65",
-    "CAPEC-78",
-    "CAPEC-79",
-    "CAPEC-80",
-    "CAPEC-81",
-    "CAPEC-82",
-    "CAPEC-83",
-    "CAPEC-84",
-    "CAPEC-85",
-    "CAPEC-94",
-    "CAPEC-123",
-    "CAPEC-124",
-    "CAPEC-129",
-    "CAPEC-130",
-    "CAPEC-131",
-    "CAPEC-132",
-    "CAPEC-133",
-    "CAPEC-134",
-    "CAPEC-135",
-    "CAPEC-136",
-    "CAPEC-137",
-    "CAPEC-138",
-    "CAPEC-139",
-    "CAPEC-140",
-    "CAPEC-141",
-    "CAPEC-142",
-    "CAPEC-143",
-    "CAPEC-144",
-    "CAPEC-145",
-    "CAPEC-146",
-    "CAPEC-147",
-    "CAPEC-153",
-    "CAPEC-177",
-    "CAPEC-233",
-    "CAPEC-268",
-    "CAPEC-272",
-    "CAPEC-273",
-    "CAPEC-274",
-    "CAPEC-275",
-    "CAPEC-276",
-    "CAPEC-277",
-    "CAPEC-278",
-    "CAPEC-279",
-    "CAPEC-280",
-    "CAPEC-281",
-    "CAPEC-282",
-    "CAPEC-283",
-    "CAPEC-284",
-    "CAPEC-285",
-    "CAPEC-286",
-    "CAPEC-287",
-    "CAPEC-288",
-    "CAPEC-289",
-    "CAPEC-290",
-    "CAPEC-461",
-    "CAPEC-462",
-    "CAPEC-463",
-    "CAPEC-464",
-    "CAPEC-465",
-    "CAPEC-466",
-    "CAPEC-467",
-    "CAPEC-468",
-    "CAPEC-469",
-    "CAPEC-470",
-    "CAPEC-471",
-    "CAPEC-472",
-    "CAPEC-473",
-    "CAPEC-557",
-    "CAPEC-558",
-    "CAPEC-559",
-    "CAPEC-560",
-    "CAPEC-561",
-    "CAPEC-562",
-    "CAPEC-563",
-    "CAPEC-564",
-    "CAPEC-565",
-    "CAPEC-566",
-    "CAPEC-567",
-    "CAPEC-568",
-    "CAPEC-569",
-    "CAPEC-570",
-    "CAPEC-571",
-    "CAPEC-572",
-    "CAPEC-573",
-    "CAPEC-574",
-    "CAPEC-575",
-    "CAPEC-576",
-    "CAPEC-577",
-    "CAPEC-578",
-    "CAPEC-579",
-    "CAPEC-580",
-    "CAPEC-581",
-    "CAPEC-582",
-    "CAPEC-583",
-    "CAPEC-584",
-    "CAPEC-585",
-    "CAPEC-586",
-    "CAPEC-587",
-    "CAPEC-588",
-    "CAPEC-589",
-    "CAPEC-590",
-    "CAPEC-591",
-    "CAPEC-592",
-    "CAPEC-593",
-    "CAPEC-594",
-    "CAPEC-595",
-    "CAPEC-596",
-    "CAPEC-597",
-    "CAPEC-598",
-    "CAPEC-599",
-    "CAPEC-600",
-    "CAPEC-601",
-    "CAPEC-602",
-    "CAPEC-603",
-    "CAPEC-604",
-    "CAPEC-605",
-    "CAPEC-606",
-    "CAPEC-607",
-    "CAPEC-608",
-    "CAPEC-609",
-    "CAPEC-610",
-    "CAPEC-611",
-    "CAPEC-612",
-    "CAPEC-613",
-    "CAPEC-614",
-    "CAPEC-615",
-    "CAPEC-616",
-    "CAPEC-617",
-    "CAPEC-618",
-    "CAPEC-619",
-    "CAPEC-620",
-    "CAPEC-621",
-    "CAPEC-622",
-    "CAPEC-623",
-    "CAPEC-624",
-    "CAPEC-625",
-    "CAPEC-626",
-    "CAPEC-627",
-    "CAPEC-628",
-    "CAPEC-629",
-    "CAPEC-630",
-    "CAPEC-631",
-    "CAPEC-632",
-    "CAPEC-633",
-    "CAPEC-634",
-    "CAPEC-635",
-    "CAPEC-636",
-    "CAPEC-637",
-    "CAPEC-638",
-    "CAPEC-639",
-    "CAPEC-640",
-    "CAPEC-641",
-    "CAPEC-642",
-    "CAPEC-643",
-    "CAPEC-644",
-    "CAPEC-645",
-    "CAPEC-646",
-    "CAPEC-647",
-    "CAPEC-648",
-    "CAPEC-649",
-    "CAPEC-650",
-    "CAPEC-651",
-    "CAPEC-652",
-    "CAPEC-653",
-    "CAPEC-654",
-    "CAPEC-655",
-    "CAPEC-656",
-    "CAPEC-657",
-    "CAPEC-658",
-    "CAPEC-659",
-    "CAPEC-660",
-    "CAPEC-661",
-    "CAPEC-662",
-    "CAPEC-663",
-    "CAPEC-664",
-    "CAPEC-665",
-    "CAPEC-666",
-    "CAPEC-667",
-    "CAPEC-668",
-    "CAPEC-669",
-    "CAPEC-670",
-    "CAPEC-671",
-    "CAPEC-672",
-    "CAPEC-673",
-    "CAPEC-674",
-    "CAPEC-675",
-    "CAPEC-676",
-    "CAPEC-677",
-    "CAPEC-678",
-    "CAPEC-679",
-    "CAPEC-680",
-    "CAPEC-681",
-    "CAPEC-682",
-    "CAPEC-683",
-    "CAPEC-684",
-    "CAPEC-685",
-    "CAPEC-686",
-    "CAPEC-687",
-    "CAPEC-688",
-    "CAPEC-689",
-    "CAPEC-690",
-    "CAPEC-691",
-    "CAPEC-692",
-    "CAPEC-693",
-    "CAPEC-694",
-    "CAPEC-695",
-    "CAPEC-696",
-    "CAPEC-697",
-    "CAPEC-698",
-    "CAPEC-699",
-    "CAPEC-700"
-  ]
+    "Denial of Service": [
+        {
+            "capec_id": "CAPEC-125",
+            "description": "Flooding"
+        },
+        {
+            "capec_id": "CAPEC-130",
+            "description": "Excessive Allocation"
+        },
+        {
+            "capec_id": "CAPEC-131",
+            "description": "Resource Leak Exposure"
+        },
+        {
+            "capec_id": "CAPEC-147",
+            "description": "XML Ping of the Death"
+        },
+        {
+            "capec_id": "CAPEC-197",
+            "description": "Exponential Data Expansion"
+        },
+        {
+            "capec_id": "CAPEC-2",
+            "description": "Inducing Account Lockout"
+        },
+        {
+            "capec_id": "CAPEC-201",
+            "description": "Serialized Data External Linking"
+        },
+        {
+            "capec_id": "CAPEC-227",
+            "description": "Sustained Client Engagement"
+        },
+        {
+            "capec_id": "CAPEC-229",
+            "description": "Serialized Data Parameter Blowup"
+        },
+        {
+            "capec_id": "CAPEC-230",
+            "description": "Serialized Data with Nested Payloads"
+        },
+        {
+            "capec_id": "CAPEC-231",
+            "description": "Oversized Serialized Data Payloads"
+        },
+        {
+            "capec_id": "CAPEC-25",
+            "description": "Forced Deadlock"
+        },
+        {
+            "capec_id": "CAPEC-469",
+            "description": "HTTP DoS"
+        },
+        {
+            "capec_id": "CAPEC-482",
+            "description": "TCP Flood"
+        },
+        {
+            "capec_id": "CAPEC-486",
+            "description": "UDP Flood"
+        },
+        {
+            "capec_id": "CAPEC-487",
+            "description": "ICMP Flood"
+        },
+        {
+            "capec_id": "CAPEC-488",
+            "description": "HTTP Flood"
+        },
+        {
+            "capec_id": "CAPEC-489",
+            "description": "SSL Flood"
+        },
+        {
+            "capec_id": "CAPEC-490",
+            "description": "Amplification"
+        },
+        {
+            "capec_id": "CAPEC-491",
+            "description": "Quadratic Data Expansion"
+        },
+        {
+            "capec_id": "CAPEC-492",
+            "description": "Regular Expression Exponential Blowup"
+        },
+        {
+            "capec_id": "CAPEC-493",
+            "description": "SOAP Array Blowup"
+        },
+        {
+            "capec_id": "CAPEC-494",
+            "description": "TCP Fragmentation"
+        },
+        {
+            "capec_id": "CAPEC-495",
+            "description": "UDP Fragmentation"
+        },
+        {
+            "capec_id": "CAPEC-496",
+            "description": "ICMP Fragmentation"
+        },
+        {
+            "capec_id": "CAPEC-528",
+            "description": "XML Flood"
+        },
+        {
+            "capec_id": "CAPEC-547",
+            "description": "Physical Destruction of Device or Component"
+        },
+        {
+            "capec_id": "CAPEC-559",
+            "description": "Orbital Jamming"
+        },
+        {
+            "capec_id": "CAPEC-582",
+            "description": "Route Disabling"
+        },
+        {
+            "capec_id": "CAPEC-583",
+            "description": "Disabling Network Hardware"
+        },
+        {
+            "capec_id": "CAPEC-584",
+            "description": "BGP Route Disabling"
+        },
+        {
+            "capec_id": "CAPEC-585",
+            "description": "DNS Domain Seizure"
+        },
+        {
+            "capec_id": "CAPEC-589",
+            "description": "DNS Blocking"
+        },
+        {
+            "capec_id": "CAPEC-590",
+            "description": "IP Address Blocking"
+        },
+        {
+            "capec_id": "CAPEC-601",
+            "description": "Jamming"
+        },
+        {
+            "capec_id": "CAPEC-603",
+            "description": "Blockage"
+        },
+        {
+            "capec_id": "CAPEC-604",
+            "description": "Wi-Fi Jamming"
+        },
+        {
+            "capec_id": "CAPEC-605",
+            "description": "Cellular Jamming"
+        },
+        {
+            "capec_id": "CAPEC-607",
+            "description": "Obstruction"
+        },
+        {
+            "capec_id": "CAPEC-666",
+            "description": "BlueSmacking"
+        },
+        {
+            "capec_id": "CAPEC-96",
+            "description": "Block Access to Libraries"
+        }
+    ],
+    "Elevation of Privilege": [
+        {
+            "capec_id": "CAPEC-1",
+            "description": "Accessing Functionality Not Properly Constrained by ACLs"
+        },
+        {
+            "capec_id": "CAPEC-101",
+            "description": "Server Side Include (SSI) Injection"
+        },
+        {
+            "capec_id": "CAPEC-102",
+            "description": "Session Sidejacking"
+        },
+        {
+            "capec_id": "CAPEC-104",
+            "description": "Cross Zone Scripting"
+        },
+        {
+            "capec_id": "CAPEC-107",
+            "description": "Cross Site Tracing"
+        },
+        {
+            "capec_id": "CAPEC-108",
+            "description": "Command Line Execution through SQL Injection"
+        },
+        {
+            "capec_id": "CAPEC-109",
+            "description": "Object Relational Mapping Injection"
+        },
+        {
+            "capec_id": "CAPEC-110",
+            "description": "SQL Injection through SOAP Parameter Tampering"
+        },
+        {
+            "capec_id": "CAPEC-112",
+            "description": "Brute Force"
+        },
+        {
+            "capec_id": "CAPEC-114",
+            "description": "Authentication Abuse"
+        },
+        {
+            "capec_id": "CAPEC-115",
+            "description": "Authentication Bypass"
+        },
+        {
+            "capec_id": "CAPEC-121",
+            "description": "Exploit Non-Production Interfaces"
+        },
+        {
+            "capec_id": "CAPEC-122",
+            "description": "Privilege Abuse"
+        },
+        {
+            "capec_id": "CAPEC-13",
+            "description": "Subverting Environment Variable Values"
+        },
+        {
+            "capec_id": "CAPEC-134",
+            "description": "Email Injection"
+        },
+        {
+            "capec_id": "CAPEC-135",
+            "description": "Format String Injection"
+        },
+        {
+            "capec_id": "CAPEC-137",
+            "description": "Parameter Injection"
+        },
+        {
+            "capec_id": "CAPEC-138",
+            "description": "Reflection Injection"
+        },
+        {
+            "capec_id": "CAPEC-15",
+            "description": "Command Delimiters"
+        },
+        {
+            "capec_id": "CAPEC-16",
+            "description": "Dictionary Based Password Attack"
+        },
+        {
+            "capec_id": "CAPEC-162",
+            "description": "Manipulating Hidden Fields"
+        },
+        {
+            "capec_id": "CAPEC-17",
+            "description": "Using Malicious Files"
+        },
+        {
+            "capec_id": "CAPEC-174",
+            "description": "Flash Parameter Injection"
+        },
+        {
+            "capec_id": "CAPEC-175",
+            "description": "Code Inclusion"
+        },
+        {
+            "capec_id": "CAPEC-177",
+            "description": "Create files with the same name as files protected with a higher classification"
+        },
+        {
+            "capec_id": "CAPEC-178",
+            "description": "Cross-Site Flashing"
+        },
+        {
+            "capec_id": "CAPEC-18",
+            "description": "XSS Through Non-Script Elements"
+        },
+        {
+            "capec_id": "CAPEC-180",
+            "description": "Exploiting Incorrectly Configured Access Control Security Levels"
+        },
+        {
+            "capec_id": "CAPEC-182",
+            "description": "Flash Injection"
+        },
+        {
+            "capec_id": "CAPEC-19",
+            "description": "Embedding Scripts within Scripts"
+        },
+        {
+            "capec_id": "CAPEC-193",
+            "description": "PHP Remote File Inclusion"
+        },
+        {
+            "capec_id": "CAPEC-196",
+            "description": "Session Credential Falsification through Forging"
+        },
+        {
+            "capec_id": "CAPEC-198",
+            "description": "XSS Targeting Error Pages"
+        },
+        {
+            "capec_id": "CAPEC-199",
+            "description": "XSS Using Alternate Syntax"
+        },
+        {
+            "capec_id": "CAPEC-20",
+            "description": "Encryption Brute Forcing"
+        },
+        {
+            "capec_id": "CAPEC-200",
+            "description": "Removal of filters: Input filters, output filters, data masking"
+        },
+        {
+            "capec_id": "CAPEC-202",
+            "description": "Create Malicious Client"
+        },
+        {
+            "capec_id": "CAPEC-207",
+            "description": "Removing Important Client Functionality"
+        },
+        {
+            "capec_id": "CAPEC-208",
+            "description": "Removing/short-circuiting 'Purse' logic: removing/mutating 'cash' decrements"
+        },
+        {
+            "capec_id": "CAPEC-209",
+            "description": "XSS Using MIME Type Mismatch"
+        },
+        {
+            "capec_id": "CAPEC-21",
+            "description": "Exploitation of Trusted Identifiers"
+        },
+        {
+            "capec_id": "CAPEC-219",
+            "description": "XML Routing Detour Attacks"
+        },
+        {
+            "capec_id": "CAPEC-22",
+            "description": "Exploiting Trust in Client"
+        },
+        {
+            "capec_id": "CAPEC-221",
+            "description": "Data Serialization External Entities Blowup"
+        },
+        {
+            "capec_id": "CAPEC-226",
+            "description": "Session Credential Falsification through Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-228",
+            "description": "DTD Injection"
+        },
+        {
+            "capec_id": "CAPEC-23",
+            "description": "File Content Injection"
+        },
+        {
+            "capec_id": "CAPEC-233",
+            "description": "Privilege Escalation"
+        },
+        {
+            "capec_id": "CAPEC-234",
+            "description": "Hijacking a privileged process"
+        },
+        {
+            "capec_id": "CAPEC-237",
+            "description": "Escaping a Sandbox by Calling Code in Another Language"
+        },
+        {
+            "capec_id": "CAPEC-240",
+            "description": "Resource Injection"
+        },
+        {
+            "capec_id": "CAPEC-242",
+            "description": "Code Injection"
+        },
+        {
+            "capec_id": "CAPEC-243",
+            "description": "XSS Targeting HTML Attributes"
+        },
+        {
+            "capec_id": "CAPEC-244",
+            "description": "XSS Targeting URI Placeholders"
+        },
+        {
+            "capec_id": "CAPEC-245",
+            "description": "XSS Using Doubled Characters"
+        },
+        {
+            "capec_id": "CAPEC-247",
+            "description": "XSS Using Invalid Characters"
+        },
+        {
+            "capec_id": "CAPEC-248",
+            "description": "Command Injection"
+        },
+        {
+            "capec_id": "CAPEC-251",
+            "description": "Local Code Inclusion"
+        },
+        {
+            "capec_id": "CAPEC-252",
+            "description": "PHP Local File Inclusion"
+        },
+        {
+            "capec_id": "CAPEC-253",
+            "description": "Remote Code Inclusion"
+        },
+        {
+            "capec_id": "CAPEC-263",
+            "description": "Force Use of Corrupted Files"
+        },
+        {
+            "capec_id": "CAPEC-30",
+            "description": "Hijacking a Privileged Thread of Execution"
+        },
+        {
+            "capec_id": "CAPEC-31",
+            "description": "Accessing/Intercepting/Modifying HTTP Cookies"
+        },
+        {
+            "capec_id": "CAPEC-32",
+            "description": "XSS Through HTTP Query String"
+        },
+        {
+            "capec_id": "CAPEC-35",
+            "description": "Leveraging Executable Code in Non-Executable Files"
+        },
+        {
+            "capec_id": "CAPEC-36",
+            "description": "Using Unpublished Interfaces"
+        },
+        {
+            "capec_id": "CAPEC-384",
+            "description": "Application API Message Manipulation via Man-in-the-Middle"
+        },
+        {
+            "capec_id": "CAPEC-385",
+            "description": "Transaction or Event Tampering via Application API Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-386",
+            "description": "Application API Navigation Remapping"
+        },
+        {
+            "capec_id": "CAPEC-387",
+            "description": "Navigation Remapping To Propagate Malicious Content"
+        },
+        {
+            "capec_id": "CAPEC-388",
+            "description": "Application API Button Hijacking"
+        },
+        {
+            "capec_id": "CAPEC-389",
+            "description": "Content Spoofing Via Application API Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-39",
+            "description": "Manipulating Opaque Client-based Data Tokens"
+        },
+        {
+            "capec_id": "CAPEC-390",
+            "description": "Bypassing Physical Security"
+        },
+        {
+            "capec_id": "CAPEC-391",
+            "description": "Bypassing Physical Locks"
+        },
+        {
+            "capec_id": "CAPEC-392",
+            "description": "Lock Bumping"
+        },
+        {
+            "capec_id": "CAPEC-393",
+            "description": "Lock Picking"
+        },
+        {
+            "capec_id": "CAPEC-394",
+            "description": "Using a Snap Gun Lock to Force a Lock"
+        },
+        {
+            "capec_id": "CAPEC-395",
+            "description": "Bypassing Electronic Locks and Access Controls"
+        },
+        {
+            "capec_id": "CAPEC-397",
+            "description": "Cloning Magnetic Strip Cards"
+        },
+        {
+            "capec_id": "CAPEC-398",
+            "description": "Magnetic Strip Card Brute Force Attacks"
+        },
+        {
+            "capec_id": "CAPEC-399",
+            "description": "Cloning RFID Cards or Chips"
+        },
+        {
+            "capec_id": "CAPEC-400",
+            "description": "RFID Chip Deactivation or Destruction"
+        },
+        {
+            "capec_id": "CAPEC-41",
+            "description": "Using Meta-Characters in E-mail Headers to Inject Malicious Payloads"
+        },
+        {
+            "capec_id": "CAPEC-44",
+            "description": "Overflow Binary Resource File"
+        },
+        {
+            "capec_id": "CAPEC-460",
+            "description": "HTTP Parameter Pollution (HPP)"
+        },
+        {
+            "capec_id": "CAPEC-461",
+            "description": "Web Services API Signature Forgery Leveraging Hash Function Extension Weakness"
+        },
+        {
+            "capec_id": "CAPEC-466",
+            "description": "Leveraging Active Adversary in the Middle Attacks to Bypass Same Origin Policy"
+        },
+        {
+            "capec_id": "CAPEC-467",
+            "description": "Cross Site Identification"
+        },
+        {
+            "capec_id": "CAPEC-468",
+            "description": "Generic Cross-Browser Cross-Domain Theft"
+        },
+        {
+            "capec_id": "CAPEC-470",
+            "description": "Expanding Control over the Operating System from the Database"
+        },
+        {
+            "capec_id": "CAPEC-480",
+            "description": "Escaping Virtualization"
+        },
+        {
+            "capec_id": "CAPEC-49",
+            "description": "Password Brute Forcing"
+        },
+        {
+            "capec_id": "CAPEC-5",
+            "description": "Blue Boxing"
+        },
+        {
+            "capec_id": "CAPEC-50",
+            "description": "Password Recovery Exploitation"
+        },
+        {
+            "capec_id": "CAPEC-500",
+            "description": "WebView Injection"
+        },
+        {
+            "capec_id": "CAPEC-503",
+            "description": "WebView Exposure"
+        },
+        {
+            "capec_id": "CAPEC-507",
+            "description": "Physical Theft"
+        },
+        {
+            "capec_id": "CAPEC-509",
+            "description": "Kerberoasting"
+        },
+        {
+            "capec_id": "CAPEC-510",
+            "description": "SaaS User Request Forgery"
+        },
+        {
+            "capec_id": "CAPEC-542",
+            "description": "Targeted Malware"
+        },
+        {
+            "capec_id": "CAPEC-549",
+            "description": "Local Code Execution"
+        },
+        {
+            "capec_id": "CAPEC-55",
+            "description": "Rainbow Table Password Cracking"
+        },
+        {
+            "capec_id": "CAPEC-550",
+            "description": "Install New Service"
+        },
+        {
+            "capec_id": "CAPEC-551",
+            "description": "Modify Existing Service"
+        },
+        {
+            "capec_id": "CAPEC-552",
+            "description": "Install Rootkit"
+        },
+        {
+            "capec_id": "CAPEC-555",
+            "description": "Remote Services with Stolen Credentials"
+        },
+        {
+            "capec_id": "CAPEC-556",
+            "description": "Replace File Extension Handlers"
+        },
+        {
+            "capec_id": "CAPEC-558",
+            "description": "Replace Trusted Executable"
+        },
+        {
+            "capec_id": "CAPEC-560",
+            "description": "Use of Known Domain Credentials"
+        },
+        {
+            "capec_id": "CAPEC-561",
+            "description": "Windows Admin Shares with Stolen Credentials"
+        },
+        {
+            "capec_id": "CAPEC-562",
+            "description": "Modify Shared File"
+        },
+        {
+            "capec_id": "CAPEC-563",
+            "description": "Add Malicious File to Shared Webroot"
+        },
+        {
+            "capec_id": "CAPEC-564",
+            "description": "Run Software at Login"
+        },
+        {
+            "capec_id": "CAPEC-565",
+            "description": "Password Spraying"
+        },
+        {
+            "capec_id": "CAPEC-579",
+            "description": "Replace Winlogon Helper DLL"
+        },
+        {
+            "capec_id": "CAPEC-58",
+            "description": "Restful Privilege Elevation"
+        },
+        {
+            "capec_id": "CAPEC-586",
+            "description": "Object Injection"
+        },
+        {
+            "capec_id": "CAPEC-588",
+            "description": "DOM-Based XSS"
+        },
+        {
+            "capec_id": "CAPEC-59",
+            "description": "Session Credential Falsification through Prediction"
+        },
+        {
+            "capec_id": "CAPEC-591",
+            "description": "Reflected XSS"
+        },
+        {
+            "capec_id": "CAPEC-592",
+            "description": "Stored XSS"
+        },
+        {
+            "capec_id": "CAPEC-593",
+            "description": "Session Hijacking"
+        },
+        {
+            "capec_id": "CAPEC-6",
+            "description": "Argument Injection"
+        },
+        {
+            "capec_id": "CAPEC-60",
+            "description": "Reusing Session IDs (aka Session Replay)"
+        },
+        {
+            "capec_id": "CAPEC-600",
+            "description": "Credential Stuffing"
+        },
+        {
+            "capec_id": "CAPEC-61",
+            "description": "Session Fixation"
+        },
+        {
+            "capec_id": "CAPEC-610",
+            "description": "Cellular Data Injection"
+        },
+        {
+            "capec_id": "CAPEC-62",
+            "description": "Cross Site Request Forgery"
+        },
+        {
+            "capec_id": "CAPEC-626",
+            "description": "Smudge Attack"
+        },
+        {
+            "capec_id": "CAPEC-629",
+            "description": "Unauthorized Use of Device Resources"
+        },
+        {
+            "capec_id": "CAPEC-63",
+            "description": "Cross-site Scripting (XSS)"
+        },
+        {
+            "capec_id": "CAPEC-640",
+            "description": "Inclusion of Code in Existing Process"
+        },
+        {
+            "capec_id": "CAPEC-642",
+            "description": "Replace Binaries"
+        },
+        {
+            "capec_id": "CAPEC-644",
+            "description": "Use of Captured Hashes (Pass The Hash)"
+        },
+        {
+            "capec_id": "CAPEC-645",
+            "description": "Use of Captured Tickets (Pass The Ticket)"
+        },
+        {
+            "capec_id": "CAPEC-650",
+            "description": "Upload a Web Shell to a Web Server"
+        },
+        {
+            "capec_id": "CAPEC-652",
+            "description": "Use of Known Kerberos Credentials"
+        },
+        {
+            "capec_id": "CAPEC-653",
+            "description": "Use of Known Windows Credentials"
+        },
+        {
+            "capec_id": "CAPEC-660",
+            "description": "Root/Jailbreak Detection Evasion via Hooking"
+        },
+        {
+            "capec_id": "CAPEC-661",
+            "description": "Root/Jailbreak Detection Evasion via Debugging"
+        },
+        {
+            "capec_id": "CAPEC-662",
+            "description": "Adversary in the Browser (AiTB)"
+        },
+        {
+            "capec_id": "CAPEC-664",
+            "description": "Server Side Request Forgery"
+        },
+        {
+            "capec_id": "CAPEC-668",
+            "description": "Key Negotiation of Bluetooth Attack (KNOB)"
+        },
+        {
+            "capec_id": "CAPEC-679",
+            "description": "Exploitation of Improperly Configured or Implemented Memory Protections"
+        },
+        {
+            "capec_id": "CAPEC-68",
+            "description": "Subvert Code-signing Facilities"
+        },
+        {
+            "capec_id": "CAPEC-680",
+            "description": "Exploitation of Improperly Controlled Registers"
+        },
+        {
+            "capec_id": "CAPEC-681",
+            "description": "Exploitation of Improperly Controlled Hardware Security Identifiers"
+        },
+        {
+            "capec_id": "CAPEC-69",
+            "description": "Target Programs with Elevated Privileges"
+        },
+        {
+            "capec_id": "CAPEC-7",
+            "description": "Blind SQL Injection"
+        },
+        {
+            "capec_id": "CAPEC-77",
+            "description": "Manipulating User-Controlled Variables"
+        },
+        {
+            "capec_id": "CAPEC-83",
+            "description": "XPath Injection"
+        },
+        {
+            "capec_id": "CAPEC-84",
+            "description": "XQuery Injection"
+        },
+        {
+            "capec_id": "CAPEC-86",
+            "description": "XSS Through HTTP Headers"
+        },
+        {
+            "capec_id": "CAPEC-87",
+            "description": "Forceful Browsing"
+        },
+        {
+            "capec_id": "CAPEC-90",
+            "description": "Reflection Attack in Authentication Protocol"
+        },
+        {
+            "capec_id": "CAPEC-94",
+            "description": "Adversary in the Middle (AiTM)"
+        }
+    ],
+    "Information Disclosure": [
+        {
+            "capec_id": "CAPEC-11",
+            "description": "Cause Web Server Misclassification"
+        },
+        {
+            "capec_id": "CAPEC-111",
+            "description": "JSON Hijacking (aka JavaScript Hijacking)"
+        },
+        {
+            "capec_id": "CAPEC-116",
+            "description": "Excavation"
+        },
+        {
+            "capec_id": "CAPEC-117",
+            "description": "Interception"
+        },
+        {
+            "capec_id": "CAPEC-12",
+            "description": "Choosing Message Identifier"
+        },
+        {
+            "capec_id": "CAPEC-127",
+            "description": "Directory Indexing"
+        },
+        {
+            "capec_id": "CAPEC-129",
+            "description": "Pointer Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-143",
+            "description": "Detect Unpublicised Web Pages"
+        },
+        {
+            "capec_id": "CAPEC-144",
+            "description": "Detect Unpublicised Web Services"
+        },
+        {
+            "capec_id": "CAPEC-149",
+            "description": "Explore for Predictable Temporary File Names"
+        },
+        {
+            "capec_id": "CAPEC-155",
+            "description": "Screen Temporary Files for Sensitive Information"
+        },
+        {
+            "capec_id": "CAPEC-157",
+            "description": "Sniffing Attacks"
+        },
+        {
+            "capec_id": "CAPEC-158",
+            "description": "Sniffing Network Traffic"
+        },
+        {
+            "capec_id": "CAPEC-167",
+            "description": "White Box Reverse Engineering"
+        },
+        {
+            "capec_id": "CAPEC-169",
+            "description": "Footprinting"
+        },
+        {
+            "capec_id": "CAPEC-170",
+            "description": "Web Application Fingerprinting"
+        },
+        {
+            "capec_id": "CAPEC-179",
+            "description": "Calling Micro-Services Directly"
+        },
+        {
+            "capec_id": "CAPEC-188",
+            "description": "Reverse Engineering"
+        },
+        {
+            "capec_id": "CAPEC-189",
+            "description": "Black Box Reverse Engineering"
+        },
+        {
+            "capec_id": "CAPEC-190",
+            "description": "Reverse Engineer an Executable to Expose Assumed Hidden Functionality"
+        },
+        {
+            "capec_id": "CAPEC-191",
+            "description": "Read Sensitive Constants Within an Executable"
+        },
+        {
+            "capec_id": "CAPEC-192",
+            "description": "Protocol Analysis"
+        },
+        {
+            "capec_id": "CAPEC-204",
+            "description": "Lifting Sensitive Data Embedded in Cache"
+        },
+        {
+            "capec_id": "CAPEC-212",
+            "description": "Functionality Misuse"
+        },
+        {
+            "capec_id": "CAPEC-215",
+            "description": "Fuzzing for Application Mapping"
+        },
+        {
+            "capec_id": "CAPEC-216",
+            "description": "Communication Channel Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-217",
+            "description": "Exploiting Incorrectly Configured SSL"
+        },
+        {
+            "capec_id": "CAPEC-224",
+            "description": "Fingerprinting"
+        },
+        {
+            "capec_id": "CAPEC-261",
+            "description": "Fuzzing for Garnering Other Adjacent user/sensitive data"
+        },
+        {
+            "capec_id": "CAPEC-285",
+            "description": "ICMP Echo Request Ping"
+        },
+        {
+            "capec_id": "CAPEC-287",
+            "description": "TCP SYN Scan"
+        },
+        {
+            "capec_id": "CAPEC-290",
+            "description": "Enumerate Mail Exchange Records"
+        },
+        {
+            "capec_id": "CAPEC-291",
+            "description": "DNS Zone Transfers"
+        },
+        {
+            "capec_id": "CAPEC-292",
+            "description": "Host Discovery"
+        },
+        {
+            "capec_id": "CAPEC-293",
+            "description": "Traceroute Route Enumeration"
+        },
+        {
+            "capec_id": "CAPEC-294",
+            "description": "ICMP Address Mask Request"
+        },
+        {
+            "capec_id": "CAPEC-295",
+            "description": "Timestamp Request"
+        },
+        {
+            "capec_id": "CAPEC-296",
+            "description": "ICMP Information Request"
+        },
+        {
+            "capec_id": "CAPEC-297",
+            "description": "TCP ACK Ping"
+        },
+        {
+            "capec_id": "CAPEC-298",
+            "description": "UDP Ping"
+        },
+        {
+            "capec_id": "CAPEC-299",
+            "description": "TCP SYN Ping"
+        },
+        {
+            "capec_id": "CAPEC-300",
+            "description": "Port Scanning"
+        },
+        {
+            "capec_id": "CAPEC-301",
+            "description": "TCP Connect Scan"
+        },
+        {
+            "capec_id": "CAPEC-302",
+            "description": "TCP FIN Scan"
+        },
+        {
+            "capec_id": "CAPEC-303",
+            "description": "TCP Xmas Scan"
+        },
+        {
+            "capec_id": "CAPEC-304",
+            "description": "TCP Null Scan"
+        },
+        {
+            "capec_id": "CAPEC-305",
+            "description": "TCP ACK Scan"
+        },
+        {
+            "capec_id": "CAPEC-306",
+            "description": "TCP Window Scan"
+        },
+        {
+            "capec_id": "CAPEC-307",
+            "description": "TCP RPC Scan"
+        },
+        {
+            "capec_id": "CAPEC-308",
+            "description": "UDP Scan"
+        },
+        {
+            "capec_id": "CAPEC-309",
+            "description": "Network Topology Mapping"
+        },
+        {
+            "capec_id": "CAPEC-310",
+            "description": "Scanning for Vulnerable Software"
+        },
+        {
+            "capec_id": "CAPEC-312",
+            "description": "Active OS Fingerprinting"
+        },
+        {
+            "capec_id": "CAPEC-313",
+            "description": "Passive OS Fingerprinting"
+        },
+        {
+            "capec_id": "CAPEC-317",
+            "description": "IP ID Sequencing Probe"
+        },
+        {
+            "capec_id": "CAPEC-318",
+            "description": "IP 'ID' Echoed Byte-Order Probe"
+        },
+        {
+            "capec_id": "CAPEC-319",
+            "description": "IP (DF) 'Don't Fragment Bit' Echoing Probe"
+        },
+        {
+            "capec_id": "CAPEC-320",
+            "description": "TCP Timestamp Probe"
+        },
+        {
+            "capec_id": "CAPEC-321",
+            "description": "TCP Sequence Number Probe"
+        },
+        {
+            "capec_id": "CAPEC-322",
+            "description": "TCP (ISN) Greatest Common Divisor Probe"
+        },
+        {
+            "capec_id": "CAPEC-323",
+            "description": "TCP (ISN) Counter Rate Probe"
+        },
+        {
+            "capec_id": "CAPEC-324",
+            "description": "TCP (ISN) Sequence Predictability Probe"
+        },
+        {
+            "capec_id": "CAPEC-325",
+            "description": "TCP Congestion Control Flag (ECN) Probe"
+        },
+        {
+            "capec_id": "CAPEC-326",
+            "description": "TCP Initial Window Size Probe"
+        },
+        {
+            "capec_id": "CAPEC-327",
+            "description": "TCP Options Probe"
+        },
+        {
+            "capec_id": "CAPEC-328",
+            "description": "TCP 'RST' Flag Checksum Probe"
+        },
+        {
+            "capec_id": "CAPEC-329",
+            "description": "ICMP Error Message Quoting Probe"
+        },
+        {
+            "capec_id": "CAPEC-330",
+            "description": "ICMP Error Message Echoing Integrity Probe"
+        },
+        {
+            "capec_id": "CAPEC-331",
+            "description": "ICMP IP Total Length Field Probe"
+        },
+        {
+            "capec_id": "CAPEC-332",
+            "description": "ICMP IP 'ID' Field Error Message Probe"
+        },
+        {
+            "capec_id": "CAPEC-37",
+            "description": "Retrieve Embedded Sensitive Information"
+        },
+        {
+            "capec_id": "CAPEC-383",
+            "description": "Harvesting Information via API Event Monitoring"
+        },
+        {
+            "capec_id": "CAPEC-406",
+            "description": "Dumpster Diving"
+        },
+        {
+            "capec_id": "CAPEC-407",
+            "description": "Pretexting"
+        },
+        {
+            "capec_id": "CAPEC-410",
+            "description": "Information Elicitation"
+        },
+        {
+            "capec_id": "CAPEC-412",
+            "description": "Pretexting via Customer Service"
+        },
+        {
+            "capec_id": "CAPEC-413",
+            "description": "Pretexting via Tech Support"
+        },
+        {
+            "capec_id": "CAPEC-414",
+            "description": "Pretexting via Delivery Person"
+        },
+        {
+            "capec_id": "CAPEC-415",
+            "description": "Pretexting via Phone"
+        },
+        {
+            "capec_id": "CAPEC-462",
+            "description": "Cross-Domain Search Timing"
+        },
+        {
+            "capec_id": "CAPEC-463",
+            "description": "Padding Oracle Crypto Attack"
+        },
+        {
+            "capec_id": "CAPEC-464",
+            "description": "Evercookie"
+        },
+        {
+            "capec_id": "CAPEC-465",
+            "description": "Transparent Proxy Abuse"
+        },
+        {
+            "capec_id": "CAPEC-472",
+            "description": "Browser Fingerprinting"
+        },
+        {
+            "capec_id": "CAPEC-48",
+            "description": "Passing Local Filenames to Functions That Expect a URL"
+        },
+        {
+            "capec_id": "CAPEC-497",
+            "description": "File Discovery"
+        },
+        {
+            "capec_id": "CAPEC-498",
+            "description": "Probe iOS Screenshots"
+        },
+        {
+            "capec_id": "CAPEC-499",
+            "description": "Android Intent Intercept"
+        },
+        {
+            "capec_id": "CAPEC-501",
+            "description": "Android Activity Hijack"
+        },
+        {
+            "capec_id": "CAPEC-508",
+            "description": "Shoulder Surfing"
+        },
+        {
+            "capec_id": "CAPEC-529",
+            "description": "Malware-Directed Internal Reconnaissance"
+        },
+        {
+            "capec_id": "CAPEC-54",
+            "description": "Query System for Information"
+        },
+        {
+            "capec_id": "CAPEC-541",
+            "description": "Application Fingerprinting"
+        },
+        {
+            "capec_id": "CAPEC-545",
+            "description": "Pull Data From System Resources"
+        },
+        {
+            "capec_id": "CAPEC-546",
+            "description": "Incomplete Data Deletion in a Multi-Tenant Environment"
+        },
+        {
+            "capec_id": "CAPEC-554",
+            "description": "Functionality Bypass"
+        },
+        {
+            "capec_id": "CAPEC-568",
+            "description": "Capture Credentials via Keylogger"
+        },
+        {
+            "capec_id": "CAPEC-569",
+            "description": "Collect Data as Provided by Users"
+        },
+        {
+            "capec_id": "CAPEC-57",
+            "description": "Utilising REST's Trust in the System Resources to Obtain Sensitive Data"
+        },
+        {
+            "capec_id": "CAPEC-573",
+            "description": "Process Footprinting"
+        },
+        {
+            "capec_id": "CAPEC-574",
+            "description": "Services Footprinting"
+        },
+        {
+            "capec_id": "CAPEC-575",
+            "description": "Account Footprinting"
+        },
+        {
+            "capec_id": "CAPEC-576",
+            "description": "Group Permission Footprinting"
+        },
+        {
+            "capec_id": "CAPEC-577",
+            "description": "Owner Footprinting"
+        },
+        {
+            "capec_id": "CAPEC-580",
+            "description": "System Footprinting"
+        },
+        {
+            "capec_id": "CAPEC-581",
+            "description": "Security Software Footprinting"
+        },
+        {
+            "capec_id": "CAPEC-606",
+            "description": "Weakening of Cellular Encryption"
+        },
+        {
+            "capec_id": "CAPEC-608",
+            "description": "Cryptanalysis of Cellular Encryption"
+        },
+        {
+            "capec_id": "CAPEC-609",
+            "description": "Cellular Traffic Intercept"
+        },
+        {
+            "capec_id": "CAPEC-612",
+            "description": "WiFi MAC Address Tracking"
+        },
+        {
+            "capec_id": "CAPEC-613",
+            "description": "WiFi SSID Tracking"
+        },
+        {
+            "capec_id": "CAPEC-618",
+            "description": "Cellular Broadcast Message Request"
+        },
+        {
+            "capec_id": "CAPEC-619",
+            "description": "Signal Strength Tracking"
+        },
+        {
+            "capec_id": "CAPEC-620",
+            "description": "Drop Encryption Level"
+        },
+        {
+            "capec_id": "CAPEC-621",
+            "description": "Analysis of Packet Timing and Sizes"
+        },
+        {
+            "capec_id": "CAPEC-622",
+            "description": "Electromagnetic Side-Channel Attack"
+        },
+        {
+            "capec_id": "CAPEC-623",
+            "description": "Compromising Emanations Attack"
+        },
+        {
+            "capec_id": "CAPEC-634",
+            "description": "Probe Audio and Video Peripherals"
+        },
+        {
+            "capec_id": "CAPEC-637",
+            "description": "Collect Data from Clipboard"
+        },
+        {
+            "capec_id": "CAPEC-639",
+            "description": "Probe System Files"
+        },
+        {
+            "capec_id": "CAPEC-643",
+            "description": "Identify Shared Files/Directories on System"
+        },
+        {
+            "capec_id": "CAPEC-646",
+            "description": "Peripheral Footprinting"
+        },
+        {
+            "capec_id": "CAPEC-647",
+            "description": "Collect Data from Registries"
+        },
+        {
+            "capec_id": "CAPEC-648",
+            "description": "Collect Data from Screen Capture"
+        },
+        {
+            "capec_id": "CAPEC-65",
+            "description": "Sniff Application Code"
+        },
+        {
+            "capec_id": "CAPEC-651",
+            "description": "Eavesdropping"
+        },
+        {
+            "capec_id": "CAPEC-675",
+            "description": "Retrieve Data from Decommissioned Devices"
+        },
+        {
+            "capec_id": "CAPEC-85",
+            "description": "AJAX Footprinting"
+        },
+        {
+            "capec_id": "CAPEC-95",
+            "description": "WSDL Scanning"
+        },
+        {
+            "capec_id": "CAPEC-97",
+            "description": "Cryptanalysis"
+        }
+    ],
+    "Repudiation": [
+        {
+            "capec_id": "CAPEC-195",
+            "description": "Principal Spoof"
+        },
+        {
+            "capec_id": "CAPEC-268",
+            "description": "Audit Log Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-571",
+            "description": "Block Logging to Central Repository"
+        },
+        {
+            "capec_id": "CAPEC-587",
+            "description": "Cross Frame Scripting (XFS)"
+        },
+        {
+            "capec_id": "CAPEC-599",
+            "description": "Terrestrial Jamming"
+        },
+        {
+            "capec_id": "CAPEC-67",
+            "description": "String Format Overflow in syslog()"
+        },
+        {
+            "capec_id": "CAPEC-81",
+            "description": "Web Logs Tampering"
+        },
+        {
+            "capec_id": "CAPEC-93",
+            "description": "Log Injection-Tampering-Forging"
+        }
+    ],
+    "Spoofing": [
+        {
+            "capec_id": "CAPEC-103",
+            "description": "Clickjacking"
+        },
+        {
+            "capec_id": "CAPEC-132",
+            "description": "Symlink Attack"
+        },
+        {
+            "capec_id": "CAPEC-141",
+            "description": "Cache Poisoning"
+        },
+        {
+            "capec_id": "CAPEC-142",
+            "description": "DNS Cache Poisoning"
+        },
+        {
+            "capec_id": "CAPEC-145",
+            "description": "Checksum Spoofing"
+        },
+        {
+            "capec_id": "CAPEC-151",
+            "description": "Identity Spoofing"
+        },
+        {
+            "capec_id": "CAPEC-154",
+            "description": "Resource Location Spoofing"
+        },
+        {
+            "capec_id": "CAPEC-159",
+            "description": "Redirect Access to Libraries"
+        },
+        {
+            "capec_id": "CAPEC-163",
+            "description": "Spear Phishing"
+        },
+        {
+            "capec_id": "CAPEC-164",
+            "description": "Mobile Phishing"
+        },
+        {
+            "capec_id": "CAPEC-173",
+            "description": "Action Spoofing"
+        },
+        {
+            "capec_id": "CAPEC-181",
+            "description": "Flash File Overlay"
+        },
+        {
+            "capec_id": "CAPEC-195",
+            "description": "Principal Spoof"
+        },
+        {
+            "capec_id": "CAPEC-218",
+            "description": "Spoofing of UDDI/ebXML Messages"
+        },
+        {
+            "capec_id": "CAPEC-222",
+            "description": "iFrame Overlay"
+        },
+        {
+            "capec_id": "CAPEC-38",
+            "description": "Leveraging/Manipulating Configuration File Search Paths"
+        },
+        {
+            "capec_id": "CAPEC-383",
+            "description": "Harvesting Information via API Event Monitoring"
+        },
+        {
+            "capec_id": "CAPEC-389",
+            "description": "Content Spoofing Via Application API Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-407",
+            "description": "Pretexting"
+        },
+        {
+            "capec_id": "CAPEC-412",
+            "description": "Pretexting via Customer Service"
+        },
+        {
+            "capec_id": "CAPEC-413",
+            "description": "Pretexting via Tech Support"
+        },
+        {
+            "capec_id": "CAPEC-414",
+            "description": "Pretexting via Delivery Person"
+        },
+        {
+            "capec_id": "CAPEC-415",
+            "description": "Pretexting via Phone"
+        },
+        {
+            "capec_id": "CAPEC-416",
+            "description": "Manipulate Human Behavior"
+        },
+        {
+            "capec_id": "CAPEC-417",
+            "description": "Influence Perception"
+        },
+        {
+            "capec_id": "CAPEC-418",
+            "description": "Influence Perception of Reciprocation"
+        },
+        {
+            "capec_id": "CAPEC-420",
+            "description": "Influence Perception of Scarcity"
+        },
+        {
+            "capec_id": "CAPEC-421",
+            "description": "Influence Perception of Authority"
+        },
+        {
+            "capec_id": "CAPEC-422",
+            "description": "Influence Perception of Commitment and Consistency"
+        },
+        {
+            "capec_id": "CAPEC-423",
+            "description": "Influence Perception of Liking"
+        },
+        {
+            "capec_id": "CAPEC-424",
+            "description": "Influence Perception of Consensus or Social Proof"
+        },
+        {
+            "capec_id": "CAPEC-425",
+            "description": "Target Influence via Framing"
+        },
+        {
+            "capec_id": "CAPEC-426",
+            "description": "Influence via Incentives"
+        },
+        {
+            "capec_id": "CAPEC-427",
+            "description": "Influence via Psychological Principles"
+        },
+        {
+            "capec_id": "CAPEC-428",
+            "description": "Influence via Modes of Thinking"
+        },
+        {
+            "capec_id": "CAPEC-429",
+            "description": "Target Influence via Eye Cues"
+        },
+        {
+            "capec_id": "CAPEC-433",
+            "description": "Target Influence via The Human Buffer Overflow"
+        },
+        {
+            "capec_id": "CAPEC-434",
+            "description": "Target Influence via Interview and Interrogation"
+        },
+        {
+            "capec_id": "CAPEC-435",
+            "description": "Target Influence via Instant Rapport"
+        },
+        {
+            "capec_id": "CAPEC-459",
+            "description": "Creating a Rogue Certification Authority Certificate"
+        },
+        {
+            "capec_id": "CAPEC-471",
+            "description": "Search Order Hijacking"
+        },
+        {
+            "capec_id": "CAPEC-474",
+            "description": "Signature Spoofing by Key Theft"
+        },
+        {
+            "capec_id": "CAPEC-475",
+            "description": "Signature Spoofing by Improper Validation"
+        },
+        {
+            "capec_id": "CAPEC-476",
+            "description": "Signature Spoofing by Misrepresentation"
+        },
+        {
+            "capec_id": "CAPEC-477",
+            "description": "Signature Spoofing by Mixing Signed and Unsigned Content"
+        },
+        {
+            "capec_id": "CAPEC-479",
+            "description": "Malicious Root Certificate"
+        },
+        {
+            "capec_id": "CAPEC-485",
+            "description": "Signature Spoofing by Key Recreation"
+        },
+        {
+            "capec_id": "CAPEC-501",
+            "description": "Android Activity Hijack"
+        },
+        {
+            "capec_id": "CAPEC-504",
+            "description": "Task Impersonation"
+        },
+        {
+            "capec_id": "CAPEC-505",
+            "description": "Scheme Squatting"
+        },
+        {
+            "capec_id": "CAPEC-506",
+            "description": "Tapjacking"
+        },
+        {
+            "capec_id": "CAPEC-51",
+            "description": "Poison Web Service Registry"
+        },
+        {
+            "capec_id": "CAPEC-543",
+            "description": "Counterfeit Websites"
+        },
+        {
+            "capec_id": "CAPEC-544",
+            "description": "Counterfeit Organizations"
+        },
+        {
+            "capec_id": "CAPEC-587",
+            "description": "Cross Frame Scripting (XFS)"
+        },
+        {
+            "capec_id": "CAPEC-598",
+            "description": "DNS Spoofing"
+        },
+        {
+            "capec_id": "CAPEC-599",
+            "description": "Terrestrial Jamming"
+        },
+        {
+            "capec_id": "CAPEC-611",
+            "description": "BitSquatting"
+        },
+        {
+            "capec_id": "CAPEC-615",
+            "description": "Evil Twin Wi-Fi Attack"
+        },
+        {
+            "capec_id": "CAPEC-616",
+            "description": "Establish Rogue Location"
+        },
+        {
+            "capec_id": "CAPEC-617",
+            "description": "Cellular Rogue Base Station"
+        },
+        {
+            "capec_id": "CAPEC-628",
+            "description": "Carry-Off GPS Attack"
+        },
+        {
+            "capec_id": "CAPEC-630",
+            "description": "TypoSquatting"
+        },
+        {
+            "capec_id": "CAPEC-631",
+            "description": "SoundSquatting"
+        },
+        {
+            "capec_id": "CAPEC-632",
+            "description": "Homograph Attack via Homoglyphs"
+        },
+        {
+            "capec_id": "CAPEC-633",
+            "description": "Token Impersonation"
+        },
+        {
+            "capec_id": "CAPEC-641",
+            "description": "DLL Side-Loading"
+        },
+        {
+            "capec_id": "CAPEC-654",
+            "description": "Credential Prompt Impersonation"
+        },
+        {
+            "capec_id": "CAPEC-656",
+            "description": "Voice Phishing"
+        },
+        {
+            "capec_id": "CAPEC-667",
+            "description": "Bluetooth Impersonation AttackS (BIAS)"
+        },
+        {
+            "capec_id": "CAPEC-98",
+            "description": "Phishing"
+        }
+    ],
+    "Tampering": [
+        {
+            "capec_id": "CAPEC-10",
+            "description": "Buffer Overflow via Environment Variables"
+        },
+        {
+            "capec_id": "CAPEC-100",
+            "description": "Overflow Buffers"
+        },
+        {
+            "capec_id": "CAPEC-105",
+            "description": "HTTP Request Splitting"
+        },
+        {
+            "capec_id": "CAPEC-113",
+            "description": "Interface Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-120",
+            "description": "Double Encoding"
+        },
+        {
+            "capec_id": "CAPEC-123",
+            "description": "Buffer Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-124",
+            "description": "Shared Resource Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-126",
+            "description": "Path Traversal"
+        },
+        {
+            "capec_id": "CAPEC-128",
+            "description": "Integer Attacks"
+        },
+        {
+            "capec_id": "CAPEC-129",
+            "description": "Pointer Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-133",
+            "description": "Try All Common Switches"
+        },
+        {
+            "capec_id": "CAPEC-139",
+            "description": "Relative Path Traversal"
+        },
+        {
+            "capec_id": "CAPEC-14",
+            "description": "Client-side Injection-induced Buffer Overflow"
+        },
+        {
+            "capec_id": "CAPEC-140",
+            "description": "Bypassing of Intermediate Forms in Multiple-Form Sets"
+        },
+        {
+            "capec_id": "CAPEC-141",
+            "description": "Cache Poisoning"
+        },
+        {
+            "capec_id": "CAPEC-142",
+            "description": "DNS Cache Poisoning"
+        },
+        {
+            "capec_id": "CAPEC-146",
+            "description": "XML Schema Poisoning"
+        },
+        {
+            "capec_id": "CAPEC-153",
+            "description": "Input Data Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-160",
+            "description": "Exploit Script-Based APIs"
+        },
+        {
+            "capec_id": "CAPEC-161",
+            "description": "Infrastructure Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-165",
+            "description": "File Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-166",
+            "description": "Force the System to Reset Values"
+        },
+        {
+            "capec_id": "CAPEC-168",
+            "description": "Windows ::DATA Alternate Data Stream"
+        },
+        {
+            "capec_id": "CAPEC-176",
+            "description": "Configuration/Environment Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-184",
+            "description": "Software Integrity Attack"
+        },
+        {
+            "capec_id": "CAPEC-185",
+            "description": "Malicious Software Download"
+        },
+        {
+            "capec_id": "CAPEC-186",
+            "description": "Malicious Software Update"
+        },
+        {
+            "capec_id": "CAPEC-187",
+            "description": "Malicious Automated Software Update via Redirection"
+        },
+        {
+            "capec_id": "CAPEC-201",
+            "description": "Serialized Data External Linking"
+        },
+        {
+            "capec_id": "CAPEC-203",
+            "description": "Manipulate Registry Information"
+        },
+        {
+            "capec_id": "CAPEC-206",
+            "description": "Signing Malicious Code"
+        },
+        {
+            "capec_id": "CAPEC-220",
+            "description": "Client-Server Protocol Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-221",
+            "description": "Data Serialization External Entities Blowup"
+        },
+        {
+            "capec_id": "CAPEC-24",
+            "description": "Filter Failure through Buffer Overflow"
+        },
+        {
+            "capec_id": "CAPEC-256",
+            "description": "SOAP Array Overflow"
+        },
+        {
+            "capec_id": "CAPEC-26",
+            "description": "Leveraging Race Conditions"
+        },
+        {
+            "capec_id": "CAPEC-267",
+            "description": "Leverage Alternate Encoding"
+        },
+        {
+            "capec_id": "CAPEC-268",
+            "description": "Audit Log Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-27",
+            "description": "Leveraging Race Conditions via Symbolic Links"
+        },
+        {
+            "capec_id": "CAPEC-270",
+            "description": "Modification of Registry Run Keys"
+        },
+        {
+            "capec_id": "CAPEC-271",
+            "description": "Schema Poisoning"
+        },
+        {
+            "capec_id": "CAPEC-272",
+            "description": "Protocol Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-273",
+            "description": "HTTP Response Smuggling"
+        },
+        {
+            "capec_id": "CAPEC-274",
+            "description": "HTTP Verb Tampering"
+        },
+        {
+            "capec_id": "CAPEC-276",
+            "description": "Inter-Component Protocol Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-277",
+            "description": "Data Interchange Protocol Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-278",
+            "description": "Web Services Protocol Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-279",
+            "description": "SOAP Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-28",
+            "description": "Fuzzing"
+        },
+        {
+            "capec_id": "CAPEC-29",
+            "description": "Leveraging Time-of-Check and Time-of-Use (TOCTOU) Race Conditions"
+        },
+        {
+            "capec_id": "CAPEC-3",
+            "description": "Using Leading 'Ghost' Character Sequences to Bypass Input Filters"
+        },
+        {
+            "capec_id": "CAPEC-33",
+            "description": "HTTP Request Smuggling"
+        },
+        {
+            "capec_id": "CAPEC-34",
+            "description": "HTTP Response Splitting"
+        },
+        {
+            "capec_id": "CAPEC-4",
+            "description": "Using Alternative IP Address Encodings"
+        },
+        {
+            "capec_id": "CAPEC-401",
+            "description": "Physically Hacking Hardware"
+        },
+        {
+            "capec_id": "CAPEC-402",
+            "description": "Bypassing ATA Password Security"
+        },
+        {
+            "capec_id": "CAPEC-42",
+            "description": "MIME Conversion"
+        },
+        {
+            "capec_id": "CAPEC-43",
+            "description": "Exploiting Multiple Input Interpretation Layers"
+        },
+        {
+            "capec_id": "CAPEC-438",
+            "description": "Modification During Manufacture"
+        },
+        {
+            "capec_id": "CAPEC-439",
+            "description": "Manipulation During Distribution"
+        },
+        {
+            "capec_id": "CAPEC-44",
+            "description": "Overflow Binary Resource File"
+        },
+        {
+            "capec_id": "CAPEC-440",
+            "description": "Hardware Integrity Attack"
+        },
+        {
+            "capec_id": "CAPEC-441",
+            "description": "Malicious Logic Insertion"
+        },
+        {
+            "capec_id": "CAPEC-442",
+            "description": "Infected Software"
+        },
+        {
+            "capec_id": "CAPEC-443",
+            "description": "Malicious Logic Inserted into Product Software by Authorized Developer"
+        },
+        {
+            "capec_id": "CAPEC-444",
+            "description": "Development Alteration"
+        },
+        {
+            "capec_id": "CAPEC-445",
+            "description": "Malicious Logic Insertion into Product Software via Configuration Management Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-446",
+            "description": "Malicious Logic Insertion into Product Software via 3rd Party Component Dependency"
+        },
+        {
+            "capec_id": "CAPEC-447",
+            "description": "Design Alteration"
+        },
+        {
+            "capec_id": "CAPEC-448",
+            "description": "Embed Virus into DLL"
+        },
+        {
+            "capec_id": "CAPEC-45",
+            "description": "Buffer Overflow via Symbolic Links"
+        },
+        {
+            "capec_id": "CAPEC-452",
+            "description": "Infected Hardware"
+        },
+        {
+            "capec_id": "CAPEC-456",
+            "description": "Infected Memory"
+        },
+        {
+            "capec_id": "CAPEC-457",
+            "description": "USB Memory Attacks"
+        },
+        {
+            "capec_id": "CAPEC-458",
+            "description": "Flash Memory Attacks"
+        },
+        {
+            "capec_id": "CAPEC-46",
+            "description": "Overflow Variables and Tags"
+        },
+        {
+            "capec_id": "CAPEC-47",
+            "description": "Buffer Overflow via Parameter Expansion"
+        },
+        {
+            "capec_id": "CAPEC-478",
+            "description": "Modification of Windows Service Configuration"
+        },
+        {
+            "capec_id": "CAPEC-481",
+            "description": "Contradictory Destinations inTraffic Routing Schemes"
+        },
+        {
+            "capec_id": "CAPEC-5",
+            "description": "Blue Boxing"
+        },
+        {
+            "capec_id": "CAPEC-51",
+            "description": "Poison Web Service Registry"
+        },
+        {
+            "capec_id": "CAPEC-511",
+            "description": "Infiltration of Software Development Environment"
+        },
+        {
+            "capec_id": "CAPEC-516",
+            "description": "Hardware Component Substitution During Baselining"
+        },
+        {
+            "capec_id": "CAPEC-517",
+            "description": "Documentation Alteration to Circumvent Dial-down"
+        },
+        {
+            "capec_id": "CAPEC-518",
+            "description": "Documentation Alteration to Produce Under-Performing Systems"
+        },
+        {
+            "capec_id": "CAPEC-519",
+            "description": "Documentation Alteration to Cause Errors in System Design"
+        },
+        {
+            "capec_id": "CAPEC-52",
+            "description": "Embedding NULL Bytes"
+        },
+        {
+            "capec_id": "CAPEC-520",
+            "description": "Counterfeit Hardware Component Inserted During Product Assembly"
+        },
+        {
+            "capec_id": "CAPEC-521",
+            "description": "Hardware Design Specifications are Altered"
+        },
+        {
+            "capec_id": "CAPEC-522",
+            "description": "Malicious Hardware Component Replacement"
+        },
+        {
+            "capec_id": "CAPEC-523",
+            "description": "Malicious Software Implanted"
+        },
+        {
+            "capec_id": "CAPEC-524",
+            "description": "Rogue Integration Procedures"
+        },
+        {
+            "capec_id": "CAPEC-53",
+            "description": "Postfix, Null Terminate, and Backslash"
+        },
+        {
+            "capec_id": "CAPEC-530",
+            "description": "Provide Counterfeit Component"
+        },
+        {
+            "capec_id": "CAPEC-531",
+            "description": "Hardware Component Substitution"
+        },
+        {
+            "capec_id": "CAPEC-532",
+            "description": "Altered Installed BIOS"
+        },
+        {
+            "capec_id": "CAPEC-533",
+            "description": "Malicious Manual Software Update"
+        },
+        {
+            "capec_id": "CAPEC-534",
+            "description": "Malicious Hardware Update"
+        },
+        {
+            "capec_id": "CAPEC-535",
+            "description": "Malicious Gray Market Hardware"
+        },
+        {
+            "capec_id": "CAPEC-536",
+            "description": "Data Injection During Configuration"
+        },
+        {
+            "capec_id": "CAPEC-537",
+            "description": "Infiltration of Hardware Development Environment"
+        },
+        {
+            "capec_id": "CAPEC-538",
+            "description": "Open-Source Library Manipulation"
+        },
+        {
+            "capec_id": "CAPEC-539",
+            "description": "ASIC with Malicious Functionality"
+        },
+        {
+            "capec_id": "CAPEC-540",
+            "description": "Overread Buffers"
+        },
+        {
+            "capec_id": "CAPEC-548",
+            "description": "Contaminate Resources"
+        },
+        {
+            "capec_id": "CAPEC-571",
+            "description": "Block Logging to Central Repository"
+        },
+        {
+            "capec_id": "CAPEC-572",
+            "description": "Artificially Inflate File Sizes"
+        },
+        {
+            "capec_id": "CAPEC-578",
+            "description": "Disable Security Software"
+        },
+        {
+            "capec_id": "CAPEC-594",
+            "description": "Traffic Injection"
+        },
+        {
+            "capec_id": "CAPEC-595",
+            "description": "Connection Reset"
+        },
+        {
+            "capec_id": "CAPEC-596",
+            "description": "TCP RST Injection"
+        },
+        {
+            "capec_id": "CAPEC-597",
+            "description": "Absolute Path Traversal"
+        },
+        {
+            "capec_id": "CAPEC-614",
+            "description": "Rooting SIM Cards"
+        },
+        {
+            "capec_id": "CAPEC-624",
+            "description": "Hardware Fault Injection"
+        },
+        {
+            "capec_id": "CAPEC-625",
+            "description": "Mobile Device Fault Injection"
+        },
+        {
+            "capec_id": "CAPEC-635",
+            "description": "Alternative Execution Due to Deceptive Filenames"
+        },
+        {
+            "capec_id": "CAPEC-636",
+            "description": "Hiding Malicious Data or Code within Files"
+        },
+        {
+            "capec_id": "CAPEC-638",
+            "description": "Altered Component Firmware"
+        },
+        {
+            "capec_id": "CAPEC-64",
+            "description": "Using Slashes and URL Encoding Combined to Bypass Validation Logic"
+        },
+        {
+            "capec_id": "CAPEC-649",
+            "description": "Adding a Space to a File Extension"
+        },
+        {
+            "capec_id": "CAPEC-655",
+            "description": "Avoid Security Tool Identification by Adding Data"
+        },
+        {
+            "capec_id": "CAPEC-657",
+            "description": "Malicious Automated Software Update via Spoofing"
+        },
+        {
+            "capec_id": "CAPEC-663",
+            "description": "Exploitation of Transient Instruction Execution"
+        },
+        {
+            "capec_id": "CAPEC-663",
+            "description": "Exploitation of TransientInstruction Execution"
+        },
+        {
+            "capec_id": "CAPEC-665",
+            "description": "Exploitation of Thunderbolt Protection Flaws"
+        },
+        {
+            "capec_id": "CAPEC-669",
+            "description": "Alteration of a Software Update"
+        },
+        {
+            "capec_id": "CAPEC-67",
+            "description": "String Format Overflow in syslog()"
+        },
+        {
+            "capec_id": "CAPEC-670",
+            "description": "Software Development Tools Maliciously Altered"
+        },
+        {
+            "capec_id": "CAPEC-671",
+            "description": "Requirements for ASIC Functionality Maliciously Altered"
+        },
+        {
+            "capec_id": "CAPEC-672",
+            "description": "Malicious Code Implanted During Chip Programming"
+        },
+        {
+            "capec_id": "CAPEC-673",
+            "description": "Developer Signing Maliciously Altered Software"
+        },
+        {
+            "capec_id": "CAPEC-674",
+            "description": "Design for FPGA Maliciously Altered"
+        },
+        {
+            "capec_id": "CAPEC-677",
+            "description": "Server Functionality Compromise"
+        },
+        {
+            "capec_id": "CAPEC-678",
+            "description": "System Build Data Maliciously Altered"
+        },
+        {
+            "capec_id": "CAPEC-71",
+            "description": "Using Unicode Encoding to Bypass Validation Logic"
+        },
+        {
+            "capec_id": "CAPEC-72",
+            "description": "URL Encoding"
+        },
+        {
+            "capec_id": "CAPEC-73",
+            "description": "User Controlled Filename"
+        },
+        {
+            "capec_id": "CAPEC-74",
+            "description": "Manipulating State"
+        },
+        {
+            "capec_id": "CAPEC-75",
+            "description": "Manipulating Writeable Configuration Files"
+        },
+        {
+            "capec_id": "CAPEC-76",
+            "description": "Manipulating Web Input to File System Calls"
+        },
+        {
+            "capec_id": "CAPEC-78",
+            "description": "Using Escaped Slashes in Alternate Encoding"
+        },
+        {
+            "capec_id": "CAPEC-79",
+            "description": "Using Slashes in Alternate Encoding"
+        },
+        {
+            "capec_id": "CAPEC-8",
+            "description": "Buffer Overflow in an API Call"
+        },
+        {
+            "capec_id": "CAPEC-80",
+            "description": "Using UTF-8 Encoding to Bypass Validation Logic"
+        },
+        {
+            "capec_id": "CAPEC-81",
+            "description": "Web Logs Tampering"
+        },
+        {
+            "capec_id": "CAPEC-9",
+            "description": "Buffer Overflow in Local Command-Line Utilities"
+        },
+        {
+            "capec_id": "CAPEC-90",
+            "description": "Reflection Attack in Authentication Protocol"
+        },
+        {
+            "capec_id": "CAPEC-92",
+            "description": "Forced Integer Overflow"
+        },
+        {
+            "capec_id": "CAPEC-93",
+            "description": "Log Injection-Tampering-Forging"
+        }
+    ]
 }

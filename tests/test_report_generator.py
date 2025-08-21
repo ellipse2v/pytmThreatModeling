@@ -120,6 +120,7 @@ def test_generate_json_export(report_generator):
     }
     report_generator.mitre_mapping.map_threat_to_mitre.return_value = []
     report_generator.mitre_mapping.mapping = {}
+    report_generator.mitre_mapping.map_threat_to_capec.return_value = []
 
     output_file = "test_export.json"
     with patch("builtins.open", mock_open()) as mock_file:

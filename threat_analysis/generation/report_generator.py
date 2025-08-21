@@ -24,6 +24,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 import webbrowser
 from jinja2 import Environment, FileSystemLoader
+import os
 from pathlib import Path
 from threat_analysis.utils import _validate_path_within_project
 from threat_analysis.mitigation_suggestions import get_mitigation_suggestions
@@ -136,6 +137,9 @@ class ReportGenerator:
     def _get_all_threats_with_mitre_info(self, grouped_threats: Dict[str, List]) -> List[Dict[str, Any]]:
         """Gathers detailed information for all threats, including MITRE ATT&CK mapping and severity."""
         all_detailed_threats = []
+        
+        stop_words = set(['a', 'an', 'the', 'is', 'in', 'on', 'of', 'for', 'to', 'and', 'or', 'but'])
+
         for threat_type, threats in grouped_threats.items():
             for item in threats:
                 if isinstance(item, tuple) and len(item) == 2:
@@ -157,6 +161,9 @@ class ReportGenerator:
 
                 severity_info = self.severity_calculator.get_severity_info(stride_category, target_name, classification=data_classification, impact=threat_impact, likelihood=threat_likelihood)
                 mitre_techniques = self.mitre_mapping.map_threat_to_mitre(threat_description)
+
+                # CAPEC matching using regex patterns
+                capecs = self.mitre_mapping.map_threat_to_capec(threat_description, stride_category)
 
                 technique_ids = [tech['id'] for tech in mitre_techniques]
                 automated_mitigations = get_mitigation_suggestions(technique_ids)
@@ -181,6 +188,7 @@ class ReportGenerator:
                     "severity": severity_info,
                     "mitre_techniques": mitre_techniques,
                     "stride_category": stride_category,
+                    "capecs": capecs,
                     "owasp_mitigations": owasp_mitigations,
                     "nist_mitigations": nist_mitigations,
                     "cis_mitigations": cis_mitigations,
@@ -424,4 +432,5 @@ class ReportGenerator:
         with open(diagram_html_path, "w", encoding="utf-8") as f:
             f.write(html)
         logging.info(f"Generated diagram HTML: {diagram_html_path}")
+
 
