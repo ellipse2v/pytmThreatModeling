@@ -132,7 +132,7 @@ def test_nested_project_and_dataflows(mock_validate, mock_generate_diagram, mock
 - **ProductDB**: submodel=./database/model.md""")
     with open(db_path / "model.md", "w") as f:
         f.write("""## Servers
-- **PrimaryDB":""")
+- **PrimaryDB**:""")
 
     # Act
     _run_generator()
