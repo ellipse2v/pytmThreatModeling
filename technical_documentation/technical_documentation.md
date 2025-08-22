@@ -146,12 +146,19 @@ The `SeverityCalculator` provides a nuanced risk score for each threat.
 ### 4.7. Output Generation (`generation/`)
 
 -   **`diagram_generator.py`**: This module is responsible for all visual representations.
-    -   It uses a Jinja2 template (`threat_model.dot.j2`) to generate Graphviz DOT language code from the `ThreatModel` object. This templated approach allows for easy customization of the diagram's appearance.
+    -   It uses a Jinja2 template (`threat_model.dot.j2`) to generate Graphviz DOT language code from the `ThreatModel` object.
+    -   **Visual Styling**: The generator includes logic for rich visual styling:
+        -   It automatically assigns shapes based on keywords in element names (e.g., `cylinder` for "database", `hexagon` for "firewall").
+        -   It adds icons (e.g., 👤 for actors, 🖥️ for servers, 🔥 for firewalls) to node labels for better readability.
     -   It calls the `dot` command-line tool to render the DOT code into SVG, PNG, or other formats.
-    -   For hierarchical projects, it post-processes the generated SVG using Python's `xml.etree.ElementTree` to inject `<a>` tags with hyperlinks, making the diagrams navigable.
+    -   **Navigable Diagrams**: For hierarchical projects, it makes diagrams navigable by post-processing the SVG. The `add_links_to_svg` function uses Python's `xml.etree.ElementTree` to find SVG nodes corresponding to elements with a `submodel` property and wraps them in an `<a>` hyperlink tag pointing to the sub-model's diagram.
 -   **`report_generator.py`**: Creates the primary user-facing artifacts.
     -   It uses Jinja2 templates (`report_template.html`, `navigable_diagram_template.html`) for generating rich HTML outputs.
-    -   The `generate_project_reports` method is particularly important, as it recursively traverses a project structure, generates reports for each sub-model, and pieces them together with correct relative links and a consistent legend.
+    -   **Hierarchical Project Generation**: The `generate_project_reports` method orchestrates the analysis of complex, multi-part systems.
+        -   It starts from a root `main.md` file and recursively discovers all `model.md` files referenced in `submodel:` properties of servers.
+        -   Before generation, it aggregates all protocol definitions and styles from every model in the project to create a single, consistent legend for all diagrams.
+        -   It generates a full set of reports (threat analysis, JSON, navigable diagram) for each model.
+        -   It constructs a breadcrumb navigation trail for each diagram, allowing users to easily navigate up and down the model hierarchy.
 -   **`stix_generator.py`**: This module provides interoperability.
     -   It translates the framework's findings into STIX 2.1, a standardized language for cyber threat intelligence.
     -   It leverages the `attack-flow` STIX extension to create a structured representation of the attack chains, creating `attack-action` and `attack-asset` objects and linking them with relationships.
@@ -163,3 +170,34 @@ The `SeverityCalculator` provides a nuanced risk score for each threat.
     -   `/api/update`: Receives Markdown from the editor, triggers a live analysis, and returns the resulting SVG diagram and legend.
     -   `/api/export` & `/api/export_all`: Handle requests to download the generated artifacts.
 -   **`threat_model_service.py`**: This service layer acts as a bridge between the web server and the core analysis engine. It encapsulates the logic for handling web requests, calling the appropriate framework components, and managing temporary files, keeping the Flask app clean and focused on routing.
+
+### 4.9. Mitigation Suggestions (`mitigation_suggestions.py`)
+
+This module provides actionable mitigation advice for the threats identified during the analysis. It bridges the gap between threat identification and remediation.
+
+-   **`MITIGATION_MAP`**: The core of this module is a dictionary that maps MITRE ATT&CK technique IDs to a curated list of mitigation suggestions.
+-   **Framework Integration**: The suggestions are sourced from well-known security frameworks, including:
+    -   OWASP Application Security Verification Standard (ASVS)
+    -   NIST Special Publication 800-53
+    -   CIS Controls
+-   **`get_mitigation_suggestions()`**: This function takes a list of ATT&CK technique IDs and returns all corresponding mitigation suggestions from the map, which are then embedded in the final HTML report.
+
+### 4.10. Centralized Configuration (`config.py`)
+
+To improve maintainability and ease of modification, the framework uses a central `config.py` file. This module contains static configuration values that are used throughout the application.
+
+Key configurations include:
+-   **Default Paths**: `DEFAULT_MODEL_FILEPATH` and `BASE_PROTOCOL_STYLES_FILEPATH`.
+-   **Output Management**: `TIMESTAMP` for unique output directories, `OUTPUT_BASE_DIR`, and `TMP_DIR`.
+-   **Filename Templates**: Templates for all output files (HTML reports, JSON, diagrams) to ensure consistent naming conventions (e.g., `HTML_REPORT_FILENAME_TPL`).
+
+### 4.11. IaC Plugin Architecture (`iac_plugins/`)
+
+The framework is designed to be extensible through a dedicated Infrastructure as Code (IaC) plugin system, allowing it to generate threat models from various IaC sources.
+
+-   **Abstract Base Class**: The `iac_plugins/__init__.py` file defines an abstract base class called `IaCPlugin`. To create a new plugin, a developer must create a class that inherits from `IaCPlugin`.
+-   **Required Implementations**: Any new plugin must implement three key methods:
+    1.  `name`: Returns the name of the plugin (e.g., "ansible").
+    2.  `parse_iac_config()`: Contains the logic to parse the IaC source files (e.g., playbooks, Terraform state).
+    3.  `generate_threat_model_components()`: Contains the logic to convert the parsed data into the Markdown DSL format used by the framework.
+-   **Dynamic Loading**: The main entrypoint (`__main__.py`) automatically discovers and loads any valid plugin placed in the `iac_plugins` directory. It also dynamically creates command-line arguments based on the plugin's name (e.g., `--ansible-path`).
