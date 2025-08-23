@@ -300,7 +300,8 @@ class ReportGenerator:
             output_dir=output_dir,
             breadcrumb=[(project_path.name, "main_diagram.html")],
             project_protocols=project_protocols,
-            project_protocol_styles=project_protocol_styles
+            project_protocol_styles=project_protocol_styles,
+            threat_model=main_threat_model # Pass the pre-loaded main model
         )
 
         return main_threat_model
@@ -352,25 +353,27 @@ class ReportGenerator:
 
         return project_protocols, project_protocol_styles
 
-    def _recursively_generate_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[tuple[str, str]], project_protocols: set, project_protocol_styles: dict):
+    def _recursively_generate_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[tuple[str, str]], project_protocols: set, project_protocol_styles: dict, threat_model: Optional[ThreatModel] = None):
         """
         Recursively generates reports for each model in the project.
         """
         model_name = model_path.stem
 
         try:
-            with open(model_path, "r", encoding="utf-8") as f:
-                markdown_content = f.read()
+            if threat_model is None:
+                with open(model_path, "r", encoding="utf-8") as f:
+                    markdown_content = f.read()
 
-            threat_model = create_threat_model(
-                markdown_content=markdown_content,
-                model_name=model_name,
-                model_description=f"Threat model for {model_name}",
-                mitre_mapping=self.mitre_mapping,
-                validate=True
-            )
+                threat_model = create_threat_model(
+                    markdown_content=markdown_content,
+                    model_name=model_name,
+                    model_description=f"Threat model for {model_name}",
+                    mitre_mapping=self.mitre_mapping,
+                    validate=True
+                )
+            
             if not threat_model:
-                logging.error(f"Failed to create threat model for {model_path}")
+                logging.error(f"Failed to create or use threat model for {model_path}")
                 return
 
             # Generate all files for the current model

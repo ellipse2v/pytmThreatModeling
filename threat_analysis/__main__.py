@@ -37,6 +37,7 @@ from threat_analysis.iac_plugins import IaCPlugin
 from threat_analysis.generation.report_generator import ReportGenerator
 from threat_analysis.utils import _validate_path_within_project
 from threat_analysis.server.server import run_gui
+from threat_analysis.core.model_validator import ModelValidator
 
 # Add project root to sys.path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -347,6 +348,92 @@ class CustomArgumentParser:
         return self.parser.parse_known_args()
 
 
+def run_single_analysis(args: argparse.Namespace, loaded_iac_plugins: Dict[str, IaCPlugin]):
+    """Runs the analysis for a single threat model file or an IaC input."""
+    markdown_content_for_analysis = ""
+    iac_plugin_used = False
+    iac_input_filename = ""
+
+    # Check for IaC plugin arguments
+    for plugin_name, plugin_instance in loaded_iac_plugins.items():
+        arg_name = f"{plugin_name}_path"
+        if hasattr(args, arg_name) and getattr(args, arg_name):
+            logging.info(f"Processing IaC configuration with {plugin_name} plugin...")
+            config_path = _validate_path_within_project(getattr(args, arg_name))
+            iac_input_filename = config_path.stem # Get filename without extension
+            try:
+                parsed_data = plugin_instance.parse_iac_config(str(config_path)) # Pass as string
+                iac_generated_content = plugin_instance.generate_threat_model_components(parsed_data)
+                logging.info(f"Successfully generated threat model components from {plugin_name}.")
+                iac_plugin_used = True
+
+                # Load base protocol styles
+                base_protocol_styles_path = config.BASE_PROTOCOL_STYLES_FILEPATH
+                if base_protocol_styles_path.exists():
+                    with open(base_protocol_styles_path, "r", encoding="utf-8") as f:
+                        base_styles_content = f.read()
+                    markdown_content_for_analysis = base_styles_content + "\n" + iac_generated_content
+                else:
+                    logging.warning(f"⚠️ Warning: Base protocol styles file not found: {base_protocol_styles_path}. Proceeding without it.")
+                    markdown_content_for_analysis = iac_generated_content
+
+                break # Process only one IaC plugin at a time
+            except Exception as e:
+                logging.error(f"❌ Error processing {plugin_name} config: {e}")
+                sys.exit(1)
+
+    if not iac_plugin_used:
+        # If no IaC plugin was used, read from the specified model file
+        base_model_filepath = _validate_path_within_project(args.model_file)
+        with open(base_model_filepath, "r", encoding="utf-8") as f:
+            markdown_content_for_analysis = f.read()
+    else:
+        # Ensure the output directory exists before writing
+        os.makedirs(config.OUTPUT_BASE_DIR, exist_ok=True)
+
+        # If IaC plugin was used, and a model file was also specified,
+        # write the generated content to that file.
+        # If no --model-file is specified, use a default name based on IaC input.
+        if args.model_file:
+            # If --model-file is specified, create the file within the timestamped output directory
+            output_model_filepath = config.OUTPUT_BASE_DIR / Path(args.model_file).name
+        else:
+            # If no --model-file is specified, use a default name based on IaC input
+            output_model_filepath = config.OUTPUT_BASE_DIR / f"{iac_input_filename}.md"
+
+        try:
+            with open(output_model_filepath, "w", encoding="utf-8") as f:
+                f.write(markdown_content_for_analysis)
+            logging.info(f"Generated IaC threat model written to: {output_model_filepath}")
+        except Exception as e:
+            logging.error(f"❌ Error writing generated IaC model to {output_model_filepath}: {e}")
+            sys.exit(1)
+
+
+    framework = ThreatAnalysisFramework(
+        markdown_content=markdown_content_for_analysis,
+        model_name=config.DEFAULT_MODEL_NAME,
+        model_description=config.DEFAULT_MODEL_DESCRIPTION,
+    )
+
+    threats = framework.run_analysis()
+
+    if not threats:
+        logging.error("Threat analysis failed. Please check the logs for validation errors.")
+        if framework.threat_model:
+            validator = ModelValidator(framework.threat_model)
+            errors = validator.validate()
+            for error in errors:
+                logging.error(f"- {error}")
+        sys.exit(1)
+
+    reports = framework.generate_reports()
+    framework.generate_stix_report()
+    diagrams = framework.generate_diagrams()
+
+    if args.navigator:
+        framework.generate_navigator_layer()
+
 # --- Main entry point ---
 if __name__ == "__main__":
     logging.basicConfig(
@@ -396,89 +483,7 @@ if __name__ == "__main__":
                 logging.error(f"❌ Failed to generate project ATT&CK Navigator layer: {e}")
 
     else:
-        markdown_content_for_analysis = ""
-        iac_plugin_used = False
-        iac_input_filename = ""
-
-        # Check for IaC plugin arguments
-        for plugin_name, plugin_instance in loaded_iac_plugins.items():
-            arg_name = f"{plugin_name}_path"
-            if hasattr(args, arg_name) and getattr(args, arg_name):
-                logging.info(f"Processing IaC configuration with {plugin_name} plugin...")
-                config_path = _validate_path_within_project(getattr(args, arg_name))
-                iac_input_filename = config_path.stem # Get filename without extension
-                try:
-                    parsed_data = plugin_instance.parse_iac_config(str(config_path)) # Pass as string
-                    iac_generated_content = plugin_instance.generate_threat_model_components(parsed_data)
-                    logging.info(f"Successfully generated threat model components from {plugin_name}.")
-                    iac_plugin_used = True
-
-                    # Load base protocol styles
-                    base_protocol_styles_path = config.BASE_PROTOCOL_STYLES_FILEPATH
-                    if base_protocol_styles_path.exists():
-                        with open(base_protocol_styles_path, "r", encoding="utf-8") as f:
-                            base_styles_content = f.read()
-                        markdown_content_for_analysis = base_styles_content + "\n" + iac_generated_content
-                    else:
-                        logging.warning(f"⚠️ Warning: Base protocol styles file not found: {base_protocol_styles_path}. Proceeding without it.")
-                        markdown_content_for_analysis = iac_generated_content
-
-                    break # Process only one IaC plugin at a time
-                except Exception as e:
-                    logging.error(f"❌ Error processing {plugin_name} config: {e}")
-                    sys.exit(1)
-
-        if not iac_plugin_used:
-            # If no IaC plugin was used, read from the specified model file
-            base_model_filepath = _validate_path_within_project(args.model_file)
-            with open(base_model_filepath, "r", encoding="utf-8") as f:
-                markdown_content_for_analysis = f.read()
-        else:
-            # Ensure the output directory exists before writing
-            os.makedirs(config.OUTPUT_BASE_DIR, exist_ok=True)
-
-            # If IaC plugin was used, and a model file was also specified,
-            # write the generated content to that file.
-            # If no --model-file is specified, use a default name based on IaC input.
-            if args.model_file:
-                # If --model-file is specified, create the file within the timestamped output directory
-                output_model_filepath = config.OUTPUT_BASE_DIR / Path(args.model_file).name
-            else:
-                # If no --model-file is specified, use a default name based on IaC input
-                output_model_filepath = config.OUTPUT_BASE_DIR / f"{iac_input_filename}.md"
-
-            try:
-                with open(output_model_filepath, "w", encoding="utf-8") as f:
-                    f.write(markdown_content_for_analysis)
-                logging.info(f"Generated IaC threat model written to: {output_model_filepath}")
-            except Exception as e:
-                logging.error(f"❌ Error writing generated IaC model to {output_model_filepath}: {e}")
-                sys.exit(1)
-
-
-        framework = ThreatAnalysisFramework(
-            markdown_content=markdown_content_for_analysis,
-            model_name=config.DEFAULT_MODEL_NAME,
-            model_description=config.DEFAULT_MODEL_DESCRIPTION,
-        )
-
-        threats = framework.run_analysis()
-
-        if not threats:
-            logging.error("Threat analysis failed. Please check the logs for validation errors.")
-            if framework.threat_model:
-                validator = ModelValidator(framework.threat_model)
-                errors = validator.validate()
-                for error in errors:
-                    logging.error(f"- {error}")
-            sys.exit(1)
-
-        reports = framework.generate_reports()
-        framework.generate_stix_report()
-        diagrams = framework.generate_diagrams()
-
-        if args.navigator:
-            framework.generate_navigator_layer()
+        run_single_analysis(args, loaded_iac_plugins)
 
         # if "html" in reports and reports["html"]:
         #     framework.open_report_in_browser(reports["html"])
