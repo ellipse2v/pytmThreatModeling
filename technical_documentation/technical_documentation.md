@@ -31,6 +31,7 @@ To understand the unique value of ThreatModelByPyTM, it's useful to compare it t
 | **IaC Integration** | None. | None. | **Yes (Ansible)**. Can generate a model directly from infrastructure definitions. |
 | **Version Control** | Possible by archiving the `.tm7` model file. However, the format is complex (XML-based) and not well-suited for line-by-line diffing or merging. | Feasible (JSON), but the diagram is the primary source of truth, not the code. | **Seamless**. Markdown is text-based and ideal for Git. |
 | **Extensibility** | Limited to templates. | Good. Open-source and extensible. | **High**. Mappings and logic are in simple Python dictionaries and modules. |
+| **Visualization & Reporting** | Basic reports. | Printable report, basic threat view. | Rich HTML reports, STIX 2.1 export, **MITRE ATT&CK Navigator layers**. |
 
 ## 3. High-Level Architecture
 
@@ -80,22 +81,42 @@ This section provides a comprehensive breakdown of each component of the ThreatM
 ### 4.1. Entrypoint and Orchestration (`threat_analysis/__main__.py`)
 
 The execution of the framework begins in `__main__.py`. This script is responsible for:
--   **Argument Parsing**: It uses a `CustomArgumentParser` to handle command-line arguments. This includes standard arguments like `--model-file`, `--gui`, and `--project`, but it also dynamically loads IaC plugins from the `iac_plugins` directory and adds corresponding arguments for them (e.g., `--ansible-path`).
+-   **Argument Parsing**: It uses a `CustomArgumentParser` to handle command-line arguments. This includes standard arguments like `--model-file`, `--gui`, `--project`, and `--navigator`, but it also dynamically loads IaC plugins from the `iac_plugins` directory and adds corresponding arguments for them (e.g., `--ansible-path`).
 -   **Mode Selection**: It determines the execution mode based on the arguments:
     -   `--gui`: Launches the Flask web server via `server.run_gui()`.
     -   `--project`: Initiates a hierarchical project analysis via `report_generator.generate_project_reports()`.
     -   `--<iac-plugin>-path`: Triggers the IaC import workflow.
     -   Default: Proceeds with a standard single-file analysis.
--   **Framework Orchestration**: For standard and IaC-based runs, it instantiates the `ThreatAnalysisFramework` class, which coordinates the entire analysis pipeline from model loading to report generation.
+-   **Framework Orchestration**: For standard and IaC-based runs, it instantiates the `ThreatAnalysisFramework` class, which coordinates the entire analysis pipeline from model loading to report generation. If the `--navigator` flag is present, it also triggers the generation of the ATT&CK Navigator layer. For project-based runs, it calls `report_generator.generate_project_reports()` and then, if the `--navigator` flag is present, generates a consolidated ATT&CK Navigator layer for the entire project.
 
 ### 4.2. Core Model (`threat_analysis/core/models_module.py`)
 
-The `ThreatModel` class is the central data structure, encapsulating the entire state of the system being analyzed.
--   **Inheritance**: It wraps the `pytm.TM` object, leveraging its foundational threat generation capabilities.
--   **Data Structures**: It maintains collections for all system components: `boundaries`, `actors`, `servers`, `dataflows`, `data_objects`, and configuration settings like `protocol_styles` and `severity_multipliers`.
--   **Element Management**: The `add_*` methods (`add_boundary`, `add_server`, etc.) are responsible for creating `pytm` objects and storing them along with their metadata (like colors and custom properties) in the appropriate collections. The `_elements_by_name` dictionary provides a fast lookup mechanism for retrieving any component by its name.
--   **`process_threats()`**: This is the primary analysis method. It orchestrates validation, threat generation (from both `pytm` and custom rules), grouping, and MITRE analysis.
--   **`_expand_class_targets()`**: A crucial helper method that takes generic threats targeted at a *class* of objects (e.g., `Server`) and creates a specific threat instance for every `Server` object defined in the model. This ensures that all components are evaluated correctly.
+The `ThreatModel` class is the heart of the framework, serving as the in-memory representation of the system under analysis. It is designed to be a rich, stateful object that not only holds the architectural components but also orchestrates the analysis process.
+
+-   **A Wrapper Around PyTM**: At its core, the `ThreatModel` class wraps a `pytm.TM` object. This allows the framework to leverage the foundational threat generation logic of the PyTM library while extending it with custom features, more detailed component attributes, and advanced analysis capabilities.
+
+-   **Key Data Structures**: The class maintains several dictionaries and lists to manage the components of the threat model:
+    -   `boundaries`, `actors`, `servers`, `dataflows`, `data_objects`: These collections store not just the `pytm` objects themselves, but also associated metadata defined in the Markdown DSL, such as custom properties, colors for diagramming, or links to sub-models.
+    -   `protocol_styles`: A dictionary to store custom styling rules for dataflow protocols (e.g., making `HTTPS` flows appear as green solid lines and `HTTP` as red dashed lines in diagrams).
+    -   `severity_multipliers`: Stores multipliers for specific components, allowing for a more nuanced risk calculation.
+    -   `_elements_by_name`: This dictionary is a critical optimization. It provides an O(1) lookup for any component in the model by its name, which is essential for quickly resolving relationships during parsing and analysis (e.g., finding the source and sink objects for a dataflow).
+
+-   **Element Management**: The `add_*` methods (e.g., `add_boundary`, `add_server`, `add_dataflow`) are the primary interface for building the model. They are responsible for:
+    1.  Creating the underlying `pytm` object.
+    2.  Storing the object along with its extended attributes in the appropriate collection.
+    3.  Populating the `_elements_by_name` lookup table.
+
+-   **Custom Threats**: The module also defines a `CustomThreat` class. This simple class allows the framework to represent threats that are not part of the standard STRIDE model generated by PyTM. These custom threats are defined in the `threat_rules.py` file and are instantiated and added to the model during the analysis process.
+
+-   **The Analysis Engine: `process_threats()`**: This is the most important method in the class. It serves as the orchestrator for the entire threat analysis pipeline, executing the following steps in order:
+    1.  **Validation**: It first calls the `ModelValidator` to ensure the model is consistent and complete (e.g., no dataflows pointing to non-existent elements).
+    2.  **PyTM Threat Generation**: It calls `self.tm.process()` to trigger the standard PyTM threat generation.
+    3.  **Target Expansion**: It calls `_expand_class_targets()`, a crucial helper method that takes generic threats targeted at a *class* of objects (e.g., a threat against all `Server` objects) and creates a specific threat instance for every `Server` defined in the model. This ensures that all components are evaluated correctly.
+    4.  **Custom Threat Generation**: It integrates custom threats defined in the rule-based engine (`custom_threats.py`).
+    5.  **Grouping**: It groups all generated threats (both from PyTM and custom rules) by their STRIDE category.
+    6.  **MITRE Analysis**: Finally, it triggers the MITRE ATT&CK mapping and enrichment process.
+
+-   **`get_all_threats_details()`**: This method provides a clean, comprehensive list of all identified threats, including their description, target, STRIDE category, severity, and associated MITRE techniques. This is the primary data source for the report generation modules.
 
 ### 4.3. Model Parsing and Validation
 
@@ -110,13 +131,63 @@ The `ThreatModel` class is the central data structure, encapsulating the entire 
 
 ### 4.4. Threat Generation Engine
 
--   **`threat_rules.py`**: This file is a static dictionary (`THREAT_RULES`) that defines the conditions under which threats are generated. It is structured by component type (`servers`, `dataflows`, `actors`). Each rule contains:
-    -   `conditions`: A dictionary of properties that a component must have to trigger the rule (e.g., `{"is_encrypted": False}`).
-    -   `threats`: A list of threat templates to be created if the conditions are met.
--   **`custom_threats.py`**: This module contains the `RuleBasedThreatGenerator`.
-    -   Its `generate_threats` method iterates through all components in the `ThreatModel`.
-    -   For each component, it checks its properties against the rules in `threat_rules.py`.
-    -   A key feature is its **boundary-aware logic** for dataflows. It checks the source and sink boundaries of a flow (e.g., `source_boundary: "DMZ"`, `sink_boundary: "Internal"`) to apply highly specific threats for traffic crossing between different network zones.
+The framework's custom threat generation is driven by a flexible, rule-based engine that complements the standard threat generation provided by the underlying PyTM library. This engine allows for the definition of highly specific, context-aware threats that are tailored to the architecture defined in the model. The engine is composed of two main files: `threat_rules.py` and `custom_threats.py`.
+
+-   **`threat_rules.py`: The Rulebook**: This file acts as a declarative "rulebook" for the threat generation engine. It contains a single, large dictionary called `THREAT_RULES`.
+    -   **Structure**: The dictionary is organized by component type (`servers`, `dataflows`, `actors`). Each component type contains a list of rules.
+    -   **Rule Definition**: Each rule is a dictionary with two key parts:
+        -   `conditions`: A dictionary specifying the properties a component must have for the rule to be triggered. For example, a dataflow rule might have `{"is_encrypted": False, "protocol": "HTTP"}`.
+        -   `threats`: A list of threat templates to be generated if all conditions are met. Each template is a dictionary that defines the threat's `description`, `stride_category`, `impact`, and `likelihood`.
+
+    -   **Example Rule**:
+        ```python
+        # From THREAT_RULES['dataflows']
+        {
+            "conditions": {
+                "is_encrypted": False,
+                "protocol": "HTTP"
+            },
+            "threats": [
+                {
+                    "description": "Sensitive data transmitted over unencrypted HTTP",
+                    "stride_category": "Information Disclosure",
+                    "impact": 4,
+                    "likelihood": 4
+                }
+            ]
+        }
+        ```
+        This rule states: "If a dataflow is not encrypted AND uses the HTTP protocol, then generate an 'Information Disclosure' threat."
+
+-   **`custom_threats.py`: The Engine Itself**: This module contains the `get_custom_threats` function which acts as the engine that interprets the rules.
+    -   **`get_custom_threats(threat_model)`**: This function is the main entry point for the custom threat generation process. It takes the fully parsed `ThreatModel` object as input.
+    -   **Iteration and Matching**: The function iterates through every component (server, dataflow, actor, etc.) in the `threat_model`. For each component, it retrieves the relevant rules from `THREAT_RULES` (based on the component's type). It then checks if the component's properties match all the `conditions` specified in a rule.
+    -   **Boundary-Aware Logic**: A key feature of the engine is its ability to handle complex conditions, especially for dataflows. It can check the properties of the source and sink of a dataflow, including which boundary they are in. For example, a rule can be written to only trigger a threat if a dataflow crosses from an untrusted boundary (like the "Internet") to a trusted one (like the "Internal Network").
+    -   **Threat Instantiation**: If a component's properties match all the conditions of a rule, the engine uses the threat templates associated with that rule to create new `CustomThreat` objects. These objects are then added to the list of threats in the `ThreatModel`.
+
+This two-part design (declarative rules + an engine to interpret them) makes the threat generation highly extensible. To add a new threat, a developer only needs to add a new entry to the `THREAT_RULES` dictionary; no changes to the engine's code are required.
+
+```mermaid
+graph TD
+    subgraph Rule-Based Threat Generation
+        A[ThreatModel Object] -->|Contains| B(Components: Servers, Dataflows, etc.)
+        C[threat_rules.py] -->|Contains| D{THREAT_RULES Dictionary}
+        
+        E[custom_threats.py] -->|Reads| A
+        E -->|Reads| C
+        
+        subgraph "For each Component in ThreatModel"
+            direction LR
+            F[Component Properties] -->|Compared with| G[Rule Conditions]
+        end
+
+        B --> F
+        D --> G
+
+        G -- "All Conditions Match" --> H(Instantiate CustomThreat)
+        H -->|Added to| A
+    end
+```
 
 ### 4.5. The STRIDE, CAPEC, and ATT&CK Mapping (`mitre_mapping_module.py`)
 
@@ -131,6 +202,18 @@ This is the most complex and critical module for enriching the raw threat data.
     -   **`map_threat_to_capec()`**: This function is the first step in the enrichment chain. It takes a threat's description and STRIDE category. It filters the patterns from `stride_to_capec.json` to only those relevant to the STRIDE category and then uses regular expressions (built from keywords in the CAPEC descriptions) to find matches in the threat description.
     -   **`map_threat_to_mitre()`**: This function takes a threat description and uses a large dictionary of regex patterns (`_initialize_threat_patterns`) to directly map keywords in the description to specific MITRE ATT&CK Technique IDs (e.g., "sql injection" maps to T1190).
     -   **Enrichment Pipeline**: The full analysis connects these pieces: A generated threat (e.g., "SQL injection on WebServer") is first mapped to ATT&CK Technique T1190. The framework then uses its data to find that T1190 is a CAPEC-19 attack pattern. This provides a multi-layered view, from the general STRIDE category (Tampering) to the specific technique (T1190) and the attack pattern (CAPEC-19).
+
+```mermaid
+graph TD
+    subgraph Threat Enrichment Pipeline
+        A[Threat Description: e.g., "SQL Injection on WebServer"] -->|Regex Match| B{MITRE ATT&CK Technique: T1190}
+        A -->|STRIDE Category| C{STRIDE: Tampering}
+        C -->|Mapping| D{CAPEC Patterns}
+        D -->|Regex Match on Threat Description| E{Specific CAPEC: e.g., CAPEC-19}
+        E -->|Mapping| B
+        B -->|Mapping| F{D3FEND Countermeasures}
+    end
+```
 
 ### 4.6. Severity Calculation (`severity_calculator_module.py`)
 
@@ -159,9 +242,35 @@ The `SeverityCalculator` provides a nuanced risk score for each threat.
         -   Before generation, it aggregates all protocol definitions and styles from every model in the project to create a single, consistent legend for all diagrams.
         -   It generates a full set of reports (threat analysis, JSON, navigable diagram) for each model.
         -   It constructs a breadcrumb navigation trail for each diagram, allowing users to easily navigate up and down the model hierarchy.
+
+```mermaid
+graph TD
+    subgraph Hierarchical Project Structure
+        A["main.md (Project Root)"]
+        B["backend/model.md"]
+        C["frontend/model.md"]
+        D["database/model.md"]
+
+        A -- "submodel: backend/model.md" --> B
+        A -- "submodel: frontend/model.md" --> C
+        B -- "submodel: database/model.md" --> D
+    end
+
+    subgraph Generated Navigable Diagram
+        direction LR
+        E[main_diagram.html] -->|Click on 'backend'| F[backend/model_diagram.html]
+        F -->|Click on 'database'| G[backend/database/model_diagram.html]
+        F -->|Breadcrumb Link| E
+        G -->|Breadcrumb Link| F
+    end
+```
 -   **`stix_generator.py`**: This module provides interoperability.
     -   It translates the framework's findings into STIX 2.1, a standardized language for cyber threat intelligence.
     -   It leverages the `attack-flow` STIX extension to create a structured representation of the attack chains, creating `attack-action` and `attack-asset` objects and linking them with relationships.
+-   **`attack_navigator_generator.py`**: This module creates a JSON layer file compatible with the [MITRE ATT&CK Navigator](https://mitre-attack.github.io/attack-navigator/) to visualize the results of the analysis.
+    -   The `AttackNavigatorGenerator` class takes the threat model's name and a list of all detailed threats.
+    -   It processes the threats to extract all unique ATT&CK techniques. For each technique, it aggregates the findings, using the highest severity score as the technique's score and compiling the descriptions of all threats mapped to it in the comments.
+    -   The final JSON output is a standard ATT&CK Navigator layer file, with techniques colored based on their severity score, allowing security analysts to quickly visualize the most critical attack vectors identified in the threat model.
 
 ### 4.8. Web Interface (`server/`)
 
@@ -173,14 +282,56 @@ The `SeverityCalculator` provides a nuanced risk score for each threat.
 
 ### 4.9. Mitigation Suggestions (`mitigation_suggestions.py`)
 
-This module provides actionable mitigation advice for the threats identified during the analysis. It bridges the gap between threat identification and remediation.
+This module provides actionable mitigation advice for the threats identified during the analysis. It bridges the gap between threat identification and remediation by linking abstract attack techniques to concrete defensive actions.
 
--   **`MITIGATION_MAP`**: The core of this module is a dictionary that maps MITRE ATT&CK technique IDs to a curated list of mitigation suggestions.
--   **Framework Integration**: The suggestions are sourced from well-known security frameworks, including:
-    -   OWASP Application Security Verification Standard (ASVS)
-    -   NIST Special Publication 800-53
-    -   CIS Controls
--   **`get_mitigation_suggestions()`**: This function takes a list of ATT&CK technique IDs and returns all corresponding mitigation suggestions from the map, which are then embedded in the final HTML report.
+-   **`MITIGATION_MAP`: The Knowledge Base**: The core of this module is a large dictionary named `MITIGATION_MAP`. This dictionary serves as a knowledge base that maps specific MITRE ATT&CK technique IDs to a curated list of mitigation suggestions.
+    -   **Structure**: Each key in the dictionary is a MITRE ATT&CK Technique ID (e.g., "T1190" for "Exploit Public-Facing Application"). The value is a list of dictionaries, where each dictionary represents a specific mitigation.
+    -   **Mitigation Details**: Each mitigation dictionary contains:
+        -   `framework`: The source of the mitigation (e.g., "OWASP ASVS", "NIST", "CIS").
+        -   `control_id`: The specific control ID from that framework (e.g., "ASVS V4.0.3-5.2.1").
+        -   `description`: A human-readable description of the mitigation control.
+
+    -   **Example Mapping**:
+        ```python
+        # From MITIGATION_MAP
+        "T1190": [
+            {
+                "framework": "OWASP ASVS",
+                "control_id": "V4.0.3-14.2.4",
+                "description": "Verify that the application sanitizes, filters, or escapes all user-supplied input..."
+            },
+            {
+                "framework": "NIST",
+                "control_id": "SI-10",
+                "description": "Information Input Validation."
+            }
+        ]
+        ```
+
+-   **`get_mitigation_suggestions()`: The Lookup Function**: This is the primary function of the module.
+    -   It takes a list of ATT&CK technique IDs (which are extracted from the threats during the report generation phase).
+    -   It iterates through the provided IDs and looks them up in the `MITIGATION_MAP`.
+    -   It aggregates all the corresponding mitigation suggestions into a single list.
+
+-   **Integration with the Report Generator**: The `report_generator.py` module calls `get_mitigation_suggestions()` for each identified threat. The returned list of mitigations is then embedded directly into the final HTML report, displayed alongside the threat it helps to counter. This provides a clear and direct link from a detected vulnerability to a set of actionable remediation steps.
+
+-   **Architecture Flow**:
+    ```mermaid
+    graph TD
+        subgraph report_generator.py
+            A[Threat with Mapped ATT&CK IDs] -->|Extracts IDs| B(List of Technique IDs)
+            B -->|Calls| C{mitigation_suggestions.get_mitigation_suggestions()}
+        end
+
+        subgraph mitigation_suggestions.py
+            C -->|Looks up IDs in| D[MITIGATION_MAP]
+            D -->|Returns| E[List of Mitigation Dictionaries]
+        end
+
+        A --> F[HTML Report]
+        E -->|Embedded in| F
+    end
+    ```
 
 ### 4.10. Centralized Configuration (`config.py`)
 
