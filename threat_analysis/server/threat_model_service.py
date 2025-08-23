@@ -19,6 +19,7 @@ import datetime
 import zipfile
 import shutil
 from io import BytesIO
+import json
 from threat_analysis import config
 
 from threat_analysis.core.model_factory import create_threat_model
@@ -26,6 +27,8 @@ from threat_analysis.core.mitre_mapping_module import MitreMapping
 from threat_analysis.severity_calculator_module import SeverityCalculator
 from threat_analysis.generation.report_generator import ReportGenerator
 from threat_analysis.generation.diagram_generator import DiagramGenerator
+from threat_analysis.generation.attack_navigator_generator import AttackNavigatorGenerator
+from threat_analysis.generation.stix_generator import StixGenerator
 from threat_analysis.core.model_validator import ModelValidator
 
 class ThreatModelService:
@@ -34,6 +37,7 @@ class ThreatModelService:
         self.severity_calculator = SeverityCalculator()
         self.diagram_generator = DiagramGenerator()
         self.report_generator = ReportGenerator(self.severity_calculator, self.mitre_mapping)
+        self.stix_generator = None # Initialize later with threat_model and all_detailed_threats
 
     def update_diagram_logic(self, markdown_content: str):
         logging.info("Entering update_diagram_logic function.")
@@ -210,7 +214,7 @@ class ThreatModelService:
             raise ValueError("Validation failed: " + ", ".join(errors))
 
 
-        markdown_filename = "threatModel_Template/threat_model.md"
+        markdown_filename = "threat_model.md"
         markdown_filepath = os.path.join(export_path, markdown_filename)
         with open(markdown_filepath, "w", encoding="utf-8") as f:
             f.write(markdown_content)
@@ -245,6 +249,35 @@ class ThreatModelService:
             threat_model, grouped_threats, json_analysis_filepath
         )
 
+        # Generate ATT&CK Navigator Layer
+        all_detailed_threats = threat_model.get_all_threats_details()
+        navigator_generator = AttackNavigatorGenerator(
+            threat_model_name=threat_model.tm.name,
+            all_detailed_threats=all_detailed_threats
+        )
+        navigator_filename = config.JSON_NAVIGATOR_FILENAME_TPL.format(timestamp=config.TIMESTAMP)
+        navigator_filepath = os.path.join(export_path, navigator_filename)
+        navigator_generator.save_layer_to_file(navigator_filepath)
+        logging.info(f"ATT&CK Navigator layer saved to: {navigator_filepath}")
+        if not os.path.exists(navigator_filepath) or os.path.getsize(navigator_filepath) == 0:
+            logging.error(f"Generated Navigator file is missing or empty: {navigator_filepath}")
+            raise RuntimeError("Failed to generate Navigator layer.")
+
+        # Generate STIX report
+        stix_generator_instance = StixGenerator(
+            threat_model=threat_model,
+            all_detailed_threats=all_detailed_threats
+        )
+        stix_bundle = stix_generator_instance.generate_stix_bundle()
+        stix_filename = f"stix_report_{config.TIMESTAMP}.json"
+        stix_filepath = os.path.join(export_path, stix_filename)
+        with open(stix_filepath, "w", encoding="utf-8") as f:
+            json.dump(stix_bundle, f, indent=4)
+        logging.info(f"STIX report saved to: {stix_filepath}")
+        if not os.path.exists(stix_filepath) or os.path.getsize(stix_filepath) == 0:
+            logging.error(f"Generated STIX file is missing or empty: {stix_filepath}")
+            raise RuntimeError("Failed to generate STIX report.")
+
         zip_buffer = BytesIO()
         with zipfile.ZipFile(
             zip_buffer, "w", zipfile.ZIP_DEFLATED
@@ -252,10 +285,118 @@ class ThreatModelService:
             for root, _, files in os.walk(export_path):
                 for file in files:
                     file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, export_path)
                     zf.write(
-                        file_path, os.path.relpath(file_path, export_path)
+                        file_path, arcname
                     )
+                    logging.info(f"Added {arcname} to zip. Size: {os.path.getsize(file_path)} bytes")
         zip_buffer.seek(0)
+        logging.info(f"Zip buffer size: {zip_buffer.getbuffer().nbytes} bytes")
+
+        shutil.rmtree(export_path)
+
+        return zip_buffer, timestamp
+
+    def export_navigator_stix_logic(self, markdown_content: str):
+        logging.info("Entering export_navigator_stix_logic function.")
+        if not markdown_content:
+            raise ValueError("Missing markdown content")
+
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        export_dir_name = f"navigator_stix_export_{timestamp}"
+        export_path = os.path.join(config.OUTPUT_BASE_DIR, export_dir_name)
+        os.makedirs(export_path, exist_ok=True)
+
+        threat_model = create_threat_model(
+            markdown_content=markdown_content,
+            model_name="ExportedThreatModel",
+            model_description="Exported from web interface",
+            mitre_mapping=self.mitre_mapping,
+            validate=True,
+        )
+        if not threat_model:
+            raise RuntimeError("Failed to create or validate threat model")
+
+        # --- Model Validation ---
+        validator = ModelValidator(threat_model)
+        errors = validator.validate()
+        if errors:
+            raise ValueError("Validation failed: " + ", ".join(errors))
+
+        # Generate all files (even if we only zip two of them)
+        markdown_filename = "threat_model.md"
+        markdown_filepath = os.path.join(export_path, markdown_filename)
+        with open(markdown_filepath, "w", encoding="utf-8") as f:
+            f.write(markdown_content)
+
+        dot_code = self.diagram_generator._generate_manual_dot(threat_model)
+        svg_filename = "tm_diagram.svg"
+        svg_filepath = os.path.join(export_path, svg_filename)
+        self.diagram_generator.generate_diagram_from_dot(
+            dot_code, svg_filepath, "svg"
+        )
+
+        html_diagram_filename = "tm_diagram.html"
+        html_diagram_filepath = os.path.join(
+            export_path, html_diagram_filename
+        )
+        self.diagram_generator._generate_html_with_legend(
+            svg_filepath, html_diagram_filepath, threat_model
+        )
+
+        grouped_threats = threat_model.process_threats()
+        html_report_filename = "stride_mitre_report.html"
+        html_report_filepath = os.path.join(export_path, html_report_filename)
+        self.report_generator.generate_html_report(
+            threat_model, grouped_threats, html_report_filepath
+        )
+
+        json_analysis_filename = "mitre_analysis.json"
+        json_analysis_filepath = os.path.join(
+            export_path, json_analysis_filename
+        )
+        self.report_generator.generate_json_export(
+            threat_model, grouped_threats, json_analysis_filepath
+        )
+
+        # Generate ATT&CK Navigator Layer
+        all_detailed_threats = threat_model.get_all_threats_details()
+        navigator_generator = AttackNavigatorGenerator(
+            threat_model_name=threat_model.tm.name,
+            all_detailed_threats=all_detailed_threats
+        )
+        navigator_filename = config.JSON_NAVIGATOR_FILENAME_TPL.format(timestamp=timestamp)
+        navigator_filepath = os.path.join(export_path, navigator_filename)
+        navigator_generator.save_layer_to_file(navigator_filepath)
+        logging.info(f"ATT&CK Navigator layer saved to: {navigator_filepath}")
+        if not os.path.exists(navigator_filepath) or os.path.getsize(navigator_filepath) == 0:
+            logging.error(f"Generated Navigator file is missing or empty: {navigator_filepath}")
+            raise RuntimeError("Failed to generate Navigator layer.")
+
+        # Generate STIX report
+        stix_generator_instance = StixGenerator(
+            threat_model=threat_model,
+            all_detailed_threats=all_detailed_threats
+        )
+        stix_bundle = stix_generator_instance.generate_stix_bundle()
+        stix_filename = f"stix_report_{timestamp}.json"
+        stix_filepath = os.path.join(export_path, stix_filename)
+        with open(stix_filepath, "w", encoding="utf-8") as f:
+            json.dump(stix_bundle, f, indent=4)
+        logging.info(f"STIX report saved to: {stix_filepath}")
+        if not os.path.exists(stix_filepath) or os.path.getsize(stix_filepath) == 0:
+            logging.error(f"Generated STIX file is missing or empty: {stix_filepath}")
+            raise RuntimeError("Failed to generate STIX report.")
+
+        zip_buffer = BytesIO()
+        with zipfile.ZipFile(
+            zip_buffer, "w", zipfile.ZIP_DEFLATED
+        ) as zf:
+            # Only add the navigator and stix files to the zip
+            zf.write(navigator_filepath, os.path.basename(navigator_filepath))
+            zf.write(stix_filepath, os.path.basename(stix_filepath))
+        zip_buffer.seek(0)
+        logging.info(f"Zip buffer size: {zip_buffer.getbuffer().nbytes} bytes")
 
         shutil.rmtree(export_path)
 

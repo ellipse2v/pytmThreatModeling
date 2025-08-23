@@ -30,6 +30,7 @@ from threat_analysis.core.models_module import ThreatModel
 from threat_analysis.core.mitre_mapping_module import MitreMapping
 from threat_analysis.severity_calculator_module import SeverityCalculator
 from threat_analysis.generation.diagram_generator import DiagramGenerator
+from threat_analysis.generation.attack_navigator_generator import AttackNavigatorGenerator
 from threat_analysis.core.model_factory import create_threat_model
 from threat_analysis import config
 from threat_analysis.iac_plugins import IaCPlugin
@@ -231,6 +232,32 @@ class ThreatAnalysisFramework:
 
         return {"dot": dot_output_full_path, "svg": svg_path, "html": html_path}
 
+    def generate_navigator_layer(self) -> Optional[str]:
+        """Generates and saves the ATT&CK Navigator layer."""
+        if not self.analysis_completed:
+            logging.warning("⚠️ Analysis not run, cannot generate Navigator layer.")
+            return None
+
+        logging.info("🗺️ Generating ATT&CK Navigator layer...")
+        try:
+            # We need all detailed threats, not just grouped ones.
+            all_threats = self.threat_model.get_all_threats_details()
+            
+            navigator_generator = AttackNavigatorGenerator(
+                threat_model_name=self.model_name,
+                all_detailed_threats=all_threats
+            )
+            
+            output_filename = f"attack_navigator_layer_{config.TIMESTAMP}.json"
+            output_path = os.path.join(self.output_base_dir, output_filename)
+            
+            navigator_generator.save_layer_to_file(output_path)
+            logging.info(f"✅ ATT&CK Navigator layer saved to: {output_path}")
+            return output_path
+        except Exception as e:
+            logging.error(f"❌ Failed to generate ATT&CK Navigator layer: {e}")
+            return None
+
     def open_report_in_browser(self, report_path: str):
         """Opens the HTML report in the default browser."""
         try:
@@ -302,6 +329,11 @@ class CustomArgumentParser:
             type=str,
             help="Path to the project directory for hierarchical threat models.",
         )
+        self.parser.add_argument(
+            "--navigator",
+            action="store_true",
+            help="Generate a MITRE ATT&CK Navigator layer.",
+        )
 
         # Dynamically add arguments for IaC plugins
         for name, plugin in loaded_plugins.items():
@@ -346,7 +378,23 @@ if __name__ == "__main__":
         severity_calculator = SeverityCalculator(markdown_file_path=str(project_path / "main.md"))
         mitre_mapping = MitreMapping()
         report_generator = ReportGenerator(severity_calculator, mitre_mapping)
-        report_generator.generate_project_reports(project_path, output_dir)
+        project_threat_model = report_generator.generate_project_reports(project_path, output_dir)
+
+        if args.navigator and project_threat_model:
+            logging.info("🗺️ Generating ATT&CK Navigator layer for project...")
+            try:
+                all_threats = project_threat_model.get_all_threats_details()
+                navigator_generator = AttackNavigatorGenerator(
+                    threat_model_name=project_threat_model.tm.name,
+                    all_detailed_threats=all_threats
+                )
+                output_filename = f"attack_navigator_all_layer_{project_path.name.replace('example_', '')}_{config.TIMESTAMP}.json"
+                output_path = output_dir / output_filename
+                navigator_generator.save_layer_to_file(str(output_path))
+                logging.info(f"✅ Project ATT&CK Navigator layer saved to: {output_path}")
+            except Exception as e:
+                logging.error(f"❌ Failed to generate project ATT&CK Navigator layer: {e}")
+
     else:
         markdown_content_for_analysis = ""
         iac_plugin_used = False
@@ -427,8 +475,10 @@ if __name__ == "__main__":
 
         reports = framework.generate_reports()
         framework.generate_stix_report()
-
         diagrams = framework.generate_diagrams()
+
+        if args.navigator:
+            framework.generate_navigator_layer()
 
         # if "html" in reports and reports["html"]:
         #     framework.open_report_in_browser(reports["html"])

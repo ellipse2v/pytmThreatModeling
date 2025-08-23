@@ -185,6 +185,7 @@
             <button onclick="exportFile('diagram')">Export Diagram (HTML)</button>
             <button onclick="exportFile('report')">Export Report (HTML)</button>
             <button onclick="exportAllFiles()">Export All (ZIP)</button>
+            <button onclick="exportNavigatorAndStixButton()">Export ATT&CK Navigator & STIX</button>
         </div>
     </div>
 
@@ -398,6 +399,36 @@
             } catch (error) {
                 console.error('Export All error:', error);
                 alert('An error occurred during export all.');
+            }
+        }
+
+        async function exportNavigatorAndStixButton() {
+            const markdownContent = editor.getValue();
+            try {
+                const response = await fetch('/api/export_navigator_stix', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ markdown: markdownContent }),
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert(`Export failed: ${errorData.error}`);
+                    return;
+                }
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = response.headers.get('Content-Disposition')?.split('filename=')[1] || 'navigator_stix_export.zip';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Export Navigator and STIX error:', error);
+                alert('An error occurred during export.');
             }
         }
 

@@ -407,6 +407,44 @@ class ThreatModel:
             "tactics": tactics,
             "techniques": techniques
         }
+
+    def get_all_threats_details(self) -> List[Dict[str, Any]]:
+        """
+        Returns a detailed list of all threats from the latest analysis results.
+        """
+        if not self.mitre_analysis_results:
+            self.process_threats()
+
+        # The processed_threats list already contains what we need.
+        # We just need to rename some keys to match what AttackNavigatorGenerator expects.
+        
+        detailed_threats = []
+        for threat_data in self.mitre_analysis_results.get("processed_threats", []):
+            # The target can be an object or a tuple of objects. We need a string representation.
+            target = threat_data.get('target')
+            if target is None:
+                target_str = "Unspecified"
+            elif isinstance(target, tuple):
+                if len(target) >= 2:
+                    source_name = getattr(target[0], 'name', "Unknown")
+                    dest_name = getattr(target[1], 'name', "Unknown")
+                    target_str = f"{source_name} -> {dest_name}"
+                elif len(target) == 1:
+                     target_str = getattr(target[0], 'name', "Unknown")
+                else:
+                    target_str = "Unknown"
+            else:
+                target_str = getattr(target, 'name', 'Unknown')
+
+            detailed_threats.append({
+                "description": threat_data.get("threat_name"),
+                "target": target_str,
+                "stride_category": threat_data.get("stride_category"),
+                "mitre_techniques": threat_data.get("mitre_techniques", []),
+                "severity": threat_data.get("severity_info", {}),
+            })
+            
+        return detailed_threats
         
 
     # The get_pytm_class_by_name and expand_threat_targets functions are no longer needed.

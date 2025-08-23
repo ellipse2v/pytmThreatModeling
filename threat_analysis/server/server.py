@@ -209,3 +209,34 @@ def export_all_files():
     except Exception as e:
         logging.error(f"An unexpected error occurred during export all: {e}", exc_info=True)
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+
+@app.route("/api/export_navigator_stix", methods=["POST"])
+def export_navigator_stix_files():
+    logging.info("Received request for /api/export_navigator_stix.")
+    """
+    Handles exporting ATT&CK Navigator layer and STIX report as a single ZIP archive.
+    """
+    markdown_content = request.json.get("markdown", "")
+    if not markdown_content:
+        return jsonify({"error": "Missing markdown content"}), 400
+    logging.info("Entering export_navigator_stix_files function.")
+
+    try:
+        zip_buffer, timestamp = threat_model_service.export_navigator_stix_logic(markdown_content)
+        logging.info(f"Generated zip buffer size: {zip_buffer.getbuffer().nbytes} bytes")
+        return send_file(
+            zip_buffer,
+            mimetype="application/zip",
+            as_attachment=True,
+            download_name=f"navigator_stix_export_{timestamp}.zip",
+        )
+
+    except ValueError as e:
+        logging.error(f"Error during export navigator and stix: {e}")
+        return jsonify({"error": str(e)}), 400
+    except RuntimeError as e:
+        logging.error(f"Error during export navigator and stix: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+    except Exception as e:
+        logging.error(f"An unexpected error occurred during export navigator and stix: {e}", exc_info=True)
+        return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500

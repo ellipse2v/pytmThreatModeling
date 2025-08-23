@@ -9,6 +9,7 @@ This project is a Python-based, end-to-end STRIDE threat modeling and analysis f
 - **Map threats to MITRE ATT&CK techniques** for actionable, real-world context.
 - **Calculate severity** using customizable base scores, target multipliers, and protocol adjustments.
 - **Generate detailed reports** (HTML, JSON) and **visual diagrams** (DOT, SVG, HTML) with threat highlights.
+- **Generate MITRE ATT&CK Navigator layers** for visualizing identified techniques.
 - **Extend and customize** all mappings, calculations, and reporting logic.
 
 > **Based on [PyTM](https://github.com/OWASP/pytm):** This framework leverages PyTM's modeling primitives and extends them with advanced reporting, MITRE mapping, and diagram generation.
@@ -89,13 +90,14 @@ Use the CLI mode for automated threat analysis, report generation, and diagram c
 1.  **Edit `threatModel_Template/threat_model.md`** to describe your architecture.
 2.  **Run the analysis:**
     ```bash
-    python -m threat_analysis --model-file threatModel_Template/threat_model.md
+    python -m threat_analysis --model-file threatModel_Template/threat_model.md --navigator
     ```
     (You can omit `--model-file threatModel_Template/threat_model.md` if your model file is named `threatModel_Template/threat_model.md` and is in the root directory.)
 3.  **View the results** in the generated `output/` folder:
     -   HTML report
     -   JSON export
     -   DOT/SVG/HTML diagrams
+    -   MITRE ATT&CK Navigator layer (JSON)
 
 ### 2. Project Mode: Hierarchical Threat Models
 

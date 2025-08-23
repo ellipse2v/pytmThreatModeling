@@ -37,6 +37,7 @@ if str(project_root) not in sys.path:
 from threat_analysis.core.model_factory import create_threat_model
 from threat_analysis.generation.diagram_generator import DiagramGenerator
 from threat_analysis.generation.stix_generator import StixGenerator
+from threat_analysis.generation.attack_navigator_generator import AttackNavigatorGenerator
 from threat_analysis.core.models_module import ThreatModel
 
 
@@ -248,9 +249,10 @@ class ReportGenerator:
             "severity_distribution": severity_distribution
         }
 
-    def generate_project_reports(self, project_path: Path, output_dir: Path):
+    def generate_project_reports(self, project_path: Path, output_dir: Path) -> Optional[ThreatModel]:
         """
         Generates all reports for a project, ensuring a consistent legend across all diagrams.
+        Returns the main threat model of the project.
         """
         output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -271,19 +273,37 @@ class ReportGenerator:
         all_models = self._get_all_project_models(project_path)
         if not all_models:
             logging.error("No threat models found in the project. Aborting.")
-            return
+            return None
 
         # 2. Aggregate data from all models for consistent legends
         project_protocols, project_protocol_styles = self._aggregate_project_data(all_models)
 
-        # 3. Start the recursive generation process
+        # 3. Load the main model to be returned later
+        main_model_path = project_path / "main.md"
+        main_threat_model = None
+        try:
+            with open(main_model_path, "r", encoding="utf-8") as f:
+                markdown_content = f.read()
+            main_threat_model = create_threat_model(
+                markdown_content=markdown_content,
+                model_name=main_model_path.stem,
+                model_description=f"Threat model for {main_model_path.stem}",
+                mitre_mapping=self.mitre_mapping,
+                validate=True
+            )
+        except Exception as e:
+            logging.error(f"Failed to create main threat model for project: {e}")
+
+        # 4. Start the recursive generation process
         self._recursively_generate_reports(
-            model_path=project_path / "main.md",
+            model_path=main_model_path,
             output_dir=output_dir,
             breadcrumb=[(project_path.name, "main_diagram.html")],
             project_protocols=project_protocols,
             project_protocol_styles=project_protocol_styles
         )
+
+        return main_threat_model
 
     def _get_all_project_models(self, project_path: Path) -> List[ThreatModel]:
         """
@@ -358,6 +378,34 @@ class ReportGenerator:
             self.generate_html_report(threat_model, grouped_threats, output_dir / f"{model_name}_threat_report.html")
             self.generate_json_export(threat_model, grouped_threats, output_dir / f"{model_name}.json")
             self.generate_diagram_html(threat_model, output_dir, breadcrumb, project_protocols, project_protocol_styles)
+
+            # Generate STIX report for the current model
+            try:
+                stix_output_file = output_dir / f"{model_name}_stix_report.json"
+                all_detailed_threats = threat_model.get_all_threats_details()
+                stix_generator_instance = StixGenerator(
+                    threat_model=threat_model,
+                    all_detailed_threats=all_detailed_threats
+                )
+                stix_bundle = stix_generator_instance.generate_stix_bundle()
+                with open(stix_output_file, "w", encoding="utf-8") as f:
+                    json.dump(stix_bundle, f, indent=4)
+                logging.info(f"STIX report generated for {model_name} at {stix_output_file}")
+            except Exception as e:
+                logging.error(f"❌ Failed to generate STIX report for {model_name}: {e}")
+
+            # Generate ATT&CK Navigator Layer for the current model
+            try:
+                navigator_output_file = output_dir / f"{model_name}_attack_navigator_layer.json"
+                all_detailed_threats = threat_model.get_all_threats_details()
+                navigator_generator = AttackNavigatorGenerator(
+                    threat_model_name=threat_model.tm.name,
+                    all_detailed_threats=all_detailed_threats
+                )
+                navigator_generator.save_layer_to_file(str(navigator_output_file))
+                logging.info(f"ATT&CK Navigator layer generated for {model_name} at {navigator_output_file}")
+            except Exception as e:
+                logging.error(f"❌ Failed to generate ATT&CK Navigator layer for {model_name}: {e}")
 
             # Recurse into submodels
             for server in threat_model.servers:

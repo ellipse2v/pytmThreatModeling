@@ -89,8 +89,8 @@ class StixGenerator:
             "id": action_id,
             "created": self._get_current_time_iso(),
             "modified": self._get_current_time_iso(),
-            "name": threat.get('description', 'Unnamed Action'),
-            "description": threat.get('description', 'No description available.'),
+            "name": str(threat.get('description', 'Unnamed Action')),
+            "description": str(threat.get('description', 'No description available.')),
             "technique_id": technique.get('id'),
             "extensions": {
                 self.extension_id: {
@@ -108,8 +108,8 @@ class StixGenerator:
             "id": asset_id,
             "created": self._get_current_time_iso(),
             "modified": self._get_current_time_iso(),
-            "name": threat.get('target', 'Unnamed Asset'),
-            "description": f"Asset targeted by threat: {threat.get('description')}",
+            "name": str(threat.get('target', 'Unnamed Asset')),
+            "description": f"Asset targeted by threat: {str(threat.get('description'))}",
             "extensions": {
                 self.extension_id: {
                     "extension_type": "new-sdo"
