@@ -1,0 +1,49 @@
+name: Sync Technical Documentation to Wiki
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/technical_documentation/*.md'
+
+jobs:
+  sync-to-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Checkout wiki repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Sync markdown files from technical documentation
+        run: |
+          # Create wiki directory if it doesn't exist
+          mkdir -p wiki
+          
+          # Process all .md files in technical_documentation
+          find docs/technical_documentation -name "*.md" -type f | while read file; do
+            # Get just the filename without path
+            filename=$(basename "$file")
+            # Remove .md extension for wiki page name
+            wikiname="${filename%.md}"
+            
+            cp "$file" "wiki/${wikiname}.md"
+            echo "Synced: $file -> wiki/${wikiname}.md"
+          done
+          
+      - name: Commit and push changes to wiki
+        run: |
+          cd wiki
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto-sync technical documentation from docs/technical_documentation/"
+            git push
+          fi

@@ -359,3 +359,42 @@ The framework is designed to be extensible through a dedicated Infrastructure as
     2.  `parse_iac_config()`: Contains the logic to parse the IaC source files (e.g., playbooks, Terraform state).
     3.  `generate_threat_model_components()`: Contains the logic to convert the parsed data into the Markdown DSL format used by the framework.
 -   **Dynamic Loading**: The main entrypoint (`__main__.py`) automatically discovers and loads any valid plugin placed in the `iac_plugins` directory. It also dynamically creates command-line arguments based on the plugin's name (e.g., `--ansible-path`).
+
+### 4.12. Ansible Plugin and Metadata (`iac_plugins/ansible_plugin.py`)
+
+The Ansible plugin is a concrete implementation of the IaC plugin architecture, designed to translate an existing Ansible project into a threat model. It works by combining information from the Ansible playbook and inventory with a dedicated metadata structure that describes the security-relevant aspects of the architecture.
+
+-   **How it Works**: The plugin is triggered when the `--ansible-path` argument is used, pointing to a main playbook file (e.g., `playbook.yml`).
+    1.  **Parsing**: The plugin first parses the specified playbook. It also looks for a corresponding inventory file named `hosts.ini` in the same directory.
+    2.  **Metadata Extraction**: The crucial step is the extraction of a special variable named `threat_model_metadata` from the `vars` section of the playbook. This variable must be a dictionary that contains the threat model definition.
+    3.  **Model Generation**: The plugin then uses the data from the `threat_model_metadata` dictionary to generate the components of the threat model (Boundaries, Actors, Servers, Dataflows) in the Markdown DSL format.
+
+-   **The `threat_model_metadata` Structure**: This is the core concept for the Ansible integration. Instead of trying to infer the entire architecture from Ansible tasks and roles (which can be ambiguous), the framework requires the user to explicitly define the threat model's structure within the playbook itself. This approach keeps the threat model definition alongside the infrastructure code that it describes.
+    -   The `threat_analysis/iac_plugins/ansible_threat_model_config.yml` file serves as a **template or example** of what this `threat_model_metadata` variable should look like. It is **not** a configuration file that is read by the plugin.
+    -   The user is expected to copy and adapt this structure into the `vars` section of their own Ansible playbook.
+
+-   **Example of Metadata in a Playbook**:
+    ```yaml
+    - name: Deploy Web Application
+      hosts: webservers
+      vars:
+        threat_model_metadata:
+          zones:
+            - name: "Public DMZ"
+              isTrusted: False
+            - name: "Internal Network"
+              isTrusted: True
+          components:
+            - name: "WebApp Server"
+              boundary: "Public DMZ"
+              ip: "{{ ansible_default_ipv4.address }}"
+          data_flows:
+            - name: "User Traffic"
+              source: "Internet"
+              destination: "WebApp Server"
+              protocol: "HTTPS"
+              data: "Web Traffic"
+      roles:
+        - webserver
+    ```
+    In this example, the `threat_model_metadata` variable is defined directly within the playbook. The plugin will parse this variable to create the "Public DMZ" and "Internal Network" boundaries, the "WebApp Server" component, and the "User Traffic" dataflow. The use of Ansible variables like `{{ ansible_default_ipv4.address }}` within the metadata is also supported, allowing the threat model to be dynamically updated with information from the inventory.
