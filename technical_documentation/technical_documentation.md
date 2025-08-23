@@ -205,11 +205,11 @@ This is the most complex and critical module for enriching the raw threat data.
 
 ```mermaid
 graph TD
-    subgraph Threat Enrichment Pipeline
-        A[Threat Description: e.g., "SQL Injection on WebServer"] -->|Regex Match| B{MITRE ATT&CK Technique: T1190}
+    subgraph "Threat Enrichment Pipeline"
+        A["Threat Description (e.g., SQL Injection)"] -->|Regex Match| B{MITRE ATT&CK Technique}
         A -->|STRIDE Category| C{STRIDE: Tampering}
         C -->|Mapping| D{CAPEC Patterns}
-        D -->|Regex Match on Threat Description| E{Specific CAPEC: e.g., CAPEC-19}
+        D -->|Regex Match on Threat Description| E{Specific CAPEC}
         E -->|Mapping| B
         B -->|Mapping| F{D3FEND Countermeasures}
     end
@@ -318,17 +318,24 @@ This module provides actionable mitigation advice for the threats identified dur
 -   **Architecture Flow**:
     ```mermaid
     graph TD
+        A[Threat with Mapped ATT&CK IDs]
+        B(List of Technique IDs)
+        C{get_mitigation_suggestions()}
+        D[MITIGATION_MAP]
+        E[List of Mitigation Dictionaries]
+        F[HTML Report]
+
         subgraph report_generator.py
-            A[Threat with Mapped ATT&CK IDs] -->|Extracts IDs| B(List of Technique IDs)
-            B -->|Calls| C{mitigation_suggestions.get_mitigation_suggestions()}
+            A -->|Extracts IDs| B
+            B -->|Calls| C
         end
 
         subgraph mitigation_suggestions.py
-            C -->|Looks up IDs in| D[MITIGATION_MAP]
-            D -->|Returns| E[List of Mitigation Dictionaries]
+            C -->|Looks up IDs in| D
+            D -->|Returns| E
         end
 
-        A --> F[HTML Report]
+        A --> F
         E -->|Embedded in| F
     end
     ```
