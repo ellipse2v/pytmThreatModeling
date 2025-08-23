@@ -40,7 +40,7 @@ The framework is a Python-based application that can be run as a command-line to
 ```mermaid
 graph TD
     subgraph Input Sources
-        A[Markdown File (.md)]
+        A[Markdown File] --> D[Model Parser]
         B[Project Directory]
         C[Ansible Playbook]
     end
@@ -320,7 +320,7 @@ This module provides actionable mitigation advice for the threats identified dur
     graph TD
         A[Threat with Mapped ATT&CK IDs]
         B(List of Technique IDs)
-        C{get_mitigation_suggestions()}
+        C[get_mitigation_suggestions function]
         D[MITIGATION_MAP]
         E[List of Mitigation Dictionaries]
         F[HTML Report]
@@ -337,7 +337,7 @@ This module provides actionable mitigation advice for the threats identified dur
 
         A --> F
         E -->|Embedded in| F
-    end
+    
     ```
 
 ### 4.10. Centralized Configuration (`config.py`)
