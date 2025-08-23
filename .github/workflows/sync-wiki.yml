@@ -1,9 +1,10 @@
-name: Sync Technical Documentation to Wiki
+name: Sync Docs to Wiki
+
 on:
   push:
     branches: [ main ]
     paths:
-      - 'docs/technical_documentation/*.md'
+      - 'docs/**.md'
 
 jobs:
   sync-to-wiki:
@@ -19,13 +20,13 @@ jobs:
           path: wiki
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Sync markdown files from technical documentation
+      - name: Sync markdown files from docs
         run: |
           # Create wiki directory if it doesn't exist
           mkdir -p wiki
           
-          # Process all .md files in technical_documentation
-          find docs/technical_documentation -name "*.md" -type f | while read file; do
+          # Process all .md files in docs
+          find docs -name "*.md" -type f | while read file; do
             # Get just the filename without path
             filename=$(basename "$file")
             # Remove .md extension for wiki page name
@@ -44,6 +45,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Auto-sync technical documentation from docs/technical_documentation/"
+            git commit -m "Auto-sync documentation from docs/"
             git push
           fi
