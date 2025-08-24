@@ -150,6 +150,20 @@ Our commitment to continuous improvement drives the evolution of this framework.
 
 We welcome contributions from the cybersecurity and development communities. Your insights and expertise are invaluable in strengthening this framework.
 
+## Showcase
+
+### GUI
+
+![GUI Example](../output/example/gui_example.gif)
+
+### Project Structure
+
+![Project Example](../output/example/project_example.gif)
+
+### MITRE ATT&CK Navigator Integration
+
+![Navigator Example](../output/example/navigator_example.jpg)
+
 ## License & Attribution
 
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.

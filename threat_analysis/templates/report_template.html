@@ -1,152 +1,581 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{{ title }}</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            margin: 0;
-            background-color: #f8f9fa;
-            color: #212529;
+        :root {
+            --primary-color: #1a73e8;
+            --primary-dark: #1557b0;
+            --secondary-color: #34a853;
+            --danger-color: #ea4335;
+            --warning-color: #fbbc04;
+            --info-color: #4285f4;
+            --background-main: #f8fafc;
+            --background-card: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: var(--background-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
         .container {
-            max-width: 1600px;
+            max-width: 1700px;
             margin: 0 auto;
             padding: 2rem;
+            background-color: var(--background-main);
+            min-height: 100vh;
         }
-        h1, h2, h3 {
-            color: #343a40;
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-large);
+            position: relative;
+            overflow: hidden;
         }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: rotate(45deg);
+        }
+
         h1 {
             text-align: center;
             font-size: 2.5rem;
-            margin-bottom: 1rem;
+            margin: 0;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            position: relative;
+            z-index: 1;
         }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
         h2 {
-            font-size: 1.75rem;
-            border-bottom: 2px solid #dee2e6;
-            padding-bottom: 0.5rem;
-            margin-top: 2rem;
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin: 3rem 0 1.5rem 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
+
+        h2::before {
+            content: '';
+            width: 4px;
+            height: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
             margin: 2rem 0;
         }
+
         .card {
-            background-color: #fff;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            border: 1px solid #dee2e6;
+            background: var(--background-card);
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: var(--shadow-medium);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 1rem 1rem 0 0;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-large);
+        }
+
         .card h3 {
             margin-top: 0;
+            margin-bottom: 1rem;
             font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
+
+        .metric-large {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+
         .tabs {
             display: flex;
             flex-wrap: wrap;
-            border-bottom: 1px solid #dee2e6;
+            background: var(--background-card);
+            border-radius: 1rem 1rem 0 0;
+            box-shadow: var(--shadow-light);
+            overflow: hidden;
+            margin-top: 2rem;
         }
+
         .tab-button {
-            padding: 1rem 1.5rem;
+            padding: 1.25rem 2rem;
             cursor: pointer;
             border: none;
-            background-color: transparent;
+            background: transparent;
             font-size: 1rem;
-            border-bottom: 3px solid transparent;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            position: relative;
+            flex: 1;
+            min-width: 140px;
         }
+
+        .tab-button:hover {
+            background: rgba(26, 115, 232, 0.05);
+            color: var(--primary-color);
+        }
+
         .tab-button.active {
-            border-bottom-color: #007bff;
-            color: #007bff;
+            color: var(--primary-color);
+            background: rgba(26, 115, 232, 0.08);
         }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-color);
+        }
+
         .tab-content {
             display: none;
-            padding-top: 1.5rem;
+            background: var(--background-card);
+            border-radius: 0 0 1rem 1rem;
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
         }
+
         .tab-content.active {
             display: block;
         }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 0 0 1rem 1rem;
+            background: var(--background-card);
+            box-shadow: var(--shadow-medium);
+        }
+
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.875rem;
+            min-width: 1200px;
         }
+
         th, td {
-            padding: 0.75rem;
+            padding: 0.75rem 0.5rem;
             text-align: left;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+            position: relative;
+            border-right: 1px solid var(--border-color);
         }
+
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+
         th {
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            font-weight: 600;
+            color: var(--text-primary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 2px solid var(--primary-color);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
         }
-        .severity-critical { background-color: #dc3545; color: white; }
-        .severity-high { background-color: #fd7e14; }
-        .severity-medium { background-color: #ffc107; }
-        .severity-low { background-color: #28a745; color: white; }
+
+        th:first-child {
+            border-top-left-radius: 0;
+        }
+
+        th:last-child {
+            border-top-right-radius: 0;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        tbody tr:hover {
+            background: linear-gradient(90deg, rgba(26, 115, 232, 0.05) 0%, rgba(26, 115, 232, 0.02) 100%);
+            border-left-color: var(--primary-color);
+            transform: translateX(2px);
+        }
+
+        tbody tr:nth-child(even) {
+            background: rgba(248, 250, 252, 0.5);
+        }
+
+        tbody tr:nth-child(even):hover {
+            background: linear-gradient(90deg, rgba(26, 115, 232, 0.05) 0%, rgba(26, 115, 232, 0.02) 100%);
+        }
+
+        /* Fixed height for cells to 100px max */
+        tbody tr td {
+            height: 100px;
+            max-height: 100px;
+            min-height: 100px;
+            vertical-align: top;
+            position: static;
+        }
+
+        td:first-child {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1rem;
+            background: linear-gradient(135deg, rgba(26, 115, 232, 0.1), rgba(26, 115, 232, 0.05));
+            border-right: 1px solid rgba(26, 115, 232, 0.2);
+        }
+
+        td:nth-child(2) {
+            font-weight: 600;
+            color: var(--text-primary);
+            max-width: 200px;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        /* Description cell with scroll */
+        td:nth-child(3) {
+            max-width: 300px;
+            line-height: 1.5;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-y: auto;
+            padding: 0.75rem 0.5rem;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(26, 115, 232, 0.02);
+        }
+
+        .severity-cell {
+            padding: 0 !important;
+            vertical-align: stretch;
+            position: relative;
+            background: transparent;
+        }
+
+        .severity-critical, .severity-high, .severity-medium, .severity-low { 
+            padding: 0.75rem 0.5rem;
+            border-radius: 0;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            box-sizing: border-box;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .severity-critical { 
+            background: linear-gradient(135deg, #dc2626, #b91c1c); 
+            color: white; 
+        }
+
+        .severity-high { 
+            background: linear-gradient(135deg, #ea580c, #dc2626); 
+            color: white;
+        }
+
+        .severity-medium { 
+            background: linear-gradient(135deg, #d97706, #ea580c); 
+            color: white;
+        }
+
+        .severity-low { 
+            background: linear-gradient(135deg, #16a34a, #15803d); 
+            color: white;
+        }
+
         .mitre-link {
-            color: #007bff;
+            color: var(--primary-color);
             text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
         }
+
         .mitre-link:hover {
+            color: var(--primary-dark);
             text-decoration: underline;
         }
+
+        /* Scrollable cells - fixed height 100px */
         .scrollable-cell {
-            max-height: 250px;
+            height: 100%;
             overflow-y: auto;
-            display: block;
+            overflow-x: hidden;
+            padding: 0.75rem 0.5rem;
+            box-sizing: border-box;
+        }
+
+        /* For cells with scrollable-cell, remove padding to avoid double padding */
+        td:nth-child(5), /* CAPEC */
+        td:nth-child(6), /* MITRE Techniques */
+        td:nth-child(7), /* MITRE Mitigations */
+        td:nth-child(8), /* D3FEND */
+        td:nth-child(9), /* CIS */
+        td:nth-child(10), /* NIST */
+        td:nth-child(11) { /* OWASP */
+            padding: 0;
+        }
+
+        .scrollable-cell::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollable-cell::-webkit-scrollbar-track {
+            background: rgba(229, 231, 235, 0.3);
+            border-radius: 3px;
+        }
+
+        .scrollable-cell::-webkit-scrollbar-thumb {
+            background: rgba(26, 115, 232, 0.3);
+            border-radius: 3px;
+        }
+
+        .scrollable-cell::-webkit-scrollbar-thumb:hover {
+            background: rgba(26, 115, 232, 0.5);
+        }
+
+        .scrollable-cell ul {
+            margin: 0;
+            padding-left: 1rem;
+            list-style-type: disc;
+        }
+
+        .scrollable-cell li {
+            margin: 0.25rem 0;
+            line-height: 1.4;
+        }
+
+        .stats-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .stats-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-list li:last-child {
+            border-bottom: none;
+        }
+
+        .stats-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .nested-list {
+            margin-top: 0.5rem;
+            padding-left: 1rem;
+        }
+
+        .row-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .explanation-card {
+            background: linear-gradient(135deg, rgba(26, 115, 232, 0.05), rgba(52, 168, 83, 0.05));
+            border: 1px solid rgba(26, 115, 232, 0.1);
+        }
+
+        .no-threats {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab-button {
+                text-align: center;
+            }
+
+            table {
+                font-size: 0.75rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>{{ report_title }}</h1>
+        <div class="header">
+            <h1>{{ report_title }}</h1>
+            <div class="subtitle">Cybersecurity Threat Analysis Report</div>
+        </div>
 
         <div class="summary-grid">
             <div class="card">
-                <h3>Threat Statistics</h3>
+                <h3>📊 Threat Statistics</h3>
                 {% if summary_stats %}
-                <ul>
-                    <li><strong>Total Threats:</strong> {{ summary_stats.total_threats }}</li>
-                    <li><strong>Average Severity:</strong> {{ "%.2f"|format(summary_stats.average_severity) }}</li>
-                    <li><strong>Max Severity:</strong> {{ "%.2f"|format(summary_stats.max_severity) }}</li>
-                    <li><strong>Min Severity:</strong> {{ "%.2f"|format(summary_stats.min_severity) }}</li>
-                    <li><strong>Severity Distribution:</strong>
-                        <ul>
+                <ul class="stats-list">
+                    <li><span>Total Threats</span> <span class="stats-value">{{ summary_stats.total_threats }}</span></li>
+                    <li><span>Average Severity</span> <span class="stats-value">{{ "%.2f"|format(summary_stats.average_severity) }}</span></li>
+                    <li><span>Max Severity</span> <span class="stats-value">{{ "%.2f"|format(summary_stats.max_severity) }}</span></li>
+                    <li><span>Min Severity</span> <span class="stats-value">{{ "%.2f"|format(summary_stats.min_severity) }}</span></li>
+                    <li>
+                        <span>Severity Distribution</span>
+                        <div class="nested-list">
                         {% for level, count in summary_stats.severity_distribution.items() %}
-                            <li>{{ level }}: {{ count }}</li>
+                            <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                                <span>{{ level }}</span> 
+                                <span class="stats-value">{{ count }}</span>
+                            </div>
                         {% endfor %}
-                        </ul>
+                        </div>
                     </li>
                 </ul>
                 {% endif %}
             </div>
             <div class="card">
-                <h3>MITRE Techniques</h3>
-                <p style="font-size: 2rem; font-weight: bold;">{{ total_mitre_techniques_mapped }}</p>
+                <h3>🎯 MITRE Techniques</h3>
+                <div class="metric-large">{{ total_mitre_techniques_mapped }}</div>
+                <p style="text-align: center; color: var(--text-secondary); margin: 0;">Techniques Mapped</p>
             </div>
             <div class="card">
-                <h3>STRIDE Distribution</h3>
-                <ul>
+                <h3>🛡️ STRIDE Distribution</h3>
+                <ul class="stats-list">
                 {% for k, v in stride_distribution.items() %}
-                    <li><strong>{{ k }}:</strong> {{ v }}</li>
+                    <li><span>{{ k }}</span> <span class="stats-value">{{ v }}</span></li>
                 {% endfor %}
                 </ul>
             </div>
         </div>
 
-        <h2>Severity Calculation Explained</h2>
-        <div class="card">
-            <p style="white-space: pre-wrap;">{{ severity_calculation_note }}</p>
+        <h2>📖 Severity Calculation Explained</h2>
+        <div class="card explanation-card">
+            <p style="white-space: pre-wrap; margin: 0;">{{ severity_calculation_note }}</p>
         </div>
 
         {% if not all_threats %}
-        <h2>No threats identified.</h2>
+        <div class="card">
+            <div class="no-threats">
+                <h2>✅ No threats identified</h2>
+                <p>Your system appears to be secure based on the current analysis.</p>
+            </div>
+        </div>
         {% else %}
-        <h2>Detailed Threat Analysis</h2>
+        <h2>🔍 Detailed Threat Analysis</h2>
         <div class="tabs">
             {% for category in stride_categories %}
             <button class="tab-button {% if loop.first %}active{% endif %}" onclick="openTab(event, '{{ category }}')">{{ category }}</button>
@@ -155,102 +584,104 @@
 
         {% for category in stride_categories %}
         <div id="{{ category }}" class="tab-content {% if loop.first %}active{% endif %}">
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Target</th>
-                        <th>Description</th>
-                        <th>Severity</th>
-                        <th>CAPEC</th>
-                        <th>MITRE Techniques</th>
-                        <th>MITRE Mitigations</th>
-                        <th>D3FEND Mitigations</th>
-                        <th>CIS Mitigations</th>
-                        <th>NIST Mitigations</th>
-                        <th>OWASP Mitigations</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for threat in all_threats if threat.stride_category == category %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td>{{ threat.target }}</td>
-                        <td>{{ threat.description }}</td>
-                        <td class="severity-{{ threat.severity.level.lower() }}">{{ threat.severity.level }} ({{ threat.severity.score }})</td>
-                        <td>
-                            <div class="scrollable-cell">
-                            {% if threat.capecs %}
-                                <ul>
-                                {% for capec in threat.capecs %}
-                                    <li><a href="https://capec.mitre.org/data/definitions/{{ capec.capec_id.split('-')[1] }}.html" target="_blank">{{ capec.capec_id }}: {{ capec.description }}</a></li>
-                                {% endfor %}
-                                </ul>
-                            {% endif %}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="scrollable-cell">
-                            <ul>
-                            {% for tech in threat.mitre_techniques %}
-                                <li><a href="https://attack.mitre.org/techniques/{{ tech.id }}" target="_blank" class="mitre-link">{{ tech.id }}: {{ tech.name }}</a></li>
-                            {% endfor %}
-                            </ul>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="scrollable-cell">
-                            <ul>
-                            {% for tech in threat.mitre_techniques if tech.mitre_mitigations %}
-                                {% for mitigation in tech.mitre_mitigations %}
-                                <li><a href="https://attack.mitre.org/mitigations/{{ mitigation.id }}" target="_blank" class="mitre-link">{{ mitigation.id }}: {{ mitigation.name }}</a></li>
-                                {% endfor %}
-                            {% endfor %}
-                            </ul>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="scrollable-cell">
-                            <ul>
-                            {% for tech in threat.mitre_techniques if tech.defend_mitigations %}
-                                {% for mitigation in tech.defend_mitigations %}
-                                <li><a href="https://d3fend.mitre.org/technique/d3f:{{ mitigation.url_friendly_name }}" target="_blank" class="mitre-link">{{ mitigation.id }}: {{ mitigation.description }}</a></li>
-                                {% endfor %}
-                            {% endfor %}
-                            </ul>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="scrollable-cell">
-                            <ul>
-                            {% for mitigation in threat.cis_mitigations %}
-                                <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
-                            {% endfor %}
-                            </ul>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="scrollable-cell">
-                            <ul>
-                            {% for mitigation in threat.nist_mitigations %}
-                                <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
-                            {% endfor %}
-                            </ul>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="scrollable-cell">
-                            <ul>
-                            {% for mitigation in threat.owasp_mitigations %}
-                                <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
-                            {% endfor %}
-                            </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Target</th>
+                            <th>Description</th>
+                            <th>Severity</th>
+                            <th>CAPEC</th>
+                            <th>MITRE Techniques</th>
+                            <th>MITRE Mitigations</th>
+                            <th>D3FEND Mitigations</th>
+                            <th>CIS Mitigations</th>
+                            <th>NIST Mitigations</th>
+                            <th>OWASP Mitigations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for threat in all_threats if threat.stride_category == category %}
+                        <tr>
+                            <td><div class="row-number">{{ loop.index }}</div></td>
+                            <td>{{ threat.target }}</td>
+                            <td>{{ threat.description }}</td>
+                            <td class="severity-cell"><span class="severity-{{ threat.severity.level.lower() }}">{{ threat.severity.level }} ({{ "%.1f"|format(threat.severity.score) }})</span></td>
+                            <td>
+                                <div class="scrollable-cell">
+                                    {% if threat.capecs %}
+                                    <ul>
+                                    {% for capec in threat.capecs %}
+                                        <li><a href="https://capec.mitre.org/data/definitions/{{ capec.capec_id.split('-')[1] }}.html" target="_blank" class="mitre-link">{{ capec.capec_id }}: {{ capec.description }}</a></li>
+                                    {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="scrollable-cell">
+                                    <ul>
+                                    {% for tech in threat.mitre_techniques %}
+                                        <li><a href="https://attack.mitre.org/techniques/{{ tech.id }}" target="_blank" class="mitre-link">{{ tech.id }}: {{ tech.name }}</a></li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="scrollable-cell">
+                                    <ul>
+                                    {% for tech in threat.mitre_techniques if tech.mitre_mitigations %}
+                                        {% for mitigation in tech.mitre_mitigations %}
+                                        <li><a href="https://attack.mitre.org/mitigations/{{ mitigation.id }}" target="_blank" class="mitre-link">{{ mitigation.id }}: {{ mitigation.name }}</a></li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="scrollable-cell">
+                                    <ul>
+                                    {% for tech in threat.mitre_techniques if tech.defend_mitigations %}
+                                        {% for mitigation in tech.defend_mitigations %}
+                                        <li><a href="https://d3fend.mitre.org/technique/d3f:{{ mitigation.url_friendly_name }}" target="_blank" class="mitre-link">{{ mitigation.id }}: {{ mitigation.description }}</a></li>
+                                        {% endfor %}
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="scrollable-cell">
+                                    <ul>
+                                    {% for mitigation in threat.cis_mitigations %}
+                                        <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="scrollable-cell">
+                                    <ul>
+                                    {% for mitigation in threat.nist_mitigations %}
+                                        <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="scrollable-cell">
+                                    <ul>
+                                    {% for mitigation in threat.owasp_mitigations %}
+                                        <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                                    {% endfor %}
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         {% endfor %}
         {% endif %}
@@ -261,13 +692,15 @@
             tabcontent = document.getElementsByClassName("tab-content");
             for (i = 0; i < tabcontent.length; i++) {
                 tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
             }
             tablinks = document.getElementsByClassName("tab-button");
             for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
+                tablinks[i].classList.remove("active");
             }
             document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
         }
     </script>
 </body>

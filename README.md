@@ -334,13 +334,19 @@ After running the analysis, you will find a timestamped folder in `output/` (e.g
 - `tm_diagram__example.svg`:  
   ![SVG Diagram Example](./output/example/tm_diagram__example.svg)
 
+- **Project Structure Example**:
+  ![Project Example](output/example/project_example.gif)
+
+- **MITRE ATT&CK Navigator Integration**:
+  ![Navigator Example](output/example/navigator_example.jpg)
+
 > **Note:** All screenshots and example files are located in the `output/example/` directory for easy preview and documentation.
 
 ### Using Pre-defined Templates
 
 To accelerate the creation of new threat models, the framework includes a set of pre-defined templates for common architectures. You can load these templates directly from the web interface.
 
-![Loading a template](output/example/template.gif)
+![Loading a template](output/example/gui_example.gif)
 
 ---
 

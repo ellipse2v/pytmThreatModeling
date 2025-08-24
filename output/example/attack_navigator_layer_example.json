@@ -1,0 +1,271 @@
+{
+    "name": "Enhanced DMZ Security Analysis - Identified Techniques",
+    "versions": {
+        "attack": "17",
+        "navigator": "4.8.2",
+        "layer": "4.5"
+    },
+    "domain": "enterprise-attack",
+    "description": "MITRE ATT&CK techniques identified in the 'Enhanced DMZ Security Analysis' threat model.",
+    "filters": {
+        "platforms": [
+            "Linux",
+            "macOS",
+            "Windows",
+            "Network",
+            "PRE",
+            "Containers",
+            "Office 365",
+            "SaaS",
+            "Google Workspace",
+            "IaaS",
+            "Azure AD"
+        ]
+    },
+    "sorting": 2,
+    "layout": {
+        "layout": "side",
+        "showID": true,
+        "showName": true
+    },
+    "gradient": {
+        "colors": [
+            "#f5f5f5",
+            "#ffc107",
+            "#fd7e14",
+            "#dc3545"
+        ],
+        "minValue": 1,
+        "maxValue": 10
+    },
+    "techniques": [
+        {
+            "techniqueID": "T1499",
+            "score": 0,
+            "comment": "Occurrences: 9\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 9
+        },
+        {
+            "techniqueID": "T1499.004",
+            "score": 0,
+            "comment": "Occurrences: 3\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 3
+        },
+        {
+            "techniqueID": "T1190",
+            "score": 0,
+            "comment": "Occurrences: 28\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on External Firewall leading to system compromise\n- Target: External Firewall\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Protocol Break Device leading to system compromise\n- Target: Protocol Break Device\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Internal Firewall leading to system compromise\n- Target: Internal Firewall\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Gateway Load Balancer leading to system compromise\n- Target: Gateway Load Balancer\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on App Server 1 leading to system compromise\n- Target: App Server 1\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on App Server 2 leading to system compromise\n- Target: App Server 2\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on App Server 3 leading to system compromise\n- Target: App Server 3\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Switch leading to system compromise\n- Target: Switch\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Central Server leading to system compromise\n- Target: Central Server\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Application Database leading to system compromise\n- Target: Application Database\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Authentication Server leading to system compromise\n- Target: Authentication Server\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Command Machine leading to system compromise\n- Target: Command Machine\n- Severity: 0.0/10.0",
+            "count": 28
+        },
+        {
+            "techniqueID": "T1539",
+            "score": 0,
+            "comment": "Occurrences: 6\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 6
+        },
+        {
+            "techniqueID": "T1071.001",
+            "score": 0,
+            "comment": "Occurrences: 5\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 5
+        },
+        {
+            "techniqueID": "T1040",
+            "score": 0,
+            "comment": "Occurrences: 3\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 3
+        },
+        {
+            "techniqueID": "T1059",
+            "score": 0,
+            "comment": "Occurrences: 3\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 3
+        },
+        {
+            "techniqueID": "T1059.007",
+            "score": 0,
+            "comment": "Occurrences: 12\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 12
+        },
+        {
+            "techniqueID": "T1041",
+            "score": 0,
+            "comment": "Occurrences: 4\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 4
+        },
+        {
+            "techniqueID": "T1078",
+            "score": 0,
+            "comment": "Occurrences: 3\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 3
+        },
+        {
+            "techniqueID": "T1556",
+            "score": 0,
+            "comment": "Occurrences: 1\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 1
+        },
+        {
+            "techniqueID": "T1083",
+            "score": 0,
+            "comment": "Occurrences: 4\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 4
+        },
+        {
+            "techniqueID": "T1027",
+            "score": 0,
+            "comment": "Occurrences: 1\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 1
+        },
+        {
+            "techniqueID": "T1565",
+            "score": 0,
+            "comment": "Occurrences: 6\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 6
+        },
+        {
+            "techniqueID": "T1574",
+            "score": 0,
+            "comment": "Occurrences: 2\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 2
+        },
+        {
+            "techniqueID": "T1036",
+            "score": 0,
+            "comment": "Occurrences: 2\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 2
+        },
+        {
+            "techniqueID": "T1110",
+            "score": 0,
+            "comment": "Occurrences: 2\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 2
+        },
+        {
+            "techniqueID": "T1110.001",
+            "score": 0,
+            "comment": "Occurrences: 1\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0> -> <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 1
+        },
+        {
+            "techniqueID": "T1555",
+            "score": 0,
+            "comment": "Occurrences: 2\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 2
+        },
+        {
+            "techniqueID": "T1592",
+            "score": 0,
+            "comment": "Occurrences: 2\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 2
+        },
+        {
+            "techniqueID": "T1105",
+            "score": 0,
+            "comment": "Occurrences: 2\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 2
+        },
+        {
+            "techniqueID": "T1548",
+            "score": 0,
+            "comment": "Occurrences: 4\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 4
+        },
+        {
+            "techniqueID": "T1055",
+            "score": 0,
+            "comment": "Occurrences: 2\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 2
+        },
+        {
+            "techniqueID": "T1505.003",
+            "score": 0,
+            "comment": "Occurrences: 2\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 2
+        },
+        {
+            "techniqueID": "T1112",
+            "score": 0,
+            "comment": "Occurrences: 1\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 1
+        },
+        {
+            "techniqueID": "T1213",
+            "score": 0,
+            "comment": "Occurrences: 2\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 2
+        },
+        {
+            "techniqueID": "T1621",
+            "score": 0,
+            "comment": "Occurrences: 1\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 1
+        },
+        {
+            "techniqueID": "T1562",
+            "score": 0,
+            "comment": "Occurrences: 13\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on External Firewall leading to information exposure\n- Target: External Firewall\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on Protocol Break Device leading to information exposure\n- Target: Protocol Break Device\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on Internal Firewall leading to information exposure\n- Target: Internal Firewall\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on Gateway Load Balancer leading to information exposure\n- Target: Gateway Load Balancer\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on App Server 1 leading to information exposure\n- Target: App Server 1\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on App Server 2 leading to information exposure\n- Target: App Server 2\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on App Server 3 leading to information exposure\n- Target: App Server 3\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on Switch leading to information exposure\n- Target: Switch\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on Central Server leading to information exposure\n- Target: Central Server\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on Application Database leading to information exposure\n- Target: Application Database\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on Authentication Server leading to information exposure\n- Target: Authentication Server\n- Severity: 0.0/10.0\n\n- Threat: Insecure security configuration or hardening on Command Machine leading to information exposure\n- Target: Command Machine\n- Severity: 0.0/10.0",
+            "count": 13
+        },
+        {
+            "techniqueID": "T1595",
+            "score": 0,
+            "comment": "Occurrences: 1\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 1
+        },
+        {
+            "techniqueID": "T1071",
+            "score": 0,
+            "comment": "Occurrences: 2\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 2
+        },
+        {
+            "techniqueID": "T1552",
+            "score": 0,
+            "comment": "Occurrences: 1\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 1
+        },
+        {
+            "techniqueID": "T1068",
+            "score": 0,
+            "comment": "Occurrences: 25\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on External Firewall leading to system compromise\n- Target: External Firewall\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on External Firewall due to misconfiguration or vulnerability\n- Target: External Firewall\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Protocol Break Device leading to system compromise\n- Target: Protocol Break Device\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on Protocol Break Device due to misconfiguration or vulnerability\n- Target: Protocol Break Device\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Internal Firewall leading to system compromise\n- Target: Internal Firewall\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on Internal Firewall due to misconfiguration or vulnerability\n- Target: Internal Firewall\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Gateway Load Balancer leading to system compromise\n- Target: Gateway Load Balancer\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on Gateway Load Balancer due to misconfiguration or vulnerability\n- Target: Gateway Load Balancer\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on App Server 1 leading to system compromise\n- Target: App Server 1\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on App Server 1 due to misconfiguration or vulnerability\n- Target: App Server 1\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on App Server 2 leading to system compromise\n- Target: App Server 2\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on App Server 2 due to misconfiguration or vulnerability\n- Target: App Server 2\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on App Server 3 leading to system compromise\n- Target: App Server 3\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on App Server 3 due to misconfiguration or vulnerability\n- Target: App Server 3\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Switch leading to system compromise\n- Target: Switch\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on Switch due to misconfiguration or vulnerability\n- Target: Switch\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Central Server leading to system compromise\n- Target: Central Server\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on Central Server due to misconfiguration or vulnerability\n- Target: Central Server\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Application Database leading to system compromise\n- Target: Application Database\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on Application Database due to misconfiguration or vulnerability\n- Target: Application Database\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Authentication Server leading to system compromise\n- Target: Authentication Server\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on Authentication Server due to misconfiguration or vulnerability\n- Target: Authentication Server\n- Severity: 0.0/10.0\n\n- Threat: Unpatched OS or software vulnerabilities on Command Machine leading to system compromise\n- Target: Command Machine\n- Severity: 0.0/10.0\n\n- Threat: Unauthorized privilege escalation on Command Machine due to misconfiguration or vulnerability\n- Target: Command Machine\n- Severity: 0.0/10.0",
+            "count": 25
+        },
+        {
+            "techniqueID": "T1140",
+            "score": 0,
+            "comment": "Occurrences: 1\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 1
+        },
+        {
+            "techniqueID": "T1070",
+            "score": 0,
+            "comment": "Occurrences: 24\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on External Firewall, preventing detection of malicious activities and enabling repudiation\n- Target: External Firewall\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on Protocol Break Device, preventing detection of malicious activities and enabling repudiation\n- Target: Protocol Break Device\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on Internal Firewall, preventing detection of malicious activities and enabling repudiation\n- Target: Internal Firewall\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on Gateway Load Balancer, preventing detection of malicious activities and enabling repudiation\n- Target: Gateway Load Balancer\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on App Server 1, preventing detection of malicious activities and enabling repudiation\n- Target: App Server 1\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on App Server 2, preventing detection of malicious activities and enabling repudiation\n- Target: App Server 2\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on App Server 3, preventing detection of malicious activities and enabling repudiation\n- Target: App Server 3\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on Switch, preventing detection of malicious activities and enabling repudiation\n- Target: Switch\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on Central Server, preventing detection of malicious activities and enabling repudiation\n- Target: Central Server\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on Application Database, preventing detection of malicious activities and enabling repudiation\n- Target: Application Database\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on Authentication Server, preventing detection of malicious activities and enabling repudiation\n- Target: Authentication Server\n- Severity: 0.0/10.0\n\n- Threat: Lack of monitoring or logging on Command Machine, preventing detection of malicious activities and enabling repudiation\n- Target: Command Machine\n- Severity: 0.0/10.0\n\n- Threat: Repudiation of critical actions performed by External Client 1 due to insufficient logging or non-repudiation controls\n- Target: External Client 1\n- Severity: 0.0/10.0\n\n- Threat: Repudiation of critical actions performed by External Client 2 due to insufficient logging or non-repudiation controls\n- Target: External Client 2\n- Severity: 0.0/10.0\n\n- Threat: Repudiation of critical actions performed by External Client 3 due to insufficient logging or non-repudiation controls\n- Target: External Client 3\n- Severity: 0.0/10.0\n\n- Threat: Repudiation of critical actions performed by External Client 4 due to insufficient logging or non-repudiation controls\n- Target: External Client 4\n- Severity: 0.0/10.0\n\n- Threat: Repudiation of critical actions performed by External Client 5 due to insufficient logging or non-repudiation controls\n- Target: External Client 5\n- Severity: 0.0/10.0\n\n- Threat: Repudiation of critical actions performed by External Client 6 due to insufficient logging or non-repudiation controls\n- Target: External Client 6\n- Severity: 0.0/10.0\n\n- Threat: Repudiation of critical actions performed by External Client 7 due to insufficient logging or non-repudiation controls\n- Target: External Client 7\n- Severity: 0.0/10.0\n\n- Threat: Repudiation of critical actions performed by External Client 8 due to insufficient logging or non-repudiation controls\n- Target: External Client 8\n- Severity: 0.0/10.0\n\n- Threat: Repudiation of critical actions performed by Internal Operator 1 due to insufficient logging or non-repudiation controls\n- Target: Internal Operator 1\n- Severity: 0.0/10.0\n\n- Threat: Repudiation of critical actions performed by Internal Operator 2 due to insufficient logging or non-repudiation controls\n- Target: Internal Operator 2\n- Severity: 0.0/10.0\n\n- Threat: Repudiation of critical actions performed by System Administrator due to insufficient logging or non-repudiation controls\n- Target: System Administrator\n- Severity: 0.0/10.0",
+            "count": 24
+        },
+        {
+            "techniqueID": "T1185",
+            "score": 0,
+            "comment": "Occurrences: 2\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 2
+        },
+        {
+            "techniqueID": "T1598",
+            "score": 0,
+            "comment": "Occurrences: 1\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 1
+        },
+        {
+            "techniqueID": "T1005",
+            "score": 0,
+            "comment": "Occurrences: 3\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0\n\n- Threat: Threat\n- Target: <pytm.pytm.varString object at 0x000001C806AC38C0>\n- Severity: 0.0/10.0",
+            "count": 3
+        },
+        {
+            "techniqueID": "T1566",
+            "score": 0,
+            "comment": "Occurrences: 11\n\n- Threat: Identity spoofing of the actor External Client 1 via phishing or credential theft\n- Target: External Client 1\n- Severity: 0.0/10.0\n\n- Threat: Identity spoofing of the actor External Client 2 via phishing or credential theft\n- Target: External Client 2\n- Severity: 0.0/10.0\n\n- Threat: Identity spoofing of the actor External Client 3 via phishing or credential theft\n- Target: External Client 3\n- Severity: 0.0/10.0\n\n- Threat: Identity spoofing of the actor External Client 4 via phishing or credential theft\n- Target: External Client 4\n- Severity: 0.0/10.0\n\n- Threat: Identity spoofing of the actor External Client 5 via phishing or credential theft\n- Target: External Client 5\n- Severity: 0.0/10.0\n\n- Threat: Identity spoofing of the actor External Client 6 via phishing or credential theft\n- Target: External Client 6\n- Severity: 0.0/10.0\n\n- Threat: Identity spoofing of the actor External Client 7 via phishing or credential theft\n- Target: External Client 7\n- Severity: 0.0/10.0\n\n- Threat: Identity spoofing of the actor External Client 8 via phishing or credential theft\n- Target: External Client 8\n- Severity: 0.0/10.0\n\n- Threat: Identity spoofing of the actor Internal Operator 1 via phishing or credential theft\n- Target: Internal Operator 1\n- Severity: 0.0/10.0\n\n- Threat: Identity spoofing of the actor Internal Operator 2 via phishing or credential theft\n- Target: Internal Operator 2\n- Severity: 0.0/10.0\n\n- Threat: Identity spoofing of the actor System Administrator via phishing or credential theft\n- Target: System Administrator\n- Severity: 0.0/10.0",
+            "count": 11
+        }
+    ]
+}

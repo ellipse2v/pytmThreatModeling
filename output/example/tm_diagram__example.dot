@@ -1,94 +1,279 @@
 digraph ThreatModel {
   rankdir=LR;
-  node [shape=box, style=filled, fillcolor=lightblue];
+  node [shape=box];
   edge [fontsize=10];
   splines=true;
   overlap=false;
   nodesep=0.5;
   ranksep=0.6;
   charset="UTF-8";
-  subgraph cluster_Internet {
+
+  
+
+  
+    
+  subgraph cluster_internet {
     label="Internet";
+    
     fontsize=10;
-    fillcolor="#F0F0F0";
+    
     style="rounded,filled";
+    
+    fillcolor="#F0F0F0";
+    
+    
     color=black;
-    "External Client 1" [shape=oval, style="", fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 1"];
-    "External Client 2" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 2"];
-    "External Client 3" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 3"];
-    "External Client 4" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 4"];
-    "External Client 5" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 5"];
-    "External Client 6" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 6"];
-    "External Client 7" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 7"];
-    "External Client 8" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 8"];
+    
+    
+    "External Client 1" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 1", id="External_Client_1"];
+    
+    "External Client 2" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 2", id="External_Client_2"];
+    
+    "External Client 3" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 3", id="External_Client_3"];
+    
+    "External Client 4" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 4", id="External_Client_4"];
+    
+    "External Client 5" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 5", id="External_Client_5"];
+    
+    "External Client 6" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 6", id="External_Client_6"];
+    
+    "External Client 7" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 7", id="External_Client_7"];
+    
+    "External Client 8" [shape=oval, style=filled, fillcolor="#ADD8E6", color="#ADD8E6", label="👤 External Client 8", id="External_Client_8"];
+    
+    
+    
   }
-  subgraph cluster_DMZ {
+  
+  
+    
+  subgraph cluster_dmz {
     label="DMZ";
+    
+    style="rounded,filled";
+    
     fillcolor="khaki";
-    style="rounded,filled";
+    
+    
     color=red;
     penwidth=3;
-    style="rounded,filled,dashed";
-    "External Firewall" [shape=hexagon, style=filled, fillcolor="#D3D3D3", color="#D3D3D3", label="🔥 External Firewall"];
-    "Protocol Break Device" [shape=box, style=filled, fillcolor="lightgreen", label="🖥️ Protocol Break Device"];
-    "Internal Firewall" [shape=hexagon, style=filled, fillcolor="#D3D3D3", color="#D3D3D3", label="🔥 Internal Firewall"];
+    
+    
+    
+    "External Firewall" [shape=hexagon, style=filled, fillcolor="#D3D3D3", color="#D3D3D3", label="🔥 External Firewall", id="External_Firewall"];
+    
+    "Protocol Break Device" [shape=box, style=filled, fillcolor="lightgreen", label="🖥️ Protocol Break Device", id="Protocol_Break_Device"];
+    
+    "Internal Firewall" [shape=hexagon, style=filled, fillcolor="#D3D3D3", color="#D3D3D3", label="🔥 Internal Firewall", id="Internal_Firewall"];
+    
+    
   }
-  subgraph cluster_Gateway_Zone {
+  
+  
+    
+  subgraph cluster_gateway_zone {
     label="Gateway_Zone";
+    
+    style="rounded,filled";
+    
     fillcolor="lightyellow";
-    style="rounded,filled";
+    
+    
     color=red;
     penwidth=3;
-    "Gateway Load Balancer" [shape=box, style=filled, fillcolor="gold", color="gold", label="🖥️ Gateway Load Balancer"];
-    "App Server 1" [shape=box, style=filled, fillcolor="#B0E0E6", color="#B0E0E6", label="🖥️ App Server 1"];
-    "App Server 2" [shape=box, style=filled, fillcolor="#B0E0E6", color="#B0E0E6", label="🖥️ App Server 2"];
-    "App Server 3" [shape=box, style=filled, fillcolor="#B0E0E6", color="#B0E0E6", label="🖥️ App Server 3"];
+    
+    
+    
+    "Gateway Load Balancer" [shape=box, style=filled, fillcolor="gold", color="gold", label="🖥️ Gateway Load Balancer", id="Gateway_Load_Balancer"];
+    
+    "App Server 1" [shape=box, style=filled, fillcolor="#B0E0E6", color="#B0E0E6", label="🖥️ App Server 1", id="App_Server_1"];
+    
+    "App Server 2" [shape=box, style=filled, fillcolor="#B0E0E6", color="#B0E0E6", label="🖥️ App Server 2", id="App_Server_2"];
+    
+    "App Server 3" [shape=box, style=filled, fillcolor="#B0E0E6", color="#B0E0E6", label="🖥️ App Server 3", id="App_Server_3"];
+    
+    
   }
-  subgraph cluster_Intranet {
+  
+  
+    
+  subgraph cluster_intranet {
     label="Intranet";
+    
     style="rounded";
+    
+    fillcolor="none";
+    
+    
     color=red;
     penwidth=3;
-    "Internal Operator 1" [shape=oval, style=filled, fillcolor="forestgreen", color="forestgreen", label="👤 Internal Operator 1"];
-    "Internal Operator 2" [shape=oval, style=filled, fillcolor="forestgreen", color="forestgreen", label="👤 Internal Operator 2"];
-    "System Administrator" [shape=oval, style=filled, fillcolor="forestgreen", color="forestgreen", label="👤 System Administrator"];
-    "Switch" [shape=diamond, style=filled, fillcolor="#E6E6FA", color="#E6E6FA", label="🔀 Switch"];
-    "Central Server" [shape=box, style=filled, fillcolor="#98FB98", color="#98FB98", label="🖥️ Central Server"];
-    "Application Database" [shape=cylinder, style=filled, fillcolor="#FFDAB9", color="#FFDAB9", label="🗄️ Application Database"];
-    "Authentication Server" [shape=box, style=filled, fillcolor="lightgreen", label="🖥️ Authentication Server"];
+    
+    
+    "Internal Operator 1" [shape=oval, style=filled, fillcolor="forestgreen", color="forestgreen", label="👤 Internal Operator 1", id="Internal_Operator_1"];
+    
+    "Internal Operator 2" [shape=oval, style=filled, fillcolor="forestgreen", color="forestgreen", label="👤 Internal Operator 2", id="Internal_Operator_2"];
+    
+    "System Administrator" [shape=oval, style=filled, fillcolor="forestgreen", color="forestgreen", label="👤 System Administrator", id="System_Administrator"];
+    
+    
+    "Switch" [shape=diamond, style=filled, fillcolor="#E6E6FA", color="#E6E6FA", label="🔀 Switch", id="Switch"];
+    
+    "Central Server" [shape=box, style=filled, fillcolor="#98FB98", color="#98FB98", label="🖥️ Central Server", id="Central_Server"];
+    
+    "Application Database" [shape=cylinder, style=filled, fillcolor="#FFDAB9", color="#FFDAB9", label="🗄️ Application Database", id="Application_Database"];
+    
+    "Authentication Server" [shape=box, style=filled, fillcolor="lightgreen", label="🖥️ Authentication Server", id="Authentication_Server"];
+    
+    
   }
-  subgraph cluster_Command_Zone {
+  
+  
+    
+  subgraph cluster_command_zone {
     label="Command_Zone";
+    
     fontsize=10;
-    fillcolor="#F0F0F0";
+    
     style="rounded,filled";
+    
+    fillcolor="#F0F0F0";
+    
+    
     color=black;
-    "Command Machine" [shape=box, style=filled, fillcolor="lightgreen", label="🖥️ Command Machine"];
+    
+    
+    
+    "Command Machine" [shape=box, style=filled, fillcolor="lightgreen", label="🖥️ Command Machine", id="Command_Machine"];
+    
+    
   }
-  "External Client 1" -> "External Firewall" [label="test1\nProtocol: HTTPS\nData: Web Traffic\n🔒 Encrypted", color="darkgreen", style="solid", fontsize=7];
-  "External Client 2" -> "External Firewall" [label="test\nProtocol: HTTP\nData: Web Traffic", color="red", style="solid", fontsize=7];
-  "External Client 3" -> "External Firewall" [label="Client 3 to External Firewall\nProtocol: FTP\nData: File Transfer", fontsize=7];
-  "External Client 4" -> "External Firewall" [label="Client 4 to External Firewall\nProtocol: SFTP\nData: File Transfer\n🔒 Encrypted", fontsize=7];
-  "External Client 5" -> "External Firewall" [label="Client 5 to External Firewall\nProtocol: DNS\nData: DNS Query", fontsize=7];
-  "External Client 6" -> "External Firewall" [label="Client 6 to External Firewall\nProtocol: SMTP\nData: Mail Traffic", fontsize=7];
-  "External Client 7" -> "External Firewall" [label="Client 7 to External Firewall\nProtocol: RTSP\nData: Video Stream", fontsize=7];
-  "External Client 8" -> "External Firewall" [label="Client 8 to External Firewall\nProtocol: MQTT\nData: IoT Data", color="teal", style="dashed", fontsize=7];
-  "External Firewall" -> "Protocol Break Device" [label="External Firewall to Protocol Break Device\nProtocol: HTTPS\nData: Web Traffic\n🔒 Encrypted", color="darkgreen", style="solid", fontsize=7];
-  "Protocol Break Device" -> "Internal Firewall" [label="Protocol Break Device to Internal Firewall\nProtocol: HTTPS\nData: Web Traffic\n🔒 Encrypted", color="darkgreen", style="solid", fontsize=7];
-  "Internal Firewall" -> "Gateway Load Balancer" [label="Internal Firewall to Gateway Load Balancer\nProtocol: HTTPS\nData: Web Traffic\n🔒 Encrypted", color="darkgreen", style="solid", fontsize=7];
-  "Gateway Load Balancer" -> "App Server 1" [label="Gateway Load Balancer to App Server 1\nProtocol: HTTPS\nData: API Request\n🔒 Encrypted", color="darkgreen", style="solid", fontsize=7];
-  "Gateway Load Balancer" -> "App Server 2" [label="Gateway Load Balancer to App Server 2\nProtocol: HTTPS\nData: API Request\n🔒 Encrypted", color="darkgreen", style="solid", fontsize=7];
-  "Gateway Load Balancer" -> "App Server 3" [label="Gateway Load Balancer to App Server 3\nProtocol: HTTPS\nData: API Request\n🔒 Encrypted", color="darkgreen", style="solid", fontsize=7];
-  "App Server 1" -> "Switch" [label="App Server 1 to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
-  "App Server 2" -> "Switch" [label="App Server 2 to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
-  "App Server 3" -> "Switch" [label="App Server 3 to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
-  "Internal Firewall" -> "Switch" [label="Internal Firewall to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
-  "Command Machine" -> "Switch" [label="Command Machine to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
-  "Internal Operator 1" -> "Switch" [label="Internal Operator 1 to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
-  "Internal Operator 2" -> "Switch" [label="Internal Operator 2 to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
-  "System Administrator" -> "Switch" [label="System Administrator to Switch\nProtocol: Ethernet\nData: General Traffic", fontsize=7];
-  "Switch" -> "Central Server" [dir="both", label="Switch to Central Server\nProtocol: HTTPS\nData: Server Request\n🔐 Authenticated\n🔒 Encrypted\n↔️ Bidirectional", color="darkgreen", style="solid", fontsize=7];
-  "System Administrator" -> "Central Server" [label="System Administrator to Central Server\nProtocol: SSH\nData: SSH Traffic\n🔐 Authenticated\n🔒 Encrypted", color="blue", style="dashed", fontsize=7];
-  "System Administrator" -> "Authentication Server" [label="System Administrator to Authentication Server\nProtocol: LDAPS\nData: Authentication Request\n🔐 Authenticated\n🔒 Encrypted", color="teal", fontsize=7];
-  "Central Server" -> "Authentication Server" [label="Central Server to Authentication Server\nProtocol: LDAPS\nData: Authentication Request\n🔐 Authenticated\n🔒 Encrypted", color="teal", fontsize=7];
+  
+  
+
+  
+
+  
+
+  
+  "External Client 1" -> "External Firewall" [label="test1
+Protocol: HTTPS
+Data: Web Traffic
+🔒 Encrypted", color="darkgreen", style="solid", fontsize=7, class="HTTPS"];
+  
+  "External Client 2" -> "External Firewall" [label="test
+Protocol: HTTP
+Data: Web Traffic", color="red", style="solid", fontsize=7, class="HTTP"];
+  
+  "External Client 3" -> "External Firewall" [label="Client 3 to External Firewall
+Protocol: FTP
+Data: File Transfer", fontsize=7, class="FTP"];
+  
+  "External Client 4" -> "External Firewall" [label="Client 4 to External Firewall
+Protocol: SFTP
+Data: File Transfer
+🔒 Encrypted", fontsize=7, class="SFTP"];
+  
+  "External Client 5" -> "External Firewall" [label="Client 5 to External Firewall
+Protocol: DNS
+Data: DNS Query", fontsize=7, class="DNS"];
+  
+  "External Client 6" -> "External Firewall" [label="Client 6 to External Firewall
+Protocol: SMTP
+Data: Mail Traffic", fontsize=7, class="SMTP"];
+  
+  "External Client 7" -> "External Firewall" [label="Client 7 to External Firewall
+Protocol: RTSP
+Data: Video Stream", fontsize=7, class="RTSP"];
+  
+  "External Client 8" -> "External Firewall" [label="Client 8 to External Firewall
+Protocol: MQTT
+Data: IoT Data", color="teal", style="dashed", fontsize=7, class="MQTT"];
+  
+  "External Firewall" -> "Protocol Break Device" [label="External Firewall to Protocol Break Device
+Protocol: HTTPS
+Data: Web Traffic
+🔒 Encrypted", color="darkgreen", style="solid", fontsize=7, class="HTTPS"];
+  
+  "Protocol Break Device" -> "Internal Firewall" [label="Protocol Break Device to Internal Firewall
+Protocol: HTTPS
+Data: Web Traffic
+🔒 Encrypted", color="darkgreen", style="solid", fontsize=7, class="HTTPS"];
+  
+  "Internal Firewall" -> "Gateway Load Balancer" [label="Internal Firewall to Gateway Load Balancer
+Protocol: HTTPS
+Data: Web Traffic
+🔒 Encrypted", color="darkgreen", style="solid", fontsize=7, class="HTTPS"];
+  
+  "Gateway Load Balancer" -> "App Server 1" [label="Gateway Load Balancer to App Server 1
+Protocol: HTTPS
+Data: API Request
+🔒 Encrypted", color="darkgreen", style="solid", fontsize=7, class="HTTPS"];
+  
+  "Gateway Load Balancer" -> "App Server 2" [label="Gateway Load Balancer to App Server 2
+Protocol: HTTPS
+Data: API Request
+🔒 Encrypted", color="darkgreen", style="solid", fontsize=7, class="HTTPS"];
+  
+  "Gateway Load Balancer" -> "App Server 3" [label="Gateway Load Balancer to App Server 3
+Protocol: HTTPS
+Data: API Request
+🔒 Encrypted", color="darkgreen", style="solid", fontsize=7, class="HTTPS"];
+  
+  "App Server 1" -> "Switch" [label="App Server 1 to Switch
+Protocol: Ethernet
+Data: General Traffic", fontsize=7, class="Ethernet"];
+  
+  "App Server 2" -> "Switch" [label="App Server 2 to Switch
+Protocol: Ethernet
+Data: General Traffic", fontsize=7, class="Ethernet"];
+  
+  "App Server 3" -> "Switch" [label="App Server 3 to Switch
+Protocol: Ethernet
+Data: General Traffic", fontsize=7, class="Ethernet"];
+  
+  "Internal Firewall" -> "Switch" [label="Internal Firewall to Switch
+Protocol: Ethernet
+Data: General Traffic", fontsize=7, class="Ethernet"];
+  
+  "Command Machine" -> "Switch" [label="Command Machine to Switch
+Protocol: Ethernet
+Data: General Traffic", fontsize=7, class="Ethernet"];
+  
+  "Internal Operator 1" -> "Switch" [label="Internal Operator 1 to Switch
+Protocol: Ethernet
+Data: General Traffic", fontsize=7, class="Ethernet"];
+  
+  "Internal Operator 2" -> "Switch" [label="Internal Operator 2 to Switch
+Protocol: Ethernet
+Data: General Traffic", fontsize=7, class="Ethernet"];
+  
+  "System Administrator" -> "Switch" [label="System Administrator to Switch
+Protocol: Ethernet
+Data: General Traffic", fontsize=7, class="Ethernet"];
+  
+  "Switch" -> "Central Server" [dir="both", label="Switch to Central Server
+Protocol: HTTPS
+Data: Server Request
+🔒 Encrypted
+🔐 Authenticated
+↔️ Bidirectional", color="darkgreen", style="solid", fontsize=7, class="HTTPS"];
+  
+  "System Administrator" -> "Central Server" [label="System Administrator to Central Server
+Protocol: SSH
+Data: SSH Traffic
+🔒 Encrypted
+🔐 Authenticated", color="blue", style="dashed", fontsize=7, class="SSH"];
+  
+  "System Administrator" -> "Authentication Server" [label="System Administrator to Authentication Server
+Protocol: LDAPS
+Data: Authentication Request
+🔒 Encrypted
+🔐 Authenticated", color="teal", fontsize=7, class="LDAPS"];
+  
+  "Central Server" -> "Authentication Server" [label="Central Server to Authentication Server
+Protocol: LDAPS
+Data: Authentication Request
+🔒 Encrypted
+🔐 Authenticated", color="teal", fontsize=7, class="LDAPS"];
+  
 }
