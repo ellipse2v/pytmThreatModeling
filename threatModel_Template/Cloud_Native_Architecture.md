@@ -24,15 +24,15 @@ This threat model focuses on a cloud-native architecture using serverless servic
 
 ## Dataflows
 - **Client Request**: from="End User", to="CloudFront/CDN", protocol="HTTPS", color=darkgreen
-- **API Request**: from="CloudFront/CDN", to="API Gateway", protocol="HTTPS", color=darkgreen
-- **Function Invocation**: from="API Gateway", to="FaaS Function (Lambda/Cloud Functions)", protocol="Internal API"
-- **Database Access**: from="FaaS Function (Lambda/Cloud Functions)", to="NoSQL Database (DynamoDB/Firestore)", protocol="Internal API"
-- **Object Storage Access**: from="FaaS Function (Lambda/Cloud Functions)", to="S3 Bucket/Cloud Storage", protocol="Internal API"
-- **Function Response**: from="FaaS Function (Lambda/Cloud Functions)", to="API Gateway", protocol="Internal API"
-- **API Response**: from="API Gateway", to="CloudFront/CDN", protocol="HTTPS", color=darkgreen
+- **API Request**: from="CloudFront/CDN", to="API Gateway (AWS API Gateway/Google Cloud Endpoints)", protocol="HTTPS", color=darkgreen
+- **Function Invocation**: from="API Gateway (AWS API Gateway/Google Cloud Endpoints)", to="Lambda Function/Cloud Function", protocol="Internal API"
+- **Database Access**: from="Lambda Function/Cloud Function", to="DynamoDB/Firestore", protocol="Internal API"
+- **Object Storage Access**: from="Lambda Function/Cloud Function", to="S3 Bucket/Cloud Storage", protocol="Internal API"
+- **Function Response**: from="Lambda Function/Cloud Function", to="API Gateway (AWS API Gateway/Google Cloud Endpoints)", protocol="Internal API"
+- **API Response**: from="API Gateway (AWS API Gateway/Google Cloud Endpoints)", to="CloudFront/CDN", protocol="HTTPS", color=darkgreen
 - **Client Response**: from="CloudFront/CDN", to="End User", protocol="HTTPS", color=darkgreen
-- **Function Code Injection**: from="Attacker", to="FaaS Function (Lambda/Cloud Functions)", protocol="API"
-- **Misconfigured IAM**: from="Attacker", to="NoSQL Database (DynamoDB/Firestore)", protocol="API"
+- **Function Code Injection**: from="Attacker", to="Lambda Function/Cloud Function", protocol="API"
+- **Misconfigured IAM**: from="Attacker", to="DynamoDB/Firestore", protocol="API"
 - **Developer to API Gateway**: from="Developer/Cloud Operator", to="API Gateway (AWS API Gateway/Google Cloud Endpoints)", protocol="API"
 - **Developer to FaaS Function**: from="Developer/Cloud Operator", to="Lambda Function/Cloud Function", protocol="API"
 - **Developer to NoSQL Database**: from="Developer/Cloud Operator", to="DynamoDB/Firestore", protocol="Management"

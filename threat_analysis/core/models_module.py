@@ -21,6 +21,16 @@ from typing import List, Dict, Any, Optional, Tuple
 import logging
 from enum import Enum
 
+# Patch pytm.Boundary to ensure it has a 'protocol' attribute
+if not hasattr(Boundary, 'protocol'):
+    original_boundary_init = Boundary.__init__
+    def new_boundary_init(self, *args, **kwargs):
+        original_boundary_init(self, *args, **kwargs)
+        self.protocol = ""
+        self.port = "" # Initialize port
+        self.data = [] # Initialize data as a list
+    Boundary.__init__ = new_boundary_init
+
 from .mitre_mapping_module import MitreMapping
 from threat_analysis.severity_calculator_module import SeverityCalculator
 from .model_validator import ModelValidator
@@ -93,7 +103,7 @@ class ThreatModel:
         # used as sources/sinks in Dataflows. The underlying pytm library
         # expects these attributes to exist on dataflow endpoints, which
         # this patch provides.
-        boundary.protocol = None
+        boundary.protocol = ""
         boundary.port = None
         boundary.data = None
 

@@ -19,7 +19,7 @@ Tests for the ModelValidator.
 import pytest
 from threat_analysis.core.models_module import ThreatModel
 from threat_analysis.core.model_validator import ModelValidator
-from pytm import Actor, Server, Dataflow
+from pytm import Actor, Server, Dataflow, Boundary
 
 @pytest.fixture
 def sample_threat_model():
@@ -69,3 +69,33 @@ def test_validator_with_invalid_dataflow_sink(sample_threat_model):
     assert validator.validate()
     assert len(validator.errors) == 1
     assert "Dataflow 'Invalid Sink Flow' refers to a non-existent 'to' element: 'Fake Server'." in validator.errors[0]
+
+def test_validator_with_dataflow_to_boundary(sample_threat_model):
+    """Tests that a dataflow to a boundary fails validation."""
+    user = sample_threat_model.get_element_by_name("User")
+    # Get a boundary object
+    boundary = Boundary("Internet")
+
+    # Manually create and add the invalid dataflow
+    invalid_df = Dataflow(user, boundary, "Invalid Boundary Flow")
+    sample_threat_model.dataflows.append(invalid_df)
+
+    validator = ModelValidator(sample_threat_model)
+    errors = validator.validate()
+    assert errors
+    assert "Dataflow 'Invalid Boundary Flow' cannot terminate directly at a boundary. The destination must be an actor or a server." in errors
+
+def test_validator_with_dataflow_from_boundary(sample_threat_model):
+    """Tests that a dataflow originating from a boundary fails validation."""
+    # Get a boundary object
+    boundary = Boundary("Internet")
+    webserver = sample_threat_model.get_element_by_name("WebServer")
+
+    # Manually create and add the invalid dataflow
+    invalid_df = Dataflow(boundary, webserver, "Invalid Boundary Source Flow")
+    sample_threat_model.dataflows.append(invalid_df)
+
+    validator = ModelValidator(sample_threat_model)
+    errors = validator.validate()
+    assert errors
+    assert "Dataflow 'Invalid Boundary Source Flow' cannot originate directly from a boundary. The source must be an actor or a server." in errors

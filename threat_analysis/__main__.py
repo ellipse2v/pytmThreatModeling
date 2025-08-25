@@ -434,11 +434,45 @@ def run_single_analysis(args: argparse.Namespace, loaded_iac_plugins: Dict[str, 
     if args.navigator:
         framework.generate_navigator_layer()
 
+class ColoredFormatter(logging.Formatter):
+    """Custom formatter to add color to log messages."""
+
+    # ANSI escape codes for colors
+    COLOR_CODES = {
+        'WARNING': '\033[93m',  # Yellow
+        'ERROR': '\033[91m',    # Red
+        'CRITICAL': '\033[95m', # Magenta
+        'INFO': '\033[0m',      # Reset
+        'DEBUG': '\033[0m',     # Reset
+    }
+    RESET_CODE = '\033[0m'
+
+    def format(self, record):
+        log_message = super().format(record)
+        return f"{self.COLOR_CODES.get(record.levelname, self.RESET_CODE)}{log_message}{self.RESET_CODE}"
+
 # --- Main entry point ---
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-    )
+    # Create a logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO) # Set default level
+
+    # Remove all existing handlers from the root logger
+    for handler in logger.handlers[:]:
+        logger.removeHandler(handler)
+
+    # Create a console handler
+    console_handler = logging.StreamHandler()
+
+    # Create and set the custom formatter
+    formatter = ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
+    console_handler.setFormatter(formatter)
+
+    # Add the handler to the logger
+    logger.addHandler(console_handler)
+
+    # Prevent basicConfig from adding another handler if it's called elsewhere
+    logger.propagate = False
 
     loaded_iac_plugins = load_iac_plugins()
     custom_parser = CustomArgumentParser(loaded_iac_plugins)

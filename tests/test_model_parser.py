@@ -168,6 +168,12 @@ def test_parse_severity_multiplier(model_parser, threat_model):
     model_parser._parse_severity_multiplier(line)
     assert threat_model.severity_multipliers["CriticalData"] == 2.5
 
+def test_parse_severity_multiplier_with_comment(model_parser, threat_model):
+    """Tests that commented lines are ignored when parsing severity multipliers."""
+    line = "# - **CommentedMultiplier**: 3.0"
+    model_parser._parse_severity_multiplier(line)
+    assert not threat_model.severity_multipliers
+
 def test_parse_custom_mitre(model_parser, threat_model):
     line = "- **Phishing**: {'tactics':['Initial Access'], 'techniques':[{'id': 'T1566', 'name': 'Phishing'}]}"
     model_parser._parse_custom_mitre(line)
@@ -175,6 +181,12 @@ def test_parse_custom_mitre(model_parser, threat_model):
     mapping = threat_model.custom_mitre_mappings["Phishing"]
     assert mapping['tactics'] == ['Initial Access']
     assert mapping['techniques'] == [{'id': 'T1566', 'name': 'Phishing'}]
+
+def test_parse_custom_mitre_with_comment(model_parser, threat_model):
+    """Tests that commented lines are ignored when parsing custom MITRE mappings."""
+    line = "# - **CommentedMapping**: {'tactics':['Initial Access'], 'techniques':[{'id': 'T1566', 'name': 'Phishing'}]}"
+    model_parser._parse_custom_mitre(line)
+    assert not threat_model.custom_mitre_mappings
 
 def test_parse_key_value_params(model_parser):
     params_str = 'key1="value one", key2=True, key3=123, key4=#FF00FF, key5=unquoted_string'

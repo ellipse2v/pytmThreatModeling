@@ -122,6 +122,7 @@ class ModelParser:
 
     def _parse_boundary(self, line: str, indentation: int, boundary_stack: List[Tuple[str, int]]):
         """Parses a boundary line with format: - **name**: color=value, isTrusted=bool, isFilled=bool"""
+        logging.debug(f"Parsing boundary line: {line.strip()}")
         match = re.match(r'^- \*\*([^\*:]+)\*\*:\s*(.*)', line.strip())
         if match:
             name = match.group(1).strip()
@@ -140,6 +141,7 @@ class ModelParser:
 
     def _parse_actor(self, line: str):
         """Parses an actor line with flexible key=value attributes."""
+        logging.debug(f"Parsing actor line: {line}")
         match = re.match(r'^- \*\*([^\*]+)\*\*:\s*(.*)', line)
         if match:
             actor_name = match.group(1).strip()
@@ -152,6 +154,7 @@ class ModelParser:
 
     def _parse_server(self, line: str):
         """Parses a server line with format: - **name**: boundary=value, color=value, isFilled=bool"""
+        logging.debug(f"Parsing server line: {line}")
         # Match server name and all parameters after colon
         match = re.match(r'^- \*\*([^\*:]+)\*\*:\s*(.*)', line)
         if match:
@@ -211,6 +214,7 @@ class ModelParser:
 
     def _parse_data(self, line: str):
         """Parses a line to define a Data object, extracting all properties."""
+        logging.debug(f"Parsing data line: {line}")
         # The regex captures the name between ** and the rest of the line as a parameter string
         match = re.match(r'^- \*\*([^\*]+)\*\*:\s*(.*)', line)
         if not match:
@@ -249,6 +253,7 @@ class ModelParser:
 
     def _parse_dataflow(self, line: str):
         """Parses a dataflow line with flexible named arguments."""
+        logging.debug(f"Parsing dataflow line: {line}")
         name_match = re.match(r'^- \*\*([^\*]+)\*\*:\s*(.*)', line)
         if not name_match:
             logging.warning(f"⚠️ Warning: Malformed dataflow line (missing name): {line}")
@@ -288,6 +293,7 @@ class ModelParser:
             
     def _parse_protocol_style(self, line: str):
         """Parses a protocol style line with format: - **protocol**: color=value, line_style=value"""
+        logging.debug(f"Parsing protocol style line: {line}")
         match = re.match(r'^- \*\*([^\*:]+)\*\*:\s*(.*)', line)
         if match:
             protocol_name = match.group(1).strip()
@@ -313,6 +319,9 @@ class ModelParser:
 
     def _parse_severity_multiplier(self, line: str):
         """Parses a severity multiplier line."""
+        logging.debug(f"Parsing severity multiplier line: {line}")
+        if line.strip().startswith('#'):
+            return
         match = re.match(r'^- \*\*([^\*]+)\*\*:\s*([0-9.]+)', line)
         if match:
             element_name = match.group(1).strip()
@@ -328,6 +337,9 @@ class ModelParser:
 
     def _parse_custom_mitre(self, line: str):
         """Parses a custom MITRE mapping line."""
+        logging.debug(f"Parsing custom MITRE mapping line: {line}")
+        if line.strip().startswith('#'):
+            return
         # Expected format: - **Attack Name**: tactics=["tactic1", "tactic2"], techniques=[{"id": "T1234", "name": "Attack Name"}]
         match = re.match(r'^- \*\*([^\*]+)\*\*:\s*(.*)', line)
         if not match:

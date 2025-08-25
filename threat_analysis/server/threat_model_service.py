@@ -40,8 +40,9 @@ class ThreatModelService:
         self.stix_generator = None # Initialize later with threat_model and all_detailed_threats
 
     def update_diagram_logic(self, markdown_content: str):
-        logging.info("Entering update_diagram_logic function.")
+        logging.info("update_diagram_logic: Starting diagram update.")
         if not markdown_content:
+            logging.error("update_diagram_logic: Markdown content is empty.")
             raise ValueError("Markdown content is empty")
 
         # Save the received markdown to a temporary file
@@ -66,6 +67,7 @@ class ThreatModelService:
         validator = ModelValidator(threat_model)
         errors = validator.validate()
         if errors:
+            logging.warning(f"update_diagram_logic: Model validation failed with errors: {errors}")
             # Return errors to the frontend
             error_html = "<div class='validation-errors'><h3>Validation Errors:</h3><ul>"
             for error in errors:
@@ -94,6 +96,7 @@ class ThreatModelService:
         svg_path = self.diagram_generator.generate_diagram_from_dot(
             dot_code, temp_svg_path, "svg"
         )
+        logging.info(f"update_diagram_logic: SVG generated at {svg_path}")
 
         if not svg_path or not os.path.exists(svg_path):
             raise RuntimeError("Failed to generate SVG diagram")
@@ -111,6 +114,7 @@ class ThreatModelService:
         )
 
         # 8. Return raw SVG, legend, and full HTML
+        logging.info("update_diagram_logic: Successfully updated diagram.")
         return {
             "diagram_html": full_html,
             "diagram_svg": svg_content,

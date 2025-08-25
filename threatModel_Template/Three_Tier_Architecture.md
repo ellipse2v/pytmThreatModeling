@@ -14,6 +14,7 @@ This threat model describes a classic three-tier web architecture: presentation,
 - **Attacker**: color=red
 
 ## Servers
+- **Client Web Browser**: boundary="Client (Web Browser)"
 - **Load Balancer**: color=gray
 - **Web Server (Nginx/Apache)**: boundary="Web Server (Presentation Tier)"
 - **Application Server (Tomcat/Node.js/Django)**: boundary="Application Server (Business Logic Tier)"
@@ -21,15 +22,15 @@ This threat model describes a classic three-tier web architecture: presentation,
 
 ## Dataflows
 - **HTTP/S Request**: from="End User", to="Load Balancer", protocol="HTTPS", color=darkgreen
-- **Web Request**: from="Load Balancer", to="Web Server (Presentation Tier)", protocol="HTTP/S", color=darkgreen
-- **API Request**: from="Web Server (Presentation Tier)", to="Application Server (Business Logic Tier)", protocol="HTTP/S", color=darkgreen
-- **SQL Request**: from="Application Server (Business Logic Tier)", to="Database Server (Data Tier)", protocol="JDBC/ODBC", color=purple
-- **SQL Response**: from="Database Server (Data Tier)", to="Application Server (Business Logic Tier)", protocol="JDBC/ODBC", color=purple
-- **API Response**: from="Application Server (Business Logic Tier)", to="Web Server (Presentation Tier)", protocol="HTTP/S", color=darkgreen
-- **Web Response**: from="Web Server (Presentation Tier)", to="Load Balancer", protocol="HTTP/S", color=darkgreen
+- **Web Request**: from="Load Balancer", to="Web Server (Nginx/Apache)", protocol="HTTP/S", color=darkgreen
+- **API Request**: from="Web Server (Nginx/Apache)", to="Application Server (Tomcat/Node.js/Django)", protocol="HTTP/S", color=darkgreen
+- **SQL Request**: from="Application Server (Tomcat/Node.js/Django)", to="Database Server (MySQL/PostgreSQL)", protocol="JDBC/ODBC", color=purple
+- **SQL Response**: from="Database Server (MySQL/PostgreSQL)", to="Application Server (Tomcat/Node.js/Django)", protocol="JDBC/ODBC", color=purple
+- **API Response**: from="Application Server (Tomcat/Node.js/Django)", to="Web Server (Nginx/Apache)", protocol="HTTP/S", color=darkgreen
+- **Web Response**: from="Web Server (Nginx/Apache)", to="Load Balancer", protocol="HTTP/S", color=darkgreen
 - **HTTP/S Response**: from="Load Balancer", to="End User", protocol="HTTPS", color=darkgreen
-- **SQL Injection**: from="Attacker", to="Application Server (Business Logic Tier)", protocol="HTTP/S", color=red
-- **XSS**: from="Attacker", to="Client (Web Browser)", protocol="HTTP/S", color=red
+- **SQL Injection**: from="Attacker", to="Application Server (Tomcat/Node.js/Django)", protocol="HTTP/S", color=red
+- **XSS**: from="Attacker", to="Client Web Browser", protocol="HTTP/S", color=red
 
 ## Protocol Styles
 - **HTTPS**: color=darkgreen, line_style=solid

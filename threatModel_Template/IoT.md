@@ -17,18 +17,19 @@ This threat model describes a typical IoT architecture, including devices, gatew
 - **Cloud Administrator**: boundary="Cloud Platform"
 
 ## Servers
+- **IoT Gateway Server**: boundary="IoT Gateway"
 - **IoT Hub**: boundary="Cloud Platform"
 - **Data Storage**: boundary="Cloud Platform"
 - **Analytics Engine**: boundary="Cloud Platform"
 - **Device Management Service**: boundary="Cloud Platform"
 
 ## Dataflows
-- **Sensor Data**: from="Sensor", to="IoT Gateway", protocol="MQTT/CoAP", color=teal
-- **Gateway to Cloud**: from="IoT Gateway", to="IoT Hub", protocol="HTTPS/MQTT", color=darkgreen
+- **Sensor Data**: from="Sensor", to="IoT Gateway Server", protocol="MQTT/CoAP", color=teal
+- **Gateway to Cloud**: from="IoT Gateway Server", to="IoT Hub", protocol="HTTPS/MQTT", color=darkgreen
 - **Cloud to Data Storage**: from="IoT Hub", to="Data Storage", protocol="Internal API"
 - **Cloud to Analytics**: from="Data Storage", to="Analytics Engine", protocol="Internal API"
-- **Command to Actuator**: from="Device Management Service", to="IoT Gateway", protocol="MQTT/CoAP", color=teal
-- **Gateway to Actuator**: from="IoT Gateway", to="Actuator", protocol="MQTT/CoAP", color=teal
+- **Command to Actuator**: from="Device Management Service", to="IoT Gateway Server", protocol="MQTT/CoAP", color=teal
+- **Gateway to Actuator**: from="IoT Gateway Server", to="Actuator", protocol="MQTT/CoAP", color=teal
 - **Admin to Device Management**: from="Device Administrator", to="Device Management Service", protocol="HTTPS", color=darkgreen
 
 ## Protocol Styles

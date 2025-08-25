@@ -30,7 +30,6 @@ if project_root not in sys.path:
     sys.sys.path.insert(0, project_root)
 
 app = Flask(__name__, template_folder="templates")
-logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 # Initialize the service layer
 threat_model_service = ThreatModelService()

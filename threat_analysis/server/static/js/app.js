@@ -53,9 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     async function updatePreview() {
-        hideErrorMessage(); // Clear previous errors
-        const markdownContent = editor.getValue();
-        try {
+            hideErrorMessage(); // Clear previous errors
+            const markdownContent = editor.getValue();
+            console.log('updatePreview: Sending markdown content to backend.');
+            try {
             const response = await fetch('/api/update', {
                 method: 'POST',
                 headers: {
@@ -65,19 +66,21 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             if (!response.ok) {
                 const errorData = await response.json();
+                console.error(`updatePreview: Backend error: ${errorData.error}`);
                 showErrorMessage(`Error updating diagram: ${errorData.error}`);
                 svgWrapper.innerHTML = ''; // Clear diagram on error
                 legendContainer.innerHTML = '';
-                if (panZoomInstance) {
+                if (panZoomInstance && typeof panZoomInstance.destroy === 'function') {
                     panZoomInstance.destroy();
                     panZoomInstance = null;
                 }
                 return;
             }
             const data = await response.json();
+            console.log('updatePreview: Received data from backend:', data);
 
             // Destroy previous instance if it exists
-            if (panZoomInstance) {
+            if (panZoomInstance && typeof panZoomInstance.destroy === 'function') {
                 panZoomInstance.destroy();
             }
 
@@ -97,22 +100,25 @@ document.addEventListener('DOMContentLoaded', function() {
             // Initialize svg-pan-zoom
             const svgElement = svgWrapper.querySelector('svg');
             if (svgElement) {
-                panZoomInstance = svgPanZoom(svgElement, {
-                    zoomEnabled: true,
-                    panEnabled: true,
-                    controlIconsEnabled: false, // Disable default controls
-                    fit: true,
-                    center: true,
-                    minZoom: 0.1,
-                    maxZoom: 10
+                requestAnimationFrame(() => {
+                    panZoomInstance = svgPanZoom(svgElement, {
+                        zoomEnabled: true,
+                        panEnabled: true,
+                        controlIconsEnabled: false, // Disable default controls
+                        fit: true,
+                        center: true,
+                        minZoom: 0.1,
+                        maxZoom: 10
+                    });
                 });
             }
 
         } catch (error) {
-            showErrorMessage(`Failed to fetch preview: ${error.message}`);
+                console.error(`updatePreview: Frontend error: ${error.message}`, error);
+                showErrorMessage(`Failed to fetch preview: ${error.message}`);
             svgWrapper.innerHTML = ''; // Clear diagram on error
             legendContainer.innerHTML = '';
-             if (panZoomInstance) {
+             if (panZoomInstance && typeof panZoomInstance.destroy === 'function') {
                 panZoomInstance.destroy();
                 panZoomInstance = null;
             }

@@ -15,6 +15,8 @@
 from __future__ import annotations
 from typing import List, Dict, Any, Set, TYPE_CHECKING
 
+from pytm import Boundary
+
 if TYPE_CHECKING:
     from threat_analysis.core.models_module import ThreatModel
 
@@ -38,6 +40,7 @@ class ModelValidator:
         self._validate_unique_names()
         self._validate_dataflow_references()
         self._validate_element_boundaries()
+        self._validate_dataflow_endpoints()
 
         return self.errors
 
@@ -121,3 +124,13 @@ class ModelValidator:
             boundary_name = server_info.get('boundary_name')
             if boundary_name and boundary_name.lower() not in boundary_names:
                 self._add_error(f"Server '{server_info['name']}' refers to a non-existent boundary: '{boundary_name}'.")
+
+    def _validate_dataflow_endpoints(self):
+        """
+        Validates that dataflows do not connect directly to boundaries.
+        """
+        for dataflow in self.threat_model.dataflows:
+            if isinstance(dataflow.source, Boundary):
+                self._add_error(f"Dataflow '{dataflow.name}' cannot originate directly from a boundary. The source must be an actor or a server.")
+            if isinstance(dataflow.sink, Boundary):
+                self._add_error(f"Dataflow '{dataflow.name}' cannot terminate directly at a boundary. The destination must be an actor or a server.")

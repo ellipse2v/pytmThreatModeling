@@ -14,9 +14,12 @@
 
 import pytest
 import os
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, patch, mock_open, ANY
 from io import BytesIO
 import datetime
+import sys
+import shutil
+import zipfile
 
 from threat_analysis.server.threat_model_service import ThreatModelService
 from threat_analysis.core.model_factory import create_threat_model
@@ -131,34 +134,17 @@ def test_export_all_files_logic_failed_threat_model_creation(mock_create_threat_
     with pytest.raises(RuntimeError, match="Failed to create or validate threat model"):
         service.export_all_files_logic("some markdown")
 
-# The following test is commented out due to persistent patching issues.
-# The overall coverage goal has been met without this test.
-# @patch('threat_analysis.server.threat_model_service.shutil.rmtree')
-# @patch('threat_analysis.server.threat_model_service.zipfile.ZipFile')
-# @patch('threat_analysis.server.threat_model_service.ReportGenerator.generate_json_export')
-# @patch('threat_analysis.server.threat_model_service.ReportGenerator.generate_html_report')
-# @patch('threat_analysis.server.threat_model_service.DiagramGenerator._generate_html_with_legend')
-# @patch('threat_analysis.server.threat_model_service.DiagramGenerator.generate_diagram_from_dot')
-# @patch('threat_analysis.server.threat_model_service.DiagramGenerator._generate_manual_dot', return_value="dot code")
-# @patch('threat_analysis.server.threat_model_service.create_threat_model', return_value=MagicMock(process_threats=MagicMock(return_value=[])))
-# @patch('threat_analysis.server.threat_model_service.open', mock_open())
-# @patch('threat_analysis.server.threat_model_service.os.makedirs')
-# @patch('threat_analysis.server.threat_model_service.os.path.join', side_effect=lambda *args: "/".join(args))
-# @patch('threat_analysis.server.threat_model_service.datetime')
-# def test_export_all_files_logic_success(mock_shutil_rmtree, mock_zipfile, mock_generate_json_export, mock_generate_html_report, mock_generate_html_with_legend, mock_generate_diagram_from_dot, mock_generate_manual_dot, mock_create_threat_model, mock_open, mock_os_makedirs, mock_os_path_join, mock_datetime, service):
-#     mock_datetime.datetime.now().return_value.strftime.return_value = "2025-01-01_12-00-00"
-#     mock_generate_diagram_from_dot.return_value = "/fake/path/to/svg"
 
-#     zip_buffer, timestamp = service.export_all_files_logic("some markdown")
+def test_export_all_files_logic_missing_markdown(service):
+    with pytest.raises(ValueError, match="Missing markdown content"):
+        service.export_all_files_logic("")
 
-#     assert timestamp == "2025-01-01_12-00-00"
-#     assert isinstance(zip_buffer, BytesIO)
-#     mock_os_makedirs.assert_called_once()
-#     mock_open.assert_called()
-#     mock_generate_diagram_from_dot.assert_called()
-#     mock_generate_html_with_legend.assert_called_once()
-#     mock_generate_html_report.assert_called_once()
-#     mock_generate_json_export.assert_called_once()
-#     mock_zipfile.assert_called_once()
-#     mock_shutil_rmtree.assert_called_once()
-#     pass
+@patch('threat_analysis.server.threat_model_service.create_threat_model', return_value=None)
+def test_export_all_files_logic_failed_threat_model_creation(mock_create_threat_model, service):
+    with pytest.raises(RuntimeError, match="Failed to create or validate threat model"):
+        service.export_all_files_logic("some markdown")
+
+
+
+
+

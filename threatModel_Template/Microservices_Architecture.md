@@ -26,8 +26,8 @@ This threat model explores a microservices-based architecture, where an applicat
 
 ## Dataflows
 - **Client Request**: from="End User", to="Load Balancer", protocol="HTTPS", color=darkgreen
-- **API Request**: from="Load Balancer", to="API Gateway", protocol="HTTPS", color=darkgreen
-- **Inter-Service Request (Synchronous)**: from="API Gateway", to="Service A (e.g., User Service)", protocol="HTTP/gRPC", color=red
+- **API Request**: from="Load Balancer", to="API Gateway (Kong/Envoy)", protocol="HTTPS", color=darkgreen
+- **Inter-Service Request (Synchronous)**: from="API Gateway (Kong/Envoy)", to="Service A (e.g., User Service)", protocol="HTTP/gRPC", color=red
 - **Inter-Service Request (Asynchronous)**: from="Service A (e.g., User Service)", to="Message Broker (Kafka/RabbitMQ)", protocol="AMQP/Kafka"
 - **Message Consumption**: from="Message Broker (Kafka/RabbitMQ)", to="Service B (e.g., Product Service)", protocol="AMQP/Kafka"
 - **Database Access**: from="Service A (e.g., User Service)", to="Database (SQL/NoSQL)", protocol="JDBC/ODBC/API", color=purple
