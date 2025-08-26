@@ -274,11 +274,22 @@ class ModelParser:
             logging.warning(f"⚠️ Warning: Dataflow '{name}' is missing mandatory parameters (from, to, protocol).")
             return
 
-        from_name = from_name_raw.lower().replace("actor:", "").replace("component:", "").replace("zone:", "")
-        to_name = to_name_raw.lower().replace("actor:", "").replace("component:", "").replace("zone:", "")
+        def find_element(name_raw: str):
+            name_lower = name_raw.lower()
+            if name_lower.startswith("boundary:"):
+                name = name_lower.split(":", 1)[1]
+                return self.threat_model.boundaries.get(name, {}).get('boundary')
+            
+            name = name_lower
+            if name_lower.startswith("actor:"):
+                name = name_lower.split(":", 1)[1]
+            elif name_lower.startswith("server:"):
+                name = name_lower.split(":", 1)[1]
+            
+            return self.threat_model.get_element_by_name(name)
 
-        from_elem = self.threat_model.get_element_by_name(from_name) or self.threat_model.boundaries.get(from_name, {}).get('boundary')
-        to_elem = self.threat_model.get_element_by_name(to_name) or self.threat_model.boundaries.get(to_name, {}).get('boundary')
+        from_elem = find_element(from_name_raw)
+        to_elem = find_element(to_name_raw)
 
         if from_elem and to_elem:
             self.threat_model.add_dataflow(
@@ -287,9 +298,9 @@ class ModelParser:
                 is_authenticated=is_authenticated,
                 is_encrypted=is_encrypted
             )
-            logging.info(f"   - Added Dataflow: {name} ({from_name} -> {to_name}, Proto: {protocol}, Data: {data_name})")
+            logging.info(f"   - Added Dataflow: {name} ({from_name_raw} -> {to_name_raw}, Proto: {protocol}, Data: {data_name})")
         else:
-            logging.warning(f"⚠️ Warning: Elements '{from_name}' or '{to_name}' not found for dataflow '{name}'.")
+            logging.warning(f"⚠️ Warning: Elements for dataflow '{name}' not found. From: '{from_name_raw}', To: '{to_name_raw}'.")
             
     def _parse_protocol_style(self, line: str):
         """Parses a protocol style line with format: - **protocol**: color=value, line_style=value"""

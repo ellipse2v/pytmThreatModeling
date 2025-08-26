@@ -128,10 +128,81 @@ The `ThreatModel` class is the heart of the framework, serving as the in-memory 
     -   **Unique Names**: Verifies that all elements (actors, servers, dataflows, etc.) have unique names.
     -   **Dataflow References**: Confirms that the `from` and `to` fields in dataflows refer to elements that actually exist in the model.
     -   **Boundary References**: Ensures that actors and servers assigned to a boundary refer to a defined boundary.
+    -   **Dataflow Endpoints**: Validates that dataflows do not connect directly to boundaries. Endpoints must be components like actors or servers.
 
 ### 4.4. Threat Generation Engine
 
 The framework's custom threat generation is driven by a flexible, rule-based engine that complements the standard threat generation provided by the underlying PyTM library. This engine allows for the definition of highly specific, context-aware threats that are tailored to the architecture defined in the model. The engine is composed of two main files: `threat_rules.py` and `custom_threats.py`.
+
+### 4.4.1. PyTM's Built-in Threat Generation
+
+The core of the framework leverages the `pytm` library for its foundational threat generation capabilities. When `threat_model.process_threats()` is called, `pytm` automatically analyzes the defined architecture (actors, servers, dataflows, and their properties) to identify potential STRIDE threats.
+
+**How PyTM Generates Threats:**
+`pytm` applies a set of predefined rules based on the relationships and properties of elements in the threat model. For example:
+*   A dataflow between an actor and a server might trigger "Spoofing" or "Repudiation" threats.
+*   Dataflows marked as unencrypted (`is_encrypted=False`) can lead to "Information Disclosure" threats.
+*   Servers with specific stereotypes (e.g., "Database") might generate threats related to data tampering or unauthorized access.
+
+**Influencing PyTM's Threats:**
+To "add" or "remove" threats generated directly by `pytm`, you primarily need to modify the underlying architecture of your threat model. This includes:
+*   **Adding/Removing Elements:** Introducing new actors, servers, or dataflows can trigger new `pytm` threats. Conversely, removing elements can eliminate threats associated with them.
+*   **Modifying Element Properties:** Changing properties like `is_encrypted` for dataflows, or `stereotype` for servers, can alter the set of threats `pytm` generates.
+*   **Structuring Boundaries:** How elements are placed within trust boundaries can also influence `pytm`'s threat identification.
+
+**Filtering PyTM Threats:**
+While `pytm` generates a comprehensive set of threats, the framework allows for post-processing and filtering. The `_expand_class_targets` method in `models_module.py` and the overall threat processing pipeline can be extended to filter or modify `pytm`-generated threats before they are presented in reports.
+
+### 4.4.2. Customizing PyTM's Threat Database
+
+The `pytm` library allows security practitioners to supply their own custom threat definitions, which can augment or override its default threat generation logic. This is achieved by setting the `TM.threatsFile` property to a path pointing to a JSON file containing these custom threats.
+
+**Threats.json File Format:**
+The `threats.json` file is expected to be a JSON array (list) of threat objects. Each threat object is a dictionary that defines a specific threat and the conditions under which it applies. While the exact schema can vary, common attributes include:
+*   `name`: A unique identifier for the threat.
+*   `description`: A detailed description of the threat.
+*   `category`: The STRIDE category (e.g., "Information Disclosure", "Tampering").
+*   `impact`: An integer representing the potential impact (e.g., 1-5).
+*   `likelihood`: An integer representing the likelihood of occurrence (e.g., 1-5).
+*   `condition`: (Optional) A Python code snippet that defines the conditions under which this threat is applicable. This code is executed against the elements of the threat model.
+
+**Example `threats.json` entry (conceptual):**
+```json
+[
+  {
+    "name": "Unencrypted Sensitive Dataflow",
+    "description": "Sensitive data transmitted over an unencrypted channel.",
+    "category": "Information Disclosure",
+    "impact": 5,
+    "likelihood": 4,
+    "condition": "dataflow.is_encrypted == False and dataflow.data.classification == 'TOP_SECRET'"
+  }
+]
+```
+
+**Using `threatmd` to Generate `threats.json`:**
+The `threatmd` tool ([https://github.com/raphaelahrens/threatmd](https://github.com/raphaelahrens/threatmd)) provides a convenient way to define these custom threats using Markdown files and then transform them into the `threats.json` format compatible with `pytm`.
+
+**Process with `threatmd`:**
+1.  **Define Threats in Markdown:** Create individual Markdown files for each custom threat, following the `threatmd` format (including metadata fields like `sid`, `severity`, `target`, `likelihood`, and a `Condition` block with Python code).
+2.  **Generate `threats.json`:** Run the `threatmd` tool, pointing it to your directory of Markdown threat definitions:
+    ```bash
+    threats_pytm <directory of markdown threats> > threats.json
+    ```
+    This command will print the generated JSON to standard output, which you can redirect to a `threats.json` file.
+3.  **Integrate with PyTM:** In your Python code, before processing the threat model, set the `TM.threatsFile` property to the path of your generated `threats.json` file. For example:
+    ```python
+    from pytm import TM
+    # ...
+    tm_instance = TM("My Threat Model")
+    tm_instance.threatsFile = "path/to/your/threats.json"
+    tm_instance.process()
+    ```
+
+**Ignoring Specific Threats:**
+The framework does not currently expose a direct `-ignore` parameter for `pytm`-generated threats. However, you can achieve similar results by:
+*   **Modifying `threats.json`:** If using a custom `threats.json` file, simply remove the unwanted threat entries from the file.
+*   **Filtering Post-Generation:** After `pytm` generates its threats, you can implement custom logic within the framework (e.g., in `models_module.py` or `report_generator.py`) to filter out specific threats based on their properties before they are processed or reported.
 
 -   **`threat_rules.py`: The Rulebook**: This file acts as a declarative "rulebook" for the threat generation engine. It contains a single, large dictionary called `THREAT_RULES`.
     -   **Structure**: The dictionary is organized by component type (`servers`, `dataflows`, `actors`). Each component type contains a list of rules.

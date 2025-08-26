@@ -272,7 +272,7 @@ def test_generate_manual_dot_with_boundaries(diagram_generator):
     assert 'subgraph cluster_Internet {' in dot_code
     assert 'label="Internet"' in dot_code
     assert 'fillcolor="lightcoral"' in dot_code
-    assert 'style="rounded,filled"' in dot_code
+    assert 'style="rounded,filled,solid"' in dot_code
     assert 'color=black;' in dot_code
 
 

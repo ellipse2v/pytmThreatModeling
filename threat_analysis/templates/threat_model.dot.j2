@@ -11,6 +11,7 @@ digraph ThreatModel {
   {% macro render_boundary(boundary) %}
   subgraph cluster_{{ boundary.safe_name }} {
     label="{{ boundary.escaped_name }}";
+    "{{ boundary.hidden_node_name }}" [style=invis, width=0, height=0, label=""];
     {% if not boundary.is_trusted %}
     fontsize=10;
     {% endif %}

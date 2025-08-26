@@ -524,6 +524,9 @@ class DiagramGenerator:
         style_parts = ["rounded"]
         if is_filled:
             style_parts.append("filled")
+
+        if line_style in ['dashed', 'dotted', 'solid', 'bold']:
+            style_parts.append(line_style)
         
         style_attr = info.get('style') # Get the style attribute
         if style_attr: # Add custom styles like "invis"
@@ -566,6 +569,8 @@ class DiagramGenerator:
             logging.info(f"DEBUG: Calling _prepare_boundary_node for child_node: {child_node['name']}")
             child_boundaries_data.append(self._prepare_boundary_node(child_node, threat_model))
 
+        hidden_node_name = f"__hidden_node_{safe_name}"
+
         return {
             "safe_name": safe_name,
             "escaped_name": escaped_name,
@@ -576,7 +581,8 @@ class DiagramGenerator:
             "style_parts": style_parts,
             "actors": actors_in_boundary,
             "servers": servers_in_boundary,
-            "children": child_boundaries_data # Add children here
+            "children": child_boundaries_data, # Add children here
+            "hidden_node_name": hidden_node_name
         }
 
     def _prepare_nodes_data(self, threat_model, node_type: str) -> List[Dict]:
@@ -619,22 +625,15 @@ class DiagramGenerator:
 
                     # Handle source being a boundary
                     if hasattr(source_obj, 'isBoundary') and source_obj.isBoundary:
-                        ltail = f'ltail=cluster_{self._sanitize_name(source_name)}'
-                        source_node = next((s for s in threat_model.servers if getattr(s, 'inBoundary', None) == source_obj), None) or \
-                                      next((a for a in threat_model.actors if getattr(a, 'inBoundary', None) == source_obj), None)
-                        if not source_node:
-                            logging.warning(f"⚠️ Dataflow from empty boundary '{source_name}' to '{dest_name}' will not be drawn to avoid a visual loop.")
-                            continue
-                        else:
-                            source_name = self._get_element_name(source_node)
+                        sanitized_source_name = self._sanitize_name(source_name)
+                        ltail = f'ltail=cluster_{sanitized_source_name}'
+                        source_name = f'__hidden_node_{sanitized_source_name}'
 
                     # Handle destination being a boundary
                     if hasattr(dest_obj, 'isBoundary') and dest_obj.isBoundary:
-                        lhead = f'lhead=cluster_{self._sanitize_name(dest_name)}'
-                        dest_node = next((s for s in threat_model.servers if getattr(s, 'inBoundary', None) == dest_obj), None) or \
-                                    next((a for a in threat_model.actors if getattr(a, 'inBoundary', None) == dest_obj), None)
-                        if dest_node:
-                            dest_name = self._get_element_name(dest_node)
+                        sanitized_dest_name = self._sanitize_name(dest_name)
+                        lhead = f'lhead=cluster_{sanitized_dest_name}'
+                        dest_name = f'__hidden_node_{sanitized_dest_name}'
 
                     escaped_source = self._escape_label(source_name)
                     escaped_dest = self._escape_label(dest_name)

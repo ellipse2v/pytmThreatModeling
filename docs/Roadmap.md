@@ -33,3 +33,11 @@ This section outlines the strategic vision and planned features for future relea
 -   **Threat Intelligence Feed Integration**: Integrate with external threat intelligence feeds (e.g., from MISP, Anomali) to automatically update the threat model with the latest real-world attack techniques.
 -   **Collaborative Real-Time Editing**: Enhance the web GUI to support real-time, multi-user collaborative editing of threat models.
 -   **Risk Quantification and Financial Impact Analysis**: Integrate with risk quantification models (e.g., FAIR) to estimate the potential financial impact of identified threats.
+-   **Automated Attack Path Analysis**: Generate potential attack paths by chaining together identified MITRE ATT&CK techniques across all nodes in the threat model. This will involve enriching the CAPEC to ATT&CK mappings to build a comprehensive attack graph.
+-   **Advanced Severity Multiplier Calculation**: Implement a more granular and qualitative method for calculating the severity multiplier of each asset. This will be based on a rating of four key security criteria:
+    *   **Confidentiality**: The impact of unauthorized disclosure of data.
+    *   **Integrity**: The impact of unauthorized modification of data.
+    *   **Availability**: The impact of the asset being unavailable.
+    *   **Traceability**: The importance of being able to trace actions back to a specific user.
+
+    Each criterion will be rated on a scale (e.g., 1-5, from low to high), and the final severity multiplier for the asset will be calculated as the average of these four ratings. This will provide a more nuanced and defensible risk score for each identified threat.

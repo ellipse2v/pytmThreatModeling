@@ -5,7 +5,7 @@
   vars:
     nodejs_version: "18"
     threat_model_metadata:
-      zones:
+      boundaries:
         - name: "Internet"
           type: "External"
           isTrusted: False
@@ -21,7 +21,7 @@
           isHuman: True
           boundary: "Internet"
 
-      components:
+      servers:
         - name: "WebServer_1"
           stereotype: "Server"
           boundary: "DMZ"
@@ -49,19 +49,19 @@
       data_flows:
         - name: "User to WebServer"
           source: "actor:External User"
-          destination: "component:WebServer_1"
+          destination: "server:WebServer_1"
           protocol: "HTTPS"
           data: "Web Traffic"
           description: "External user accesses web server"
         - name: "WebServer to AppServer"
-          source: "component:WebServer_1"
-          destination: "component:AppServer_1"
+          source: "server:WebServer_1"
+          destination: "server:AppServer_1"
           protocol: "HTTP/S"
           data: "Application Requests"
           description: "Web server communicates with application server"
         - name: "AppServer to DBServer"
-          source: "component:AppServer_1"
-          destination: "component:DBServer_1"
+          source: "server:AppServer_1"
+          destination: "server:DBServer_1"
           protocol: "DB"
           data: "Database Queries"
           description: "Application server communicates with database server"

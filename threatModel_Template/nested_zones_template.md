@@ -1,7 +1,7 @@
 ## Boundaries
-- **Infrastructure_Zone**: color=lightblue, is_trusted=True
- - **Main_SubZone**: color=lightcyan, is_trusted=True
- - **Fallback_SubZone**: color=lightyellow, is_trusted=True
+- **Infrastructure_Zone**: color=lightblue, isTrusted=True
+ - **Main_SubZone**: color=lightcyan, isTrusted=True
+ - **Fallback_SubZone**: color=lightyellow, isTrusted=True
 
 ## Actors
 - **External_Client**:

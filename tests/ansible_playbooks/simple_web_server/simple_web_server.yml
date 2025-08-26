@@ -4,21 +4,21 @@
   become: yes
   vars:
     threat_model_metadata:
-      zones:
+      boundaries:
         - name: "Internet"
           type: "External"
           isTrusted: False
         - name: "DMZ"
           type: "Internal"
           isTrusted: True
-          components: ["WebServer"]
+          servers: ["WebServer"]
 
       actors:
         - name: "External User"
           isHuman: True
           boundary: "Internet"
 
-      components:
+      servers:
         - name: "WebServer"
           stereotype: "Server"
           boundary: "DMZ"
@@ -32,13 +32,13 @@
       data_flows:
         - name: "User to WebServer HTTP"
           source: "actor:External User"
-          destination: "component:WebServer"
+          destination: "server:WebServer"
           protocol: "HTTP"
           data: "Web Traffic"
           description: "External user accesses web server over HTTP"
         - name: "User to WebServer HTTPS"
           source: "actor:External User"
-          destination: "component:WebServer"
+          destination: "server:WebServer"
           protocol: "HTTPS"
           data: "Web Traffic"
           description: "External user accesses web server over HTTPS"

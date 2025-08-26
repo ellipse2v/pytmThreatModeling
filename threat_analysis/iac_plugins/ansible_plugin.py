@@ -110,15 +110,15 @@ class AnsiblePlugin(IaCPlugin):
         metadata = iac_data.get("threat_model_metadata", {})
         markdown = []
 
-        if "zones" in metadata:
+        if "boundaries" in metadata:
             markdown.append("## Boundaries")
-            for zone in metadata["zones"]:
-                props = ", ".join([f"{k}={v}" for k, v in zone.items() if k not in ["name", "sub_zones"]])
-                markdown.append(f"- **{zone['name']}**: {props}")
-                if "sub_zones" in zone:
-                    for sub_zone in zone["sub_zones"]:
-                        sub_props = ", ".join([f"{k}={v}" for k, v in sub_zone.items() if k != "name"])
-                        markdown.append(f"  - **{sub_zone['name']}**: {sub_props}")
+            for boundary in metadata["boundaries"]:
+                props = ", ".join([f"{k}={v}" for k, v in boundary.items() if k not in ["name", "sub_boundaries"]])
+                markdown.append(f"- **{boundary['name']}**: {props}")
+                if "sub_boundaries" in boundary:
+                    for sub_boundary in boundary["sub_boundaries"]:
+                        sub_props = ", ".join([f"{k}={v}" for k, v in sub_boundary.items() if k != "name"])
+                        markdown.append(f"  - **{sub_boundary['name']}**: {sub_props}")
             markdown.append("")
 
         if "actors" in metadata:
@@ -128,14 +128,14 @@ class AnsiblePlugin(IaCPlugin):
                 markdown.append(f"- **{actor['name']}**: {props}")
             markdown.append("")
 
-        if "components" in metadata:
+        if "servers" in metadata:
             markdown.append("## Servers")
-            for component in metadata["components"]:
-                props_list = [f"{k}={v}" for k, v in component.items() if k != "name"]
-                if "ansible_host" in component:
-                    props_list.append(f"ip={component['ansible_host']}")
+            for server in metadata["servers"]:
+                props_list = [f"{k}={v}" for k, v in server.items() if k != "name"]
+                if "ansible_host" in server:
+                    props_list.append(f"ip={server['ansible_host']}")
                 props = ", ".join(props_list)
-                markdown.append(f"- **{component['name']}**: {props}")
+                markdown.append(f"- **{server['name']}**: {props}")
             markdown.append("")
 
         if "data" in metadata:

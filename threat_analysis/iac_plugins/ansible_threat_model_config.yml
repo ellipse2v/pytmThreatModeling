@@ -3,7 +3,7 @@ boundaries:
     color: "#F0F0F0"
     isTrusted: False
     isFilled: True
-    sub_zones:
+    sub_boundaries:
       - name: External_Network_RIE
         color: lightgray
         isTrusted: False
@@ -12,7 +12,7 @@ boundaries:
     isFilled: False
     line_style: dashed
     isTrusted: True
-    sub_zones:
+    sub_boundaries:
       - name: app_zone
         color: red
         isTrusted: True
@@ -327,3 +327,140 @@ protocol_styles:
   - name: I/O
     color: orange
     line_style: dotted
+
+
+severity_multipliers:
+  - name: Router_RIE_InfraBoundary
+    multiplier: 2.0
+  - name: Switch_Main_Fallback
+    multiplier: 1.5
+  - name: Switch_Main
+    multiplier: 1.2
+  - name: Switch_Fallback
+    multiplier: 1.2
+  - name: Server_1
+    multiplier: 1.1
+  - name: Frontend_1
+    multiplier: 1.1
+  - name: Server_2
+    multiplier: 1.1
+  - name: Frontend_2
+    multiplier: 1.1
+  - name: Server_3
+    multiplier: 1.1
+  - name: Frontend_3
+    multiplier: 1.1
+  - name: Server_4
+    multiplier: 1.1
+  - name: Frontend_4
+    multiplier: 1.1
+  - name: Server_5
+    multiplier: 1.1
+  - name: Frontend_5
+    multiplier: 1.1
+  - name: Server_1_fallback
+    multiplier: 1.1
+  - name: Frontend_1_fallback
+    multiplier: 1.1
+  - name: Server_2_fallback
+    multiplier: 1.1
+  - name: Frontend_2_fallback
+    multiplier: 1.1
+  - name: Server_3_fallback
+    multiplier: 1.1
+  - name: Frontend_3_fallback
+    multiplier: 1.1
+  - name: Server_4_fallback
+    multiplier: 1.1
+  - name: Frontend_4_fallback
+    multiplier: 1.1
+  - name: Server_5_fallback
+    multiplier: 1.1
+  - name: Frontend_5_fallback
+    multiplier: 1.1
+  - name: External_Network_RIE
+    multiplier: 1.0
+  - name: Operator
+    multiplier: 1.0
+  - name: Admin
+    multiplier: 1.0
+  - name: Any Traffic
+    multiplier: 1.0
+  - name: Web Traffic
+    multiplier: 1.0
+  - name: SSH Traffic
+    multiplier: 1.0
+  - name: I/O Traffic
+    multiplier: 1.0
+  - name: RIE_to_Router
+    multiplier: 1.0
+  - name: Router_to_InfraBoundary_Internal
+    multiplier: 1.0
+  - name: Operator_to_Frontend_1
+    multiplier: 1.0
+  - name: Operator_to_Frontend_2
+    multiplier: 1.0
+  - name: Operator_to_Frontend_3
+    multiplier: 1.0
+  - name: Operator_to_Frontend_4
+    multiplier: 1.0
+  - name: Operator_to_Frontend_5
+    multiplier: 1.0
+  - name: Admin_to_Switch_Main
+    multiplier: 1.0
+  - name: Switch_Main_Fallback_to_Switch_Main
+    multiplier: 1.0
+  - name: Server_1_to_Switch_Main
+    multiplier: 1.0
+  - name: Frontend_1_to_Switch_Main
+    multiplier: 1.0
+  - name: Server_2_to_Switch_Main
+    multiplier: 1.0
+  - name: Frontend_2_to_Switch_Main
+    multiplier: 1.0
+  - name: Server_3_to_Switch_Main
+    multiplier: 1.0
+  - name: Frontend_3_to_Switch_Main
+    multiplier: 1.0
+  - name: Server_4_to_Switch_Main
+    multiplier: 1.0
+  - name: Frontend_4_to_Switch_Main
+    multiplier: 1.0
+  - name: Server_5_to_Switch_Main
+    multiplier: 1.0
+  - name: Frontend_5_to_Switch_Main
+    multiplier: 1.0
+  - name: Operator_to_Frontend_1_fallback
+    multiplier: 1.0
+  - name: Operator_to_Frontend_2_fallback
+    multiplier: 1.0
+  - name: Operator_to_Frontend_3_fallback
+    multiplier: 1.0
+  - name: Operator_to_Frontend_4_fallback
+    multiplier: 1.0
+  - name: Operator_to_Frontend_5_fallback
+    multiplier: 1.0
+  - name: Admin_to_Switch_Fallback
+    multiplier: 1.0
+  - name: Switch_Main_Fallback_to_Switch_Fallback
+    multiplier: 1.0
+  - name: Server_1_fallback_to_Switch_Fallback
+    multiplier: 1.0
+  - name: Frontend_1_fallback_to_Switch_Fallback
+    multiplier: 1.0
+  - name: Server_2_fallback_to_Switch_Fallback
+    multiplier: 1.0
+  - name: Frontend_2_fallback_to_Switch_Fallback
+    multiplier: 1.0
+  - name: Server_3_fallback_to_Switch_Fallback
+    multiplier: 1.0
+  - name: Frontend_3_fallback_to_Switch_Fallback
+    multiplier: 1.0
+  - name: Server_4_fallback_to_Switch_Fallback
+    multiplier: 1.0
+  - name: Frontend_4_fallback_to_Switch_Fallback
+    multiplier: 1.0
+  - name: Server_5_fallback_to_Switch_Fallback
+    multiplier: 1.0
+  - name: Frontend_5_fallback_to_Switch_Fallback
+    multiplier: 1.0

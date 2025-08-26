@@ -40,6 +40,7 @@ This framework is built upon robust security principles and industry-leading int
 
 -   **STRIDE-based Threat Identification**: Automatically uncovers threats across Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege categories for every component and dataflow.
 -   **Rich Threat Enrichment**: Each identified threat is meticulously mapped to relevant **MITRE ATT&CK** tactics and techniques, **CAPEC** attack patterns, and **D3FEND** countermeasures, providing real-world context and actionable defensive strategies.
+-   **Context-Aware Threat Generation**: Threats are dynamically generated based on dataflow properties such as encryption (`is_encrypted`) and authentication (`is_authenticated`). For instance, unencrypted dataflows will automatically trigger "Information Disclosure" threats, with increased severity if sensitive data is involved.
 -   **Hierarchical Threat Modeling**: Analyze complex systems by breaking them down into smaller, interconnected sub-models. The framework can process an entire project directory and generate navigable diagrams.
 -   **Dynamic Severity Calculation**: Customizable scoring mechanisms (base scores, target multipliers, protocol adjustments) provide a precise risk posture for each threat.
 -   **Comprehensive Reporting & Visualization**: Generate rich HTML reports, STIX 2.1 exports, and intuitive diagrams (SVG, PNG, interactive HTML). Crucially, export to **MITRE ATT&CK Navigator** layers for advanced visualization and analysis.

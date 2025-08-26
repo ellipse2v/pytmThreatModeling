@@ -26,6 +26,7 @@ import webbrowser
 from jinja2 import Environment, FileSystemLoader
 import os
 from pathlib import Path
+from collections import defaultdict
 from threat_analysis.utils import _validate_path_within_project
 from threat_analysis.mitigation_suggestions import get_mitigation_suggestions
 
@@ -50,27 +51,31 @@ class ReportGenerator:
         self.env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / 'templates'))
 
     def generate_html_report(self, threat_model, grouped_threats: Dict[str, List],
-                             output_file: Path = Path("stride_mitre_report.html")) -> Path:
+                             output_file: Path = Path("stride_mitre_report.html"),
+                             all_detailed_threats: Optional[List[Dict]] = None,
+                             report_title: str = "🛡️ STRIDE & MITRE ATT&CK Threat Model Report") -> Path:
         """Generates a complete HTML report with MITRE ATT&CK"""
 
         total_threats_analyzed = threat_model.mitre_analysis_results.get('total_threats', 0)
         total_mitre_techniques_mapped = threat_model.mitre_analysis_results.get('mitre_techniques_count', 0)
         stride_distribution = threat_model.mitre_analysis_results.get('stride_distribution', {})
 
-        all_detailed_threats_with_mitre = self._get_all_threats_with_mitre_info(grouped_threats)
-        summary_stats = self.generate_summary_stats(all_detailed_threats_with_mitre)
+        if all_detailed_threats is None:
+            all_detailed_threats = self._get_all_threats_with_mitre_info(grouped_threats)
         
-        stride_categories = sorted(list(set(threat['stride_category'] for threat in all_detailed_threats_with_mitre)))
+        summary_stats = self.generate_summary_stats(all_detailed_threats)
+        
+        stride_categories = sorted(list(set(threat['stride_category'] for threat in all_detailed_threats)))
 
         template = self.env.get_template('report_template.html')
         html = template.render(
             title="STRIDE & MITRE ATT&CK Report",
-            report_title="🛡️ STRIDE & MITRE ATT&CK Threat Model Report",
+            report_title=report_title,
             total_threats_analyzed=total_threats_analyzed,
             total_mitre_techniques_mapped=total_mitre_techniques_mapped,
             stride_distribution=stride_distribution,
             summary_stats=summary_stats,
-            all_threats=all_detailed_threats_with_mitre,
+            all_threats=all_detailed_threats,
             stride_categories=stride_categories,
             severity_calculation_note=self.severity_calculator.get_calculation_explanation()
         )
@@ -249,6 +254,41 @@ class ReportGenerator:
             "severity_distribution": severity_distribution
         }
 
+    def generate_global_project_report(self, all_models: List[ThreatModel], output_dir: Path):
+        """Generates a single global report for all models in the project."""
+        all_threats_details = []
+        total_threats_analyzed = 0
+        all_stride_distribution = defaultdict(int)
+
+        for model in all_models:
+            grouped_threats = model.grouped_threats
+            threats_details = self._get_all_threats_with_mitre_info(grouped_threats)
+            all_threats_details.extend(threats_details)
+
+            total_threats_analyzed += model.mitre_analysis_results.get('total_threats', 0)
+            for k, v in model.mitre_analysis_results.get('stride_distribution', {}).items():
+                all_stride_distribution[k] += v
+
+        summary_stats = self.generate_summary_stats(all_threats_details)
+        total_mitre_techniques_mapped = len(set(tech['id'] for threat in all_threats_details for tech in threat.get('mitre_techniques', [])))
+
+        # Create a dummy threat model for the report context
+        dummy_model = ThreatModel("Global Project")
+        dummy_model.mitre_analysis_results = {
+            'total_threats': total_threats_analyzed,
+            'mitre_techniques_count': total_mitre_techniques_mapped,
+            'stride_distribution': all_stride_distribution
+        }
+
+        self.generate_html_report(
+            threat_model=dummy_model,
+            grouped_threats={},
+            output_file=output_dir / "global_threat_report.html",
+            all_detailed_threats=all_threats_details,
+            report_title="🛡️ Global Project Threat Model Report"
+        )
+        logging.info(f"✅ Generated global project report with {len(all_threats_details)} total threats at {output_dir / 'global_threat_report.html'}")
+
     def generate_project_reports(self, project_path: Path, output_dir: Path) -> Optional[ThreatModel]:
         """
         Generates all reports for a project, ensuring a consistent legend across all diagrams.
@@ -260,7 +300,6 @@ class ReportGenerator:
         static_src_dir = Path(__file__).parent.parent / 'server' / 'static'
         static_dest_dir = output_dir / 'static'
         if static_src_dir.exists():
-            # Remove existing static dir in output to ensure it's up-to-date
             if static_dest_dir.exists():
                 shutil.rmtree(static_dest_dir)
             try:
@@ -295,14 +334,20 @@ class ReportGenerator:
             logging.error(f"Failed to create main threat model for project: {e}")
 
         # 4. Start the recursive generation process
+        all_processed_models = [] # List to store all processed models
         self._recursively_generate_reports(
             model_path=main_model_path,
             output_dir=output_dir,
             breadcrumb=[(project_path.name, "main_diagram.html")],
             project_protocols=project_protocols,
             project_protocol_styles=project_protocol_styles,
-            threat_model=main_threat_model # Pass the pre-loaded main model
+            all_project_models=all_processed_models,
+            threat_model=main_threat_model
         )
+
+        # 5. Generate the global report
+        if all_processed_models:
+            self.generate_global_project_report(all_processed_models, output_dir)
 
         return main_threat_model
 
@@ -353,7 +398,7 @@ class ReportGenerator:
 
         return project_protocols, project_protocol_styles
 
-    def _recursively_generate_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[tuple[str, str]], project_protocols: set, project_protocol_styles: dict, threat_model: Optional[ThreatModel] = None):
+    def _recursively_generate_reports(self, model_path: Path, output_dir: Path, breadcrumb: List[tuple[str, str]], project_protocols: set, project_protocol_styles: dict, all_project_models: List[ThreatModel], threat_model: Optional[ThreatModel] = None):
         """
         Recursively generates reports for each model in the project.
         """
@@ -376,8 +421,11 @@ class ReportGenerator:
                 logging.error(f"Failed to create or use threat model for {model_path}")
                 return
 
-            # Generate all files for the current model
+            # Process threats and add the model to our list for global report
             grouped_threats = threat_model.process_threats()
+            all_project_models.append(threat_model)
+
+            # Generate all files for the current model
             self.generate_html_report(threat_model, grouped_threats, output_dir / f"{model_name}_threat_report.html")
             self.generate_json_export(threat_model, grouped_threats, output_dir / f"{model_name}.json")
             self.generate_diagram_html(threat_model, output_dir, breadcrumb, project_protocols, project_protocol_styles)
@@ -429,7 +477,8 @@ class ReportGenerator:
                             output_dir=sub_output_dir,
                             breadcrumb=new_breadcrumb,
                             project_protocols=project_protocols,
-                            project_protocol_styles=project_protocol_styles
+                            project_protocol_styles=project_protocol_styles,
+                            all_project_models=all_project_models
                         )
                     else:
                         logging.warning(f"Submodel file not found: {submodel_path}")
@@ -483,5 +532,3 @@ class ReportGenerator:
         with open(diagram_html_path, "w", encoding="utf-8") as f:
             f.write(html)
         logging.info(f"Generated diagram HTML: {diagram_html_path}")
-
-
