@@ -13,5 +13,8 @@
 # limitations under the License.
  
 import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from pathlib import Path
+
+# Add project root to sys.path
+project_root = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(project_root))

@@ -28,7 +28,7 @@ import os
 from pathlib import Path
 from collections import defaultdict
 from threat_analysis.utils import _validate_path_within_project
-from threat_analysis.mitigation_suggestions import get_mitigation_suggestions
+from threat_analysis.mitigation_suggestions import get_stix_mitigation_suggestions, get_framework_mitigation_suggestions
 
 # Add project root to sys.path to allow imports from other directories
 project_root = Path(__file__).resolve().parents[2]
@@ -166,17 +166,20 @@ class ReportGenerator:
                 threat_likelihood = getattr(threat, 'likelihood', None)
 
                 severity_info = self.severity_calculator.get_severity_info(stride_category, target_name, classification=data_classification, impact=threat_impact, likelihood=threat_likelihood)
-                mitre_techniques = self.mitre_mapping.map_threat_to_mitre(threat_description)
-
-                # CAPEC matching using regex patterns
-                capecs = self.mitre_mapping.map_threat_to_capec(threat_description, stride_category)
+                mapping_results = self.mitre_mapping.map_threat_to_mitre(threat_description, stride_category)
+                mitre_techniques = mapping_results.get('techniques', [])
+                capecs = mapping_results.get('capecs', [])
 
                 technique_ids = [tech['id'] for tech in mitre_techniques]
-                automated_mitigations = get_mitigation_suggestions(technique_ids)
+                
+                # Get both STIX and framework mitigations
+                stix_mitigations = get_stix_mitigation_suggestions(technique_ids)
+                framework_mitigations = get_framework_mitigation_suggestions(technique_ids)
 
-                owasp_mitigations = [m for m in automated_mitigations if m['framework'] == 'OWASP ASVS']
-                nist_mitigations = [m for m in automated_mitigations if m['framework'] == 'NIST']
-                cis_mitigations = [m for m in automated_mitigations if m['framework'] == 'CIS']
+                # Filter framework mitigations
+                owasp_mitigations = [m for m in framework_mitigations if m.get('framework') == 'OWASP ASVS']
+                nist_mitigations = [m for m in framework_mitigations if m.get('framework') == 'NIST']
+                cis_mitigations = [m for m in framework_mitigations if m.get('framework') == 'CIS']
 
                 for tech in mitre_techniques:
                     if 'defend_mitigations' in tech and tech['defend_mitigations']:
@@ -195,6 +198,7 @@ class ReportGenerator:
                     "mitre_techniques": mitre_techniques,
                     "stride_category": stride_category,
                     "capecs": capecs,
+                    "mitre_mitigations": stix_mitigations, # Official MITRE mitigations
                     "owasp_mitigations": owasp_mitigations,
                     "nist_mitigations": nist_mitigations,
                     "cis_mitigations": cis_mitigations,

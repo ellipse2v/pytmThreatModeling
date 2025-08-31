@@ -16,9 +16,10 @@
 STRIDE Threat Analysis Library with MITRE ATT&CK Integration
 """
 
-__version__ = "v0.2.0-alpha"
+__version__ = "v1.1.1"
 __author__ = "ellipse2v"
 
+from .core import data_loader
 from .core.models_module import ThreatModel
 from .core.mitre_mapping_module import MitreMapping
 from .severity_calculator_module import SeverityCalculator
@@ -32,5 +33,6 @@ __all__ = [
     'SeverityCalculator',
     'ReportGenerator',
     'DiagramGenerator',
-    'ModelParser'
+    'ModelParser',
+    'data_loader'
 ]

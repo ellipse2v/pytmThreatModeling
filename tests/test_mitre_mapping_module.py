@@ -20,20 +20,22 @@ from threat_analysis.core.mitre_mapping_module import MitreMapping
 
 @pytest.fixture
 def mitre_mapping():
-    with patch('threat_analysis.core.mitre_mapping_module.pd.read_csv') as mock_read_csv:
+    with patch('threat_analysis.core.data_loader.pd.read_csv') as mock_read_csv:
         mock_read_csv.return_value = MagicMock()
         with patch('threat_analysis.core.mitre_mapping_module.get_custom_threats') as mock_get_custom_threats:
             mock_get_custom_threats.return_value = {}
-            with patch('builtins.open', new_callable=MagicMock) as mock_open:
-                mock_open.return_value.read.return_value = ""
-                yield MitreMapping(threat_model=MagicMock())
+            with patch('builtins.open', new_callable=mock_open, read_data='{}') as mock_file:
+                with patch('threat_analysis.core.mitre_mapping_module.attack_d3fend_mapping', {'M1015': ['D3-ANCI Test']}):
+                    with patch('threat_analysis.core.data_loader.load_d3fend_mapping', return_value={'D3-ANCI': {'name': 'Test', 'description': 'Test'}}):
+                        yield MitreMapping(threat_model=MagicMock())
 
 def test_mitre_mapping_initialization(mitre_mapping):
     assert mitre_mapping is not None
 
 def test_map_threat_to_mitre(mitre_mapping):
     threat_description = "A phishing attack was performed."
-    mitre_techniques = mitre_mapping.map_threat_to_mitre(threat_description)
+    mapping_results = mitre_mapping.map_threat_to_mitre(threat_description, "Spoofing")
+    mitre_techniques = mapping_results.get('techniques', [])
     assert len(mitre_techniques) > 0
     assert mitre_techniques[0]['id'] == 'T1566'
 
@@ -45,12 +47,12 @@ def test_classify_pytm_threat(mitre_mapping):
     assert stride_category == 'Spoofing'
 
 def test_initialize_d3fend_mapping_file_not_found(caplog):
-    with patch('threat_analysis.core.mitre_mapping_module.pd.read_csv', side_effect=FileNotFoundError):
+    with patch('threat_analysis.core.data_loader.pd.read_csv', side_effect=FileNotFoundError):
         with patch('os.path.join', return_value='/fake/path/d3fend.csv'):
             with caplog.at_level(1):
                 mitre_mapping = MitreMapping(threat_model=MagicMock())
                 assert mitre_mapping.d3fend_details == {}
-                assert "Error: d3fend.csv not found" in caplog.text
+                assert "Unexpected error loading d3fend.csv" in caplog.text
 
 def test_load_custom_mitre_mappings_from_markdown_file_not_found(caplog):
     with patch('builtins.open', side_effect=FileNotFoundError):
@@ -86,6 +88,20 @@ def test_technique_urls_are_present(mitre_mapping):
 def test_new_technique_mapping(mitre_mapping):
     """Test the mapping of a newly added technique."""
     threat_description = "A trusted relationship was abused."
-    mitre_techniques = mitre_mapping.map_threat_to_mitre(threat_description)
+    mapping_results = mitre_mapping.map_threat_to_mitre(threat_description, "Spoofing")
+    mitre_techniques = mapping_results.get('techniques', [])
     assert len(mitre_techniques) > 0
     assert any(t['id'] == 'T1199' for t in mitre_techniques)
+
+def test_get_d3fend_mitigations_for_mitre_id(mitre_mapping):
+    """Test _get_d3fend_mitigations_for_mitre_id."""
+    mitigations = mitre_mapping._get_d3fend_mitigations_for_mitre_id("M1015")
+    assert isinstance(mitigations, list)
+    assert len(mitigations) > 0
+    assert "Test" in mitigations[0]["name"]
+
+def test_get_stride_categories(mitre_mapping):
+    """Test get_stride_categories."""
+    categories = mitre_mapping.get_stride_categories()
+    assert isinstance(categories, list)
+    assert "Spoofing" in categories

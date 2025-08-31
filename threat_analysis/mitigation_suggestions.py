@@ -15,26 +15,19 @@
 """
 Mitigation Suggestions Module
 
-This module provides mitigation suggestions for MITRE ATT&CK techniques based on
-well-known security frameworks like OWASP, NIST, and CIS.
-
-The `MITIGATION_MAP` dictionary maps MITRE ATT&CK technique IDs to a list of
-mitigation suggestions. Each suggestion is a dictionary with the following
-keys:
-- "name": A descriptive name for the mitigation.
-- "description": A brief explanation of the mitigation.
-- "framework": The source framework and control ID (e.g., "OWASP ASVS V14.2.2").
-- "url": A link to the framework's documentation for verification.
-
-To add new mitigation suggestions:
-1. Identify the MITRE ATT&CK technique ID (e.g., "T1190").
-2. Find relevant mitigations from OWASP, NIST, or CIS.
-3. Add a new entry to the `MITIGATION_MAP` dictionary for the technique, or
-   append to an existing entry.
-4. Ensure all fields ("name", "description", "framework", "url") are filled out.
+This module provides mitigation suggestions from two sources:
+1.  Official MITRE ATT&CK mitigations (Courses of Action) parsed from STIX data.
+2.  A curated list of framework-specific mitigations (OWASP, NIST, CIS).
 """
 
-MITIGATION_MAP = {
+import json
+import logging
+from pathlib import Path
+from typing import List, Dict, Any
+
+# --- Framework-Specific Mitigations (Hardcoded) ---
+
+FRAMEWORK_MITIGATION_MAP = {
     # T1190: Exploit Public-Facing Application (e.g., SQL Injection)
     "T1190": [
         {
@@ -352,21 +345,79 @@ MITIGATION_MAP = {
     ]
 }
 
+class MitigationStixMapper:
+    """Parses ATT&CK STIX data to map techniques to mitigations."""
+    def __init__(self, stix_data_path: Path):
+        self.stix_data_path = stix_data_path
+        self.attack_to_mitigations_map = self._build_mapping()
 
-def get_mitigation_suggestions(technique_ids: list[str]) -> list[dict]:
+    def _build_mapping(self) -> Dict[str, List[Dict[str, str]]]:
+        """Builds the mapping from ATT&CK techniques to mitigations."""
+        try:
+            with open(self.stix_data_path, 'r', encoding='utf-8') as f:
+                stix_data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            logging.error(f"Failed to load or parse STIX data from {self.stix_data_path}: {e}")
+            return {}
+
+        objects = stix_data.get("objects", [])
+        
+        techniques_by_id = {obj['id']: obj for obj in objects if obj.get('type') == 'attack-pattern'}
+        mitigations_by_id = {obj['id']: obj for obj in objects if obj.get('type') == 'course-of-action'}
+
+        attack_map = {}
+
+        for obj in objects:
+            if obj.get('type') == 'relationship' and obj.get('relationship_type') == 'mitigates':
+                mitigation_id = obj.get('source_ref')
+                technique_id = obj.get('target_ref')
+
+                if technique_id in techniques_by_id and mitigation_id in mitigations_by_id:
+                    technique = techniques_by_id[technique_id]
+                    mitigation = mitigations_by_id[mitigation_id]
+
+                    attack_id = next((ref['external_id'] for ref in technique.get('external_references', []) if ref.get('source_name') == 'mitre-attack'), None)
+                    
+                    if attack_id:
+                        mitigation_info = {
+                            "id": mitigation.get('external_references', [{}])[0].get('external_id'),
+                            "name": mitigation.get('name'),
+                            "description": mitigation.get('description'),
+                            "url": mitigation.get('external_references', [{}])[0].get('url')
+                        }
+                        
+                        if attack_id not in attack_map:
+                            attack_map[attack_id] = []
+                        attack_map[attack_id].append(mitigation_info)
+
+        return attack_map
+
+    def get_suggestions(self, technique_ids: List[str]) -> List[Dict[str, str]]:
+        """Retrieves mitigation suggestions for a list of technique IDs."""
+        suggestions = []
+        for tech_id in technique_ids:
+            if tech_id in self.attack_to_mitigations_map:
+                suggestions.extend(self.attack_to_mitigations_map[tech_id])
+        return suggestions
+
+# --- Global Instances ---
+STIX_DATA_FILE = Path(__file__).parent / 'external_data' / 'enterprise-attack.json'
+mitigation_stix_mapper_instance = MitigationStixMapper(STIX_DATA_FILE)
+
+def get_stix_mitigation_suggestions(technique_ids: list[str]) -> list[dict]:
     """
-    Retrieves a list of mitigation suggestions for the given MITRE ATT&CK
-    technique IDs.
+    Retrieves a list of STIX-based mitigation suggestions for the given MITRE ATT&CK
+    technique IDs using the global mapper instance.
+    """
+    return mitigation_stix_mapper_instance.get_suggestions(technique_ids)
 
-    Args:
-        technique_ids: A list of MITRE ATT&CK technique IDs.
-
-    Returns:
-        A list of mitigation suggestion dictionaries. Each dictionary contains
-        the name, description, framework, and URL of the mitigation.
+def get_framework_mitigation_suggestions(technique_ids: list[str]) -> list[dict]:
+    """
+    Retrieves a list of framework-specific mitigation suggestions for the given
+    MITRE ATT&CK technique IDs from the hardcoded map.
     """
     suggestions = []
     for tech_id in technique_ids:
-        if tech_id in MITIGATION_MAP:
-            suggestions.extend(MITIGATION_MAP[tech_id])
+        if tech_id in FRAMEWORK_MITIGATION_MAP:
+            suggestions.extend(FRAMEWORK_MITIGATION_MAP[tech_id])
     return suggestions
