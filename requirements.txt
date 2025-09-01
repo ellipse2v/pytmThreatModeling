@@ -1,7 +1,6 @@
 pytm
 Flask
 Jinja2
-graphviz
-flake8
 pandas
 PyYAML
+graphviz
