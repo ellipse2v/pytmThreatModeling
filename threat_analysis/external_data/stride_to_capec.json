@@ -244,7 +244,7 @@
         },
         {
             "capec_id": "CAPEC-16",
-            "description": "Dictionary Based Password Attack"
+            "description": "Dictionary-based Password Attack"
         },
         {
             "capec_id": "CAPEC-162",
@@ -272,7 +272,7 @@
         },
         {
             "capec_id": "CAPEC-18",
-            "description": "XSS Through Non-Script Elements"
+            "description": "XSS Targeting Non-Script Elements"
         },
         {
             "capec_id": "CAPEC-180",
@@ -420,15 +420,15 @@
         },
         {
             "capec_id": "CAPEC-32",
-            "description": "XSS Through HTTP Query String"
+            "description": "XSS Through HTTP Query Strings"
         },
         {
             "capec_id": "CAPEC-35",
-            "description": "Leveraging Executable Code in Non-Executable Files"
+            "description": "Leverage Executable Code in Non-Executable Files"
         },
         {
             "capec_id": "CAPEC-36",
-            "description": "Using Unpublished Interfaces"
+            "description": "Using Unpublished Interfaces or Functionality"
         },
         {
             "capec_id": "CAPEC-384",
@@ -572,7 +572,7 @@
         },
         {
             "capec_id": "CAPEC-549",
-            "description": "Local Code Execution"
+            "description": "Local Execution of Code"
         },
         {
             "capec_id": "CAPEC-55",
@@ -620,7 +620,7 @@
         },
         {
             "capec_id": "CAPEC-564",
-            "description": "Run Software at Login"
+            "description": "Run Software at Logon"
         },
         {
             "capec_id": "CAPEC-565",
@@ -688,7 +688,7 @@
         },
         {
             "capec_id": "CAPEC-629",
-            "description": "Unauthorized Use of Device Resources"
+            "description": "DEPRECATED: Unauthorized Use of Device Resources"
         },
         {
             "capec_id": "CAPEC-63",
@@ -720,7 +720,7 @@
         },
         {
             "capec_id": "CAPEC-653",
-            "description": "Use of Known Windows Credentials"
+            "description": "Use of Known Operating System Credentials"
         },
         {
             "capec_id": "CAPEC-660",
@@ -826,11 +826,11 @@
         },
         {
             "capec_id": "CAPEC-143",
-            "description": "Detect Unpublicised Web Pages"
+            "description": "Detect Unpublicized Web Pages"
         },
         {
             "capec_id": "CAPEC-144",
-            "description": "Detect Unpublicised Web Services"
+            "description": "Detect Unpublicized Web Services"
         },
         {
             "capec_id": "CAPEC-149",
@@ -902,7 +902,7 @@
         },
         {
             "capec_id": "CAPEC-217",
-            "description": "Exploiting Incorrectly Configured SSL"
+            "description": "Exploiting Incorrectly Configured SSL/TLS"
         },
         {
             "capec_id": "CAPEC-224",
@@ -922,7 +922,7 @@
         },
         {
             "capec_id": "CAPEC-290",
-            "description": "Enumerate Mail Exchange Records"
+            "description": "Enumerate Mail Exchange (MX) Records"
         },
         {
             "capec_id": "CAPEC-291",
@@ -1078,7 +1078,7 @@
         },
         {
             "capec_id": "CAPEC-37",
-            "description": "Retrieve Embedded Sensitive Information"
+            "description": "Retrieve Embedded Sensitive Data"
         },
         {
             "capec_id": "CAPEC-383",
@@ -1190,7 +1190,7 @@
         },
         {
             "capec_id": "CAPEC-57",
-            "description": "Utilising REST's Trust in the System Resources to Obtain Sensitive Data"
+            "description": "Utilizing REST's Trust in the System Resource to Obtain Sensitive Data"
         },
         {
             "capec_id": "CAPEC-573",
@@ -1344,7 +1344,7 @@
         },
         {
             "capec_id": "CAPEC-81",
-            "description": "Web Logs Tampering"
+            "description": "Web Server Logs Tampering"
         },
         {
             "capec_id": "CAPEC-93",
@@ -1896,7 +1896,7 @@
         },
         {
             "capec_id": "CAPEC-443",
-            "description": "Malicious Logic Inserted into Product Software by Authorized Developer"
+            "description": "Malicious Logic Inserted Into Product by Authorized Developer"
         },
         {
             "capec_id": "CAPEC-444",
@@ -1908,7 +1908,7 @@
         },
         {
             "capec_id": "CAPEC-446",
-            "description": "Malicious Logic Insertion into Product Software via 3rd Party Component Dependency"
+            "description": "Malicious Logic Insertion into Product via Inclusion of Third-Party Component"
         },
         {
             "capec_id": "CAPEC-447",
@@ -1952,7 +1952,7 @@
         },
         {
             "capec_id": "CAPEC-481",
-            "description": "Contradictory Destinations inTraffic Routing Schemes"
+            "description": "Contradictory Destinations in Traffic Routing Schemes"
         },
         {
             "capec_id": "CAPEC-5",
@@ -2036,7 +2036,7 @@
         },
         {
             "capec_id": "CAPEC-536",
-            "description": "Data Injection During Configuration"
+            "description": "Data Injected During Configuration"
         },
         {
             "capec_id": "CAPEC-537",
@@ -2056,7 +2056,7 @@
         },
         {
             "capec_id": "CAPEC-548",
-            "description": "Contaminate Resources"
+            "description": "Contaminate Resource"
         },
         {
             "capec_id": "CAPEC-571",
@@ -2132,7 +2132,7 @@
         },
         {
             "capec_id": "CAPEC-663",
-            "description": "Exploitation of TransientInstruction Execution"
+            "description": "Exploitation of Transient Instruction Execution"
         },
         {
             "capec_id": "CAPEC-665",
@@ -2168,7 +2168,7 @@
         },
         {
             "capec_id": "CAPEC-677",
-            "description": "Server Functionality Compromise"
+            "description": "Server Motherboard Compromise"
         },
         {
             "capec_id": "CAPEC-678",
@@ -2184,7 +2184,7 @@
         },
         {
             "capec_id": "CAPEC-73",
-            "description": "User Controlled Filename"
+            "description": "User-Controlled Filename"
         },
         {
             "capec_id": "CAPEC-74",
@@ -2216,7 +2216,7 @@
         },
         {
             "capec_id": "CAPEC-81",
-            "description": "Web Logs Tampering"
+            "description": "Web Server Logs Tampering"
         },
         {
             "capec_id": "CAPEC-9",

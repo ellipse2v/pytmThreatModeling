@@ -20,9 +20,12 @@ import logging
 from typing import Dict, List, Any
 import re
 import ast
-import pandas as pd
+import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET
+
 from pathlib import Path
 from threat_analysis.custom_threats import get_custom_threats
+from threat_analysis import data_loader
 
 attack_d3fend_mapping = {
     "M1013 Application Developer Guidance": ["A future release of D3FEND will define a taxonomy of Source Code Hardening Techniques."],
@@ -72,10 +75,11 @@ attack_d3fend_mapping = {
 class MitreMapping:
     """Class for managing MITRE ATT&CK mapping with D3FEND mitigations"""
     def __init__(self, threat_model=None, threat_model_path: str = '/mnt/d/dev/github/threatModelBypyTm/threatModel_Template/threat_model.md'):
-        self.d3fend_details = self._initialize_d3fend_mapping()
+        self.d3fend_details = data_loader.load_d3fend_mapping()
+        self.capec_to_mitre_map = data_loader.load_capec_to_mitre_mapping()
+        self.stride_to_capec = data_loader.load_stride_to_capec_map()
         self.mapping = self._initialize_mapping()
         self.threat_patterns = self._initialize_threat_patterns()
-        self.capec_patterns = self._initialize_capec_patterns()
         self.custom_threats = self._load_custom_threats(threat_model)
         self.custom_mitre_mappings = []
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -83,14 +87,18 @@ class MitreMapping:
         if os.path.exists(full_markdown_path):
             self.custom_mitre_mappings = self._load_custom_mitre_mappings_from_markdown(full_markdown_path)
         self.markdown_mitigations = {}
+
+
     def _load_custom_threats(self, threat_model) -> Dict[str, List[Dict[str, Any]]]:
         """Loads custom threats from the custom_threats module."""
         if threat_model:
             return get_custom_threats(threat_model)
         return {}
+    
     def get_custom_threats(self) -> Dict[str, List[Dict[str, Any]]]:
         """Returns the loaded custom threats."""
         return self.custom_threats
+    
     def _load_custom_mitre_mappings_from_markdown(self, markdown_file_path: str) -> List[Dict[str, Any]]:
         """
         Loads custom MITRE ATT&CK mappings from the '## Custom Mitre Mapping' section of a Markdown file.
@@ -131,28 +139,9 @@ class MitreMapping:
         except Exception as e:
             logging.error(f"Error loading custom MITRE mappings from markdown: {e}")
         return custom_mappings
-    def _initialize_d3fend_mapping(self) -> Dict[str, Dict[str, str]]:
-        """Initializes D3FEND mitigations by loading from d3fend.csv."""
-        d3fend_details = {}
-        csv_file_path = os.path.join(os.path.dirname(__file__), '..', 'external_data/d3fend.csv')
-        try:
-            df = pd.read_csv(csv_file_path)
-            for _, row in df.iterrows():
-                d3fend_id = row['ID']
-                d3fend_name = row['D3FEND Technique'] if pd.notna(row['D3FEND Technique']) else d3fend_id
-                d3fend_description = row['Definition'] if pd.notna(row['Definition']) else ""
-                d3fend_details[d3fend_id] = {
-                    "name": d3fend_name,
-                    "description": d3fend_description
-                }
-        except FileNotFoundError:
-            logging.error(f"Error: d3fend.csv not found at {csv_file_path}. Using empty D3FEND mapping.")
-        except Exception as e:
-            logging.error(f"Error loading d3fend.csv: {e}. Using empty D3FEND mapping.")
-        return d3fend_details
+
     def _initialize_mapping(self) -> Dict[str, Dict[str, Any]]:
         """Initializes comprehensive STRIDE to MITRE ATT&CK mapping with D3FEND mitigations"""
-        official_d3fend_mapping = self._initialize_d3fend_mapping()
         mapping = {
             "Spoofing": {
                 "tactics": ["Initial Access", "Defense Evasion", "Credential Access"],
@@ -1085,65 +1074,28 @@ class MitreMapping:
         
         return tech_copy
 
-    def _initialize_capec_patterns(self) -> Dict[str, Dict[str, str]]:
-        """Initializes CAPEC patterns by loading from stride_to_capec.json."""
-        capec_patterns = {}
-        capec_mapping_path = Path(__file__).parent.parent / 'external_data' / 'stride_to_capec.json'
-        try:
-            with open(capec_mapping_path, 'r') as f:
-                stride_to_capec_data = json.load(f)
-
-            for stride_category, capec_list in stride_to_capec_data.items():
-                for capec_info in capec_list:
-                    capec_id = capec_info['capec_id']
-                    capec_description = capec_info['description']
-                    # Create a regex pattern from the CAPEC description
-                    # Convert to lowercase, split by non-alphanumeric, filter short words, join with OR
-                    keywords = re.findall(r'\b\w+\b', capec_description.lower())
-                    # Filter out common words that might lead to too many false positives
-                    filtered_keywords = [kw for kw in keywords if len(kw) > 2 and kw not in ['the', 'and', 'for', 'to', 'with', 'via', 'from', 'into', 'through', 'using', 'of', 'to', 'in', 'an', 'a', 'or', 'by', 'on', 'that', 'this', 'can', 'be', 'is', 'are', 'as', 'has', 'have', 'had', 'was', 'were', 'will', 'would', 'may', 'might', 'must', 'should', 'could', 'get', 'geta', 'getb', 'getc', 'getd', 'gete', 'getf', 'getg', 'geth', 'geti', 'getj', 'getk', 'getl', 'getm', 'getn', 'geto', 'getp', 'getq', 'getr', 'gets', 'gett', 'getu', 'getv', 'getw', 'getx', 'gety', 'getz']]
-                    if not filtered_keywords: # Fallback if all keywords are filtered
-                        filtered_keywords = keywords # Use all keywords if filtering results in empty list
-
-                    pattern = r"(?i)" + "|".join(re.escape(kw) for kw in filtered_keywords)
-                    if pattern == "(?i)": # If no meaningful keywords, use the full description
-                        pattern = r"(?i)" + re.escape(capec_description)
-
-                    capec_patterns[capec_id] = {
-                        "description": capec_description,
-                        "pattern": pattern,
-                        "stride_category": stride_category
-                    }
-        except FileNotFoundError:
-            logging.error(f"Error: stride_to_capec.json not found at {capec_mapping_path}. Using empty CAPEC mapping.")
-        except Exception as e:
-            logging.error(f"Error loading stride_to_capec.json: {e}. Using empty CAPEC mapping.")
-        return capec_patterns
-
-    def map_threat_to_capec(self, threat_description: str, stride_category: str) -> List[Dict[str, Any]]:
-        """Maps a threat description and STRIDE category to CAPEC IDs using regex patterns."""
-        found_capecs = []
-        threat_text_lower = threat_description.lower()
-
-        for capec_id, capec_info in self.capec_patterns.items():
-            # Check if the CAPEC belongs to the given STRIDE category
-            # Note: stride_to_capec.json uses "Elevation of Privilege" while PyTM uses "ElevationOfPrivilege"
-            # Need to normalize the category names for comparison
-            normalized_capec_stride = capec_info["stride_category"].replace(" ", "")
-            normalized_input_stride = stride_category.replace(" ", "")
-
-            if normalized_capec_stride.lower() == normalized_input_stride.lower():
-                if re.search(capec_info["pattern"], threat_text_lower):
-                    found_capecs.append({
-                        "capec_id": capec_id,
-                        "description": capec_info["description"]
-                    })
-        return found_capecs
-
     def _initialize_threat_patterns(self) -> Dict[str, str]:
         """
-        Enhanced threat recognition patterns with comprehensive coverage
+        Initializes a dictionary mapping STRIDE categories to a list of MITRE ATT&CK techniques.
+        This is built by chaining STRIDE -> CAPEC -> ATT&CK mappings.
         """
+        stride_to_mitre_map = {}
+        for stride_category, capec_list in self.stride_to_capec.items():
+            all_techniques = set()
+            for capec_info in capec_list:
+                capec_id = capec_info['capec_id']
+                if capec_id in self.capec_to_mitre_map:
+                    all_techniques.update(self.capec_to_mitre_map[capec_id])
+            
+            # Normalize stride category name to match the keys in self.mapping
+            normalized_stride_category = stride_category.replace(" ", "")
+            if "DenialOfService" in normalized_stride_category:
+                 normalized_stride_category = "DenialOfService"
+
+            stride_to_mitre_map[normalized_stride_category] = sorted(list(all_techniques))
+
+        # This part is for the regex-based mapping, which will be kept as a secondary mechanism.
+        # It can be extended or kept as is.
         return {
             # === Core MITRE ATT&CK Techniques ===
             "T1566": r"(?i)phishing|identity spoofing|social engineering|spear phishing",
@@ -1226,47 +1178,51 @@ class MitreMapping:
             "denialofservice": "DenialOfService",
             "elevationofprivilege": "ElevationOfPrivilege|unauthorized privilege escalation|vulnerability in the management interface|compromise of the management interface|lateral movement"
         }
-    def map_threat_to_mitre(self, threat_description: str) -> List[Dict[str, Any]]:
-        """Maps a threat description to MITRE ATT&CK techniques using regex patterns."""
-        found_techniques = {} # Use dict to store unique techniques by ID
-        for pattern_value, pattern_regex in self.threat_patterns.items(): # pattern_value can be a T-ID or STRIDE category
-            if re.search(pattern_regex, threat_description, re.IGNORECASE):
-                if re.match(r'T\d{4}(?:\.\d{3})?', pattern_value):
-                    technique_id = pattern_value
+    def map_threat_to_mitre(self, threat_description: str, stride_category: str) -> Dict[str, List[Dict[str, Any]]]:
+        """
+        Maps a threat to MITRE ATT&CK techniques and CAPEC patterns.
+        Returns a dictionary with 'techniques' and 'capecs'.
+        """
+        found_techniques = {}
+        found_capecs = {}
+
+        # Primary mapping: STRIDE -> CAPEC -> ATT&CK
+        normalized_stride_category = stride_category.replace(" ", "")
+        if "DenialOfService" in normalized_stride_category:
+            normalized_stride_category = "DenialOfService"
+
+        if normalized_stride_category in self.stride_to_capec:
+            for capec_info in self.stride_to_capec[normalized_stride_category]:
+                capec_id = capec_info['capec_id']
+                if capec_id not in found_capecs:
+                    found_capecs[capec_id] = capec_info
+                
+                if capec_id in self.capec_to_mitre_map:
+                    technique_ids = self.capec_to_mitre_map[capec_id]
+                    for tech_id in technique_ids:
+                        if tech_id not in found_techniques:
+                            for cat_map in self.mapping.values():
+                                for tech in cat_map.get("techniques", []):
+                                    if tech.get("id") == tech_id:
+                                        found_techniques[tech_id] = self._process_technique_mitigations(tech, cat_map)
+                                        break
+
+        # Secondary mapping: Regex on description
+        for pattern_value, pattern_regex in self.threat_patterns.items():
+            if re.match(r'T\d{4}(?:\.\d{3})?', pattern_value) and re.search(pattern_regex, threat_description, re.IGNORECASE):
+                technique_id = pattern_value
+                if technique_id not in found_techniques:
                     for category_mapping in self.mapping.values():
                         for technique in category_mapping.get("techniques", []):
                             if technique.get("id") == technique_id:
-                                if technique_id not in found_techniques:
-                                    found_techniques[technique_id] = self._process_technique_mitigations(technique, category_mapping)
+                                found_techniques[technique_id] = self._process_technique_mitigations(technique, category_mapping)
                                 break
-                else:
-                    stride_category = pattern_value
-                    category_mapping = self.mapping.get(stride_category)
-                    if category_mapping:
-                        for technique in category_mapping.get("techniques", []):
-                            if technique.get("id") not in found_techniques:
-                                found_techniques[technique.get("id")] = self._process_technique_mitigations(technique, category_mapping)
-        return list(found_techniques.values())
-    def get_d3fend_mitigations_for_technique(self, technique_id: str) -> List[Dict[str, str]]:
-        """Retrieves D3FEND mitigations for a given MITRE ATT&CK technique ID."""
-        if not self.d3fend_mappings:
-            return []
-        return self.d3fend_mappings.get(technique_id, [])
-    def get_all_techniques(self) -> List[Dict[str, str]]:
-        """Returns all distinct MITRE techniques defined in the mapping."""
-        techniques = []
-        for threat_info in self.mapping.values():
-            techniques.extend(threat_info.get("techniques", []))
-        return techniques
-    def get_techniques_count(self) -> int:
-        """Returns the total number of distinct MITRE techniques defined in the mapping."""
-        return len(self.get_all_techniques())
-    def add_custom_mapping(self, threat_type: str, tactics: List[str], techniques: List[Dict[str, str]]):
-        """Adds a custom mapping for a STRIDE category."""
-        self.mapping[threat_type] = {
-            "tactics": tactics,
-            "techniques": techniques
+        
+        return {
+            "techniques": list(found_techniques.values()),
+            "capecs": list(found_capecs.values())
         }
+
     def analyze_pytm_threats_list(self, pytm_threats_list: List[Any]) -> Dict[str, Any]:
         """
         Analyzes a list of PyTM threat objects and applies MITRE mapping.
@@ -1283,7 +1239,8 @@ class MitreMapping:
             threat_description = getattr(threat, 'description', '')
             threat_name = getattr(threat, 'name', str(threat.__class__.__name__))
             stride_category = self.classify_pytm_threat(threat)
-            mitre_techniques = self.map_threat_to_mitre(threat_description)
+            mapping_results = self.map_threat_to_mitre(threat_description, stride_category)
+            mitre_techniques = mapping_results.get('techniques', [])
             mitre_tactics = self.get_tactics_for_threat(stride_category)
             processed_threat = {
                 "threat_name": threat_name,
@@ -1368,18 +1325,8 @@ class MitreMapping:
         }
         tactics = stride_to_tactics.get(stride_category, [])
         return tactics
+    
     def get_stride_categories(self) -> List[str]:
         """Returns the list of available STRIDE categories."""
         return list(self.mapping.keys())
-    def get_statistics(self) -> Dict[str, Any]:
-        """Returns mapping statistics."""
-        return {
-            "total_stride_categories": len(self.mapping),
-            "total_techniques": self.get_techniques_count(),
-            "total_threat_patterns": len(self.threat_patterns),
-            "stride_categories": list(self.mapping.keys()),
-            "techniques_per_category": {
-                category: len(info.get("techniques", []))
-                for category, info in self.mapping.items()
-            }
-        }
+    
