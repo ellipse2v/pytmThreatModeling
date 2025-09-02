@@ -487,3 +487,29 @@ The framework relies on external data from MITRE ATT&CK, CAPEC, and other source
 -   **Purpose**: To correct the discrepancies identified by the `validate_capec_json.py` script.
 -   **Function**: This script contains a hardcoded dictionary of known corrections for CAPEC descriptions. It reads the `stride_to_capec.json` file, and for any CAPEC ID that has a known correction, it replaces the incorrect local description with the correct one from its internal dictionary.
 -   **Usage**: This provides a quick and automated way to fix common errors in the scraped data without having to manually edit the JSON file.
+
+### 4.13. Attack Flow Generation (`generation/attack_flow_generator.py`)
+
+This module is responsible for generating visual, end-to-end attack scenarios based on the identified threats. Unlike other generators that produce static reports, the `AttackFlowGenerator` creates multiple `.afb` files, each representing a plausible attack path that can be imported into the [Attack Flow](https://attackflow.io/) tool for visualization and analysis.
+
+-   **Core Philosophy**: The generator's goal is to transform a flat list of threats into meaningful narratives. It achieves this by sequencing threats according to the logical progression of adversary tactics as defined by the MITRE ATT&CK framework.
+
+-   **Path Discovery Logic**:
+    1.  **Threat Filtering**: The process begins by filtering the full list of threats. Only threats belonging to specific, actionable STRIDE categories (**Spoofing, Tampering, Repudiation, Information Disclosure, Elevation of Privilege**) are considered as building blocks for the attack paths.
+    2.  **Technique Extraction**: It extracts all unique MITRE ATT&CK techniques from the filtered threats.
+    3.  **Phase Mapping**: Each technique is mapped to a "phase" in the attack lifecycle based on its tactic (e.g., "Initial Access" is an early phase, "Impact" is a late phase). This mapping is defined in `tactic_logic.py`.
+    4.  **Path Finding**: The generator identifies all techniques that belong to the earliest phase (e.g., all identified "Initial Access" techniques). It then creates a distinct attack path for **each** of these starting techniques. A path is constructed as a linear chain of techniques, progressing sequentially through the tactic phases.
+
+-   **Diagram Structure and Content**:
+    -   Each generated `.afb` file represents a single, complete attack path.
+    -   The diagram illustrates the progression by alternating between **Actions** and **Assets**. For each step in the path, the generator creates:
+        1.  An `action` node representing the MITRE ATT&CK technique.
+        2.  An `asset` node representing the real target of that action (e.g., "WebApp Server", "Firewall"), as identified in the original threat.
+    -   The final node in the chain is a conceptual `asset` representing the adversary's objective, derived from the STRIDE category of the final threat (e.g., "Impact: Tampering").
+    -   The resulting flow visually communicates a clear narrative: `(Action 1) -> (targets Asset A) -> (enabling Action 2) -> (targets Asset B) -> ... -> (achieves Impact)`.
+
+-   **Output**:
+    -   The generator creates a new subdirectory, `afb/`, inside the main timestamped output folder.
+    -   Inside this directory, it saves one `.afb` file for each discovered path, named `attack_path_1.afb`, `attack_path_2.afb`, and so on.
+
+-   **Integration (`__main__.py`)**: The main script was updated to call the `generate_and_save_flows()` method, which orchestrates this entire process.

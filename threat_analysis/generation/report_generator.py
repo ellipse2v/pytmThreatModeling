@@ -482,7 +482,7 @@ class ReportGenerator:
                             breadcrumb=new_breadcrumb,
                             project_protocols=project_protocols,
                             project_protocol_styles=project_protocol_styles,
-                            all_project_models=all_project_models
+                            all_project_models=all_processed_models
                         )
                     else:
                         logging.warning(f"Submodel file not found: {submodel_path}")

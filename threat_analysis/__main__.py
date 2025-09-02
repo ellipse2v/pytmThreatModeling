@@ -24,6 +24,7 @@ from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path
 import importlib.util
 import inspect
+import traceback
 
 # Import library modules
 from threat_analysis.core.models_module import ThreatModel
@@ -31,6 +32,7 @@ from threat_analysis.core.mitre_mapping_module import MitreMapping
 from threat_analysis.severity_calculator_module import SeverityCalculator
 from threat_analysis.generation.diagram_generator import DiagramGenerator
 from threat_analysis.generation.attack_navigator_generator import AttackNavigatorGenerator
+from threat_analysis.generation.attack_flow_generator import AttackFlowGenerator
 from threat_analysis.core.model_factory import create_threat_model
 from threat_analysis import config
 from threat_analysis.iac_plugins import IaCPlugin
@@ -276,6 +278,27 @@ class ThreatAnalysisFramework:
             pass
 
 
+def generate_and_save_attack_flow(threat_model, output_dir, model_name):
+    """Generates and saves Attack Flow files based on STRIDE categories."""
+    logging.info(f"🌊 Generating Attack Flow files for {model_name}...")
+    try:
+        all_threats = threat_model.get_all_threats_details()
+        if not all_threats:
+            logging.warning("No threats found, skipping Attack Flow generation.")
+            return
+
+        flow_generator = AttackFlowGenerator(
+            threats=all_threats,
+            model_name=model_name
+        )
+        # This new method handles the creation of the 'afb' subdir and saving the files.
+        flow_generator.generate_and_save_flows(output_dir)
+        logging.info(f"✅ Attack Flow generation process completed for {model_name}.")
+
+    except Exception as e:
+        logging.error(f"❌ Failed to generate Attack Flow files for {model_name}: {e}")
+        traceback.print_exc()
+
 def load_iac_plugins() -> Dict[str, IaCPlugin]:
     """Dynamically loads IaC plugins from the iac_plugins directory.
 
@@ -334,6 +357,11 @@ class CustomArgumentParser:
             "--navigator",
             action="store_true",
             help="Generate a MITRE ATT&CK Navigator layer.",
+        )
+        self.parser.add_argument(
+            "--attack-flow",
+            action="store_true",
+            help="Generate an Attack Flow JSON file for visualization.",
         )
 
         # Dynamically add arguments for IaC plugins
@@ -434,6 +462,13 @@ def run_single_analysis(args: argparse.Namespace, loaded_iac_plugins: Dict[str, 
     if args.navigator:
         framework.generate_navigator_layer()
 
+    if args.attack_flow:
+        generate_and_save_attack_flow(
+            threat_model=framework.threat_model,
+            output_dir=framework.output_base_dir,
+            model_name=framework.model_name
+        )
+
 class ColoredFormatter(logging.Formatter):
     """Custom formatter to add color to log messages."""
 
@@ -515,6 +550,13 @@ if __name__ == "__main__":
                 logging.info(f"✅ Project ATT&CK Navigator layer saved to: {output_path}")
             except Exception as e:
                 logging.error(f"❌ Failed to generate project ATT&CK Navigator layer: {e}")
+
+        if args.attack_flow and project_threat_model:
+            generate_and_save_attack_flow(
+                threat_model=project_threat_model,
+                output_dir=output_dir,
+                model_name=project_threat_model.tm.name
+            )
 
     else:
         run_single_analysis(args, loaded_iac_plugins)
