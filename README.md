@@ -10,6 +10,7 @@ This project is a Python-based, end-to-end STRIDE threat modeling and analysis f
 - **Calculate severity** using customizable base scores, target multipliers, and protocol adjustments.
 - **Generate detailed reports** (HTML, JSON) and **visual diagrams** (DOT, SVG, HTML) with threat highlights.
 - **Generate MITRE ATT&CK Navigator layers** for visualizing identified techniques.
+- **Generate optimized Attack Flow diagrams** for key objectives (Tampering, Spoofing, Information Disclosure, Repudiation).
 - **Extend and customize** all mappings, calculations, and reporting logic.
 
 > **Based on [PyTM](https://github.com/OWASP/pytm):** This framework leverages PyTM's modeling primitives and extends them with advanced reporting, MITRE mapping, and diagram generation.
@@ -93,11 +94,17 @@ Use the CLI mode for automated threat analysis, report generation, and diagram c
     python -m threat_analysis --model-file threatModel_Template/threat_model.md --navigator
     ```
     (You can omit `--model-file threatModel_Template/threat_model.md` if your model file is named `threatModel_Template/threat_model.md` and is in the root directory.)
-3.  **View the results** in the generated `output/` folder:
+3.  **Generate Attack Flow diagrams:** Add the `--attack-flow` flag to any analysis command to generate optimized Attack Flow `.afb` files for key objectives.
+    ```bash
+    python -m threat_analysis --model-file path/to/your_model.md --attack-flow
+    ```
+    This will generate one `.afb` file for each of the main objectives (Tampering, Spoofing, Information Disclosure, Repudiation) found in your model, selecting the highest-scoring path for each.
+4.  **View the results** in the generated `output/` folder:
     -   HTML report
     -   JSON export
     -   DOT/SVG/HTML diagrams
     -   MITRE ATT&CK Navigator layer (JSON)
+    -   Optimized Attack Flow `.afb` files
 
 ### 2. Project Mode: Hierarchical Threat Models
 
@@ -358,7 +365,7 @@ To accelerate the creation of new threat models, the framework includes a set of
 -   **MITRE ATT&CK Mapping**: Each STRIDE threat is mapped to one or more MITRE ATT&CK techniques and tactics.
 -   **Severity Calculation**:
     -   Base scores per STRIDE category.
-    -   Target multipliers (e.g., critical servers).
+    -   Target multipliers per STRIDE category.
     -   Protocol-based adjustments (e.g., HTTP vs HTTPS).
 -   **Diagram Generation**:
     -   DOT, SVG, and HTML diagrams with threat highlights and legends.

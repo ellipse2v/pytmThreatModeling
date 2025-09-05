@@ -128,7 +128,7 @@ def test_nested_project_and_dataflows(mock_validate, mock_generate_diagram, mock
 - **WebServer**:""")
     with open(backend_path / "model.md", "w") as f:
         f.write("""## Servers
-- **APIGateway":
+- **APIGateway**:
 - **ProductDB**: submodel=./database/model.md""")
     with open(db_path / "model.md", "w") as f:
         f.write("""## Servers

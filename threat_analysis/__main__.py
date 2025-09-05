@@ -282,16 +282,16 @@ def generate_and_save_attack_flow(threat_model, output_dir, model_name):
     """Generates and saves Attack Flow files based on STRIDE categories."""
     logging.info(f"🌊 Generating Attack Flow files for {model_name}...")
     try:
-        all_threats = threat_model.get_all_threats_details()
-        if not all_threats:
-            logging.warning("No threats found, skipping Attack Flow generation.")
+        # The generator now expects the raw threat data to perform its own filtering.
+        raw_threats = threat_model.mitre_analysis_results.get("processed_threats", [])
+        if not raw_threats:
+            logging.warning("No raw threats found, skipping Attack Flow generation.")
             return
 
         flow_generator = AttackFlowGenerator(
-            threats=all_threats,
+            threats=raw_threats,
             model_name=model_name
         )
-        # This new method handles the creation of the 'afb' subdir and saving the files.
         flow_generator.generate_and_save_flows(output_dir)
         logging.info(f"✅ Attack Flow generation process completed for {model_name}.")
 

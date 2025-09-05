@@ -15,6 +15,7 @@
 import json
 import uuid
 import os
+import logging
 from datetime import datetime, timezone
 from collections import defaultdict
 from .tactic_logic import TACTIC_PROGRESSION, TACTIC_INFO
@@ -29,7 +30,16 @@ class AttackFlowGenerator:
     def __init__(self, threats, model_name="Attack Flow"):
         self.model_name = model_name
 
-        # Filter threats to only include specific STRIDE categories for path generation
+        # Filter out generic/class-based threats as requested
+        filtered_threats = []
+        for threat in threats:
+            target = threat.get('target')
+            if isinstance(target, type):
+                continue
+            if isinstance(target, tuple) and len(target) > 0 and any(isinstance(t, type) for t in target):
+                continue
+            filtered_threats.append(threat)
+
         allowed_categories = {
             "Elevation of Privilege",
             "Information Disclosure",
@@ -38,7 +48,7 @@ class AttackFlowGenerator:
             "Tampering"
         }
         self.threats = [
-            threat for threat in threats
+            threat for threat in filtered_threats
             if threat.get("stride_category") in allowed_categories
         ]
 
@@ -47,8 +57,8 @@ class AttackFlowGenerator:
 
     def _get_techniques_from_threats(self, threats):
         techniques = {}
-        for threat in threats:
-            for tech in threat.get('mitre_techniques', []):
+        for threat_dict in threats:
+            for tech in threat_dict.get('mitre_techniques', []):
                 tech_id = str(tech['id'])
                 if tech_id not in techniques:
                     techniques[tech_id] = {
@@ -57,7 +67,7 @@ class AttackFlowGenerator:
                         'tactics': [str(t) for t in tech.get('tactics', [])],
                         'threats': []
                     }
-                techniques[tech_id]['threats'].append(threat)
+                techniques[tech_id]['threats'].append(threat_dict)
         return techniques
 
     def _build_tactic_phase_map(self):
@@ -70,91 +80,159 @@ class AttackFlowGenerator:
                         break
         return phase_map
 
-    def _find_attack_paths(self):
+    def _find_attack_paths(self, max_paths=20):
         if not self.techniques:
             return []
 
-        techniques_by_phase = defaultdict(list)
+        threats_by_phase = defaultdict(list)
         for tech_id, tech_data in self.techniques.items():
             for tactic in tech_data['tactics']:
                 if tactic in self.tactic_phase_map:
                     phase_index = self.tactic_phase_map[tactic]
-                    if tech_id not in techniques_by_phase[phase_index]:
-                        techniques_by_phase[phase_index].append(tech_id)
-        
-        if not techniques_by_phase:
+                    for threat in tech_data['threats']:
+                        threat_tuple = (tech_id, threat)
+                        if threat_tuple not in threats_by_phase[phase_index]:
+                            threats_by_phase[phase_index].append(threat_tuple)
+
+        if not threats_by_phase:
             return []
 
         all_paths = []
-        sorted_phases = sorted(techniques_by_phase.keys())
+        sorted_phases = sorted(threats_by_phase.keys())
         if not sorted_phases:
             return []
 
-        start_phase_index = sorted_phases[0]
+        def find_paths_recursive(current_path, phase_idx):
+            if len(all_paths) >= max_paths:
+                return
 
-        for start_tech_id in techniques_by_phase[start_phase_index]:
-            path = [start_tech_id]
-            for i in range(1, len(sorted_phases)):
-                next_phase_index = sorted_phases[i]
-                if techniques_by_phase[next_phase_index]:
-                    path.append(techniques_by_phase[next_phase_index][0])
-            all_paths.append(path)
+            if phase_idx >= len(sorted_phases):
+                if current_path:
+                    all_paths.append(list(current_path))
+                return
+
+            current_phase_key = sorted_phases[phase_idx]
             
+            # Explore paths by adding a threat from the current phase
+            for threat_tuple in threats_by_phase[current_phase_key]:
+                if threat_tuple not in current_path:
+                    current_path.append(threat_tuple)
+                    find_paths_recursive(current_path, phase_idx + 1)
+                    current_path.pop()  # Backtrack
+
+                    if len(all_paths) >= max_paths:
+                        return
+            
+            # We are not exploring paths that skip phases for now to create more distinct paths
+            # find_paths_recursive(current_path, phase_idx + 1)
+
+        find_paths_recursive([], 0)
         return all_paths
 
     def generate_and_save_flows(self, output_dir):
         afb_output_dir = os.path.join(output_dir, "afb")
         os.makedirs(afb_output_dir, exist_ok=True)
-
+        
         attack_paths = self._find_attack_paths()
-
         if not attack_paths:
             print("INFO: No logical attack paths found based on tactic progression.")
             return
 
-        for i, path in enumerate(attack_paths):
+        paths_by_objective = defaultdict(list)
+        final_objectives = {"Tampering", "Spoofing", "Information Disclosure", "Repudiation"}
+        
+        for path in attack_paths:
+            if not path:
+                continue
+            
+            path_objectives = set()
+            for _, threat in path:
+                objective = threat.get('stride_category')
+                if objective in final_objectives:
+                    path_objectives.add(objective)
+            
+            for objective in path_objectives:
+                paths_by_objective[objective].append(path)
+
+        best_paths_data = {}
+        for objective, path_list in paths_by_objective.items():
+            best_path_for_objective = None
+            max_score = -1
+            
+            for path in path_list:
+                current_score = sum(threat.get('severity', {}).get('score', 0) for _, threat in path)
+                
+                if current_score > max_score:
+                    max_score = current_score
+                    best_path_for_objective = path
+            
+            if best_path_for_objective:
+                path_signature = tuple(item[0] for item in best_path_for_objective)
+                if path_signature not in best_paths_data:
+                    best_paths_data[path_signature] = {"path": best_path_for_objective, "objectives": []}
+                best_paths_data[path_signature]["objectives"].append(objective)
+
+        if not best_paths_data:
+            print("INFO: No valid attack paths found after optimization.")
+            return
+
+        print(f"INFO: Found {len(best_paths_data)} unique attack paths after optimization.")
+        i = 0
+        for path_data in best_paths_data.values():
+            path = path_data["path"]
+            primary_objective = path_data["objectives"][0]
+            
             flow_data = self._generate_single_path_flow(path, i + 1)
             if flow_data:
-                file_path = os.path.join(afb_output_dir, f"attack_path_{i + 1}.afb")
+                file_path = os.path.join(afb_output_dir, f"optimized_path_{primary_objective}.afb")
                 try:
                     with open(file_path, 'w') as f:
                         json.dump(flow_data, f, indent=4)
-                    print(f"INFO: Successfully generated Attack Path #{i + 1} at {file_path}")
+                    print(f"INFO: Successfully generated optimized attack path for objective '{primary_objective}' at {file_path}")
                 except Exception as e:
-                    print(f"ERROR: Error writing file for Attack Path #{i + 1}: {e}")
+                    print(f"ERROR: Error writing file for objective '{primary_objective}': {e}")
+            i += 1
 
-    def _get_asset_name_from_target(self, target: any):
-        """Safely gets the name of a target, mirroring the logic from ReportGenerator."""
-        if isinstance(target, tuple) and len(target) == 2:
-            # Handle dataflows (source, sink)
-            source, sink = target
-            source_name = self._get_asset_name_from_target(source)
-            sink_name = self._get_asset_name_from_target(sink)
-            return f"{source_name} → {sink_name}"
+    # --- Start of Duplicated Methods from Report Generator ---
+    def _get_target_name(self, target: any) -> str:
+        """Determines the target name, handling different target types."""
+        if isinstance(target, tuple):
+            if len(target) == 2:
+                source, sink = target
+                if hasattr(source, 'source') and hasattr(source, 'sink'):
+                    source_name = self._extract_name_from_object(source.source)
+                else:
+                    source_name = self._extract_name_from_object(source)
+                if hasattr(sink, 'source') and hasattr(sink, 'sink'):
+                    dest_name = self._extract_name_from_object(sink.sink)
+                else:
+                    dest_name = self._extract_name_from_object(sink)
+                return f"{source_name} → {dest_name}"
+        return self._extract_name_from_object(target)
 
-        if isinstance(target, tuple) and len(target) == 1:
-            target = target[0]
-
-        if target is None:
+    def _extract_name_from_object(self, obj: any) -> str:
+        if isinstance(obj, tuple) and len(obj) == 1:
+            obj = obj[0]
+        if obj is None: 
             return "Unspecified"
-        
         try:
-            return str(target.name)
+            return str(obj.name)
         except AttributeError:
+            if isinstance(obj, str):
+                return obj
             return "Unspecified"
+    # --- End of Duplicated Methods ---
 
     def _generate_single_path_flow(self, path, path_number):
-        all_objects = []
-        layout = {}
-        nodes_in_path = []
-        asset_node_cache = {}
-
-        for tech_id in path:
+        all_objects, layout, nodes_in_path, asset_node_cache = [], {}, [], {}
+        for tech_id, threat in path:
             tech_data = self.techniques[tech_id]
-            if not tech_data['threats']:
+
+            target_obj = threat.get('target')
+            target_asset_name = self._get_target_name(target_obj)
+
+            if target_asset_name == "Unspecified" or not target_asset_name or target_asset_name == "Unknown":
                 continue
-            threat = tech_data['threats'][0]
-            target_asset_name = self._get_asset_name_from_target(threat.get('target'))
 
             action_obj, action_anchors = self._create_action_object(tech_data)
             all_objects.extend([action_obj] + action_anchors)
@@ -164,31 +242,30 @@ class AttackFlowGenerator:
                 asset_obj, asset_anchors = self._create_asset_object(target_asset_name)
                 asset_node_cache[target_asset_name] = asset_obj
                 all_objects.extend([asset_obj] + asset_anchors)
+            
             nodes_in_path.append(asset_node_cache[target_asset_name])
 
-        last_threat = self.techniques[path[-1]]['threats'][0]
+        if not nodes_in_path:
+            return None
+
+        last_threat = path[-1][1]
         impact_category = str(last_threat.get('stride_category', ''))
         if impact_category and impact_category != 'Unknown':
             impact_node, impact_anchors = self._create_asset_object(f"Impact: {impact_category}")
             all_objects.extend([impact_node] + impact_anchors)
             nodes_in_path.append(impact_node)
-
         for i in range(len(nodes_in_path) - 1):
-            source_node = nodes_in_path[i]
-            target_node = nodes_in_path[i+1]
+            source_node, target_node = nodes_in_path[i], nodes_in_path[i+1]
             conn_objects = self._create_connection_objects(source_node, target_node)
             all_objects.extend(conn_objects)
-
         for i, node in enumerate(nodes_in_path):
             layout[node['instance']] = [i * 300, 0]
-
         flow_name = f"{self.model_name}: Attack Path #{path_number}"
         description = " -> ".join([node['properties'][0][1] for node in nodes_in_path])
         return self._generate_flow_file(flow_name, description, all_objects, layout)
 
     def _create_anchor_objects(self):
-        anchors = {}
-        anchor_objects = []
+        anchors, anchor_objects = {}, []
         for angle in range(0, 360, 30):
             anchor_id = str(uuid.uuid4())
             anchors[str(angle)] = anchor_id
@@ -201,8 +278,7 @@ class AttackFlowGenerator:
         anchors, anchor_objects = self._create_anchor_objects()
         tactic_name = technique['tactics'][0] if technique['tactics'] else "Unknown"
         tactic_id = TACTIC_INFO.get(tactic_name, {}).get('id', '')
-        tech_name = technique['name']
-        tech_id = technique['id']
+        tech_name, tech_id = technique['name'], technique['id']
         action_obj = {
             "id": "action", "instance": instance_id,
             "properties": [["name", tech_name], ["ttp", [["tactic", tactic_id], ["technique", tech_id]]], ["description", f"{tech_name} ({tech_id})"],],
@@ -222,12 +298,9 @@ class AttackFlowGenerator:
 
     def _create_connection_objects(self, source_obj, target_obj, source_anchor_angle=0, target_anchor_angle=180):
         line_instance, source_latch_instance, target_latch_instance, handle_instance = str(uuid.uuid4()), str(uuid.uuid4()), str(uuid.uuid4()), str(uuid.uuid4())
-        source_anchor_id = source_obj["anchors"][str(source_anchor_angle)]
-        target_anchor_id = target_obj["anchors"][str(target_anchor_angle)]
+        source_anchor_id, target_anchor_id = source_obj["anchors"][str(source_anchor_angle)], target_obj["anchors"][str(target_anchor_angle)]
         dynamic_line = {"id": "dynamic_line", "instance": line_instance, "source": source_latch_instance, "target": target_latch_instance, "handles": [handle_instance]}
-        source_latch = {"id": "generic_latch", "instance": source_latch_instance}
-        target_latch = {"id": "generic_latch", "instance": target_latch_instance}
-        handle = {"id": "generic_handle", "instance": handle_instance}
+        source_latch, target_latch, handle = {"id": "generic_latch", "instance": source_latch_instance}, {"id": "generic_latch", "instance": target_latch_instance}, {"id": "generic_handle", "instance": handle_instance}
         connection_objects = [dynamic_line, source_latch, target_latch, handle]
         source_anchor_obj = next((obj for obj in source_obj["_anchors_list"] if obj["instance"] == source_anchor_id), None)
         if source_anchor_obj: source_anchor_obj.setdefault("latches", []).append(source_latch_instance)

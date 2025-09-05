@@ -438,13 +438,16 @@ class ThreatModel:
                 if len(target) >= 2:
                     source_name = getattr(target[0], 'name', "Unknown")
                     dest_name = getattr(target[1], 'name', "Unknown")
-                    target_str = f"{source_name} -> {dest_name}"
+                    # Explicitly cast to str() to handle pytm.varString objects
+                    target_str = f"{str(source_name)} -> {str(dest_name)}"
                 elif len(target) == 1:
-                     target_str = getattr(target[0], 'name', "Unknown")
+                     # Explicitly cast to str()
+                     target_str = str(getattr(target[0], 'name', "Unknown"))
                 else:
                     target_str = "Unknown"
             else:
-                target_str = getattr(target, 'name', 'Unknown')
+                # Explicitly cast to str()
+                target_str = str(getattr(target, 'name', 'Unknown'))
 
             detailed_threats.append({
                 "description": threat_data.get("threat_name"),

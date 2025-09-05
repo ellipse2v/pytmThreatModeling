@@ -63,6 +63,9 @@ class ReportGenerator:
         if all_detailed_threats is None:
             all_detailed_threats = self._get_all_threats_with_mitre_info(grouped_threats)
         
+        # Store for other modules to use
+        self.all_detailed_threats = all_detailed_threats
+
         summary_stats = self.generate_summary_stats(all_detailed_threats)
         
         stride_categories = sorted(list(set(threat['stride_category'] for threat in all_detailed_threats)))
@@ -482,7 +485,7 @@ class ReportGenerator:
                             breadcrumb=new_breadcrumb,
                             project_protocols=project_protocols,
                             project_protocol_styles=project_protocol_styles,
-                            all_project_models=all_processed_models
+                            all_project_models=all_project_models
                         )
                     else:
                         logging.warning(f"Submodel file not found: {submodel_path}")
