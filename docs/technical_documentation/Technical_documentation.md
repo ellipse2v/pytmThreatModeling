@@ -487,3 +487,29 @@ The framework relies on external data from MITRE ATT&CK, CAPEC, and other source
 -   **Purpose**: To correct the discrepancies identified by the `validate_capec_json.py` script.
 -   **Function**: This script contains a hardcoded dictionary of known corrections for CAPEC descriptions. It reads the `stride_to_capec.json` file, and for any CAPEC ID that has a known correction, it replaces the incorrect local description with the correct one from its internal dictionary.
 -   **Usage**: This provides a quick and automated way to fix common errors in the scraped data without having to manually edit the JSON file.
+
+### 4.13. Attack Flow Generation (`generation/attack_flow_generator.py`)
+
+This module is responsible for generating visual, end-to-end attack scenarios based on the identified threats, compatible with the [Attack Flow](https://attackflow.io/) tool. It has been significantly enhanced to provide more realistic and optimized attack paths.
+
+-   **Core Philosophy**: The generator's goal is to transform a flat list of threats into meaningful narratives. It achieves this by sequencing threats according to the logical progression of adversary tactics as defined by the MITRE ATT&CK framework.
+-   **Path Discovery Logic (`_find_attack_paths`)**:
+    -   Now uses a **recursive (DFS) algorithm** to explore the search space more thoroughly, generating a diverse set of attack paths. This replaces the previous simplistic, greedy approach.
+    -   It considers threats grouped by their MITRE ATT&CK tactic phases.
+    -   Paths are constructed by selecting threats from sequential phases, ensuring a logical progression.
+    -   It includes a `max_paths` limit to control the number of generated paths, preventing combinatorial explosion.
+-   **Optimization and Selection (`generate_and_save_flows`)**:
+    -   After generating all possible paths, it **optimizes the output** to provide a concise and high-value summary.
+    -   It groups paths by their **final objective** (Tampering, Spoofing, Information Disclosure, Repudiation). Elevation of Privilege is considered a means to an end, not a final objective for this optimization.
+    -   For each objective, it selects the **highest-scoring path** (based on the sum of severity scores of threats within the path).
+    -   It ensures that **only one unique path is generated per objective**, even if the same path is the "best" for multiple objectives.
+    -   It filters out threats targeting generic classes (e.g., `pytm.Server` class itself) or tuples of classes, focusing only on threats against specific asset instances.
+-   **Diagram Structure and Content**:
+    -   Each generated `.afb` file represents a single, complete attack path.
+    -   The diagram illustrates the progression by alternating between **Actions** (MITRE ATT&CK techniques) and **Assets** (the specific components from your threat model).
+    -   The final node in the chain is a conceptual `asset` representing the adversary's objective, derived from the STRIDE category of the final threat (e.g., "Impact: Tampering").
+    -   The resulting flow visually communicates a clear narrative: `(Action 1) -> (targets Asset A) -> (enabling Action 2) -> (targets Asset B) -> ... -> (achieves Impact)`.
+-   **Asset Name Resolution**: Uses dedicated helper methods (`_get_target_name`, `_extract_name_from_object`) to accurately resolve asset names from raw `pytm` objects, ensuring human-readable labels in the generated attack flows.
+-   **Output**:
+    -   The generator creates a new subdirectory, `afb/`, inside the main timestamped output folder.
+    -   Inside this directory, it saves one `.afb` file for each optimized path, named descriptively (e.g., `optimized_path_Tampering.afb`).
