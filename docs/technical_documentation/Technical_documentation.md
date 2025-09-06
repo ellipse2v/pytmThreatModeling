@@ -282,7 +282,7 @@ This chained approach ensures that the threat analysis is not based on simple ke
 ```mermaid
 graph TD
     subgraph "Threat Enrichment Pipeline"
-        A[Threat with STRIDE Category] -->|e.g., "Tampering"| B(STRIDE-to-CAPEC Mapping)
+        A[Threat with STRIDE Category] -->|e.g., Tampering| B(STRIDE-to-CAPEC Mapping)
         B -->|Returns List of CAPEC IDs| C{CAPEC-to-ATT&CK Mapping}
         C -->|Returns List of Technique IDs| D[Potential ATT&CK Techniques]
 
@@ -398,7 +398,6 @@ This module provides actionable mitigation advice for the threats identified dur
         
         E --> I[HTML Report]
         H -->|Embedded in| I
-    end
     ```
 
 ### 4.10. Centralized Configuration (`config.py`)
