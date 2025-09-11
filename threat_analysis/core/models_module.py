@@ -21,14 +21,15 @@ from typing import List, Dict, Any, Optional, Tuple
 import logging
 from enum import Enum
 
-# Patch pytm.Boundary to ensure it has a 'protocol' attribute
-if not hasattr(Boundary, 'protocol'):
+# Patch pytm.Boundary to ensure it has all necessary custom attributes
+if not hasattr(Boundary, 'isTrusted'):
     original_boundary_init = Boundary.__init__
     def new_boundary_init(self, *args, **kwargs):
         original_boundary_init(self, *args, **kwargs)
         self.protocol = ""
         self.port = "" # Initialize port
         self.data = [] # Initialize data as a list
+        self.isTrusted = False # Default value
     Boundary.__init__ = new_boundary_init
 
 from .mitre_mapping_module import MitreMapping
@@ -38,13 +39,14 @@ from threat_analysis.custom_threats import get_custom_threats
 
 class CustomThreat:
     """A simple class to represent a custom threat."""
-    def __init__(self, name, description, stride_category, impact, likelihood, target):
+    def __init__(self, name, description, stride_category, impact, likelihood, target, capec_ids=None):
         self.name = name
         self.description = description
         self.stride_category = stride_category
         self.impact = impact
         self.likelihood = likelihood
         self.target = target
+        self.capec_ids = capec_ids or []
         self.severity_info = None # To store calculated severity
 
     def __str__(self):
@@ -76,7 +78,7 @@ class ThreatModel:
         }
         
         # MITRE ATT&CK Integration
-        self.mitre_mapper = MitreMapping(self)
+        self.mitre_mapper = MitreMapping(threat_model=self)
         self.mitre_analysis_results = {}
         self.threat_mitre_mapping = {}
         self.severity_calculator = SeverityCalculator() # Instantiate SeverityCalculator
@@ -275,7 +277,8 @@ class ThreatModel:
                     stride_category=threat_dict['stride_category'],
                     impact=threat_dict['impact'],
                     likelihood=threat_dict['likelihood'],
-                    target=target_obj
+                    target=target_obj,
+                    capec_ids=threat_dict.get('capec_ids')
                 )
                 # Calculate and store severity for custom threats
                 threat_type = custom_threat.stride_category

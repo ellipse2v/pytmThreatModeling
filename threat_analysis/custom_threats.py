@@ -11,40 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Custom Threat Generation Module
-
-This module defines a rule-based engine for generating threats based on the
-components and dataflows defined in a threat model. It uses a set of rules
-defined in `threat_rules.py` to identify potential threats.
-
-The `RuleBasedThreatGenerator` class is the core of this module, which
-iterates through the threat model's components (servers, dataflows, actors)
-and applies the corresponding rules to generate a list of threats.
-
-The threat generation logic for dataflows is particularly enhanced to be
-"boundary-aware", meaning it can generate specific threats for dataflows
-that cross between different network zones (e.g., from the internet to a DMZ).
-"""
 
 from .threat_rules import THREAT_RULES
-
-
-def _create_threat_dict(component_name, description, stride_category, impact, likelihood, mitigations=None):
-    """Creates a threat dictionary with a placeholder for the ID."""
-    return {
-        "component": component_name,
-        "description": description,
-        "stride_category": stride_category,
-        "impact": impact,
-        "likelihood": likelihood,
-        "mitigations": mitigations or [],
-    }
-
+import logging
 
 class RuleBasedThreatGenerator:
     """
-    A class to generate threats for a given threat model based on a set of rules.
+    A class to generate threats for a given threat model based on a set of expressive rules.
+    The engine can handle nested property checks (e.g., 'source.boundary.isTrusted').
     """
     def __init__(self, threat_model):
         self.threat_model = threat_model
@@ -52,137 +26,116 @@ class RuleBasedThreatGenerator:
         self.id_counter = 1
         self.rules = THREAT_RULES
 
-    def _add_threat(self, component_name, description, stride_category, impact, likelihood, mitigations=None):
-        """Adds a new threat to the list with a unique ID."""
-        threat = _create_threat_dict(component_name, description, stride_category, impact, likelihood, mitigations)
-        threat["id"] = self.id_counter
+    def _add_threat(self, component_name, description, stride_category, impact, likelihood, mitigations=None, capec_ids=None):
+        threat = {
+            "id": self.id_counter,
+            "component": component_name,
+            "description": description,
+            "stride_category": stride_category,
+            "impact": impact,
+            "likelihood": likelihood,
+            "mitigations": mitigations or [],
+            "capec_ids": capec_ids or []
+        }
         self.threats.append(threat)
         self.id_counter += 1
 
-    def _matches(self, component_properties, conditions):
+    def _get_property(self, component, key):
+        """Gets a property from a component, handling dot notation for nested objects."""
+        value = component
+        try:
+            for part in key.split('.'):
+                if isinstance(value, dict):
+                    value = value.get(part)
+                else:
+                    value = getattr(value, part, None)
+                if value is None:
+                    return None
+        except AttributeError:
+            return None
+        return value
+
+    def _matches(self, component, conditions):
         """
-        Checks if a component's properties match the given conditions.
-        This check is case-insensitive for string comparisons.
+        Checks if a component's properties match the given conditions, supporting dot notation
+        and special computed conditions.
         """
-        if not conditions:  # If conditions are empty, it's a match for any component
+        if not conditions:
             return True
-        for key, value in conditions.items():
-            prop_value = component_properties.get(key)
-            # Make string comparison case-insensitive
-            if isinstance(prop_value, str) and isinstance(value, str):
-                if prop_value.lower() != value.lower():
+
+        for key, expected_value in conditions.items():
+            # Handle special computed conditions first
+            if key == 'crosses_trust_boundary':
+                source_boundary = self._get_property(component, 'source.inBoundary')
+                sink_boundary = self._get_property(component, 'sink.inBoundary')
+                if not source_boundary or not sink_boundary:
+                    return False # Cannot determine if boundaries are crossed
+                
+                is_crossing = source_boundary.isTrusted != sink_boundary.isTrusted
+                if is_crossing != expected_value:
                     return False
-            elif prop_value != value:
+                continue # Move to the next condition
+
+            if key == 'contains_sensitive_data':
+                data_list = self._get_property(component, 'data')
+                if not isinstance(data_list, list):
+                    return False # Data is not in the expected list format
+                
+                has_sensitive = any(
+                    self._get_property(d, 'classification.name').lower() in ['secret', 'top_secret', 'sensitive'] 
+                    for d in data_list
+                )
+                if has_sensitive != expected_value:
+                    return False
+                continue # Move to the next condition
+
+            # Handle direct property lookups
+            prop_value = self._get_property(component, key)
+            
+            if hasattr(prop_value, 'name'):
+                prop_value = prop_value.name.lower()
+
+            if isinstance(prop_value, str) and isinstance(expected_value, str):
+                if prop_value.lower() != expected_value.lower():
+                    return False
+            elif prop_value != expected_value:
                 return False
         return True
 
     def generate_threats(self):
         """
-        Generates all threats for the threat model by applying rules.
+        Generates all threats for the threat model by applying rules to each component.
         """
-        self._generate_server_threats()
-        self._generate_dataflow_threats()
-        self._generate_actor_threats()
-        return self.threats
-
-    def _generate_server_threats(self):
-        """Generates threats for all servers based on rules."""
         for server_info in self.threat_model.servers:
             for rule in self.rules.get("servers", []):
                 if self._matches(server_info, rule["conditions"]):
                     for threat_template in rule["threats"]:
-                        self._add_threat(
-                            server_info['name'],
-                            threat_template["description"].format(name=server_info['name']),
-                            threat_template["stride_category"],
-                            threat_template["impact"],
-                            threat_template["likelihood"],
-                            threat_template.get("mitigations")
-                        )
+                        # Format description separately and pass other args via kwargs
+                        formatted_description = threat_template["description"].format(name=server_info['name'])
+                        threat_args = {k: v for k, v in threat_template.items() if k != 'description'}
+                        self._add_threat(server_info['name'], formatted_description, **threat_args)
 
-    def _generate_dataflow_threats(self):
-        """
-        Generates threats for all dataflows based on a set of rules.
-
-        This function iterates through each dataflow in the threat model and
-        evaluates a set of properties against the defined rules. The properties
-        include:
-        - is_encrypted: Whether the dataflow uses encryption.
-        - is_authenticated: Whether the dataflow is authenticated.
-        - contains_sensitive_data: Whether the flow contains PII.
-        - crosses_trust_boundary: A boolean indicating if the source and sink
-          are in different network boundaries.
-
-        Boundary-Aware Threat Generation:
-        The function specifically checks for the network boundaries of the
-        source and sink components (e.g., 'DMZ', 'Internal', 'Public').
-        These boundary names are passed as `source_boundary` and
-        `sink_boundary` properties. A value of `None` for a boundary
-        typically represents the public internet.
-
-        This allows for the creation of targeted threat rules in
-        `threat_rules.py` that apply only when data flows between specific
-        zones, such as from the internet to a DMZ, or from a DMZ to an
-        internal network.
-        """
         for flow in self.threat_model.dataflows:
-            contains_sensitive_data = False
-            if hasattr(flow, 'data') and flow.data:
-                for data_obj in flow.data:
-                    if hasattr(data_obj, 'classification') and data_obj.classification == 'pii':
-                        contains_sensitive_data = True
-                        break
-
-            source_boundary_name = None
-            if hasattr(flow.source, 'inBoundary') and flow.source.inBoundary:
-                source_boundary_name = flow.source.inBoundary.name
-
-            sink_boundary_name = None
-            if hasattr(flow.sink, 'inBoundary') and flow.sink.inBoundary:
-                sink_boundary_name = flow.sink.inBoundary.name
-
-            crosses_trust_boundary = source_boundary_name != sink_boundary_name
-
-            flow_properties = {
-                "is_encrypted": flow.is_encrypted,
-                "is_authenticated": flow.is_authenticated,
-                "contains_sensitive_data": contains_sensitive_data,
-                "crosses_trust_boundary": crosses_trust_boundary,
-                "source_boundary": source_boundary_name,
-                "sink_boundary": sink_boundary_name,
-            }
             for rule in self.rules.get("dataflows", []):
-                if self._matches(flow_properties, rule["conditions"]):
+                if self._matches(flow, rule["conditions"]):
                     for threat_template in rule["threats"]:
-                        self._add_threat(
-                            f"Flow from {flow.source.name} to {flow.sink.name}",
-                            threat_template["description"].format(source=flow.source, sink=flow.sink),
-                            threat_template["stride_category"],
-                            threat_template["impact"],
-                            threat_template["likelihood"],
-                            threat_template.get("mitigations")
-                        )
+                        formatted_description = threat_template["description"].format(source=flow.source, sink=flow.sink)
+                        threat_args = {k: v for k, v in threat_template.items() if k != 'description'}
+                        self._add_threat(f"Flow from {flow.source.name} to {flow.sink.name}", formatted_description, **threat_args)
 
-    def _generate_actor_threats(self):
-        """Generates threats for all actors based on rules."""
         for actor_info in self.threat_model.actors:
             for rule in self.rules.get("actors", []):
                 if self._matches(actor_info, rule["conditions"]):
                     for threat_template in rule["threats"]:
-                        self._add_threat(
-                            actor_info['name'],
-                            threat_template["description"].format(name=actor_info['name']),
-                            threat_template["stride_category"],
-                            threat_template["impact"],
-                            threat_template["likelihood"],
-                            threat_template.get("mitigations")
-                        )
-
+                        formatted_description = threat_template["description"].format(name=actor_info['name'])
+                        threat_args = {k: v for k, v in threat_template.items() if k != 'description'}
+                        self._add_threat(actor_info['name'], formatted_description, **threat_args)
+        
+        return self.threats
 
 def get_custom_threats(threat_model):
     """
-    Generates a list of threats based on the components in the threat model
-    using a rule-based engine.
+    Generates a list of threats based on the components in the threat model.
     """
     generator = RuleBasedThreatGenerator(threat_model)
     return generator.generate_threats()

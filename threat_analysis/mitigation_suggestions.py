@@ -24,6 +24,63 @@ import json
 import logging
 from pathlib import Path
 from typing import List, Dict, Any
+from collections import defaultdict
+from threat_analysis.core.data_loader import load_cis_to_mitre_mapping, load_nist_mappings
+
+# Define the path to the STIX data file
+STIX_DATA_FILE = Path(__file__).parent / 'external_data' / 'enterprise-attack.json'
+
+class MitigationStixMapper:
+    def __init__(self):
+        self.attack_to_mitigations_map = self._load_stix_mitigations()
+
+    def _load_stix_mitigations(self):
+        mitigations_map = {}
+        try:
+            with open(STIX_DATA_FILE, 'r', encoding='utf-8') as f:
+                stix_data = json.load(f)
+
+            # Extract mitigations and their relationships to techniques
+            objects = stix_data.get('objects', [])
+            
+            # First pass: collect all mitigations
+            mitigations = {}
+            for obj in objects:
+                if obj.get('type') == 'course-of-action':
+                    external_id = next((ref['external_id'] for ref in obj.get('external_references', []) if ref.get('source_name') == 'mitre-attack'), None)
+                    if external_id:
+                        mitigations[obj['id']] = {
+                            'id': external_id,
+                            'name': obj.get('name'),
+                            'description': obj.get('description'),
+                            'url': next((ref['url'] for ref in obj.get('external_references', []) if ref.get('source_name') == 'mitre-attack'), None)
+                        }
+            
+            # Second pass: map techniques to mitigations
+            for obj in objects:
+                if obj.get('type') == 'relationship' and obj.get('relationship_type') == 'mitigates':
+                    source_ref = obj.get('source_ref') # This is the mitigation (course-of-action)
+                    target_ref = obj.get('target_ref') # This is the technique (attack-pattern)
+
+                    if source_ref in mitigations:
+                        # Find the ATT&CK ID for the target_ref (technique)
+                        technique_obj = next((o for o in objects if o['id'] == target_ref and o.get('type') == 'attack-pattern'), None)
+                        if technique_obj:
+                            technique_external_id = next((ref['external_id'] for ref in technique_obj.get('external_references', []) if ref.get('source_name') == 'mitre-attack'), None)
+                            if technique_external_id:
+                                if technique_external_id not in mitigations_map:
+                                    mitigations_map[technique_external_id] = []
+                                mitigations_map[technique_external_id].append(mitigations[source_ref])
+
+        except FileNotFoundError:
+            logging.error(f"Error: STIX data file not found at {STIX_DATA_FILE}.")
+        except Exception as e:
+            logging.error(f"Error processing STIX data for mitigations: {e}")
+        
+        logging.info(f"Loaded {len(mitigations_map)} ATT&CK techniques with STIX mitigations.")
+        return mitigations_map
+
+logging.info("DEBUG: mitigation_suggestions.py loaded")
 
 # --- Framework-Specific Mitigations (Hardcoded) ---
 
@@ -41,24 +98,6 @@ FRAMEWORK_MITIGATION_MAP = {
             "description": "Validate that all user input is well-formed and matches the expected data type and format.",
             "framework": "OWASP ASVS",
             "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x13-V5-Validation-Sanitization-Encoding.md#v51-input-validation-requirements"
-        },
-        {
-            "name": "NIST SP 800-53 SI-10: Information Input Validation",
-            "description": "Ensure that inputs are validated to detect and filter malicious content at the application and network level.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/si/si-10/"
-        },
-        {
-            "name": "NIST SP 800-53 SA-11: Developer Testing and Evaluation",
-            "description": "Require developers to perform static and dynamic code analysis to identify vulnerabilities like injection.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/sa/sa-11/"
-        },
-        {
-            "name": "CIS Control 16.10: Web Application Firewalls",
-            "description": "Deploy and configure a Web Application Firewall (WAF) to inspect and filter traffic to public-facing web applications.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/application-software-security"
         }
     ],
     # T1059: Command and Scripting Interpreter (e.g., Command Injection)
@@ -68,18 +107,15 @@ FRAMEWORK_MITIGATION_MAP = {
             "description": "Avoid calling OS commands directly. If unavoidable, use structured APIs and ensure all user input is sanitized.",
             "framework": "OWASP ASVS",
             "url": "https://owasp.org/www-project-application-security-verification-standard/"
-        },
+        }
+    ],
+    # T1083: File and Directory Discovery
+    "T1083": [
         {
-            "name": "NIST SP 800-53 CM-7: Least Privilege",
-            "description": "Ensure that the application's execution context has the minimum level of privileges required, preventing broad system access from a single vulnerability.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/cm/cm-7/"
-        },
-        {
-            "name": "CIS Control 2.5: Limit Administrative Privileges",
-            "description": "Limit the use of administrative privileges to dedicated administrator accounts to reduce the impact of command injection.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/inventory-and-control-of-software-assets"
+            "name": "OWASP ASVS V14.1.2: Disable Directory Listing",
+            "description": "Verify that directory listing is disabled on web servers to prevent attackers from discovering sensitive files.",
+            "framework": "OWASP ASVS",
+            "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x21-V14-Configuration.md#v141-general-configuration-requirements"
         }
     ],
     # T1059.007: JavaScript (e.g., XSS)
@@ -95,18 +131,6 @@ FRAMEWORK_MITIGATION_MAP = {
             "description": "Apply contextual output encoding to all user-supplied data when it is rendered in HTML, JavaScript, CSS, or other contexts.",
             "framework": "OWASP ASVS",
             "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x13-V5-Validation-Sanitization-Encoding.md#v53-output-encoding-and-injection-prevention-requirements"
-        },
-        {
-            "name": "NIST SP 800-53 SI-10 (Enhancement 5): Restrict User-Supplied Content",
-            "description": "Restrict the use of user-supplied content and scripts, and validate or sanitize all such input before use.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/si/si-10/"
-        },
-        {
-            "name": "CIS Control 16.9: Use of Secure Libraries",
-            "description": "Use modern, secure libraries and frameworks (e.g., React, Angular) that have built-in XSS protection mechanisms.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/application-software-security"
         }
     ],
     # T1557: Adversary-in-the-Middle (e.g., weak TLS)
@@ -116,18 +140,6 @@ FRAMEWORK_MITIGATION_MAP = {
             "description": "Use strong, validated TLS protocols (TLS 1.2, TLS 1.3) and ciphers for all network communications.",
             "framework": "OWASP ASVS",
             "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x17-V9-Communications.md#v91-communication-security-requirements"
-        },
-        {
-            "name": "NIST SP 800-53 SC-13: Cryptographic Protection",
-            "description": "Implement cryptographic mechanisms to prevent unauthorized disclosure and modification of information during transmission.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/sc/sc-13/"
-        },
-        {
-            "name": "CIS Control 9.1: Ensure Only Secure Ports, Protocols, and Services Are Running",
-            "description": "Block or disable all ports and services that are not essential for business purposes, and ensure that all used protocols are secure.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/network-monitoring-and-defense"
         }
     ],
     # T1078: Valid Accounts (e.g., weak passwords)
@@ -137,24 +149,6 @@ FRAMEWORK_MITIGATION_MAP = {
             "description": "Enforce strong password policies, including length, complexity, and resistance to common passwords.",
             "framework": "OWASP ASVS",
             "url": "https://owasp.org/www-project-application-security-verification-standard/"
-        },
-        {
-            "name": "NIST SP 800-53 IA-5: Authenticator Management",
-            "description": "Manage authenticators by defining strong verification mechanisms and protecting them accordingly.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/ia/ia-5/"
-        },
-        {
-            "name": "NIST SP 800-53 IA-2: Identification and Authentication (Multi-Factor)",
-            "description": "Implement multi-factor authentication for access to privileged and non-privileged accounts.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/ia/ia-2/"
-        },
-        {
-            "name": "CIS Control 5.3: Disable Dormant Accounts",
-            "description": "Automatically disable accounts after a defined period of inactivity.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/account-management"
         }
     ],
     # T1110: Brute Force
@@ -170,18 +164,6 @@ FRAMEWORK_MITIGATION_MAP = {
             "description": "Use CAPTCHA or other automated threat detection mechanisms to prevent credential stuffing and brute-force attacks.",
             "framework": "OWASP ASVS",
             "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x11-V2-Authentication.md#v22-authenticator-lifecycle-requirements"
-        },
-        {
-            "name": "NIST SP 800-53 AC-7: Unsuccessful Logon Attempts",
-            "description": "Enforce a limit of consecutive unsuccessful logon attempts by a user during a specified time period.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/ac/ac-7/"
-        },
-        {
-            "name": "CIS Control 4.4: Implement and Manage a Firewall on Servers",
-            "description": "Implement a host-based firewall or port-filtering tool on servers to limit connections, which can help mitigate brute-force attempts.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/secure-configuration-of-enterprise-assets-and-software"
         }
     ],
     # T1068: Exploitation for Privilege Escalation
@@ -191,18 +173,6 @@ FRAMEWORK_MITIGATION_MAP = {
             "description": "Ensure a robust and well-designed access control mechanism is in place to prevent vertical and horizontal privilege escalation.",
             "framework": "OWASP ASVS",
             "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x10-V1-Architecture.md#v14-access-control-requirements"
-        },
-        {
-            "name": "NIST SP 800-53 SI-2: Flaw Remediation",
-            "description": "Identify, report, and correct system flaws and vulnerabilities in a timely manner through a robust patch management process.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/si/si-2/"
-        },
-        {
-            "name": "CIS Control 7: Continuous Vulnerability Management",
-            "description": "Develop a plan to continuously assess and track vulnerabilities to remediate them in a timely manner.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/continuous-vulnerability-management"
         }
     ],
     # T1499: Endpoint Denial of Service
@@ -212,40 +182,10 @@ FRAMEWORK_MITIGATION_MAP = {
             "description": "Implement rate limiting and resource controls on application endpoints to prevent resource exhaustion from a single user or source.",
             "framework": "OWASP ASVS",
             "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x20-V13-Malicious-Code.md#v132-denial-of-service-requirements"
-        },
-        {
-            "name": "NIST SP 800-53 CP-7: Contingency Planning",
-            "description": "Develop and implement a contingency plan for system availability, including measures to mitigate DoS attacks.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/cp/cp-7/"
-        },
-        {
-            "name": "CIS Control 12: Network Infrastructure Management",
-            "description": "Implement network infrastructure defenses, such as traffic filtering and rate limiting, to mitigate DoS attacks at the network layer.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/network-infrastructure-management"
         }
     ],
     # T1070: Indicator Removal on Host
     "T1070": [
-        {
-            "name": "NIST SP 800-53 AU-9: Protection of Audit Information",
-            "description": "Protect audit information and audit logging tools from unauthorized access, modification, and deletion.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/au/au-9/"
-        },
-        {
-            "name": "NIST SP 800-53 SI-7: Software, Firmware, and Information Integrity",
-            "description": "Implement integrity verification tools to detect unauthorized changes to software, firmware, and information.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/si/si-7/"
-        },
-        {
-            "name": "CIS Control 8: Audit Log Management",
-            "description": "Collect, alert, review, and retain audit logs of events that could help detect, understand, or recover from an attack. Ensure logs are sent to a centralized, protected repository.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/audit-log-management"
-        },
         {
             "name": "OWASP ASVS V7.1: Logging and Auditing",
             "description": "Ensure that all security-relevant events are logged in a way that is sufficient to trace suspicious or malicious activity.",
@@ -256,59 +196,14 @@ FRAMEWORK_MITIGATION_MAP = {
     # T1040: Network Sniffing
     "T1040": [
         {
-            "name": "NIST SP 800-53 SC-8: Transmission Confidentiality and Integrity",
-            "description": "Protect the confidentiality and integrity of transmitted information by using encryption (e.g., TLS, SSH, VPNs).",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/sc/sc-8/"
-        },
-        {
-            "name": "CIS Control 12: Network Infrastructure Management",
-            "description": "Implement network segmentation and filtering to limit an adversary's ability to capture traffic across different network segments.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/network-infrastructure-management"
-        },
-        {
             "name": "OWASP ASVS V9.1: Communication Security",
             "description": "Ensure all communication channels use strong, validated TLS with secure ciphers and configurations.",
             "framework": "OWASP ASVS",
             "url": "https://owasp.org/www-project-application-security-verification-standard/"
         }
     ],
-    # T1005: Data from Local System
-    "T1005": [
-        {
-            "name": "NIST SP 800-53 AC-3: Access Enforcement",
-            "description": "Enforce approved authorizations for logical access to information and system resources in accordance with applicable access control policies.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/ac/ac-3/"
-        },
-        {
-            "name": "NIST SP 800-53 SC-28: Protection of Information at Rest",
-            "description": "Protect the confidentiality and integrity of information at rest using mechanisms such as encryption.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/sc/sc-28/"
-        },
-        {
-            "name": "CIS Control 3: Data Protection",
-            "description": "Develop processes and technical controls to identify, classify, securely handle, retain, and dispose of data.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/data-protection"
-        }
-    ],
     # T1566: Phishing
     "T1566": [
-        {
-            "name": "NIST SP 800-53 AT-2: Security Awareness Training",
-            "description": "Provide security awareness training to all users on an ongoing basis to recognize and report phishing attempts.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/at/at-2/"
-        },
-        {
-            "name": "CIS Control 14: Security Awareness and Skills Training",
-            "description": "Establish and maintain a security awareness program to influence behavior among the workforce to be security-conscious.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/security-awareness-and-skills-training"
-        },
         {
             "name": "OWASP ASVS V2: Strong Authentication",
             "description": "Implement strong authentication (MFA, credential stuffing resistance) to mitigate the impact of phished credentials, as required by the ASVS V2 controls.",
@@ -319,105 +214,92 @@ FRAMEWORK_MITIGATION_MAP = {
     # T1562: Impair Defenses
     "T1562": [
         {
-            "name": "NIST SP 800-53 SC-8: Transmission Confidentiality and Integrity",
-            "description": "Protect the confidentiality and integrity of transmitted information by using encryption (e.g., TLS, SSH, VPNs).",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r4/sc/sc-8/"
-        },
-        {
-            "name": "NIST SP 800-53 SI-4: System Monitoring",
-            "description": "Monitor for unauthorized changes to security software, configurations, and critical system files. Alert on unexpected termination of security services.",
-            "framework": "NIST",
-            "url": "https://csf.tools/reference/nist-sp-800-53/r5/si/si-4/"
-        },
-        {
-            "name": "CIS Control 5: Access Control Management",
-            "description": "Use the principle of least privilege to ensure that user accounts do not have the necessary permissions to stop or alter security tools.",
-            "framework": "CIS",
-            "url": "https://www.cisecurity.org/controls/access-control-management"
-        },
-        {
             "name": "OWASP ASVS V7.1: Immutable and Protected Logs",
             "description": "Ensure the application generates audit logs for security-relevant events and that these logs are protected from tampering, which directly counters attempts to impair defenses.",
             "framework": "OWASP ASVS",
             "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x15-V7-Error-Logging.md#v71-logging-and-auditing-requirements"
         }
+    ],
+    # T1592: Gather Victim Host Information
+    "T1592": [
+        {
+            "name": "OWASP ASVS V1.1.1: Secure Software Development Lifecycle",
+            "description": "Verify that a secure software development lifecycle is in place, which includes security requirements, design, implementation, testing, and maintenance.",
+            "framework": "OWASP ASVS",
+            "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x10-V1-Architecture.md#v11-secure-software-development-lifecycle-requirements"
+        },
+        {
+            "name": "OWASP ASVS V7.4.1: Sensitive Information in Error Messages",
+            "description": "Verify that error messages or stack traces do not reveal sensitive information, such as internal paths, configuration details, or excessive personal data.",
+            "framework": "OWASP ASVS",
+            "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x15-V7-Error-Logging.md#v74-sensitive-information-requirements"
+        }
+    ],
+    # T1595: Active Scanning
+    "T1595": [
+        {
+            "name": "OWASP ASVS V14.2.1: Automated Vulnerability Scanning",
+            "description": "Verify that automated vulnerability scanning tools are used to identify vulnerabilities in the application and its dependencies.",
+            "framework": "OWASP ASVS",
+            "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x21-V14-Configuration.md#v142-dependency-and-third-party-component-requirements"
+        }
+    ],
+    # T1548: Abuse Elevation Control Mechanism
+    "T1548": [
+        {
+            "name": "OWASP ASVS V1.4.1: Access Control Design",
+            "description": "Ensure a robust and well-designed access control mechanism is in place to prevent vertical and horizontal privilege escalation.",
+            "framework": "OWASP ASVS",
+            "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x10-V1-Architecture.md#v14-access-control-requirements"
+        }
+    ],
+    # T1055: Process Injection
+    "T1055": [
+        {
+            "name": "OWASP ASVS V1.14.1: Process Injection Prevention",
+            "description": "Verify that the application is not vulnerable to process injection attacks.",
+            "framework": "OWASP ASVS",
+            "url": "https://github.com/OWASP/ASVS/blob/v4.0.3/4.0/en/0x10-V1-Architecture.md#v114-process-and-threading-requirements"
+        }
     ]
 }
 
-class MitigationStixMapper:
-    """Parses ATT&CK STIX data to map techniques to mitigations."""
-    def __init__(self, stix_data_path: Path):
-        self.stix_data_path = stix_data_path
-        self.attack_to_mitigations_map = self._build_mapping()
-
-    def _build_mapping(self) -> Dict[str, List[Dict[str, str]]]:
-        """Builds the mapping from ATT&CK techniques to mitigations."""
-        try:
-            with open(self.stix_data_path, 'r', encoding='utf-8') as f:
-                stix_data = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            logging.error(f"Failed to load or parse STIX data from {self.stix_data_path}: {e}")
-            return {}
-
-        objects = stix_data.get("objects", [])
-        
-        techniques_by_id = {obj['id']: obj for obj in objects if obj.get('type') == 'attack-pattern'}
-        mitigations_by_id = {obj['id']: obj for obj in objects if obj.get('type') == 'course-of-action'}
-
-        attack_map = {}
-
-        for obj in objects:
-            if obj.get('type') == 'relationship' and obj.get('relationship_type') == 'mitigates':
-                mitigation_id = obj.get('source_ref')
-                technique_id = obj.get('target_ref')
-
-                if technique_id in techniques_by_id and mitigation_id in mitigations_by_id:
-                    technique = techniques_by_id[technique_id]
-                    mitigation = mitigations_by_id[mitigation_id]
-
-                    attack_id = next((ref['external_id'] for ref in technique.get('external_references', []) if ref.get('source_name') == 'mitre-attack'), None)
-                    
-                    if attack_id:
-                        mitigation_info = {
-                            "id": mitigation.get('external_references', [{}])[0].get('external_id'),
-                            "name": mitigation.get('name'),
-                            "description": mitigation.get('description'),
-                            "url": mitigation.get('external_references', [{}])[0].get('url')
-                        }
-                        
-                        if attack_id not in attack_map:
-                            attack_map[attack_id] = []
-                        attack_map[attack_id].append(mitigation_info)
-
-        return attack_map
-
-    def get_suggestions(self, technique_ids: List[str]) -> List[Dict[str, str]]:
-        """Retrieves mitigation suggestions for a list of technique IDs."""
-        suggestions = []
-        for tech_id in technique_ids:
-            if tech_id in self.attack_to_mitigations_map:
-                suggestions.extend(self.attack_to_mitigations_map[tech_id])
-        return suggestions
-
-# --- Global Instances ---
-STIX_DATA_FILE = Path(__file__).parent / 'external_data' / 'enterprise-attack.json'
-mitigation_stix_mapper_instance = MitigationStixMapper(STIX_DATA_FILE)
-
-def get_stix_mitigation_suggestions(technique_ids: list[str]) -> list[dict]:
+def _create_mitre_to_cis_map() -> Dict[str, List[Dict[str, str]]]:
     """
-    Retrieves a list of STIX-based mitigation suggestions for the given MITRE ATT&CK
-    technique IDs using the global mapper instance.
+    Loads the CIS->MITRE mapping and inverts it to create a MITRE->CIS mapping.
     """
-    return mitigation_stix_mapper_instance.get_suggestions(technique_ids)
+    cis_to_mitre = load_cis_to_mitre_mapping()
+    mitre_to_cis = defaultdict(list)
+    for cis_id, data in cis_to_mitre.items():
+        cis_name = data.get("name", "")
+        cis_url = data.get("url", "https://www.cisecurity.org/controls/cis-controls-v8") # Use new URL
+        for technique_id in data.get("techniques", []):
+            # Avoid duplicates
+            if not any(d['id'] == cis_id for d in mitre_to_cis[technique_id]):
+                mitre_to_cis[technique_id].append({
+                    "id": cis_id,
+                    "name": f"CIS {cis_id}: {cis_name}",
+                    "url": cis_url,
+                    "framework": "CIS"
+                })
+    logging.info(f"Successfully created MITRE to CIS reverse map for {len(mitre_to_cis)} techniques.")
+    return mitre_to_cis
+
+# Load framework-specific mitigation maps
+MITRE_TO_CIS_MAP = _create_mitre_to_cis_map()
+NIST_MITIGATION_MAP = load_nist_mappings()
 
 def get_framework_mitigation_suggestions(technique_ids: list[str]) -> list[dict]:
     """
     Retrieves a list of framework-specific mitigation suggestions for the given
-    MITRE ATT&CK technique IDs from the hardcoded map.
+    MITRE ATT&CK technique IDs.
     """
     suggestions = []
     for tech_id in technique_ids:
         if tech_id in FRAMEWORK_MITIGATION_MAP:
             suggestions.extend(FRAMEWORK_MITIGATION_MAP[tech_id])
+        if tech_id in MITRE_TO_CIS_MAP:
+            suggestions.extend(MITRE_TO_CIS_MAP[tech_id])
+        if tech_id in NIST_MITIGATION_MAP:
+            suggestions.extend(NIST_MITIGATION_MAP[tech_id])
     return suggestions

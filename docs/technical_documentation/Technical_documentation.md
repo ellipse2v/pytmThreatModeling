@@ -95,6 +95,8 @@ The `ThreatModel` class is the heart of the framework, serving as the in-memory 
 
 -   **A Wrapper Around PyTM**: At its core, the `ThreatModel` class wraps a `pytm.TM` object. This allows the framework to leverage the foundational threat generation logic of the PyTM library while extending it with custom features, more detailed component attributes, and advanced analysis capabilities.
 
+-   **Self-Initialization of MitreMapping**: The `ThreatModel` class now self-initializes its `MitreMapping` instance. This simplifies the constructor of `ThreatModel` and centralizes the management of the `MitreMapping` dependency within the `ThreatModel` itself, improving modularity and testability.
+
 -   **Key Data Structures**: The class maintains several dictionaries and lists to manage the components of the threat model:
     -   `boundaries`, `actors`, `servers`, `dataflows`, `data_objects`: These collections store not just the `pytm` objects themselves, but also associated metadata defined in the Markdown DSL, such as custom properties, colors for diagramming, or links to sub-models.
     -   `protocol_styles`: A dictionary to store custom styling rules for dataflow protocols (e.g., making `HTTPS` flows appear as green solid lines and `HTTP` as red dashed lines in diagrams).
@@ -120,7 +122,7 @@ The `ThreatModel` class is the heart of the framework, serving as the in-memory 
 
 ### 4.3. Model Parsing and Validation
 
--   **`model_factory.py`**: The `create_threat_model` function acts as a centralized factory. It simplifies the creation process by encapsulating the instantiation of `ThreatModel`, `ModelParser`, and `ModelValidator`, ensuring a consistent and valid model is produced.
+-   **`model_factory.py`**: The `create_threat_model` function acts as a centralized factory. It simplifies the creation process by encapsulating the instantiation of `ThreatModel`, `ModelParser`, and `ModelValidator`, ensuring a consistent and valid model is produced. The `create_threat_model` function no longer takes `mitre_mapping` as an argument, as the `ThreatModel` now handles its own `MitreMapping` instance internally.
 -   **`model_parser.py`**: The `ModelParser` class is responsible for translating the Markdown DSL into the in-memory `ThreatModel` object.
     -   It employs a **two-pass parsing strategy**. The first pass processes element definitions (Boundaries, Actors, Servers, Data) to ensure all components exist before relationships are established. The second pass processes Dataflows and other configurations that reference these elements.
     -   The `_parse_key_value_params` method uses a regular expression to flexibly parse `key=value` attributes, handling quoted strings, booleans, and numbers.
@@ -230,7 +232,7 @@ The framework does not currently expose a direct `-ignore` parameter for `pytm`-
         ```
         This rule states: "If a dataflow is not encrypted AND uses the HTTP protocol, then generate an 'Information Disclosure' threat."
 
--   **`custom_threats.py`: The Engine Itself**: This module contains the `get_custom_threats` function which acts as the engine that interprets the rules.
+-   **`custom_threats.py`: The Engine Itself**: This module contains the `get_custom_threats` function which acts as the engine that interprets the rules. This module has been refactored to use a more robust property lookup mechanism (`_get_property`) that supports nested attributes (e.g., `source.inBoundary.isTrusted`), making the rule application more powerful and flexible.
     -   **`get_custom_threats(threat_model)`**: This function is the main entry point for the custom threat generation process. It takes the fully parsed `ThreatModel` object as input.
     -   **Iteration and Matching**: The function iterates through every component (server, dataflow, actor, etc.) in the `threat_model`. For each component, it retrieves the relevant rules from `THREAT_RULES` (based on the component's type). It then checks if the component's properties match all the `conditions` specified in a rule.
     -   **Boundary-Aware Logic**: A key feature of the engine is its ability to handle complex conditions, especially for dataflows. It can check the properties of the source and sink of a dataflow, including which boundary they are in. For example, a rule can be written to only trigger a threat if a dataflow crosses from an untrusted boundary (like the "Internet") to a trusted one (like the "Internal Network").
@@ -266,18 +268,20 @@ This is the most complex and critical module for enriching the raw threat data. 
 
 -   **`MitreMapping` Class**: The central class that orchestrates the entire enrichment pipeline.
     -   **Initialization**: When instantiated, it pre-loads and processes several external data sources to build its mapping tables:
-        -   `CAPEC_VIEW_ATT&CK_Related_Patterns.csv`: This file provides the crucial link between CAPEC (Common Attack Pattern Enumeration and Classification) and MITRE ATT&CK techniques. The module parses this to create a `capec_to_mitre_map`.
-        -   `stride_to_capec.json`: This file, generated by the `tooling/download_stride_mappings.py` script, maps each STRIDE category to a list of relevant CAPEC patterns.
+        -   `capec_to_mitre_structured_mapping.json`: This file provides the crucial link between CAPEC (Common Attack Pattern Enumeration and Classification) and MITRE ATT&CK techniques. The module parses this to create a `capec_to_mitre_map`.
+        -   `stride_to_capec.json`: This file maps each STRIDE category to a list of relevant CAPEC patterns.
         -   `d3fend.csv`: This file maps ATT&CK techniques to D3FEND countermeasures, providing defensive context.
+        -   `nist800-53-r5-mappings.xlsx`: This file maps ATT&CK techniques to NIST 800-53 R5 controls.
+        -   **`cis_to_mitre_mapping.json`**: This newly integrated file provides mappings from CIS Controls to MITRE ATT&CK techniques. It is generated by `tooling/cis_controls_parser.py` and includes the full name and a specific URL for each CIS control.
 
 -   **Automated Enrichment Pipeline**: The framework follows a systematic, multi-step process to map threats:
     1.  **STRIDE to CAPEC**: For a given threat, its STRIDE category (e.g., "Tampering") is used to look up a list of associated CAPEC patterns from the `stride_to_capec.json` data.
-    2.  **CAPEC to ATT&CK**: Each of a threat's associated CAPEC IDs is then used as a key in the `capec_to_mitre_map` (built from the `CAPEC_VIEW_ATT&CK_Related_Patterns.csv` file) to find a list of corresponding MITRE ATT&CK technique IDs.
+    2.  **CAPEC to ATT&CK**: Each of a threat's associated CAPEC IDs is then used as a key in the `capec_to_mitre_map` (built from the `capec_to_mitre_structured_mapping.json` file) to find a list of corresponding MITRE ATT&CK technique IDs.
     3.  **Description-Based Refinement (Secondary Mapping)**: In addition to the primary STRIDE-based mapping, the system also uses a set of regex patterns to find keywords directly within the threat's description (e.g., mapping the term "sql injection" directly to T1190). This acts as a secondary mechanism to catch highly specific threats or variations not covered by the broader STRIDE-to-CAPEC mapping.
     4.  **Aggregation and Uniqueness**: The techniques identified from both the primary (STRIDE-based) and secondary (description-based) mappings are combined, and duplicates are removed to produce a final, unique list of enriched MITRE ATT&CK techniques for the threat.
     5.  **D3FEND Countermeasures**: Finally, the identified ATT&CK techniques are cross-referenced with the D3FEND data to attach relevant countermeasures and mitigations.
-
-This chained approach ensures that the threat analysis is not based on simple keyword matching alone, but is grounded in the structured relationships between STRIDE, CAPEC, and ATT&CK, providing a more accurate and context-rich analysis.
+    6.  **NIST Controls**: The identified ATT&CK techniques are also cross-referenced with the NIST data to attach relevant NIST 800-53 R5 controls.
+    7.  **CIS Controls**: The identified ATT&CK techniques are now also cross-referenced with the `cis_to_mitre_mapping.json` data to attach relevant CIS Controls.
 
 ```mermaid
 graph TD
@@ -319,7 +323,8 @@ The `SeverityCalculator` provides a nuanced risk score for each threat.
     -   It calls the `dot` command-line tool to render the DOT code into SVG, PNG, or other formats.
     -   **Navigable Diagrams**: For hierarchical projects, it makes diagrams navigable by post-processing the SVG. The `add_links_to_svg` function uses Python's `xml.etree.ElementTree` to find SVG nodes corresponding to elements with a `submodel` property and wraps them in an `<a>` hyperlink tag pointing to the sub-model's diagram.
 -   **`report_generator.py`**: Creates the primary user-facing artifacts.
-    -   It uses Jinja2 templates (`report_template.html`, `navigable_diagram_template.html`) for generating rich HTML outputs.
+    -   It uses Jinja2 templates (`report_template.html`, `navigable_diagram_template.html`) for generating rich HTML outputs. The `report_template.html` is responsible for rendering all threat details, including the various types of mitigations (MITRE, D3FEND, CIS, etc.) associated with each identified ATT&CK technique. The template uses unique boolean variables for each mitigation type (e.g., `mitre_mitigations_found`, `d3fend_mitigations_found`) to correctly display a "No specific mitigations found" message when appropriate.
+    -   **Consistent MitreMapping Usage**: The `ReportGenerator` now consistently uses its `self.mitre_mapping` instance for all mapping operations, removing redundant `mitre_mapping` arguments from its internal methods. This improves consistency and reduces potential for errors.
     -   **Hierarchical Project Generation**: The `generate_project_reports` method orchestrates the analysis of complex, multi-part systems.
         -   It starts from a root `main.md` file and recursively discovers all `model.md` files referenced in `submodel:` properties of servers.
         -   Before generation, it aggregates all protocol definitions and styles from every model in the project to create a single, consistent legend for all diagrams.
@@ -361,7 +366,7 @@ graph TD
     -   `/`: Serves the main `web_interface.html`.
     -   `/api/update`: Receives Markdown from the editor, triggers a live analysis, and returns the resulting SVG diagram and legend.
     -   `/api/export` & `/api/export_all`: Handle requests to download the generated artifacts.
--   **`threat_model_service.py`**: This service layer acts as a bridge between the web server and the core analysis engine. It encapsulates the logic for handling web requests, calling the appropriate framework components, and managing temporary files, keeping the Flask app clean and focused on routing.
+-   **`threat_model_service.py`**: This service layer acts as a bridge between the web server and the core analysis engine. It encapsulates the logic for handling web requests, calling the appropriate framework components, and managing temporary files, keeping the Flask app clean and focused on routing. It has been updated to align with the new `create_threat_model` signature, removing the `mitre_mapping` argument from its calls.
 
 ### 4.9. Mitigation Suggestions (`mitigation_suggestions.py`)
 
@@ -371,28 +376,22 @@ This module provides actionable mitigation advice for the threats identified dur
     -   A new script, `tooling/download_attack_data.py`, has been added to the project. This script is responsible for downloading the `enterprise-attack.json` file from the official [MITRE attack-stix-data GitHub repository](https://github.com/mitre-attack/attack-stix-data).
     -   This ensures that the mitigation suggestions are always based on the latest, most accurate data provided by MITRE.
 
--   **`MitigationMapper` Class**: This class is the new core of the module.
-    -   **Initialization**: When the application starts, an instance of `MitigationMapper` is created. It loads and parses the `enterprise-attack.json` file.
-    -   **STIX Parsing**: The mapper processes the array of STIX Domain Objects (SDOs) in the JSON file. It specifically looks for:
-        1.  `attack-pattern` objects, which represent the ATT&CK techniques.
-        2.  `course-of-action` objects, which represent the official mitigations.
-        3.  `relationship` objects with a `relationship_type` of `mitigates`. These objects link a `course-of-action` (source) to an `attack-pattern` (target).
-    -   **Mapping Construction**: By processing these relationships, the class builds a comprehensive in-memory map where each ATT&CK Technique ID (e.g., "T1070") is a key, and the value is a list of detailed mitigation objects.
+-   **`_create_mitre_to_cis_map` Function**: This new function is responsible for inverting the CIS-to-MITRE mapping loaded from `cis_to_mitre_mapping.json`. It creates a reverse map from MITRE ATT&CK Technique IDs to relevant CIS Controls, including their full names and specific documentation URLs. This replaces previous hardcoded or Excel-based CIS mappings.
 
--   **`get_mitigation_suggestions()` Function**: This is the primary function exposed by the module.
+-   **`get_framework_mitigation_suggestions()` Function**: This is the primary function exposed by the module.
     -   It takes a list of ATT&CK technique IDs (extracted from the threats during the report generation phase).
-    -   It queries the `MitigationMapper`'s internal map to find all corresponding `course-of-action` objects.
-    -   The details of these mitigations (name, description, official URL) are then embedded directly into the final HTML report, providing a clear and authoritative link from a detected vulnerability to a set of actionable remediation steps.
+    -   It now leverages the `MITRE_TO_CIS_MAP` (generated by `_create_mitre_to_cis_map`) to provide CIS control suggestions.
+    -   The `FRAMEWORK_MITIGATION_MAP` has been updated with more relevant OWASP ASVS entries, particularly for Information Disclosure threats, ensuring more comprehensive and accurate mitigation advice.
 
 -   **Architecture Flow**:
     ```mermaid
     graph TD
         A[tooling/download_attack_data.py] -->|Downloads| B(enterprise-attack.json)
-        C[MitigationMapper Class] -->|Loads & Parses| B
+        C[MitigationStixMapper Class] -->|Loads & Parses| B
         C -->|Builds| D{Technique-to-Mitigation Map}
 
         E[Threat with Mapped ATT&CK IDs] -->|Extracts IDs| F(List of Technique IDs)
-        F -->|Calls| G[get_mitigation_suggestions function]
+        F -->|Calls| G[get_framework_mitigation_suggestions function]
         G -->|Queries| D
         D -->|Returns| H[List of Mitigation Objects]
         
@@ -416,7 +415,7 @@ The framework is designed to be extensible through a dedicated Infrastructure as
 -   **Abstract Base Class**: The `iac_plugins/__init__.py` file defines an abstract base class called `IaCPlugin`. To create a new plugin, a developer must create a class that inherits from `IaCPlugin`.
 -   **Required Implementations**: Any new plugin must implement three key methods:
     1.  `name`: Returns the name of the plugin (e.g., "ansible").
-    2.  `parse_iac_config()`: Contains the logic to parse the IaC source files (e.g., playbooks, Terraform state).
+    2.  `parse_iac_config()`: Contains the logic to parse the IaC source files (e.g., playbooks, Terraform `.tf` files).
     3.  `generate_threat_model_components()`: Contains the logic to convert the parsed data into the Markdown DSL format used by the framework.
 -   **Dynamic Loading**: The main entrypoint (`__main__.py`) automatically discovers and loads any valid plugin placed in the `iac_plugins` directory. It also dynamically creates command-line arguments based on the plugin's name (e.g., `--ansible-path`).
 
@@ -509,6 +508,31 @@ This module is responsible for generating visual, end-to-end attack scenarios ba
     -   The final node in the chain is a conceptual `asset` representing the adversary's objective, derived from the STRIDE category of the final threat (e.g., "Impact: Tampering").
     -   The resulting flow visually communicates a clear narrative: `(Action 1) -> (targets Asset A) -> (enabling Action 2) -> (targets Asset B) -> ... -> (achieves Impact)`.
 -   **Asset Name Resolution**: Uses dedicated helper methods (`_get_target_name`, `_extract_name_from_object`) to accurately resolve asset names from raw `pytm` objects, ensuring human-readable labels in the generated attack flows.
--   **Output**:
-    -   The generator creates a new subdirectory, `afb/`, inside the main timestamped output folder.
-    -   Inside this directory, it saves one `.afb` file for each optimized path, named descriptively (e.g., `optimized_path_Tampering.afb`).
+
+### 5. Tooling and Data Maintenance
+
+The framework relies on external data from MITRE ATT&CK, CAPEC, and other sources to enrich its threat analysis. The `tooling/` directory contains several scripts to download, validate, and maintain this data.
+
+### 5.1. `download_attack_data.py`
+
+-   **Purpose**: This script downloads the official MITRE ATT&CK enterprise dataset.
+-   **Function**: It fetches the `enterprise-attack.json` file from the official [MITRE attack-stix-data GitHub repository](https://github.com/mitre-attack/attack-stix-data). This file contains the full knowledge base of ATT&CK techniques, tactics, and, most importantly, mitigations.
+-   **Usage**: The `MitigationMapper` class in `mitigation_suggestions.py` uses this file to map identified ATT&CK techniques to their corresponding `course-of-action` mitigations, ensuring that the mitigation advice provided in the reports is always up-to-date with MITRE's official recommendations.
+
+### 5.2. `download_nist_data.py`
+
+-   **Purpose**: This script downloads the NIST 800-53 R5 mappings.
+-   **Function**: It fetches the `nist800-53-r5-mappings.xlsx` file from the [center-for-threat-informed-defense/attack-control-framework-mappings](https://github.com/center-for-threat-informed-defense/attack-control-framework-mappings) repository.
+-   **Usage**: The `load_nist_mappings` function in `threat_analysis/core/data_loader.py` uses this file to load the NIST mappings. This allows the tool to work offline once the file is downloaded.
+
+### 5.3. `capec_to_mitre_builder.py`
+
+-   **Purpose**: To build the `capec_to_mitre_structured_mapping.json` file.
+-   **Function**: This script parses the `CAPEC_VIEW_ATT&CK_Related_Patterns.csv` file and the `enterprise-attack.json` file to build a structured mapping between CAPEC and MITRE ATT&CK techniques.
+-   **Output**: The script generates the `capec_to_mitre_structured_mapping.json` file, which is a critical input for the `MitreMapping` module.
+
+### 5.4. `cis_controls_parser.py`
+
+-   **Purpose**: To generate the `cis_to_mitre_mapping.json` file.
+-   **Function**: This script parses the `CIS_Controls_v8_to_Enterprise_ATTCK_v82_Master_Mapping__5262021.xlsx` Excel file. It extracts CIS Control IDs, their full names, and associated MITRE ATT&CK Technique IDs. It also constructs specific documentation URLs for each CIS control based on a defined pattern.
+-   **Output**: The script generates the `cis_to_mitre_mapping.json` file, which is a critical input for the `MitreMapping` module and the `mitigation_suggestions.py` module.

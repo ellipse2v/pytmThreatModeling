@@ -41,6 +41,7 @@ from threat_analysis.utils import _validate_path_within_project
 from threat_analysis.server.server import run_gui
 from threat_analysis.core.model_validator import ModelValidator
 
+
 # Add project root to sys.path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
@@ -50,12 +51,13 @@ class ThreatAnalysisFramework:
     """Main framework for threat analysis"""
 
     def __init__(
-        self, markdown_content: str, model_name: str, model_description: str
+        self, markdown_content: str, model_name: str, model_description: str, model_file_path: str
     ):
         """Initializes the analysis framework"""
         self.markdown_content = markdown_content
         self.model_name = model_name
         self.model_description = model_description
+        self.model_file_path = model_file_path
 
         # --- Output path management ---
         self.output_base_dir = config.OUTPUT_BASE_DIR
@@ -83,7 +85,7 @@ class ThreatAnalysisFramework:
         # --- End of output path management ---
 
         # Component initialization
-        self.mitre_mapping = MitreMapping()
+        self.mitre_mapper = MitreMapping(threat_model_path=self.model_file_path)
         self.threat_model = self._load_and_validate_model(self.markdown_content)
         if not self.threat_model:
             sys.exit(1)  # Exit if model loading fails
@@ -92,7 +94,7 @@ class ThreatAnalysisFramework:
             markdown_file_path=config.DEFAULT_MODEL_FILEPATH # Keep this for now, will adjust later if needed
         )
         self.report_generator = ReportGenerator(
-            self.severity_calculator, self.mitre_mapping
+            self.severity_calculator, self.mitre_mapper # Use the mitre_mapper from the threat_model
         )
         self.diagram_generator = DiagramGenerator()
 
@@ -125,7 +127,6 @@ class ThreatAnalysisFramework:
                 markdown_content=markdown_content,
                 model_name=self.model_name,
                 model_description=self.model_description,
-                mitre_mapping=self.mitre_mapping,
                 validate=True,
             )
 
@@ -381,6 +382,7 @@ def run_single_analysis(args: argparse.Namespace, loaded_iac_plugins: Dict[str, 
     markdown_content_for_analysis = ""
     iac_plugin_used = False
     iac_input_filename = ""
+    base_model_filepath = None # Initialize to None
 
     # Check for IaC plugin arguments
     for plugin_name, plugin_instance in loaded_iac_plugins.items():
@@ -433,6 +435,7 @@ def run_single_analysis(args: argparse.Namespace, loaded_iac_plugins: Dict[str, 
             with open(output_model_filepath, "w", encoding="utf-8") as f:
                 f.write(markdown_content_for_analysis)
             logging.info(f"Generated IaC threat model written to: {output_model_filepath}")
+            base_model_filepath = output_model_filepath # Assign here
         except Exception as e:
             logging.error(f"❌ Error writing generated IaC model to {output_model_filepath}: {e}")
             sys.exit(1)
@@ -442,6 +445,7 @@ def run_single_analysis(args: argparse.Namespace, loaded_iac_plugins: Dict[str, 
         markdown_content=markdown_content_for_analysis,
         model_name=config.DEFAULT_MODEL_NAME,
         model_description=config.DEFAULT_MODEL_DESCRIPTION,
+        model_file_path=str(base_model_filepath)
     )
 
     threats = framework.run_analysis()
@@ -532,7 +536,7 @@ if __name__ == "__main__":
         output_dir.mkdir(parents=True, exist_ok=True)
 
         severity_calculator = SeverityCalculator(markdown_file_path=str(project_path / "main.md"))
-        mitre_mapping = MitreMapping()
+        mitre_mapping = MitreMapping(threat_model_path=str(project_path / "main.md"))
         report_generator = ReportGenerator(severity_calculator, mitre_mapping)
         project_threat_model = report_generator.generate_project_reports(project_path, output_dir)
 

@@ -486,6 +486,17 @@
             font-size: 1.125rem;
         }
 
+        .implemented-mitigation {
+            background-color: #d4edda; /* A light green color */
+            border-left: 3px solid #28a745; /* A darker green border */
+            padding-left: 5px;
+            border-radius: 3px;
+        }
+        .implemented-mitigation a {
+            font-weight: bold;
+            color: #155724; /* Darker green text for contrast */
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -567,6 +578,10 @@
             <p style="white-space: pre-wrap; margin: 0;">{{ severity_calculation_note }}</p>
         </div>
 
+        <div class="card explanation-card" style="margin-top: 2rem;">
+            <p><b>Legend:</b><br>  * : Indicates a CAPEC mapping was manually added to improve relevance.</p>
+        </div>
+
         {% if not all_threats %}
         <div class="card">
             <div class="no-threats">
@@ -631,49 +646,104 @@
                             <td>
                                 <div class="scrollable-cell">
                                     <ul>
-                                    {% for tech in threat.mitre_techniques if tech.mitre_mitigations %}
+                                    {% set all_mitre_mitigations = [] %}
+                                    {% for tech in threat.mitre_techniques %}
                                         {% for mitigation in tech.mitre_mitigations %}
-                                        <li><a href="https://attack.mitre.org/mitigations/{{ mitigation.id }}" target="_blank" class="mitre-link">{{ mitigation.id }}: {{ mitigation.name }}</a></li>
+                                            {% do all_mitre_mitigations.append(mitigation) %}
                                         {% endfor %}
                                     {% endfor %}
+
+                                    {% if all_mitre_mitigations %}
+                                        {% for mitigation in all_mitre_mitigations %}
+                                            <li {% if mitigation.id in implemented_mitigation_ids %}class="implemented-mitigation"{% endif %}>
+                                                <a href="https://attack.mitre.org/mitigations/{{ mitigation.id }}" target="_blank" class="mitre-link">{{ mitigation.id }}: {{ mitigation.name }}</a>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li>No specific MITRE mitigations found.</li>
+                                    {% endif %}
                                     </ul>
                                 </div>
                             </td>
                             <td>
                                 <div class="scrollable-cell">
                                     <ul>
-                                    {% for tech in threat.mitre_techniques if tech.defend_mitigations %}
+                                    {% set all_defend_mitigations = [] %}
+                                    {% for tech in threat.mitre_techniques %}
                                         {% for mitigation in tech.defend_mitigations %}
-                                        <li><a href="https://d3fend.mitre.org/technique/d3f:{{ mitigation.url_friendly_name }}" target="_blank" class="mitre-link">{{ mitigation.id }}: {{ mitigation.description }}</a></li>
+                                            {% do all_defend_mitigations.append(mitigation) %}
                                         {% endfor %}
                                     {% endfor %}
+
+                                    {% if all_defend_mitigations %}
+                                        {% for mitigation in all_defend_mitigations %}
+                                            {% if mitigation.id %}
+                                            <li><a href="https://d3fend.mitre.org/technique/d3f:{{ mitigation.url_friendly_name }}" target="_blank" class="mitre-link">{{ mitigation.id }}: {{ mitigation.description }}</a></li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        <li>No specific D3FEND mitigations found.</li>
+                                    {% endif %}
                                     </ul>
                                 </div>
                             </td>
                             <td>
                                 <div class="scrollable-cell">
                                     <ul>
-                                    {% for mitigation in threat.cis_mitigations %}
-                                        <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                                    {% set all_cis_mitigations = [] %}
+                                    {% for tech in threat.mitre_techniques %}
+                                        {% for mitigation in tech.cis_mitigations %}
+                                            {% do all_cis_mitigations.append(mitigation) %}
+                                        {% endfor %}
                                     {% endfor %}
+
+                                    {% if all_cis_mitigations %}
+                                        {% for mitigation in all_cis_mitigations %}
+                                            <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li>No specific CIS mitigations found.</li>
+                                    {% endif %}
                                     </ul>
                                 </div>
                             </td>
                             <td>
                                 <div class="scrollable-cell">
                                     <ul>
-                                    {% for mitigation in threat.nist_mitigations %}
-                                        <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                                    {% set all_nist_mitigations = [] %}
+                                    {% for tech in threat.mitre_techniques %}
+                                        {% for mitigation in tech.nist_mitigations %}
+                                            {% do all_nist_mitigations.append(mitigation) %}
+                                        {% endfor %}
                                     {% endfor %}
+
+                                    {% if all_nist_mitigations %}
+                                        {% for mitigation in all_nist_mitigations %}
+                                            <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li>No specific NIST mitigations found.</li>
+                                    {% endif %}
                                     </ul>
                                 </div>
                             </td>
                             <td>
                                 <div class="scrollable-cell">
                                     <ul>
-                                    {% for mitigation in threat.owasp_mitigations %}
-                                        <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                                    {% set all_owasp_mitigations = [] %}
+                                    {% for tech in threat.mitre_techniques %}
+                                        {% for mitigation in tech.owasp_mitigations %}
+                                            {% do all_owasp_mitigations.append(mitigation) %}
+                                        {% endfor %}
                                     {% endfor %}
+
+                                    {% if all_owasp_mitigations %}
+                                        {% for mitigation in all_owasp_mitigations %}
+                                            <li><a href="{{ mitigation.url }}" target="_blank" class="mitre-link">{{ mitigation.name }}</a></li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li>No specific OWASP mitigations found.</li>
+                                    {% endif %}
                                     </ul>
                                 </div>
                             </td>

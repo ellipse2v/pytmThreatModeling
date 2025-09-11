@@ -1,0 +1,5 @@
+# Add the IDs of the MITRE mitigations you have implemented here, one per line.
+# Exemple :
+# M1013
+# M1015
+M1052

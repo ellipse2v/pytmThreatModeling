@@ -1,0 +1,3035 @@
+[
+    {
+        "capec_id": "CAPEC-1",
+        "name": "Accessing Functionality Not Properly Constrained by ACLs",
+        "url": "https://capec.mitre.org/data/definitions/1.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow: ServicesFile Permissions Weakness",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-11",
+        "name": "Cause Web Server Misclassification",
+        "url": "https://capec.mitre.org/data/definitions/11.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1036",
+                "name": "Masquerading: Space after Filename",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-112",
+        "name": "Brute Force",
+        "url": "https://capec.mitre.org/data/definitions/112.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1110",
+                "name": "Brute Force",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-114",
+        "name": "Authentication Abuse",
+        "url": "https://capec.mitre.org/data/definitions/114.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1548",
+                "name": "Abuse Elevation Control Mechanism",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-115",
+        "name": "Authentication Bypass",
+        "url": "https://capec.mitre.org/data/definitions/115.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1548",
+                "name": "Abuse Elevation Control Mechanism",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-122",
+        "name": "Privilege Abuse",
+        "url": "https://capec.mitre.org/data/definitions/122.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1548",
+                "name": "Abuse Elevation Control Mechanism",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-125",
+        "name": "Flooding",
+        "url": "https://capec.mitre.org/data/definitions/125.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-127",
+        "name": "Directory Indexing",
+        "url": "https://capec.mitre.org/data/definitions/127.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1083",
+                "name": "File and Directory Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-13",
+        "name": "Subverting Environment Variable Values",
+        "url": "https://capec.mitre.org/data/definitions/13.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1562",
+                "name": "Impair Defenses:Impair Command History Logging",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow:Dynamic Linker Hijacking",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow:Path Interception by PATH Environment Variable",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-130",
+        "name": "Excessive Allocation",
+        "url": "https://capec.mitre.org/data/definitions/130.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service:Application Exhaustion Flood",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-131",
+        "name": "Resource Leak Exposure",
+        "url": "https://capec.mitre.org/data/definitions/131.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-132",
+        "name": "Symlink Attack",
+        "url": "https://capec.mitre.org/data/definitions/132.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1547",
+                "name": "Boot or Logon Autostart Execution:Shortcut Modification",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-141",
+        "name": "Cache Poisoning",
+        "url": "https://capec.mitre.org/data/definitions/141.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1557",
+                "name": "Adversary-in-the-Middle: ARP Cache Poisoning",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-142",
+        "name": "DNS Cache Poisoning",
+        "url": "https://capec.mitre.org/data/definitions/142.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1584",
+                "name": "Compromise Infrastructure: DNS Server",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-148",
+        "name": "Content Spoofing",
+        "url": "https://capec.mitre.org/data/definitions/148.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1491",
+                "name": "Defacement",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-150",
+        "name": "Collect Data from Common Resource Locations",
+        "url": "https://capec.mitre.org/data/definitions/150.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1003",
+                "name": "OS Credential Dumping",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1119",
+                "name": "Automated Collection",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1213",
+                "name": "Data from Information Repositories",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1530",
+                "name": "Data from Cloud Storage Object",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1555",
+                "name": "Credentials from Password Stores",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1602",
+                "name": "Data from Configuration Repository",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-158",
+        "name": "Sniffing Network Traffic",
+        "url": "https://capec.mitre.org/data/definitions/158.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1040",
+                "name": "Network Sniffing",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1111",
+                "name": "Multi-Factor Authentication Interception",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-159",
+        "name": "Redirect Access to Libraries",
+        "url": "https://capec.mitre.org/data/definitions/159.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow:Path Interception by Search Order Hijacking",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-163",
+        "name": "Spear Phishing",
+        "url": "https://capec.mitre.org/data/definitions/163.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1534",
+                "name": "Internal Spearfishing",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-165",
+        "name": "File Manipulation",
+        "url": "https://capec.mitre.org/data/definitions/165.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1036",
+                "name": "Masquerading: Rename System Utilities",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-169",
+        "name": "Footprinting",
+        "url": "https://capec.mitre.org/data/definitions/169.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1217",
+                "name": "Browser Bookmark Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1592",
+                "name": "Gather Victim Host Information",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1595",
+                "name": "Active Scanning",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-17",
+        "name": "Using Malicious Files",
+        "url": "https://capec.mitre.org/data/definitions/17.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow: Executable Installer File Permissions Weakness",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow: Services File Permissions Weakness",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-177",
+        "name": "Create files with the same name as files protected with a higher classification",
+        "url": "https://capec.mitre.org/data/definitions/177.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1036",
+                "name": "Masquerading",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-180",
+        "name": "Exploiting Incorrectly Configured Access Control Security Levels",
+        "url": "https://capec.mitre.org/data/definitions/180.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow: Services File Permissions Weaknesses",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-186",
+        "name": "Malicious Software Update",
+        "url": "https://capec.mitre.org/data/definitions/186.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-187",
+        "name": "Malicious Automated Software Update via Redirection",
+        "url": "https://capec.mitre.org/data/definitions/187.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1072",
+                "name": "Software Deployment Tools",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-19",
+        "name": "Embedding Scripts within Scripts",
+        "url": "https://capec.mitre.org/data/definitions/19.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1027",
+                "name": "Obfuscated Files or Information:\u00a0Embedded Payloads",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1546",
+                "name": "Event Triggered Execution:.bash_profile and .bashrc",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1546",
+                "name": "Event Triggered Execution:\u00a0Installer Packages",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-191",
+        "name": "Read Sensitive Constants Within an Executable",
+        "url": "https://capec.mitre.org/data/definitions/191.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1552",
+                "name": "Unsecured Credentials:Credentials in files",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-196",
+        "name": "Session Credential Falsification through Forging",
+        "url": "https://capec.mitre.org/data/definitions/196.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1606",
+                "name": "Forge Web Credentials",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-2",
+        "name": "Inducing Account Lockout",
+        "url": "https://capec.mitre.org/data/definitions/2.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1531",
+                "name": "Account Access Removal",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-203",
+        "name": "Manipulate Registry Information",
+        "url": "https://capec.mitre.org/data/definitions/203.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1112",
+                "name": "Modify Registry",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1647",
+                "name": "Plist Modification",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-204",
+        "name": "Lifting Sensitive Data Embedded in Cache",
+        "url": "https://capec.mitre.org/data/definitions/204.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1005",
+                "name": "Data from Local System",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-206",
+        "name": "Signing Malicious Code",
+        "url": "https://capec.mitre.org/data/definitions/206.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1553",
+                "name": "Subvert Trust Controls:Code Signing",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-21",
+        "name": "Exploitation of Trusted Identifiers",
+        "url": "https://capec.mitre.org/data/definitions/21.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1134",
+                "name": "Access Token Manipulation",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1528",
+                "name": "Steal Application Access Token",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1539",
+                "name": "Steal Web Session Cookie",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-227",
+        "name": "Sustained Client Engagement",
+        "url": "https://capec.mitre.org/data/definitions/227.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-233",
+        "name": "Privilege Escalation",
+        "url": "https://capec.mitre.org/data/definitions/233.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1548",
+                "name": "Abuse Elevation Control Mechanism",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-25",
+        "name": "Forced Deadlock",
+        "url": "https://capec.mitre.org/data/definitions/25.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service: Application or System Exploitation",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-251",
+        "name": "Local Code Inclusion",
+        "url": "https://capec.mitre.org/data/definitions/251.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1055",
+                "name": "Process Injection",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-267",
+        "name": "Leverage Alternate Encoding",
+        "url": "https://capec.mitre.org/data/definitions/267.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1027",
+                "name": "Obfuscated Files or Information",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-268",
+        "name": "Audit Log Manipulation",
+        "url": "https://capec.mitre.org/data/definitions/268.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1070",
+                "name": "Indicator Removal on Host",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-270",
+        "name": "Modification of Registry Run Keys",
+        "url": "https://capec.mitre.org/data/definitions/270.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1547",
+                "name": "Boot or Logon Autostart Execution: Registry Run Keys / Start Folder",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1547",
+                "name": "Boot or Logon Autostart Execution: Active",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-292",
+        "name": "Host Discovery",
+        "url": "https://capec.mitre.org/data/definitions/292.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1018",
+                "name": "Remote System Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-295",
+        "name": "Timestamp Request",
+        "url": "https://capec.mitre.org/data/definitions/295.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1124",
+                "name": "System Time Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-30",
+        "name": "Hijacking a Privileged Thread of Execution",
+        "url": "https://capec.mitre.org/data/definitions/30.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1055",
+                "name": "Process Injection: Thread Execution Hijacking",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-300",
+        "name": "Port Scanning",
+        "url": "https://capec.mitre.org/data/definitions/300.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1046",
+                "name": "Network Service Scanning",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-309",
+        "name": "Network Topology Mapping",
+        "url": "https://capec.mitre.org/data/definitions/309.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1016",
+                "name": "System Network Configuration Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1049",
+                "name": "System Network Connections Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1590",
+                "name": "Gather Victim Network Information",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-31",
+        "name": "Accessing/Intercepting/Modifying HTTP Cookies",
+        "url": "https://capec.mitre.org/data/definitions/31.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1539",
+                "name": "Steal Web Session Cookie",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-312",
+        "name": "Active OS Fingerprinting",
+        "url": "https://capec.mitre.org/data/definitions/312.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1082",
+                "name": "System Information Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-313",
+        "name": "Passive OS Fingerprinting",
+        "url": "https://capec.mitre.org/data/definitions/313.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1082",
+                "name": "System Information Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-35",
+        "name": "Leverage Executable Code in Non-Executable Files",
+        "url": "https://capec.mitre.org/data/definitions/35.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1027",
+                "name": "Obfuscated Files or Information: HTML Smuggling",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1027",
+                "name": "Obfuscated Files or Information:\u00a0Embedded Payloads",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1564",
+                "name": "Hide Artifacts: Resource Forking",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-37",
+        "name": "Retrieve Embedded Sensitive Data",
+        "url": "https://capec.mitre.org/data/definitions/37.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1005",
+                "name": "Data from Local System",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-38",
+        "name": "Leveraging/Manipulating Configuration File Search Paths",
+        "url": "https://capec.mitre.org/data/definitions/38.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow: Path Interception by PATH Environment Variable",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow: Path Interception by Unquoted Path",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-383",
+        "name": "Harvesting Information via API Event Monitoring",
+        "url": "https://capec.mitre.org/data/definitions/383.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1056",
+                "name": "Input Capture: Credential API Hooking",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-407",
+        "name": "Pretexting",
+        "url": "https://capec.mitre.org/data/definitions/407.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1589",
+                "name": "Gather Victim Identity Information",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-438",
+        "name": "Modification During Manufacture",
+        "url": "https://capec.mitre.org/data/definitions/438.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-439",
+        "name": "Manipulation During Distribution",
+        "url": "https://capec.mitre.org/data/definitions/439.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-440",
+        "name": "Hardware Integrity Attack",
+        "url": "https://capec.mitre.org/data/definitions/440.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1200",
+                "name": "Hardware Additions",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-442",
+        "name": "Infected Software",
+        "url": "https://capec.mitre.org/data/definitions/442.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Dependencies and Development Tools",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-443",
+        "name": "Malicious Logic Inserted Into Product by Authorized Developer",
+        "url": "https://capec.mitre.org/data/definitions/443.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-445",
+        "name": "Malicious Logic Insertion into Product Software via Configuration Management Manipulation",
+        "url": "https://capec.mitre.org/data/definitions/445.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Dependencies and Development Tools",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-446",
+        "name": "Malicious Logic Insertion into Product via Inclusion of Third-Party Component",
+        "url": "https://capec.mitre.org/data/definitions/446.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-448",
+        "name": "Embed Virus into DLL",
+        "url": "https://capec.mitre.org/data/definitions/448.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1027",
+                "name": "Obfuscated Files or Information:\u00a0Embedded Payloads",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-457",
+        "name": "USB Memory Attacks",
+        "url": "https://capec.mitre.org/data/definitions/457.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1091",
+                "name": "Replication Through Removable Media",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1092",
+                "name": "Communication Through Removable Media",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-464",
+        "name": "Evercookie",
+        "url": "https://capec.mitre.org/data/definitions/464.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1606",
+                "name": "Forge Web Credentials: Web Cookies",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-465",
+        "name": "Transparent Proxy Abuse",
+        "url": "https://capec.mitre.org/data/definitions/465.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1090",
+                "name": "Proxy: Internal Proxy",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-469",
+        "name": "HTTP DoS",
+        "url": "https://capec.mitre.org/data/definitions/469.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service: Service Exhaustion Flood",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-471",
+        "name": "Search Order Hijacking",
+        "url": "https://capec.mitre.org/data/definitions/471.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow:DLL search order hijacking",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow: Dylib Hijacking",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow: Path Interception by Search Order Hijacking",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-473",
+        "name": "Signature Spoof",
+        "url": "https://capec.mitre.org/data/definitions/473.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1036",
+                "name": "Masquerading: Invalid Code Signature",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1553",
+                "name": "Subvert Trust Controls: Code Signing",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-474",
+        "name": "Signature Spoofing by Key Theft",
+        "url": "https://capec.mitre.org/data/definitions/474.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1552",
+                "name": "Unsecured Credentials: Private Keys",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-478",
+        "name": "Modification of Windows Service Configuration",
+        "url": "https://capec.mitre.org/data/definitions/478.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow:Service Registry Permissions Weakness",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1543",
+                "name": "Create or Modify System Process:Windows Service",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-479",
+        "name": "Malicious Root Certificate",
+        "url": "https://capec.mitre.org/data/definitions/479.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1553",
+                "name": "Subvert Trust Controls:Install Root Certificate",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-480",
+        "name": "Escaping Virtualization",
+        "url": "https://capec.mitre.org/data/definitions/480.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1611",
+                "name": "Escape to Host",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-481",
+        "name": "Contradictory Destinations in Traffic Routing Schemes",
+        "url": "https://capec.mitre.org/data/definitions/481.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1090",
+                "name": "Proxy:Domain Fronting",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-482",
+        "name": "TCP Flood",
+        "url": "https://capec.mitre.org/data/definitions/482.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1498",
+                "name": "Network Denial of Service: Direct Network Flood",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service: OS Exhaustion Flood",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service: Service Exhaustion Flood",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-485",
+        "name": "Signature Spoofing by Key Recreation",
+        "url": "https://capec.mitre.org/data/definitions/485.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1552",
+                "name": "Unsecure Credentials: Private Keys",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-488",
+        "name": "HTTP Flood",
+        "url": "https://capec.mitre.org/data/definitions/488.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service:Service Exhaustion Flood",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-489",
+        "name": "SSL Flood",
+        "url": "https://capec.mitre.org/data/definitions/489.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service:Service Exhaustion Flood",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-49",
+        "name": "Password Brute Forcing",
+        "url": "https://capec.mitre.org/data/definitions/49.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1110",
+                "name": "Brute Force:Password Guessing",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-490",
+        "name": "Amplification",
+        "url": "https://capec.mitre.org/data/definitions/490.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1498",
+                "name": "Network Denial of Service:Reflection Amplification",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-497",
+        "name": "File Discovery",
+        "url": "https://capec.mitre.org/data/definitions/497.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1083",
+                "name": "File and Directory Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-504",
+        "name": "Task Impersonation",
+        "url": "https://capec.mitre.org/data/definitions/504.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1036",
+                "name": "Masquerading: Masquerade Task or Service",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-509",
+        "name": "Kerberoasting",
+        "url": "https://capec.mitre.org/data/definitions/509.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1558",
+                "name": "Steal or Forge Kerberos Tickets:Kerberoasting",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-511",
+        "name": "Infiltration of Software Development Environment",
+        "url": "https://capec.mitre.org/data/definitions/511.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Dependencies and Development Tools",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-516",
+        "name": "Hardware Component Substitution During Baselining",
+        "url": "https://capec.mitre.org/data/definitions/516.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-520",
+        "name": "Counterfeit Hardware Component Inserted During Product Assembly",
+        "url": "https://capec.mitre.org/data/definitions/520.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-522",
+        "name": "Malicious Hardware Component Replacement",
+        "url": "https://capec.mitre.org/data/definitions/522.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-523",
+        "name": "Malicious Software Implanted",
+        "url": "https://capec.mitre.org/data/definitions/523.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-528",
+        "name": "XML Flood",
+        "url": "https://capec.mitre.org/data/definitions/528.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service:Service Exhaustion Flood",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1498",
+                "name": "Network Denial of Service:Direct Network Flood",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-531",
+        "name": "Hardware Component Substitution",
+        "url": "https://capec.mitre.org/data/definitions/531.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-532",
+        "name": "Altered Installed BIOS",
+        "url": "https://capec.mitre.org/data/definitions/532.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1495",
+                "name": "Firmware Corruption",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-537",
+        "name": "Infiltration of Hardware Development Environment",
+        "url": "https://capec.mitre.org/data/definitions/537.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-538",
+        "name": "Open-Source Library Manipulation",
+        "url": "https://capec.mitre.org/data/definitions/538.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Software Dependencies and Development Tools",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-539",
+        "name": "ASIC With Malicious Functionality",
+        "url": "https://capec.mitre.org/data/definitions/539.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-541",
+        "name": "Application Fingerprinting",
+        "url": "https://capec.mitre.org/data/definitions/541.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1592",
+                "name": "Gather Victim Host Information: Software",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-542",
+        "name": "Targeted Malware",
+        "url": "https://capec.mitre.org/data/definitions/542.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1027",
+                "name": "Obfuscated Files or Information",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-543",
+        "name": "Counterfeit Websites",
+        "url": "https://capec.mitre.org/data/definitions/543.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1036",
+                "name": "Masquerading: Match Legitimate Name or Location",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-545",
+        "name": "Pull Data from System Resources",
+        "url": "https://capec.mitre.org/data/definitions/545.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1005",
+                "name": "Data from Local System",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-55",
+        "name": "Rainbow Table Password Cracking",
+        "url": "https://capec.mitre.org/data/definitions/55.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1110",
+                "name": "Brute Force:Password Cracking",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-550",
+        "name": "Install New Service",
+        "url": "https://capec.mitre.org/data/definitions/550.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1543",
+                "name": "Create or Modify System Process",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-551",
+        "name": "Modify Existing Service",
+        "url": "https://capec.mitre.org/data/definitions/551.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1543",
+                "name": "Create or Modify System Process",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-552",
+        "name": "Install Rootkit",
+        "url": "https://capec.mitre.org/data/definitions/552.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1014",
+                "name": "Rootkit",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-555",
+        "name": "Remote Services with Stolen Credentials",
+        "url": "https://capec.mitre.org/data/definitions/555.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1021",
+                "name": "Remote Services",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1133",
+                "name": "External Remote Services",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-556",
+        "name": "Replace File Extension Handlers",
+        "url": "https://capec.mitre.org/data/definitions/556.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1546",
+                "name": "Event Triggered Execution:Change Default File Association",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-558",
+        "name": "Replace Trusted Executable",
+        "url": "https://capec.mitre.org/data/definitions/558.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1505",
+                "name": "Server Software Component: Terminal Services DLL",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1546",
+                "name": "Event Triggered Execution: Accessibility Features",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-560",
+        "name": "Use of Known Domain Credentials",
+        "url": "https://capec.mitre.org/data/definitions/560.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1078",
+                "name": "Valid Accounts",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-561",
+        "name": "Windows Admin Shares with Stolen Credentials",
+        "url": "https://capec.mitre.org/data/definitions/561.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1021",
+                "name": "Remote Services:SMB/Windows Admin Shares",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-562",
+        "name": "Modify Shared File",
+        "url": "https://capec.mitre.org/data/definitions/562.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1080",
+                "name": "Taint shared content",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-564",
+        "name": "Run Software at Logon",
+        "url": "https://capec.mitre.org/data/definitions/564.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1037",
+                "name": "Boot or Logon Initialization Scripts",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1547",
+                "name": "Boot or Logon Autostart Execution",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-565",
+        "name": "Password Spraying",
+        "url": "https://capec.mitre.org/data/definitions/565.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1110",
+                "name": "Brute Force:Password Spraying",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-568",
+        "name": "Capture Credentials via Keylogger",
+        "url": "https://capec.mitre.org/data/definitions/568.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1056",
+                "name": "Input Capture:Keylogging",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-569",
+        "name": "Collect Data as Provided by Users",
+        "url": "https://capec.mitre.org/data/definitions/569.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1056",
+                "name": "Input Capture",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-57",
+        "name": "Utilizing REST's Trust in the System Resource to Obtain Sensitive Data",
+        "url": "https://capec.mitre.org/data/definitions/57.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1040",
+                "name": "Network Sniffing",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-571",
+        "name": "Block Logging to Central Repository",
+        "url": "https://capec.mitre.org/data/definitions/571.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1562",
+                "name": "Impair Defenses: Disable Windows Event Logging",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1562",
+                "name": "Impair Defenses: Impair Command History Logging",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1562",
+                "name": "Impair Defenses: Indicator Blocking",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1562",
+                "name": "Impair Defenses: Disable Cloud Logs",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-572",
+        "name": "Artificially Inflate File Sizes",
+        "url": "https://capec.mitre.org/data/definitions/572.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1027",
+                "name": "Obfuscated Files or Information:Binary Padding",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-573",
+        "name": "Process Footprinting",
+        "url": "https://capec.mitre.org/data/definitions/573.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1057",
+                "name": "Process Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-574",
+        "name": "Services Footprinting",
+        "url": "https://capec.mitre.org/data/definitions/574.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1007",
+                "name": "System Service Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-575",
+        "name": "Account Footprinting",
+        "url": "https://capec.mitre.org/data/definitions/575.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1087",
+                "name": "Account Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-576",
+        "name": "Group Permission Footprinting",
+        "url": "https://capec.mitre.org/data/definitions/576.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1069",
+                "name": "Permission Groups Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1615",
+                "name": "Group Policy Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-577",
+        "name": "Owner Footprinting",
+        "url": "https://capec.mitre.org/data/definitions/577.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1033",
+                "name": "System Owner/User Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-578",
+        "name": "Disable Security Software",
+        "url": "https://capec.mitre.org/data/definitions/578.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1556",
+                "name": "Modify Authentication Process:\u00a0Multi-Factor Authentication",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1562",
+                "name": "Impair Defenses: Disable or Modify Tools",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1562",
+                "name": "Impair Defenses: Disable Windows Event Logging",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1562",
+                "name": "Impair Defenses: Disable or Modify System Firewall",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1562",
+                "name": "Impair Defenses: Disable or Modify Cloud Firewall",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1562",
+                "name": "Impair Defenses: Disable Cloud Logs",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1562",
+                "name": "Impair Defenses: Safe Mode Boot",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-579",
+        "name": "Replace Winlogon Helper DLL",
+        "url": "https://capec.mitre.org/data/definitions/579.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1547",
+                "name": "Boot or Logon Autostart Execution: Winlogon helper DLL",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-580",
+        "name": "System Footprinting",
+        "url": "https://capec.mitre.org/data/definitions/580.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1082",
+                "name": "System Information Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-581",
+        "name": "Security Software Footprinting",
+        "url": "https://capec.mitre.org/data/definitions/581.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1518",
+                "name": "Software Discovery:Security Software Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-593",
+        "name": "Session Hijacking",
+        "url": "https://capec.mitre.org/data/definitions/593.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1185",
+                "name": "Browser Session Hijacking",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1563",
+                "name": "Remote Service Session Hijacking",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-60",
+        "name": "Reusing Session IDs (aka Session Replay)",
+        "url": "https://capec.mitre.org/data/definitions/60.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1134",
+                "name": "Access Token Manipulation:Token Impersonation/Theft",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1550",
+                "name": "Use Alternate Authentication Material:Web Session Cookie",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-600",
+        "name": "Credential Stuffing",
+        "url": "https://capec.mitre.org/data/definitions/600.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1110",
+                "name": "Brute Force:Credential Stuffing",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-609",
+        "name": "Cellular Traffic Intercept",
+        "url": "https://capec.mitre.org/data/definitions/609.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1111",
+                "name": "Multi-Factor Authentication Interception",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-616",
+        "name": "Establish Rogue Location",
+        "url": "https://capec.mitre.org/data/definitions/616.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1036",
+                "name": "Masquerading: Match Legitimate Name or Location",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-620",
+        "name": "Drop Encryption Level",
+        "url": "https://capec.mitre.org/data/definitions/620.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1600",
+                "name": "Weaken Encryption",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-633",
+        "name": "Token Impersonation",
+        "url": "https://capec.mitre.org/data/definitions/633.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1134",
+                "name": "Access Token Manipulation",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-634",
+        "name": "Probe Audio and Video Peripherals",
+        "url": "https://capec.mitre.org/data/definitions/634.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1123",
+                "name": "Audio Capture",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1125",
+                "name": "Video Capture",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-635",
+        "name": "Alternative Execution Due to Deceptive Filenames",
+        "url": "https://capec.mitre.org/data/definitions/635.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1036",
+                "name": "Masquerading: Double File Extension",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-636",
+        "name": "Hiding Malicious Data or Code within Files",
+        "url": "https://capec.mitre.org/data/definitions/636.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1221",
+                "name": "Template Injection",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-637",
+        "name": "Collect Data from Clipboard",
+        "url": "https://capec.mitre.org/data/definitions/637.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1115",
+                "name": "Clipboard Data",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-638",
+        "name": "Altered Component Firmware",
+        "url": "https://capec.mitre.org/data/definitions/638.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1542",
+                "name": "Pre-OS Boot:Component Firmware",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-639",
+        "name": "Probe System Files",
+        "url": "https://capec.mitre.org/data/definitions/639.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1039",
+                "name": "Data from Network Shared Drive",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-640",
+        "name": "Inclusion of Code in Existing Process",
+        "url": "https://capec.mitre.org/data/definitions/640.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1620",
+                "name": "Reflective Code Loading",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-641",
+        "name": "DLL Side-Loading",
+        "url": "https://capec.mitre.org/data/definitions/641.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1574",
+                "name": "Hijack Execution Flow:DLL Side-Loading",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-642",
+        "name": "Replace Binaries",
+        "url": "https://capec.mitre.org/data/definitions/642.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1554",
+                "name": "Compromise Client Software Binary",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-643",
+        "name": "Identify Shared Files/Directories on System",
+        "url": "https://capec.mitre.org/data/definitions/643.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1135",
+                "name": "Network Share Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-644",
+        "name": "Use of Captured Hashes (Pass The Hash)",
+        "url": "https://capec.mitre.org/data/definitions/644.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1550",
+                "name": "Use Alternate Authentication Material:Pass The Hash",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-645",
+        "name": "Use of Captured Tickets (Pass The Ticket)",
+        "url": "https://capec.mitre.org/data/definitions/645.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1550",
+                "name": "Use Alternate Authentication Material:Pass The Ticket",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-646",
+        "name": "Peripheral Footprinting",
+        "url": "https://capec.mitre.org/data/definitions/646.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1120",
+                "name": "Peripheral Device Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-647",
+        "name": "Collect Data from Registries",
+        "url": "https://capec.mitre.org/data/definitions/647.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1005",
+                "name": "Data from Local System",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1012",
+                "name": "Query Registry",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-648",
+        "name": "Collect Data from Screen Capture",
+        "url": "https://capec.mitre.org/data/definitions/648.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1113",
+                "name": "Screen Capture",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1513",
+                "name": "Screen Capture",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-649",
+        "name": "Adding a Space to a File Extension",
+        "url": "https://capec.mitre.org/data/definitions/649.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1036",
+                "name": "Masquerading:Space after Filename",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-65",
+        "name": "Sniff Application Code",
+        "url": "https://capec.mitre.org/data/definitions/65.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1040",
+                "name": "Network Sniffing",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-650",
+        "name": "Upload a Web Shell to a Web Server",
+        "url": "https://capec.mitre.org/data/definitions/650.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1505",
+                "name": "Server Software Component:Web Shell",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-651",
+        "name": "Eavesdropping",
+        "url": "https://capec.mitre.org/data/definitions/651.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1111",
+                "name": "Multi-Factor Authentication Interception",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-652",
+        "name": "Use of Known Kerberos Credentials",
+        "url": "https://capec.mitre.org/data/definitions/652.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1558",
+                "name": "Steal or Forge Kerberos Tickets",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-654",
+        "name": "Credential Prompt Impersonation",
+        "url": "https://capec.mitre.org/data/definitions/654.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1056",
+                "name": "Input Capture",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-655",
+        "name": "Avoid Security Tool Identification by Adding Data",
+        "url": "https://capec.mitre.org/data/definitions/655.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1027",
+                "name": "Obfuscated Files or Information:Binary padding",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-657",
+        "name": "Malicious Automated Software Update via Spoofing",
+        "url": "https://capec.mitre.org/data/definitions/657.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1072",
+                "name": "Software Deployment Tools",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-660",
+        "name": "Root/Jailbreak Detection Evasion via Hooking",
+        "url": "https://capec.mitre.org/data/definitions/660.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1055",
+                "name": "Process Injection",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-662",
+        "name": "Adversary in the Browser (AiTB)",
+        "url": "https://capec.mitre.org/data/definitions/662.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1185",
+                "name": "Man in the Browser",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-665",
+        "name": "Exploitation of Thunderbolt Protection Flaws",
+        "url": "https://capec.mitre.org/data/definitions/665.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1211",
+                "name": "Exploitation for Defensive Evasion",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1556",
+                "name": "Modify Authentication Process",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-666",
+        "name": "BlueSmacking",
+        "url": "https://capec.mitre.org/data/definitions/666.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1498",
+                "name": "Network Denial of Service: Direct Network Flood",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1499",
+                "name": "Endpoint Denial of Service: OS Exhaustion Flood",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-668",
+        "name": "Key Negotiation of Bluetooth Attack (KNOB)",
+        "url": "https://capec.mitre.org/data/definitions/668.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1565",
+                "name": "Data Manipulation: Transmitted Data Manipulation",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-669",
+        "name": "Alteration of a Software Update",
+        "url": "https://capec.mitre.org/data/definitions/669.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-670",
+        "name": "Software Development Tools Maliciously Altered",
+        "url": "https://capec.mitre.org/data/definitions/670.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1127",
+                "name": "Trusted Developer Utilities Proxy Execution",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-671",
+        "name": "Requirements for ASIC Functionality Maliciously Altered",
+        "url": "https://capec.mitre.org/data/definitions/671.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-672",
+        "name": "Malicious Code Implanted During Chip Programming",
+        "url": "https://capec.mitre.org/data/definitions/672.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-673",
+        "name": "Developer Signing Maliciously Altered Software",
+        "url": "https://capec.mitre.org/data/definitions/673.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-674",
+        "name": "Design for FPGA Maliciously Altered",
+        "url": "https://capec.mitre.org/data/definitions/674.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-675",
+        "name": "Retrieve Data from Decommissioned Devices",
+        "url": "https://capec.mitre.org/data/definitions/675.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1052",
+                "name": "Exfiltration Over Physical Medium",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-677",
+        "name": "Server Motherboard Compromise",
+        "url": "https://capec.mitre.org/data/definitions/677.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Hardware Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-678",
+        "name": "System Build Data Maliciously Altered",
+        "url": "https://capec.mitre.org/data/definitions/678.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-68",
+        "name": "Subvert Code-signing Facilities",
+        "url": "https://capec.mitre.org/data/definitions/68.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1553",
+                "name": "Subvert Trust Controls: Code Signing",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-691",
+        "name": "Spoof Open-Source Software Metadata",
+        "url": "https://capec.mitre.org/data/definitions/691.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Dependencies and Development Tools",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Supply Chain",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-694",
+        "name": "System Location Discovery",
+        "url": "https://capec.mitre.org/data/definitions/694.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1614",
+                "name": "System Language Discovery",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-695",
+        "name": "Repo Jacking",
+        "url": "https://capec.mitre.org/data/definitions/695.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1195",
+                "name": "Supply Chain Compromise: Compromise Software Dependencies and Development Tools",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-697",
+        "name": "DHCP Spoofing",
+        "url": "https://capec.mitre.org/data/definitions/697.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1557",
+                "name": "Adversary-in-the-Middle: DHCP Spoofing",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-698",
+        "name": "Install Malicious Extension",
+        "url": "https://capec.mitre.org/data/definitions/698.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1176",
+                "name": "Browser Extensions",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-70",
+        "name": "Try Common or Default Usernames and Passwords",
+        "url": "https://capec.mitre.org/data/definitions/70.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1078",
+                "name": "Valid Accounts:Default Accounts",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-700",
+        "name": "Network Boundary Bridging",
+        "url": "https://capec.mitre.org/data/definitions/700.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1599",
+                "name": "Network Boundary Bridging",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-94",
+        "name": "Adversary in the Middle (AiTM)",
+        "url": "https://capec.mitre.org/data/definitions/94.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1557",
+                "name": "Adversary-in-the-Middle",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    },
+    {
+        "capec_id": "CAPEC-98",
+        "name": "Phishing",
+        "url": "https://capec.mitre.org/data/definitions/98.html",
+        "fromMitre": "yes",
+        "techniques": [
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1566",
+                "name": "Phishing",
+                "fromMitre": "yes",
+                "tactics": []
+            },
+            {
+                "taxonomy": "ATT&CK",
+                "id": "T1598",
+                "name": "Phishing for Information",
+                "fromMitre": "yes",
+                "tactics": []
+            }
+        ]
+    }
+]

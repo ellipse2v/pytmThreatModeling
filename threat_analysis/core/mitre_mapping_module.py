@@ -17,15 +17,15 @@ MITRE ATT&CK mapping module with D3FEND mitigations
 import os
 import json
 import logging
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 import re
 import ast
-import xml.etree.ElementTree as ET
 import xml.etree.ElementTree as ET
 
 from pathlib import Path
 from threat_analysis.custom_threats import get_custom_threats
 from threat_analysis import data_loader
+from threat_analysis.mitigation_suggestions import MitigationStixMapper, get_framework_mitigation_suggestions
 
 attack_d3fend_mapping = {
     "M1013 Application Developer Guidance": ["A future release of D3FEND will define a taxonomy of Source Code Hardening Techniques."],
@@ -68,24 +68,27 @@ attack_d3fend_mapping = {
     "M1052 User Account Control": ["D3-SCF System Call Filtering"],
     "M1053 Data Backup": ["Comprehensive IT disaster recovery plans are outside the current scope of D3FEND."],
     "M1054 Software Configuration": ["D3-ACH Application Configuration Hardening", "D3-CP Certificate Pinning"],
-    "M1055 Do Not Mitigate": [], # No D3FEND techniques listed
+    "M1055 Do Not Mitigate": [],
     "M1056 Pre-compromise": ["D3-DE Decoy Environment", "D3-DO Decoy Object"]
 }
 
 class MitreMapping:
     """Class for managing MITRE ATT&CK mapping with D3FEND mitigations"""
-    def __init__(self, threat_model=None, threat_model_path: str = '/mnt/d/dev/github/threatModelBypyTm/threatModel_Template/threat_model.md'):
+    def __init__(self, threat_model=None, threat_model_path: str = ""):
         self.d3fend_details = data_loader.load_d3fend_mapping()
         self.capec_to_mitre_map = data_loader.load_capec_to_mitre_mapping()
         self.stride_to_capec = data_loader.load_stride_to_capec_map()
-        self.mapping = self._initialize_mapping()
-        self.threat_patterns = self._initialize_threat_patterns()
+        self.all_attack_techniques = data_loader.load_attack_techniques()
+        self.mitigation_stix_mapper = MitigationStixMapper()
+        self.technique_to_mitigation_map = self.mitigation_stix_mapper.attack_to_mitigations_map
+        logging.info(f"MitreMapping initialized. technique_to_mitigation_map size: {len(self.technique_to_mitigation_map)}")
         self.custom_threats = self._load_custom_threats(threat_model)
         self.custom_mitre_mappings = []
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-        full_markdown_path = os.path.join(project_root, threat_model_path)
-        if os.path.exists(full_markdown_path):
-            self.custom_mitre_mappings = self._load_custom_mitre_mappings_from_markdown(full_markdown_path)
+        if threat_model_path:
+            full_markdown_path = os.path.join(project_root, threat_model_path)
+            if os.path.exists(full_markdown_path):
+                self.custom_mitre_mappings = self._load_custom_mitre_mappings_from_markdown(full_markdown_path)
         self.markdown_mitigations = {}
 
 
@@ -110,9 +113,6 @@ class MitreMapping:
             mapping_section_match = re.search(r'## Custom Mitre Mapping\n(.*?)(\n## |$)', content, re.DOTALL)
             if mapping_section_match:
                 mappings_content = mapping_section_match.group(1).strip()
-                # Regex to capture the threat name, tactics, and techniques string
-                # It looks for lines starting with '- **Threat Name**:'
-                # and then captures the rest of the line which should contain tactics and techniques lists
                 pattern = re.compile(r'- \*\*(.*?)\*\*:\s*(.*)')
                 for line in mappings_content.split('\n'):
                     line = line.strip()
@@ -122,7 +122,6 @@ class MitreMapping:
                         raw_mapping_string = match.group(2).strip()
 
                         try:
-                            # Safely evaluate the string as a Python literal (dictionary)
                             parsed_mapping = ast.literal_eval(raw_mapping_string)
                             tactics = parsed_mapping.get('tactics', [])
                             techniques = parsed_mapping.get('techniques', [])
@@ -140,1083 +139,94 @@ class MitreMapping:
             logging.error(f"Error loading custom MITRE mappings from markdown: {e}")
         return custom_mappings
 
-    def _initialize_mapping(self) -> Dict[str, Dict[str, Any]]:
-        """Initializes comprehensive STRIDE to MITRE ATT&CK mapping with D3FEND mitigations"""
-        mapping = {
-            "Spoofing": {
-                "tactics": ["Initial Access", "Defense Evasion", "Credential Access"],
-                "techniques": [
-                    {
-                        "id": "T1566",
-                        "name": "Phishing",
-                        "description": "Identity spoofing via phishing",
-                        "url": "https://attack.mitre.org/techniques/T1566/",
-                        "mitre_mitigations": [
-                            {"id": "M1056", "name": "User Training"},
-                            {"id": "M1049", "name": "Antivirus/Antimalware"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1036",
-                        "name": "Masquerading",
-                        "description": "Disguising malicious processes",
-                        "url": "https://attack.mitre.org/techniques/T1036/",
-                        "mitre_mitigations": [
-                            {"id": "M1049", "name": "Antivirus/Antimalware"},
-                            {"id": "M1045", "name": "Code Signing"},
-                            {"id": "M1038", "name": "Execution Prevention"},
-                            {"id": "M1026", "name": "Privileged Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1134",
-                        "name": "Access Token Manipulation",
-                        "description": "Manipulation of access tokens",
-                        "url": "https://attack.mitre.org/techniques/T1134/",
-                        "mitre_mitigations": [
-                            {"id": "M1049", "name": "Antivirus/Antimalware"},
-                            {"id": "M1043", "name": "Audit"},
-                            {"id": "M1028", "name": "Operating System Configuration"},
-                            {"id": "M1026", "name": "Privileged Account Management"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1078",
-                        "name": "Valid Accounts",
-                        "description": "Use of valid accounts for access",
-                        "url": "https://attack.mitre.org/techniques/T1078/",
-                        "mitre_mitigations": [
-                            {"id": "M1049", "name": "Antivirus/Antimalware"},
-                            {"id": "M1043", "name": "Audit"},
-                            {"id": "M1036", "name": "Disable or Remove Feature or Program"},
-                            {"id": "M1026", "name": "Privileged Account Management"},
-                            {"id": "M1018", "name": "User Account Control"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1078.003",
-                        "name": "Local Accounts",
-                        "description": "Abuse of local accounts",
-                        "url": "https://attack.mitre.org/techniques/T1078/003/",
-                        "mitre_mitigations": [
-                            {"id": "M1049", "name": "Antivirus/Antimalware"},
-                            {"id": "M1043", "name": "Audit"},
-                            {"id": "M1036", "name": "Disable or Remove Feature or Program"},
-                            {"id": "M1026", "name": "Privileged Account Management"},
-                            {"id": "M1018", "name": "User Account Control"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1110",
-                        "name": "Brute Force",
-                        "description": "Attempting to guess or crack passwords",
-                        "url": "https://attack.mitre.org/techniques/T1110/",
-                        "mitre_mitigations": [
-                            {"id": "M1043", "name": "Audit"},
-                            {"id": "M1029", "name": "Network Intrusion Prevention"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1110.001",
-                        "name": "Password Guessing",
-                        "description": "Dictionary-based password attacks",
-                        "url": "https://attack.mitre.org/techniques/T1110/001/",
-                        "mitre_mitigations": [
-                            {"id": "M1043", "name": "Audit"},
-                            {"id": "M1029", "name": "Network Intrusion Prevention"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1110.003",
-                        "name": "Password Spraying",
-                        "description": "Low-and-slow password attack",
-                        "url": "https://attack.mitre.org/techniques/T1110/003/",
-                        "mitre_mitigations": [
-                            {"id": "M1043", "name": "Audit"},
-                            {"id": "M1029", "name": "Network Intrusion Prevention"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1110.004",
-                        "name": "Credential Stuffing",
-                        "description": "Using breached credential pairs",
-                        "url": "https://attack.mitre.org/techniques/T1110/004/",
-                        "mitre_mitigations": [
-                            {"id": "M1043", "name": "Audit"},
-                            {"id": "M1029", "name": "Network Intrusion Prevention"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1185",
-                        "name": "Browser Session Hijacking",
-                        "description": "Session hijacking attacks",
-                        "url": "https://attack.mitre.org/techniques/T1185/",
-                        "mitre_mitigations": [
-                            {"id": "M1028", "name": "Operating System Configuration"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1539",
-                        "name": "Steal Web Session Cookie",
-                        "description": "Steal Web Session Cookie",
-                        "url": "https://attack.mitre.org/techniques/T1539/",
-                        "mitre_mitigations": [
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1212",
-                        "name": "Exploitation for Credential Access",
-                        "description": "Exploiting vulnerabilities to access credentials",
-                        "url": "https://attack.mitre.org/techniques/T1212/",
-                        "mitre_mitigations": [
-                            {"id": "M1050", "name": "Exploit Protection"},
-                            {"id": "M1048", "name": "Application Isolation and Sandboxing"},
-                            {"id": "M1026", "name": "Privileged Account Management"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1557",
-                        "name": "Adversary-in-the-Middle",
-                        "description": "Man-in-the-middle attacks",
-                        "url": "https://attack.mitre.org/techniques/T1557/",
-                        "mitre_mitigations": [
-                            {"id": "M1049", "name": "Antivirus/Antimalware"},
-                            {"id": "M1043", "name": "Audit"},
-                            {"id": "M1028", "name": "Operating System Configuration"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1556",
-                        "name": "Modify Authentication Process",
-                        "description": "Authentication bypass techniques",
-                        "url": "https://attack.mitre.org/techniques/T1556/",
-                        "mitre_mitigations": [
-                            {"id": "M1043", "name": "Audit"},
-                            {"id": "M1028", "name": "Operating System Configuration"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1598",
-                        "name": "Phishing for Information",
-                        "description": "Cross Site Request Forgery attacks",
-                        "url": "https://attack.mitre.org/techniques/T1598/",
-                        "mitre_mitigations": [
-                            {"id": "M1056", "name": "User Training"}
-                        ]
-                    },
-                    {
-                        "id": "T1213",
-                        "name": "Data from Information Repositories",
-                        "description": "Exploiting Trust in Client",
-                        "url": "https://attack.mitre.org/techniques/T1213/",
-                        "mitre_mitigations": [
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1026", "name": "Privileged Account Management"},
-                           {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1199",
-                        "name": "Trusted Relationship",
-                        "description": "Leveraging trusted third-party relationships to gain access",
-                        "url": "https://attack.mitre.org/techniques/T1199/",
-                        "mitre_mitigations": [
-                            {"id": "M1015", "name": "Active Directory Configuration"},
-                            {"id": "M1035", "name": "Limit Access to Resource Over Network"}
-                        ]
-                    }
-                ]
-            },
-            "Tampering": {
-                "tactics": ["Defense Evasion", "Impact", "Initial Access", "Execution"],
-                "techniques": [
-                    {
-                        "id": "T1565",
-                        "name": "Data Manipulation",
-                        "description": "Unauthorized data modification",
-                        "url": "https://attack.mitre.org/techniques/T1565/",
-                        "mitre_mitigations": [
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1070",
-                        "name": "Indicator Removal",
-                        "description": "Deletion of activity traces",
-                        "url": "https://attack.mitre.org/techniques/T1070/",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1027",
-                        "name": "Obfuscated Files or Information",
-                        "description": "Obfuscation of malicious content",
-                        "url": "https://attack.mitre.org/techniques/T1027/",
-                        "mitre_mitigations": [
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1038", "name": "Execution Prevention"},
-                           {"id": "M1029", "name": "Network Intrusion Prevention"}
-                        ]
-                    },
-                    {
-                        "id": "T1190",
-                        "name": "Exploit Public-Facing Application",
-                        "description": "Web application vulnerabilities exploitation",
-                        "url": "https://attack.mitre.org/techniques/T1190/",
-                        "mitre_mitigations": [
-                           {"id": "M1050", "name": "Exploit Protection"},
-                           {"id": "M1030", "name": "Network Segmentation"},
-                           {"id": "M1029", "name": "Network Intrusion Prevention"}
-                        ]
-                    },
-                    {
-                        "id": "T1059",
-                        "name": "Command and Scripting Interpreter",
-                        "description": "Command injection and execution",
-                        "url": "https://attack.mitre.org/techniques/T1059/",
-                        "mitre_mitigations": [
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1048", "name": "Application Isolation and Sandboxing"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1038", "name": "Execution Prevention"},
-                           {"id": "M1026", "name": "Privileged Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1059.007",
-                        "name": "JavaScript",
-                        "description": "JavaScript-based attacks including XSS",
-                        "url": "https://attack.mitre.org/techniques/T1059/007/",
-                        "mitre_mitigations": [
-                           {"id": "M1050", "name": "Exploit Protection"},
-                           {"id": "M1048", "name": "Application Isolation and Sandboxing"},
-                           {"id": "M1038", "name": "Execution Prevention"}
-                        ]
-                    },
-                    {
-                        "id": "T1505.003",
-                        "name": "Web Shell",
-                        "description": "Web shell installation and usage",
-                        "url": "https://attack.mitre.org/techniques/T1505/003/",
-                        "mitre_mitigations": [
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1029", "name": "Network Intrusion Prevention"}
-                        ]
-                    },
-                    {
-                        "id": "T1105",
-                        "name": "Ingress Tool Transfer",
-                        "description": "Remote file inclusion and malicious file upload",
-                        "url": "https://attack.mitre.org/techniques/T1105/",
-                        "mitre_mitigations": [
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1048", "name": "Application Isolation and Sandboxing"},
-                           {"id": "M1037", "name": "Filter Network Traffic"},
-                           {"id": "M1031", "name": "Network Segmentation"},
-                           {"id": "M1029", "name": "Network Intrusion Prevention"}
-                        ]
-                    },
-                    {
-                        "id": "T1211",
-                        "name": "Exploitation for Defense Evasion",
-                        "description": "Exploiting vulnerabilities to evade defenses",
-                        "url": "https://attack.mitre.org/techniques/T1211/",
-                        "mitre_mitigations": [
-                           {"id": "M1050", "name": "Exploit Protection"},
-                           {"id": "M1048", "name": "Application Isolation and Sandboxing"},
-                           {"id": "M1026", "name": "Privileged Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1055",
-                        "name": "Process Injection",
-                        "description": "Injecting code into privileged processes",
-                        "url": "https://attack.mitre.org/techniques/T1055/",
-                        "mitre_mitigations": [
-                           {"id": "M1050", "name": "Exploit Protection"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1048", "name": "Application Isolation and Sandboxing"},
-                           {"id": "M1038", "name": "Execution Prevention"},
-                           {"id": "M1026", "name": "Privileged Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1562",
-                        "name": "Impair Defenses",
-                        "description": "Disabling security controls",
-                        "url": "https://attack.mitre.org/techniques/T1562/",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1028", "name": "Operating System Configuration"},
-                           {"id": "M1026", "name": "Privileged Account Management"},
-                           {"id": "M1018", "name": "User Account Control"}
-                        ]
-                    },
-                    {
-                        "id": "T1562.001",
-                        "name": "Disable or Modify System Firewall",
-                        "description": "Firewall manipulation",
-                        "url": "https://attack.mitre.org/techniques/T1562/001/",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1028", "name": "Operating System Configuration"},
-                           {"id": "M1026", "name": "Privileged Account Management"},
-                           {"id": "M1018", "name": "User Account Control"}
-                        ]
-                    },
-                    {
-                        "id": "T1140",
-                        "name": "Deobfuscate/Decode Files or Information",
-                        "description": "Processing encoded/obfuscated content",
-                        "url": "https://attack.mitre.org/techniques/T1140/",
-                        "mitre_mitigations": [
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1048", "name": "Application Isolation and Sandboxing"},
-                           {"id": "M1021", "name": "Restrict Web-Based Content"}
-                        ]
-                    },
-                    {
-                        "id": "T1083",
-                        "name": "File and Directory Discovery",
-                        "description": "Discovery of sensitive files and directories",
-                        "url": "https://attack.mitre.org/techniques/T1083/",
-                        "defend_mitigations": [{"id": "D3F-FDD"}]
-                    },
-                    {
-                        "id": "T1574",
-                        "name": "Hijack Execution Flow",
-                        "description": "Execution flow manipulation",
-                        "url": "https://attack.mitre.org/techniques/T1574/",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1038", "name": "Execution Prevention"},
-                           {"id": "M1028", "name": "Operating System Configuration"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1071",
-                        "name": "Application Layer Protocol",
-                        "description": "Protocol manipulation and smuggling",
-                        "url": "https://attack.mitre.org/techniques/T1071/",
-                        "mitre_mitigations": [
-                           {"id": "M1037", "name": "Filter Network Traffic"},
-                           {"id": "M1029", "name": "Network Intrusion Prevention"}
-                        ]
-                    },
-                    {
-                        "id": "T1071.001",
-                        "name": "Web Protocols",
-                        "description": "HTTP/HTTPS protocol manipulation",
-                        "url": "https://attack.mitre.org/techniques/T1071/001/",
-                        "mitre_mitigations": [
-                           {"id": "M1037", "name": "Filter Network Traffic"},
-                           {"id": "M1029", "name": "Network Intrusion Prevention"}
-                        ]
-                    },
-                    {
-                        "id": "T1112",
-                        "name": "Modify Registry",
-                        "description": "Registry manipulation and information tampering",
-                        "url": "https://attack.mitre.org/techniques/T1112/",
-                        "mitre_mitigations": [
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1038", "name": "Execution Prevention"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1565.001",
-                        "name": "Stored Data Manipulation",
-                        "description": "XML Schema Poisoning and nested payload attacks",
-                        "url": "https://attack.mitre.org/techniques/T1565/001/",
-                        "mitre_mitigations": [
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1621",
-                        "name": "Multi-Factor Authentication Request Generation",
-                        "description": "Removing Important Client Functionality",
-                        "url": "https://attack.mitre.org/techniques/T1621/",
-                        "mitre_mitigations": [
-                            {"id": "M1033", "name": "Limit Access to Resource Over Network"},
-                            {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1499.004",
-                        "name": "Application or System Exploitation",
-                        "description": "Buffer manipulation and overflow attacks",
-                        "url": "https://attack.mitre.org/techniques/T1499/004/",
-                        "mitre_mitigations": [
-                            {"id": "M1050", "name": "Exploit Protection"},
-                            {"id": "M1048", "name": "Application Isolation and Sandboxing"},
-                            {"id": "M1030", "name": "Network Segmentation"}
-                        ]
-                    },
-                    {
-                        "id": "T1485",
-                        "name": "Data Destruction",
-                        "description": "Permanently destroying data on a system.",
-                        "url": "https://attack.mitre.org/techniques/T1485/",
-                        "mitre_mitigations": [
-                            {"id": "M1053", "name": "Data Backup"},
-                            {"id": "M1028", "name": "Operating System Configuration"}
-                        ]
-                    }
-                ]
-            },
-            "DenialOfService": {
-                "tactics": ["Impact"],
-                "techniques": [
-                    {
-                        "id": "T1499",
-                        "name": "Endpoint Denial of Service",
-                        "description": "Degrading or blocking the availability of services on an endpoint.",
-                        "url": "https://attack.mitre.org/techniques/T1499/",
-                        "mitre_mitigations": [
-                            {"id": "M1050", "name": "Exploit Protection"},
-                            {"id": "M1048", "name": "Application Isolation and Sandboxing"},
-                            {"id": "M1029", "name": "Network Intrusion Prevention"}
-                        ]
-                    },
-                    {
-                        "id": "T1498",
-                        "name": "Network Denial of Service",
-                        "description": "Flooding a network with traffic to degrade or block the availability of services.",
-                        "url": "https://attack.mitre.org/techniques/T1498/",
-                        "mitre_mitigations": [
-                            {"id": "M1037", "name": "Filter Network Traffic"},
-                            {"id": "M1030", "name": "Network Segmentation"}
-                        ]
-                    },
-                    {
-                        "id": "T1496",
-                        "name": "Resource Hijacking",
-                        "description": "Using system resources for unauthorized purposes like cryptocurrency mining.",
-                        "url": "https://attack.mitre.org/techniques/T1496/",
-                        "mitre_mitigations": [
-                            {"id": "M1049", "name": "Antivirus/Antimalware"},
-                            {"id": "M1040", "name": "Behavior Prevention on Endpoint"}
-                        ]
-                    }
-                ]
-            },
-            "ElevationOfPrivilege": {
-                "tactics": ["Privilege Escalation", "Defense Evasion"],
-                "techniques": [
-                    {
-                        "id": "T1068",
-                        "name": "Exploitation for Privilege Escalation",
-                        "description": "Exploiting software vulnerabilities to gain higher privileges.",
-                        "url": "https://attack.mitre.org/techniques/T1068/",
-                        "mitre_mitigations": [
-                            {"id": "M1050", "name": "Exploit Protection"},
-                            {"id": "M1045", "name": "Code Signing"},
-                            {"id": "M1026", "name": "Privileged Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1548",
-                        "name": "Abuse Elevation Control Mechanism",
-                        "description": "Abusing built-in elevation control mechanisms to execute code with higher privileges.",
-                        "url": "https://attack.mitre.org/techniques/T1548/",
-                        "mitre_mitigations": [
-                            {"id": "M1043", "name": "Audit"},
-                            {"id": "M1026", "name": "Privileged Account Management"},
-                            {"id": "M1018", "name": "User Account Control"}
-                        ]
-                    },
-                    {
-                        "id": "T1055",
-                        "name": "Process Injection",
-                        "description": "Injecting code into other processes to evade defenses and escalate privileges.",
-                        "url": "https://attack.mitre.org/techniques/T1055/",
-                        "mitre_mitigations": [
-                            {"id": "M1050", "name": "Exploit Protection"},
-                            {"id": "M1049", "name": "Antivirus/Antimalware"},
-                            {"id": "M1048", "name": "Application Isolation and Sandboxing"}
-                        ]
-                    },
-                    {
-                        "id": "T1021",
-                        "name": "Remote Services",
-                        "description": "Using remote services to execute code on a remote system, potentially for lateral movement.",
-                        "url": "https://attack.mitre.org/techniques/T1021/",
-                        "mitre_mitigations": [
-                            {"id": "M1033", "name": "Limit Access to Resource Over Network"},
-                            {"id": "M1030", "name": "Network Segmentation"},
-                            {"id": "M1018", "name": "User Account Control"}
-                        ]
-                    },
-                    {
-                        "id": "T1547",
-                        "name": "Boot or Logon Autostart Execution",
-                        "description": "Adding malicious code to autostart locations to run with higher privileges.",
-                        "url": "https://attack.mitre.org/techniques/T1547/",
-                        "mitre_mitigations": [
-                            {"id": "M1046", "name": "Boot Integrity"},
-                            {"id": "M1028", "name": "Operating System Configuration"}
-                        ]
-                    }
-                ]
-            },
-            "Repudiation": {
-                "tactics": ["Defense Evasion", "Impact"],
-                "techniques": [
-                    {
-                        "id": "T1070.001",
-                        "name": "Clear Windows Event Logs",
-                        "description": "Clearing Windows event logs",
-                        "url": "https://attack.mitre.org/techniques/T1070/001/",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1070.002",
-                        "name": "Clear Linux or Mac System Logs",
-                        "description": "Clearing Unix/Linux system logs",
-                        "url": "https://attack.mitre.org/techniques/T1070/002/",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1070.003",
-                        "name": "Clear Command History",
-                        "description": "Clearing command history",
-                        "url": "https://attack.mitre.org/techniques/T1070/003/",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1070.004",
-                        "name": "File Deletion",
-                        "description": "Removing files to eliminate traces",
-                        "url": "https://attack.mitre.org/techniques/T1070/004/",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1070.006",
-                        "name": "Timestomp",
-                        "description": "Modifying file timestamps",
-                        "url": "https://attack.mitre.org/techniques/T1070/006/",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1562",
-                        "name": "Impair Defenses",
-                        "description": "Disabling logging and monitoring",
-                        "url": "https://attack.mitre.org/techniques/T1562/",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1028", "name": "Operating System Configuration"},
-                           {"id": "M1026", "name": "Privileged Account Management"},
-                           {"id": "M1018", "name": "User Account Control"}
-                        ]
-                    },
-                    {
-                        "id": "T1562.002",
-                        "name": "Disable Windows Event Logging",
-                        "description": "Disabling event logging",
-                        "url": "https://attack.mitre.org/techniques/T1562/002/",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1028", "name": "Operating System Configuration"},
-                           {"id": "M1026", "name": "Privileged Account Management"},
-                           {"id": "M1018", "name": "User Account Control"}
-                        ]
-                    },
-                    {
-                        "id": "T1562.006",
-                        "name": "Indicator Blocking",
-                        "description": "Blocking security indicators",
-                        "url": "https://attack.mitre.org/techniques/T1562/006/",
-                        "mitre_mitigations": [
-                           {"id": "M1054", "name": "Software Deployment Tools"},
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1028", "name": "Operating System Configuration"},
-                           {"id": "M1026", "name": "Privileged Account Management"},
-                           {"id": "M1018", "name": "User Account Control"}
-                        ]
-                    },
-                    {
-                        "id": "T1565.001",
-                        "name": "Stored Data Manipulation",
-                        "description": "Audit log manipulation",
-                        "url": "https://attack.mitre.org/techniques/T1565/001/",
-                        "mitre_mitigations": [
-                           {"id": "M1049", "name": "Antivirus/Antimalware"},
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"}
-                        ]
-                    },
-                    {
-                        "id": "T1204",
-                        "name": "User Execution",
-                        "description": "Tricking users into executing malicious code.",
-                        "url": "https://attack.mitre.org/techniques/T1204/",
-                        "mitre_mitigations": [
-                            {"id": "M1017", "name": "User Training"},
-                            {"id": "M1038", "name": "Execution Prevention"}
-                        ]
-                    }
-                ]
-            },
-            "InformationDisclosure": {
-                "tactics": ["Collection", "Exfiltration", "Discovery", "Reconnaissance"],
-                "techniques": [
-                    {
-                        "id": "T1005",
-                        "name": "Data from Local System",
-                        "description": "Collecting local sensitive data",
-                        "url": "https://attack.mitre.org/techniques/T1005/",
-                        "defend_mitigations": [{"id": "D3F-DFLS"}]
-                    },
-                    {
-                        "id": "T1041",
-                        "name": "Exfiltration Over C2 Channel",
-                        "description": "Data exfiltration via command and control",
-                        "url": "https://attack.mitre.org/techniques/T1041/",
-                        "mitre_mitigations": [
-                           {"id": "M1037", "name": "Filter Network Traffic"}
-                        ]
-                    },
-                    {
-                        "id": "T1083",
-                        "name": "File and Directory Discovery",
-                        "description": "Discovery of sensitive files and directories",
-                        "url": "https://attack.mitre.org/techniques/T1083/",
-                        "defend_mitigations": [{"id": "D3F-FDD"}]
-                    },
-                    {
-                        "id": "T1040",
-                        "name": "Network Sniffing",
-                        "description": "Network traffic interception and sniffing",
-                        "url": "https://attack.mitre.org/techniques/T1040/",
-                        "defend_mitigations": [{"id": "D3F-NS"}]
-                    },
-                    {
-                        "id": "T1592",
-                        "name": "Gather Victim Host Information",
-                        "description": "Host information gathering and fingerprinting",
-                        "url": "https://attack.mitre.org/techniques/T1592/",
-                        "defend_mitigations": [{"id": "D3F-GVHI"}]
-                    },
-                    {
-                        "id": "T1592.002",
-                        "name": "Software",
-                        "description": "Software fingerprinting and enumeration",
-                        "url": "https://attack.mitre.org/techniques/T1592/002/",
-                        "mitre_mitigations": [
-                           {"id": "M1036", "name": "Disable or Remove Feature or Program"}
-                        ]
-                    },
-                    {
-                        "id": "T1595",
-                        "name": "Active Scanning",
-                        "description": "Active reconnaissance and scanning",
-                        "url": "https://attack.mitre.org/techniques/T1595/",
-                        "defend_mitigations": [{"id": "D3F-AS"}]
-                    },
-                    {
-                        "id": "T1595.001",
-                        "name": "Scanning IP Blocks",
-                        "description": "Network scanning and enumeration",
-                        "url": "https://attack.mitre.org/techniques/T1595/001/",
-                        "mitre_mitigations": [
-                           {"id": "M1037", "name": "Filter Network Traffic"}
-                        ]
-                    },
-                    {
-                        "id": "T1595.002",
-                        "name": "Vulnerability Scanning",
-                        "description": "Vulnerability assessment and scanning",
-                        "url": "https://attack.mitre.org/techniques/T1595/002/",
-                        "mitre_mitigations": [
-                           {"id": "M1037", "name": "Filter Network Traffic"}
-                        ]
-                    },
-                    {
-                        "id": "T1589",
-                        "name": "Gather Victim Identity Information",
-                        "description": "Identity information gathering",
-                        "url": "https://attack.mitre.org/techniques/T1589/",
-                        "mitre_mitigations": [
-                           {"id": "M1056", "name": "User Training"},
-                           {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1590",
-                        "name": "Gather Victim Network Information",
-                        "description": "Network information reconnaissance",
-                        "url": "https://attack.mitre.org/techniques/T1590/",
-                        "mitre_mitigations": [
-                           {"id": "M1037", "name": "Filter Network Traffic"},
-                           {"id": "M1030", "name": "Network Segmentation"}
-                        ]
-                    },
-                    {
-                        "id": "T1591",
-                        "name": "Gather Victim Org Information",
-                        "description": "Organizational information gathering",
-                        "url": "https://attack.mitre.org/techniques/T1591/",
-                        "mitre_mitigations": [
-                           {"id": "M1056", "name": "User Training"}
-                        ]
-                    },
-                    {
-                        "id": "T1613",
-                        "name": "Container and Resource Discovery",
-                        "description": "Container and cloud resource discovery",
-                        "url": "https://attack.mitre.org/techniques/T1613/",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1030", "name": "Network Segmentation"},
-                           {"id": "M1026", "name": "Privileged Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1046",
-                        "name": "Network Service Discovery",
-                        "description": "Service enumeration and discovery",
-                        "url": "https://attack.mitre.org/techniques/T1046/",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1037", "name": "Filter Network Traffic"},
-                           {"id": "M1030", "name": "Network Segmentation"}
-                        ]
-                    },
-                    {
-                        "id": "T1087",
-                        "name": "Account Discovery",
-                        "description": "User and account enumeration",
-                        "url": "https://attack.mitre.org/techniques/T1087/",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1033", "name": "Limit Access to Resource Over Network"},
-                           {"id": "M1030", "name": "Network Segmentation"},
-                           {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1518",
-                        "name": "Software Discovery",
-                        "description": "Installed software discovery",
-                        "url": "https://attack.mitre.org/techniques/T1518/",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1038", "name": "Execution Prevention"}
-                        ]
-                    },
-                    {
-                        "id": "T1082",
-                        "name": "System Information Discovery",
-                        "description": "System configuration discovery",
-                        "url": "https://attack.mitre.org/techniques/T1082/",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1038", "name": "Execution Prevention"},
-                           {"id": "M1026", "name": "Privileged Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1213",
-                        "name": "Data from Information Repositories",
-                        "description": "Lifting sensitive data from caches and repositories",
-                        "url": "https://attack.mitre.org/techniques/T1213/",
-                        "mitre_mitigations": [
-                           {"id": "M1022", "name": "Restrict File and Directory Permissions"},
-                           {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1555",
-                        "name": "Credentials from Password Stores",
-                        "description": "Reverse engineering and white box analysis",
-                        "url": "https://attack.mitre.org/techniques/T1555/",
-                        "mitre_mitigations": [
-                           {"id": "M1028", "name": "Operating System Configuration"},
-                           {"id": "M1026", "name": "Privileged Account Management"},
-                           {"id": "M1017", "name": "User Account Management"}
-                        ]
-                    },
-                    {
-                        "id": "T1552",
-                        "name": "Unsecured Credentials",
-                        "description": "Exploiting incorrectly configured SSL/TLS",
-                        "url": "https://attack.mitre.org/techniques/T1552/",
-                        "mitre_mitigations": [
-                           {"id": "M1043", "name": "Audit"},
-                           {"id": "M1028", "name": "Operating System Configuration"}
-                        ]
-                    }
-                ]
-            }
-        }
-        # Add the official D3FEND mapping to each technique
-        for category in mapping.values():
-            for technique in category.get("techniques", []):
-                technique['defend_mitigations'] = []
-                for mitre_mitigation in technique.get("mitre_mitigations", []):
-                    mitigation_id = mitre_mitigation.get("id")
-                    if mitigation_id:
-                        technique['defend_mitigations'].extend(self._get_d3fend_mitigations_for_mitre_id(mitigation_id))
-        # DEBUG: Add a logging statement here to check the populated defend_mitigations
-        if technique.get("id") == "T1566": # Example technique
-            logging.debug(f"DEBUG: D3FEND mitigations for T1566: {technique.get('defend_mitigations')}")
-        return mapping
-
     def _get_d3fend_mitigations_for_mitre_id(self, mitigation_id: str) -> List[Dict[str, Any]]:
         """
         Retrieves D3FEND mitigations for a given MITRE mitigation ID.
         """
         d3fend_mitigations = []
+        # Find the matching MITRE mitigation in the attack_d3fend_mapping
         for attack_d3fend_key, d3fend_entries in attack_d3fend_mapping.items():
-            mitre_id_from_d3fend_key_match = re.match(r'^(M\d+)', attack_d3fend_key)
-            if mitre_id_from_d3fend_key_match:
-                mitre_id_from_d3fend_key = mitre_id_from_d3fend_key_match.group(1)
-                if mitigation_id == mitre_id_from_d3fend_key:
-                    for d3fend_entry in d3fend_entries:
-                        d3fend_id_from_entry_match = re.match(r'^(D3-[A-Z0-9]+)', d3fend_entry)
-                        if d3fend_id_from_entry_match:
-                            d3fend_id_from_entry = d3fend_id_from_entry_match.group(1)
-                            if d3fend_id_from_entry in self.d3fend_details:
-                                d3fend_mitigations.append({
-                                    "id": d3fend_id_from_entry,
-                                    "name": self.d3fend_details[d3fend_id_from_entry]['name'],
-                                    "description": self.d3fend_details[d3fend_id_from_entry]['description'],
-                                    "url_friendly_name_source": d3fend_entry # Ensure this key is always present
-                                })
-                            else:
-                                d3fend_mitigations.append({
-                                    "id": "UNKNOWN",
-                                    "name": d3fend_entry.split(' ', 1)[1] if ' ' in d3fend_entry else d3fend_entry,
-                                    "description": "D3FEND mitigation details not found or not applicable."
-                                })
-                    break  # Found matching M-ID, no need to check further
+            if mitigation_id in attack_d3fend_key:
+                for d3fend_entry in d3fend_entries:
+                    # Extract D3FEND ID
+                    d3fend_id_match = re.match(r'^(D3-[A-Z0-9]+)', d3fend_entry)
+                    if d3fend_id_match:
+                        d3fend_id = d3fend_id_match.group(1)
+                        # Check if we have details for this D3FEND ID
+                        if d3fend_id in self.d3fend_details:
+                            # Create a URL-friendly name from the description
+                            name_part = self.d3fend_details[d3fend_id]['name']
+                            url_friendly_name = name_part.replace(' ', '-')
+                            
+                            d3fend_mitigations.append({
+                                "id": d3fend_id,
+                                "name": name_part,
+                                "description": self.d3fend_details[d3fend_id]['description'],
+                                "url_friendly_name": url_friendly_name
+                            })
+                        else:
+                            # Fallback if no details are found
+                            name_part = d3fend_entry.split(' ', 1)[1] if ' ' in d3fend_entry else d3fend_entry
+                            url_friendly_name = name_part.replace(' ', '-')
+                            d3fend_mitigations.append({
+                                "id": "UNKNOWN",
+                                "name": name_part,
+                                "description": "D3FEND mitigation details not found or not applicable.",
+                                "url_friendly_name": url_friendly_name
+                            })
+                # Since we found the matching MITRE ID, we can stop searching
+                break
         return d3fend_mitigations
 
-    def _process_technique_mitigations(self, technique: Dict[str, Any], category_mapping: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Processes and enriches a technique with MITRE and D3FEND mitigations.
-        """
-        tech_copy = technique.copy()
-        technique_id = tech_copy.get("id")
-        
-        tech_copy['tactics'] = category_mapping.get("tactics", [])
-        
-        # Process custom mitigations from Markdown
-        if technique_id in self.markdown_mitigations:
-            mitigations_list = []
-            for i, m in enumerate(self.markdown_mitigations[technique_id]):
-                mitigations_list.append({'id': f'M-CUSTOM-{i+1}', 'name': m})
-            tech_copy['mitre_mitigations'] = mitigations_list
-        
-        # Process D3FEND mitigations
-        tech_copy['defend_mitigations'] = technique.get('defend_mitigations', [])
-        
-        return tech_copy
-
-    def _initialize_threat_patterns(self) -> Dict[str, str]:
-        """
-        Initializes a dictionary mapping STRIDE categories to a list of MITRE ATT&CK techniques.
-        This is built by chaining STRIDE -> CAPEC -> ATT&CK mappings.
-        """
-        stride_to_mitre_map = {}
-        for stride_category, capec_list in self.stride_to_capec.items():
-            all_techniques = set()
-            for capec_info in capec_list:
-                capec_id = capec_info['capec_id']
-                if capec_id in self.capec_to_mitre_map:
-                    all_techniques.update(self.capec_to_mitre_map[capec_id])
-            
-            # Normalize stride category name to match the keys in self.mapping
-            normalized_stride_category = stride_category.replace(" ", "")
-            if "DenialOfService" in normalized_stride_category:
-                 normalized_stride_category = "DenialOfService"
-
-            stride_to_mitre_map[normalized_stride_category] = sorted(list(all_techniques))
-
-        # This part is for the regex-based mapping, which will be kept as a secondary mechanism.
-        # It can be extended or kept as is.
-        return {
-            # === Core MITRE ATT&CK Techniques ===
-            "T1566": r"(?i)phishing|identity spoofing|social engineering|spear phishing",
-            "T1036": r"(?i)masquerading|impersonation|disguise|process masquerading",
-            "T1078": r"(?i)valid accounts|compromised credentials|stolen accounts|authentication abuse|authentication bypass|weak authentication|insecure credentials|exploitation of trusted credentials|principal spoof",
-            "T1110": r"(?i)brute force|password attack|credential stuffing|password spraying|dictionary attack|encryption brute forcing",
-            "T1110.001": r"(?i)dictionary.based password attack|password guessing|dictionary attack",
-            "T1185": r"(?i)session hijacking|browser session hijacking",
-            "T1539": r"(?i)session cookie|steal.*session|session sidejacking|reusing session ids|session replay|session credential falsification|session.*prediction|session.*manipulation|session.*forging",
-            "T1557": r"(?i)man.in.the.middle|adversary.in.the.middle|mitm attack",
-            "T1556": r"(?i)authentication bypass|modify authentication|authentication abuse",
-            "T1598": r"(?i)cross site request forgery|csrf|phishing for information",
-            # Tampering and Injection Attacks
-            "T1565": r"(?i)data manipulation|process tampering|alteration of data|input data manipulation|parameter injection|audit log manipulation|schema poisoning|xml schema poisoning",
-            "T1190": r"(?i)exploit public.facing application|web application exploit|application vulnerability|unpatched.*vulnerabilities|injection|sql injection|xml injection|command injection|code injection|ldap injection|format string injection|server side include|ssi injection|remote code inclusion|argument injection|dtd injection|resource injection",
-            "T1059": r"(?i)command.*injection|scripting interpreter|command execution|shell injection",
-            "T1059.007": r"(?i)javascript|xss|cross.site scripting|dom.based xss|reflected xss|stored xss|script injection",
-            "T1505.003": r"(?i)web shell|php.*inclusion|remote.*inclusion|file.*inclusion",
-            "T1105": r"(?i)ingress tool transfer|malicious file|file upload|remote file inclusion|php remote file inclusion",
-            "T1071": r"(?i)application layer protocol|protocol manipulation|communication channel manipulation",
-            "T1071.001": r"(?i)web protocols|http.*manipulation|http.*smuggling|http.*splitting|protocol tampering|http request splitting|http response smuggling|http request smuggling|xml routing detour|client.server protocol manipulation",
-            # Path and Directory Attacks
-            "T1083": r"(?i)path traversal|directory traversal|relative path traversal|file.*directory discovery|try all common switches|excavation",
-            # Encoding and Obfuscation
-            "T1027": r"(?i)obfuscated files|double encoding|obfuscation|encoding manipulation",
-            "T1140": r"(?i)deobfuscate|decode|alternate encoding|leverage alternate encoding",
-            # Session and Credential Attacks
-            "T1212": r"(?i)exploitation for credential access|credential exploitation",
-            "T1134": r"(?i)access token manipulation|token manipulation|token theft|token impersonation",
-            # Information Disclosure and Reconnaissance
-            "T1005": r"(?i)sensitive data disclosure|local data|unprotected sensitive data|data leak|credentials aging",
-            "T1040": r"(?i)network sniffing|sniffing attacks|interception|cross site tracing",
-            "T1592": r"(?i)footprinting|web application fingerprinting|victim host information|software fingerprinting",
-            "T1595": r"(?i)active scanning|vulnerability scanning|fuzzing|scanning",
-            "T1213": r"(?i)exploiting trust in client|data from information repositories|lifting sensitive data.*cache|insecure direct object references|idor",
-            "T1555": r"(?i)reverse engineering|white box reverse engineering|credentials from password stores",
-            "T1552": r"(?i)unsecured credentials|exploiting incorrectly configured ssl|ssl/tls misconfiguration|weak ssl/tls",
-            # JSON and API Attacks
-            "T1041": r"(?i)json hijacking|javascript hijacking|api manipulation|exploit.*apis|exploit test apis|exploit script.based apis",
-            # Registry and Environment
-            "T1112": r"(?i)modify registry|manipulate registry|registry manipulation|manipulate registry information",
-            "T1574": r"(?i)hijack execution flow|subverting environment variable|environment variable manipulation|command delimiters",
-            # Content and Interface Attacks
-            "T1036": r"(?i)masquerading|impersonation|disguise|process masquerading|content spoofing|iframe overlay",
-            # Privilege Escalation
-            "T1068": r"(?i)privilege escalation|exploitation for privilege escalation|elevation of privilege|vulnerability in the management interface|unpatched.*vulnerabilities|compromise of the management interface",
-            "T1548": r"(?i)abuse elevation control|exploiting incorrectly configured access control|functionality misuse|hijacking.*privileged process|catching exception.*privileged",
-            "T1055": r"(?i)process injection|hijacking.*privileged process|embedding scripts",
-            "T1484": r"(?i)privilege abuse|domain policy modification",
-            "T1021": r"(?i)remote services|lateral movement",
-            # Denial of Service and Buffer Attacks
-            "T1499": r"(?i)denial of service|dos attack|endpoint dos|resource exhaustion|flooding|excessive allocation|xml.*blowup|buffer overflow|removing.*functionality|xml entity expansion|xml ping of death|resource-intensive queries|exhaust its resources|disrupt air traffic control",
-            "T1498": r"(?i)network denial of service|ddos|network flood|amplification",
-            "T1489": r"(?i)service stop|disable.*service",
-            "T1499.004": r"(?i)buffer manipulation|overflow buffers|xml entity expansion|xml ping of death",
-            # Client Function Removal
-            "T1621": r"(?i)removing important client functionality|multi.factor authentication request generation",
-            # Log and Audit Manipulation
-            "T1070": r"(?i)indicator removal|log deletion|clear.*logs|audit log manipulation|repudiation of critical actions|lack of monitoring|lack of logging",
-            "T1070.001": r"(?i)clear windows event logs",
-            "T1070.002": r"(?i)clear linux.*logs|clear mac.*logs",
-            "T1562": r"(?i)impair defenses|disable.*security|functionality misuse|insecure security configuration|hardening",
-            "T1562.001": r"(?i)firewall rule misconfiguration|disable or modify system firewall|firewall bypass",
-            # Custom Threats
-            "T-CUSTOM-APIKEY": r"(?i)api key exposure|hardcoded api key|insecure api key",
-            "T-CUSTOM-CONTAINER-ESCAPE": r"(?i)container escape|breakout container|container breakout",
-            "T-CUSTOM-SSRF": r"(?i)ssrf|server side request forgery",
-            "T-CUSTOM-DESERIALIZATION": r"(?i)deserialization vulnerability|insecure deserialization",
-            "T-CUSTOM-LOG-FORGERY": r"(?i)log forgery|log injection|audit log tampering",
-            "T1199": r"(?i)trusted relationship|third-party trust",
-            "T1485": r"(?i)data destruction|delete files|wipe data",
-            "T1496": r"(?i)resource hijacking|cryptojacking|cryptomining",
-            "T1547": r"(?i)boot or logon autostart|autostart execution",
-            "T1204": r"(?i)user execution|trick user|social engineering",
-            # PyTM STRIDE Categories
-            "spoofing": "Spoofing",
-            "tampering": "Tampering|unpatched.*vulnerabilities|sql.*injection|nosql.*injection|xss|cross.site scripting|data corruption|unauthorized write access|injection of false surveillance data|unauthorized access to or modification of flight plans|unpatched.*vulnerabilities",
-            "repudiation": "Repudiation",
-            "information disclosure": "InformationDisclosure",
-            "denialofservice": "DenialOfService",
-            "elevationofprivilege": "ElevationOfPrivilege|unauthorized privilege escalation|vulnerability in the management interface|compromise of the management interface|lateral movement"
-        }
-    def map_threat_to_mitre(self, threat_description: str, stride_category: str) -> Dict[str, List[Dict[str, Any]]]:
+    def map_threat_to_mitre(self, threat: Dict[str, Any]) -> Dict[str, List[Dict[str, Any]]]:
         """
         Maps a threat to MITRE ATT&CK techniques and CAPEC patterns.
-        Returns a dictionary with 'techniques' and 'capecs'.
+        It uses a dynamic mapping from the loaded JSON data.
         """
         found_techniques = {}
         found_capecs = {}
+        stride_category = threat.get("stride_category", "")
 
-        # Primary mapping: STRIDE -> CAPEC -> ATT&CK
-        normalized_stride_category = stride_category.replace(" ", "")
-        if "DenialOfService" in normalized_stride_category:
-            normalized_stride_category = "DenialOfService"
+        direct_capec_ids = threat.get("capec_ids", [])
+        if not direct_capec_ids:
+            normalized_stride = stride_category.replace(" ", "")
+            if "DenialOfService" in normalized_stride:
+                 normalized_stride = "DenialOfService"
+            capec_list = self.stride_to_capec.get(normalized_stride, [])
+            direct_capec_ids = [c['capec_id'] for c in capec_list]
+            for capec_info in capec_list:
+                if capec_info['capec_id'] not in found_capecs:
+                    found_capecs[capec_info['capec_id']] = capec_info
 
-        if normalized_stride_category in self.stride_to_capec:
-            for capec_info in self.stride_to_capec[normalized_stride_category]:
-                capec_id = capec_info['capec_id']
-                if capec_id not in found_capecs:
-                    found_capecs[capec_id] = capec_info
-                
-                if capec_id in self.capec_to_mitre_map:
-                    technique_ids = self.capec_to_mitre_map[capec_id]
-                    for tech_id in technique_ids:
-                        if tech_id not in found_techniques:
-                            for cat_map in self.mapping.values():
-                                for tech in cat_map.get("techniques", []):
-                                    if tech.get("id") == tech_id:
-                                        found_techniques[tech_id] = self._process_technique_mitigations(tech, cat_map)
-                                        break
+        for capec_id in direct_capec_ids:
+            if capec_id not in found_capecs:
+                 for cat_capecs in self.stride_to_capec.values():
+                    for capec_info in cat_capecs:
+                        if capec_info['capec_id'] == capec_id:
+                            found_capecs[capec_id] = capec_info
+                            break
+            
+            technique_ids = self.capec_to_mitre_map.get(capec_id, [])
+            #if not technique_ids:
+                #logging.warning(f"WARNING: No ATT&CK techniques found for CAPEC ID {capec_id}")
+            for tech_id in technique_ids:
+                if tech_id in self.all_attack_techniques and tech_id not in found_techniques:
+                    technique_data = self.all_attack_techniques[tech_id].copy()
+                    
+                    technique_data['mitre_mitigations'] = self.technique_to_mitigation_map.get(tech_id, [])
+                    d3fend_list = []
+                    for mitre_mitigation in technique_data['mitre_mitigations']:
+                        mitigation_id = mitre_mitigation.get('id')
+                        if mitigation_id:
+                            d3fend_list.extend(self._get_d3fend_mitigations_for_mitre_id(mitigation_id))
+                    technique_data['defend_mitigations'] = d3fend_list
 
-        # Secondary mapping: Regex on description
-        for pattern_value, pattern_regex in self.threat_patterns.items():
-            if re.match(r'T\d{4}(?:\.\d{3})?', pattern_value) and re.search(pattern_regex, threat_description, re.IGNORECASE):
-                technique_id = pattern_value
-                if technique_id not in found_techniques:
-                    for category_mapping in self.mapping.values():
-                        for technique in category_mapping.get("techniques", []):
-                            if technique.get("id") == technique_id:
-                                found_techniques[technique_id] = self._process_technique_mitigations(technique, category_mapping)
-                                break
+                    framework_mitigations = get_framework_mitigation_suggestions([tech_id])
+                    technique_data['owasp_mitigations'] = [m for m in framework_mitigations if m.get('framework') == 'OWASP ASVS']
+                    technique_data['nist_mitigations'] = [m for m in framework_mitigations if m.get('framework') == 'NIST']
+                    technique_data['cis_mitigations'] = [m for m in framework_mitigations if m.get('framework') == 'CIS']
+
+                    found_techniques[tech_id] = technique_data
         
         return {
             "techniques": list(found_techniques.values()),
@@ -1239,7 +249,14 @@ class MitreMapping:
             threat_description = getattr(threat, 'description', '')
             threat_name = getattr(threat, 'name', str(threat.__class__.__name__))
             stride_category = self.classify_pytm_threat(threat)
-            mapping_results = self.map_threat_to_mitre(threat_description, stride_category)
+            
+            threat_dict = {
+                "description": threat_description,
+                "stride_category": stride_category,
+                "capec_ids": getattr(threat, 'capec_ids', [])
+            }
+            mapping_results = self.map_threat_to_mitre(threat_dict)
+
             mitre_techniques = mapping_results.get('techniques', [])
             mitre_tactics = self.get_tactics_for_threat(stride_category)
             processed_threat = {
@@ -1259,25 +276,22 @@ class MitreMapping:
             for tech in mitre_techniques:
                 unique_mitre_techniques.add(tech.get("id"))
         results["mitre_techniques_count"] = len(unique_mitre_techniques)
-        logging.info(f"\n=== Final Results ===")
+        logging.info(f"\n=== Final Results ====")
         logging.info(f"Total threats: {results['total_threats']}")
         return results
+
     def classify_pytm_threat(self, threat) -> str:
         """
         Classifies a threat into a STRIDE category based on its properties.
         """
-        # Priority 1: Use the pre-assigned stride_category if it exists
         if hasattr(threat, 'stride_category') and threat.stride_category:
             return threat.stride_category
-        # Priority 2: Use the threat's class name if it maps to a STRIDE category
         threat_class_name = threat.__class__.__name__
         if threat_class_name in ['Spoofing', 'Tampering', 'Repudiation', 'InformationDisclosure', 'DenialOfService', 'ElevationOfPrivilege']:
             return threat_class_name
-        # Priority 3: Use keyword matching on the threat's description
         description = getattr(threat, 'description', '').lower()
         if not description:
             return 'Unknown'
-        # Keywords for each STRIDE category
         stride_keywords = {
             'Spoofing': ['spoof', 'impersonat', 'masquerad', 'phish', 'credential theft'],
             'Tampering': ['tamper', 'modif', 'inject', 'xss', 'cross-site scripting', 'idor'],
@@ -1290,43 +304,22 @@ class MitreMapping:
             if any(keyword in description for keyword in keywords):
                 return category
         return 'Unknown'
+
     def get_tactics_for_threat(self, stride_category: str) -> List[str]:
         """
         Enhanced MITRE tactics mapping for STRIDE categories.
         """
         stride_to_tactics = {
-            'Information Disclosure': [
-                'Collection',
-                'Exfiltration', 
-                'Discovery'
-            ],
-            'Tampering': [
-                'Defense Evasion',
-                'Impact',
-                'Initial Access',
-                'Execution'
-            ],
-            'Spoofing': [
-                'Initial Access',
-                'Credential Access',
-                'Defense Evasion'
-            ],
-            'Denial of Service': [
-                'Impact'
-            ],
-            'Elevation of Privilege': [
-                'Privilege Escalation',
-                'Defense Evasion'
-            ],
-            'Repudiation': [
-                'Defense Evasion',
-                'Impact'
-            ]
+            'Information Disclosure': ['Collection', 'Exfiltration', 'Discovery'],
+            'Tampering': ['Defense Evasion', 'Impact', 'Initial Access', 'Execution'],
+            'Spoofing': ['Initial Access', 'Credential Access', 'Defense Evasion'],
+            'Denial of Service': ['Impact'],
+            'Elevation of Privilege': ['Privilege Escalation', 'Defense Evasion'],
+            'Repudiation': ['Defense Evasion', 'Impact']
         }
         tactics = stride_to_tactics.get(stride_category, [])
         return tactics
     
     def get_stride_categories(self) -> List[str]:
         """Returns the list of available STRIDE categories."""
-        return list(self.mapping.keys())
-    
+        return list(self.stride_to_capec.keys())

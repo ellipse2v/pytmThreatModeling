@@ -41,11 +41,12 @@ class AttackFlowGenerator:
             filtered_threats.append(threat)
 
         allowed_categories = {
-            "Elevation of Privilege",
-            "Information Disclosure",
-            "Repudiation",
             "Spoofing",
-            "Tampering"
+            "Tampering",
+            "Repudiation",
+            "Information Disclosure",
+            "Denial of Service",
+            "Elevation of Privilege"
         }
         self.threats = [
             threat for threat in filtered_threats
@@ -80,7 +81,7 @@ class AttackFlowGenerator:
                         break
         return phase_map
 
-    def _find_attack_paths(self, max_paths=20):
+    def _find_attack_paths(self, max_paths=100):
         if not self.techniques:
             return []
 
@@ -139,7 +140,7 @@ class AttackFlowGenerator:
             return
 
         paths_by_objective = defaultdict(list)
-        final_objectives = {"Tampering", "Spoofing", "Information Disclosure", "Repudiation"}
+        final_objectives = {"Spoofing", "Tampering", "Repudiation", "Information Disclosure", "Denial of Service", "Elevation of Privilege"}
         
         for path in attack_paths:
             if not path:
@@ -167,10 +168,7 @@ class AttackFlowGenerator:
                     best_path_for_objective = path
             
             if best_path_for_objective:
-                path_signature = tuple(item[0] for item in best_path_for_objective)
-                if path_signature not in best_paths_data:
-                    best_paths_data[path_signature] = {"path": best_path_for_objective, "objectives": []}
-                best_paths_data[path_signature]["objectives"].append(objective)
+                best_paths_data[objective] = {"path": best_path_for_objective, "objectives": [objective]}
 
         if not best_paths_data:
             print("INFO: No valid attack paths found after optimization.")
@@ -178,19 +176,18 @@ class AttackFlowGenerator:
 
         print(f"INFO: Found {len(best_paths_data)} unique attack paths after optimization.")
         i = 0
-        for path_data in best_paths_data.values():
+        for objective, path_data in best_paths_data.items():
             path = path_data["path"]
-            primary_objective = path_data["objectives"][0]
             
             flow_data = self._generate_single_path_flow(path, i + 1)
             if flow_data:
-                file_path = os.path.join(afb_output_dir, f"optimized_path_{primary_objective}.afb")
+                file_path = os.path.join(afb_output_dir, f"optimized_path_{objective}.afb")
                 try:
                     with open(file_path, 'w') as f:
                         json.dump(flow_data, f, indent=4)
-                    print(f"INFO: Successfully generated optimized attack path for objective '{primary_objective}' at {file_path}")
+                    print(f"INFO: Successfully generated optimized attack path for objective '{objective}' at {file_path}")
                 except Exception as e:
-                    print(f"ERROR: Error writing file for objective '{primary_objective}': {e}")
+                    print(f"ERROR: Error writing file for objective '{objective}': {e}")
             i += 1
 
     # --- Start of Duplicated Methods from Report Generator ---

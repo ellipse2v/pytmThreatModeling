@@ -20,41 +20,82 @@ This module is responsible for loading and parsing external threat data files.
 import pandas as pd
 import json
 import logging
-import re
 from pathlib import Path
 from typing import Dict, List, Any, Optional
+from collections import defaultdict
 
-import xml.etree.ElementTree as ET
 
+def load_attack_techniques() -> Dict[str, Dict[str, Any]]:
+    """Loads all ATT&CK techniques from the enterprise-attack.json file."""
+    techniques = {}
+    stix_path = Path(__file__).parent.parent / 'external_data' / 'enterprise-attack.json'
+    try:
+        with open(stix_path, 'r', encoding='utf-8') as f:
+            stix_data = json.load(f)
+        
+        for obj in stix_data.get("objects", []):
+            if obj.get("type") == "attack-pattern":
+                external_id = next((ref['external_id'] for ref in obj.get('external_references', []) if ref.get('source_name') == 'mitre-attack'), None)
+                if external_id:
+                    techniques[external_id] = {
+                        "id": external_id,
+                        "name": obj.get("name"),
+                        "description": obj.get("description"),
+                        "url": next((ref['url'] for ref in obj.get('external_references', []) if ref.get('source_name') == 'mitre-attack'), None),
+                        "tactics": [phase['phase_name'].replace('-', ' ').title() for phase in obj.get('kill_chain_phases', []) if phase.get('kill_chain_name') == 'mitre-attack']
+                    }
+    except FileNotFoundError:
+        logging.error(f"Error: STIX data file not found at {stix_path}.")
+    except Exception as e:
+        logging.error(f"Error processing STIX data file: {e}")
+    logging.info(f"Successfully loaded {len(techniques)} ATT&CK techniques into the dictionary.")
+    return techniques
 
 
 def load_capec_to_mitre_mapping() -> Dict[str, List[str]]:
-    """Initializes CAPEC to MITRE ATT&CK mapping from the CSV file."""
+    """Initializes CAPEC to MITRE ATT&CK mapping from the structured JSON file."""
     capec_to_mitre = {}
-    xml_path = Path(__file__).parent.parent / 'external_data' / 'CAPEC_VIEW_ATT&CK_Related_Patterns.xml'
+    json_path = Path(__file__).parent.parent / 'external_data' / 'capec_to_mitre_structured_mapping.json'
     try:
-        tree = ET.parse(xml_path)
-        root = tree.getroot()
+        with open(json_path, 'r', encoding='utf-8') as f:
+            file_content_for_debug = f.read()
+            logging.info(f"--- Attempting to parse capec_to_mitre_structured_mapping.json ---")
+            structured_data = json.loads(file_content_for_debug)
+        
+        all_techniques = set()
+        for capec_entry in structured_data:
+            capec_id = capec_entry.get('capec_id')
+            techniques = capec_entry.get('techniques', [])
+            
+            if not capec_id:
+                continue
 
-        # Define the namespace
-        namespace = {'capec': 'http://capec.mitre.org/capec-3'}
+            technique_ids = [
+                tech['id'] for tech in techniques 
+                if tech.get('taxonomy') == 'ATT&CK' and tech.get('id')
+            ]
+            
+            if technique_ids:
+                # Ensure we don't have duplicates
+                unique_ids = sorted(list(set(technique_ids)))
+                capec_to_mitre[capec_id] = unique_ids
+                all_techniques.update(unique_ids)
 
-        for attack_pattern in root.findall('.//capec:Attack_Pattern', namespace):
-            capec_id = attack_pattern.get('ID')
-            if capec_id:
-                mitre_ids = []
-                for taxonomy_mapping in attack_pattern.findall('.//capec:Taxonomy_Mapping', namespace):
-                    if taxonomy_mapping.get('Taxonomy_Name') == 'ATTACK':
-                        entry_id = taxonomy_mapping.find('capec:Entry_ID', namespace)
-                        if entry_id is not None and entry_id.text:
-                            mitre_ids.append(f"T{entry_id.text}")
-                if mitre_ids:
-                    capec_to_mitre[capec_id] = sorted(list(set(mitre_ids)))
+        logging.info(f"Successfully loaded CAPEC->MITRE mapping. "
+                      f"Found {len(capec_to_mitre)} CAPEC entries "
+                      f"mapped to a total of {len(all_techniques)} unique ATT&CK techniques.")
+
     except FileNotFoundError:
-        logging.error(f"Error: CAPEC to MITRE mapping file not found at {xml_path}.")
+        logging.error(f"Error: CAPEC to MITRE JSON mapping file not found at {json_path}. "
+                      f"Please run 'tooling/capec_to_mitre_builder.py' to generate it.")
+    except json.JSONDecodeError:
+        logging.error(f"Error decoding JSON from {json_path}. The file might be corrupt.")
     except Exception as e:
-        logging.error(f"Error processing CAPEC to MITRE mapping file: {e}")
+        logging.error(f"Error processing CAPEC to MITRE JSON mapping file: {e}")
+        
     return capec_to_mitre
+
+
 
 def load_stride_to_capec_map() -> Dict[str, List[Dict[str, str]]]:
     """Loads the STRIDE to CAPEC mapping from the JSON file."""
@@ -173,45 +214,77 @@ def _clean_string(value: Optional[str]) -> str:
     return cleaned if cleaned and cleaned.lower() not in ['nan', 'null', 'none'] else ""
 
 
-# Alternative version with caching for performance optimization
-import functools
+def load_nist_mappings() -> Dict[str, List[Dict[str, str]]]:
+    """
+    Loads NIST 800-53 R5 mappings from the local Excel file.
+    Maps ATT&CK Technique IDs to NIST control details.
+    """
+    nist_mappings = defaultdict(list)
+    excel_path = Path(__file__).parent.parent / 'external_data' / "nist800-53-r5-mappings.xlsx"
 
-@functools.lru_cache(maxsize=1)
-def load_d3fend_mapping_cached() -> Dict[str, Dict[str, str]]:
+    if not excel_path.exists() or excel_path.stat().st_size == 0:
+        logging.error(f"NIST mapping file not found at {excel_path}. Please run 'tooling/download_nist_data.py' to download it.")
+        return defaultdict(list)
+
+    try:
+        # Load the Excel file
+        df = pd.read_excel(excel_path, sheet_name='Mappings')
+
+        # Clean column names
+        df.columns = df.columns.str.strip()
+
+        # Expected columns
+        attack_id_col = 'Technique ID'
+        nist_id_col = 'Control ID'
+        nist_name_col = 'Control Name'
+        
+        if not all(col in df.columns for col in [attack_id_col, nist_id_col, nist_name_col]):
+            logging.error(f"Missing expected columns in NIST Excel file. Found: {df.columns.tolist()}")
+            return defaultdict(list)
+
+        for index, row in df.iterrows():
+            attack_id = str(row[attack_id_col]).strip()
+            nist_id = str(row[nist_id_col]).strip()
+            nist_name = str(row[nist_name_col]).strip()
+
+            if attack_id and nist_id:
+                nist_url = "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+                nist_mappings[attack_id].append({
+                    "id": nist_id,
+                    "name": nist_name,
+                    "url": nist_url,
+                    "framework": "NIST"
+                })
+        
+        logging.info(f"Successfully loaded {len(nist_mappings)} ATT&CK techniques mapped to NIST controls.")
+
+    except FileNotFoundError:
+        logging.error(f"Error: NIST Excel file not found at {excel_path}. Please run 'tooling/download_nist_data.py'.")
+    except pd.errors.EmptyDataError:
+        logging.error(f"NIST Excel file is empty or corrupted: {excel_path}")
+    except Exception as e:
+        logging.error(f"Error processing NIST Excel file: {e}")
+        
+    return nist_mappings
+
+def load_cis_to_mitre_mapping() -> Dict[str, Dict[str, List[str]]]:
     """
-    Cached version of load_d3fend_mapping to avoid repeated file loading.
-    Uses LRU cache with single entry for repeated calls.
+    Loads the CIS Controls to MITRE ATT&CK mapping from the generated JSON file.
+    The JSON maps CIS IDs to a list of MITRE techniques.
     """
-    return load_d3fend_mapping()
+    json_path = Path(__file__).parent.parent / 'external_data' / 'cis_to_mitre_mapping.json'
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            logging.info(f"Successfully loaded CIS to MITRE mapping from {json_path}.")
+            return data
+    except FileNotFoundError:
+        logging.error(f"Error: CIS to MITRE mapping file not found at {json_path}. "
+                      f"Please run 'tooling/cis_controls_parser.py' to generate it.")
+        return {}
+    except json.JSONDecodeError:
+        logging.error(f"Error decoding JSON from {json_path}. The file might be corrupt.")
+        return {}
 
 
-# Utility function to validate loaded mapping
-def validate_d3fend_mapping(mapping: Dict[str, Dict[str, str]]) -> bool:
-    """
-    Validates the structure of the loaded D3FEND mapping.
-    
-    Args:
-        mapping: D3FEND mapping dictionary to validate
-        
-    Returns:
-        bool: True if mapping is valid, False otherwise
-    """
-    if not isinstance(mapping, dict):
-        return False
-    
-    for d3fend_id, details in mapping.items():
-        if not isinstance(d3fend_id, str) or not d3fend_id.strip():
-            return False
-        
-        if not isinstance(details, dict):
-            return False
-        
-        required_keys = ['name', 'description']
-        if not all(key in details for key in required_keys):
-            return False
-        
-        if not isinstance(details['name'], str):
-            return False
-    
-    return True
 

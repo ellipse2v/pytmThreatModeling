@@ -30,6 +30,22 @@ This will display a summary of the coverage in your terminal.
 
 ---
 
+## External Data
+
+### NIST Data
+
+The application uses NIST 800-53 R5 mappings. This data is not included in the repository and must be downloaded separately.
+
+To download the NIST data, run the following command from the root of the project:
+
+```bash
+python3 tooling/download_nist_data.py
+```
+
+This will download the necessary file to `threat_analysis/external_data/`.
+
+---
+
 ## Future Development: Infrastructure as Code (IaC) Integration
 
 This section outlines the planned integration of Infrastructure as Code (IaC) tools, starting with Ansible, into the STRIDE Threat Analysis Framework. The goal is to enhance the "Threat Modeling as Code" philosophy by enabling automated threat model generation and analysis directly from IaC configurations.

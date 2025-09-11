@@ -31,9 +31,10 @@ from threat_analysis.generation.attack_navigator_generator import AttackNavigato
 from threat_analysis.generation.stix_generator import StixGenerator
 from threat_analysis.core.model_validator import ModelValidator
 
+
 class ThreatModelService:
     def __init__(self):
-        self.mitre_mapping = MitreMapping()
+        self.mitre_mapping = MitreMapping(threat_model_path="")
         self.severity_calculator = SeverityCalculator()
         self.diagram_generator = DiagramGenerator()
         self.report_generator = ReportGenerator(self.severity_calculator, self.mitre_mapping)
@@ -57,7 +58,7 @@ class ThreatModelService:
             markdown_content=markdown_content,
             model_name="WebThreatModel",
             model_description="Live-updated threat model",
-            mitre_mapping=self.mitre_mapping,
+
             validate=False,  # No need to validate on every update
         )
         if not threat_model:
@@ -131,7 +132,7 @@ class ThreatModelService:
             markdown_content=markdown_content,
             model_name="ExportedThreatModel",
             model_description="Exported from web interface",
-            mitre_mapping=self.mitre_mapping,
+
             validate=True,
         )
         if not threat_model:
@@ -205,7 +206,7 @@ class ThreatModelService:
             markdown_content=markdown_content,
             model_name="ExportedThreatModel",
             model_description="Exported from web interface",
-            mitre_mapping=self.mitre_mapping,
+
             validate=True,
         )
         if not threat_model:
@@ -315,7 +316,7 @@ class ThreatModelService:
             markdown_content=markdown_content,
             model_name="ExportedThreatModel",
             model_description="Exported from web interface",
-            mitre_mapping=self.mitre_mapping,
+
             validate=True,
         )
         if not threat_model:

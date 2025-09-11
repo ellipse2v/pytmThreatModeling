@@ -374,8 +374,8 @@ def test_generate_legend_html_basic(diagram_generator):
     mock_threat_model.dataflows = []
     mock_threat_model.get_all_protocol_styles.return_value = {}
     legend_html = diagram_generator._generate_legend_html(mock_threat_model)
-    assert "Acteur" in legend_html
-    assert "Serveur" in legend_html
+    assert "Actor" in legend_html
+    assert "Server" in legend_html
     assert "Firewall" in legend_html
     assert "Database" in legend_html
     assert "Trust Boundaries" in legend_html
@@ -388,8 +388,8 @@ def test_generate_legend_html_with_actors_and_servers(diagram_generator):
     mock_threat_model.dataflows = []
     mock_threat_model.get_all_protocol_styles.return_value = {}
     legend_html = diagram_generator._generate_legend_html(mock_threat_model)
-    assert '👤 Acteur' in legend_html
-    assert '🖥️ Serveur' in legend_html
+    assert '👤 Actor' in legend_html
+    assert '🖥️ Server' in legend_html
     assert '🔥 Firewall' in legend_html
     assert '🗄️ Database' in legend_html
 

@@ -20,7 +20,7 @@ import re
 import json
 import logging
 import sys
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Set
 from datetime import datetime
 import webbrowser
 from jinja2 import Environment, FileSystemLoader
@@ -28,9 +28,8 @@ import os
 from pathlib import Path
 from collections import defaultdict
 from threat_analysis.utils import _validate_path_within_project
-from threat_analysis.mitigation_suggestions import get_stix_mitigation_suggestions, get_framework_mitigation_suggestions
+from threat_analysis.mitigation_suggestions import get_framework_mitigation_suggestions
 
-# Add project root to sys.path to allow imports from other directories
 project_root = Path(__file__).resolve().parents[2]
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
@@ -40,7 +39,15 @@ from threat_analysis.generation.diagram_generator import DiagramGenerator
 from threat_analysis.generation.stix_generator import StixGenerator
 from threat_analysis.generation.attack_navigator_generator import AttackNavigatorGenerator
 from threat_analysis.core.models_module import ThreatModel
+from threat_analysis.core.mitre_mapping_module import MitreMapping
 
+def load_implemented_mitigations(root_path: Path) -> Set[str]:
+    """Loads implemented mitigation IDs from a file in the project root."""
+    implemented_file = root_path / "implemented_mitigations.txt"
+    if not implemented_file.exists():
+        return set()
+    with open(implemented_file, "r", encoding="utf-8") as f:
+        return {line.strip() for line in f if line.strip() and not line.strip().startswith("#")}
 
 class ReportGenerator:
     """Class for generating HTML and JSON reports"""
@@ -48,14 +55,15 @@ class ReportGenerator:
     def __init__(self, severity_calculator, mitre_mapping):
         self.severity_calculator = severity_calculator
         self.mitre_mapping = mitre_mapping
-        self.env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / 'templates'))
+        self.env = Environment(loader=FileSystemLoader(Path(__file__).parent.parent / 'templates'), extensions=['jinja2.ext.do'])
+        self.implemented_mitigations = load_implemented_mitigations(project_root)
+        self.all_detailed_threats = []
 
-    def generate_html_report(self, threat_model, grouped_threats: Dict[str, List],
-                             output_file: Path = Path("stride_mitre_report.html"),
+    def generate_html_report(self, threat_model, grouped_threats: Dict[str, List], 
+                             output_file: Path = Path("stride_mitre_report.html"), 
                              all_detailed_threats: Optional[List[Dict]] = None,
                              report_title: str = "🛡️ STRIDE & MITRE ATT&CK Threat Model Report") -> Path:
         """Generates a complete HTML report with MITRE ATT&CK"""
-
         total_threats_analyzed = threat_model.mitre_analysis_results.get('total_threats', 0)
         total_mitre_techniques_mapped = threat_model.mitre_analysis_results.get('mitre_techniques_count', 0)
         stride_distribution = threat_model.mitre_analysis_results.get('stride_distribution', {})
@@ -63,11 +71,8 @@ class ReportGenerator:
         if all_detailed_threats is None:
             all_detailed_threats = self._get_all_threats_with_mitre_info(grouped_threats)
         
-        # Store for other modules to use
         self.all_detailed_threats = all_detailed_threats
-
         summary_stats = self.generate_summary_stats(all_detailed_threats)
-        
         stride_categories = sorted(list(set(threat['stride_category'] for threat in all_detailed_threats)))
 
         template = self.env.get_template('report_template.html')
@@ -80,7 +85,8 @@ class ReportGenerator:
             summary_stats=summary_stats,
             all_threats=all_detailed_threats,
             stride_categories=stride_categories,
-            severity_calculation_note=self.severity_calculator.get_calculation_explanation()
+            severity_calculation_note=self.severity_calculator.get_calculation_explanation(),
+            implemented_mitigation_ids=self.implemented_mitigations
         )
 
         with open(output_file, "w", encoding="utf-8") as f:
@@ -91,13 +97,12 @@ class ReportGenerator:
     def generate_json_export(self, threat_model, grouped_threats: Dict[str, List],
                              output_file: Path = Path("mitre_analysis.json")) -> Path:
         """Generates a JSON export of the analysis data"""
-
         export_data = {
             "analysis_date": datetime.now().isoformat(),
             "architecture": threat_model.tm.name,
             "threats_detected": sum(len(threats) for threats in grouped_threats.values()),
             "threat_types": list(grouped_threats.keys()),
-            "mitre_mapping": self.mitre_mapping.mapping,
+            "mitre_mapping": self.mitre_mapping.capec_to_mitre_map,
             "severity_levels": {
                 "CRITICAL": "9.0-10.0",
                 "HIGH": "7.5-8.9",
@@ -139,7 +144,6 @@ class ReportGenerator:
             return True
         except Exception as e:
             return False
-
     def _export_detailed_threats(self, grouped_threats: Dict[str, List]) -> List[Dict[str, Any]]:
         return self._get_all_threats_with_mitre_info(grouped_threats)
 
@@ -169,29 +173,15 @@ class ReportGenerator:
                 threat_likelihood = getattr(threat, 'likelihood', None)
 
                 severity_info = self.severity_calculator.get_severity_info(stride_category, target_name, classification=data_classification, impact=threat_impact, likelihood=threat_likelihood)
-                mapping_results = self.mitre_mapping.map_threat_to_mitre(threat_description, stride_category)
+                
+                threat_dict = {
+                    "description": threat_description,
+                    "stride_category": stride_category,
+                    "capec_ids": getattr(threat, 'capec_ids', [])
+                }
+                mapping_results = self.mitre_mapping.map_threat_to_mitre(threat_dict)
                 mitre_techniques = mapping_results.get('techniques', [])
                 capecs = mapping_results.get('capecs', [])
-
-                technique_ids = [tech['id'] for tech in mitre_techniques]
-                
-                # Get both STIX and framework mitigations
-                stix_mitigations = get_stix_mitigation_suggestions(technique_ids)
-                framework_mitigations = get_framework_mitigation_suggestions(technique_ids)
-
-                # Filter framework mitigations
-                owasp_mitigations = [m for m in framework_mitigations if m.get('framework') == 'OWASP ASVS']
-                nist_mitigations = [m for m in framework_mitigations if m.get('framework') == 'NIST']
-                cis_mitigations = [m for m in framework_mitigations if m.get('framework') == 'CIS']
-
-                for tech in mitre_techniques:
-                    if 'defend_mitigations' in tech and tech['defend_mitigations']:
-                        for mitigation in tech['defend_mitigations']:
-                            # Extract the part after 'D3-XXXX ' for the URL
-                            source_name = mitigation.get('url_friendly_name_source', '')
-                            url_name_match = re.match(r'D3-[A-Z0-9]+\s(.*)', source_name)
-                            url_friendly_name = url_name_match.group(1).replace(' ', '') if url_name_match else source_name.replace(' ', '')
-                            mitigation['url_friendly_name'] = url_friendly_name
 
                 all_detailed_threats.append({
                     "type": threat_type,
@@ -201,44 +191,29 @@ class ReportGenerator:
                     "mitre_techniques": mitre_techniques,
                     "stride_category": stride_category,
                     "capecs": capecs,
-                    "mitre_mitigations": stix_mitigations, # Official MITRE mitigations
-                    "owasp_mitigations": owasp_mitigations,
-                    "nist_mitigations": nist_mitigations,
-                    "cis_mitigations": cis_mitigations,
                 })
         return all_detailed_threats
 
     def _get_target_name_for_severity_calc(self, target: Any) -> str:
         """Determines the target name for severity calculation, handling different target types."""
-        if isinstance(target, tuple):
-            # Handle dataflows (source, sink)
-            if len(target) == 2:
-                source, sink = target
-                # Check if source or sink is a Dataflow object itself
-                if hasattr(source, 'source') and hasattr(source, 'sink'): # It's a dataflow
-                    source_name = self._extract_name_from_object(source.source)
-                else:
-                    source_name = self._extract_name_from_object(source)
+        if isinstance(target, tuple) and len(target) == 2:
+            source, sink = target
+            if hasattr(source, 'source') and hasattr(source, 'sink'):
+                source_name = self._extract_name_from_object(source.source)
+            else:
+                source_name = self._extract_name_from_object(source)
 
-                if hasattr(sink, 'source') and hasattr(sink, 'sink'): # It's a dataflow
-                    dest_name = self._extract_name_from_object(sink.sink)
-                else:
-                    dest_name = self._extract_name_from_object(sink)
-
-                return f"{source_name} → {dest_name}"
-        
-        # Handle single elements (Actors, Servers, Boundaries, etc.)
+            if hasattr(sink, 'source') and hasattr(sink, 'sink'):
+                dest_name = self._extract_name_from_object(sink.sink)
+            else:
+                dest_name = self._extract_name_from_object(sink)
+            return f"{source_name} → {dest_name}"
         return self._extract_name_from_object(target)
 
     def _extract_name_from_object(self, obj: Any) -> str:
-        # If the object is a tuple containing a single element, extract that element
         if isinstance(obj, tuple) and len(obj) == 1:
             obj = obj[0]
-
-        if obj is None: 
-            return "Unspecified"
-        
-        # Directly access .name attribute, as PyTM objects are expected to have it
+        if obj is None: return "Unspecified"
         try:
             return str(obj.name)
         except AttributeError:
@@ -279,7 +254,6 @@ class ReportGenerator:
         summary_stats = self.generate_summary_stats(all_threats_details)
         total_mitre_techniques_mapped = len(set(tech['id'] for threat in all_threats_details for tech in threat.get('mitre_techniques', [])))
 
-        # Create a dummy threat model for the report context
         dummy_model = ThreatModel("Global Project")
         dummy_model.mitre_analysis_results = {
             'total_threats': total_threats_analyzed,
@@ -303,7 +277,6 @@ class ReportGenerator:
         """
         output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Copy static files to the root of the output directory
         static_src_dir = Path(__file__).parent.parent / 'server' / 'static'
         static_dest_dir = output_dir / 'static'
         if static_src_dir.exists():
@@ -315,16 +288,13 @@ class ReportGenerator:
             except Exception as e:
                 logging.error(f"Failed to copy static files: {e}")
 
-        # 1. Discover and parse all models in the project
         all_models = self._get_all_project_models(project_path)
         if not all_models:
             logging.error("No threat models found in the project. Aborting.")
             return None
 
-        # 2. Aggregate data from all models for consistent legends
         project_protocols, project_protocol_styles = self._aggregate_project_data(all_models)
 
-        # 3. Load the main model to be returned later
         main_model_path = project_path / "main.md"
         main_threat_model = None
         try:
@@ -334,14 +304,12 @@ class ReportGenerator:
                 markdown_content=markdown_content,
                 model_name=main_model_path.stem,
                 model_description=f"Threat model for {main_model_path.stem}",
-                mitre_mapping=self.mitre_mapping,
                 validate=True
             )
         except Exception as e:
             logging.error(f"Failed to create main threat model for project: {e}")
 
-        # 4. Start the recursive generation process
-        all_processed_models = [] # List to store all processed models
+        all_processed_models = []
         self._recursively_generate_reports(
             model_path=main_model_path,
             output_dir=output_dir,
@@ -352,7 +320,6 @@ class ReportGenerator:
             threat_model=main_threat_model
         )
 
-        # 5. Generate the global report
         if all_processed_models:
             self.generate_global_project_report(all_processed_models, output_dir)
 
@@ -374,8 +341,7 @@ class ReportGenerator:
                     markdown_content=markdown_content,
                     model_name=model_path.stem,
                     model_description=f"Threat model for {model_path.stem}",
-                    mitre_mapping=self.mitre_mapping,
-                    validate=False  # Validate later if needed
+                    validate=False
                 )
                 if threat_model:
                     all_models.append(threat_model)
@@ -391,14 +357,12 @@ class ReportGenerator:
         project_protocol_styles = {}
 
         for model in all_models:
-            # Aggregate used protocols
             if hasattr(model, 'dataflows'):
                 for df in model.dataflows:
                     protocol = getattr(df, 'protocol', None)
                     if protocol:
                         project_protocols.add(protocol)
 
-            # Aggregate protocol styles, allowing overrides
             if hasattr(model, 'get_all_protocol_styles'):
                 styles = model.get_all_protocol_styles()
                 project_protocol_styles.update(styles)
@@ -420,7 +384,6 @@ class ReportGenerator:
                     markdown_content=markdown_content,
                     model_name=model_name,
                     model_description=f"Threat model for {model_name}",
-                    mitre_mapping=self.mitre_mapping,
                     validate=True
                 )
             
@@ -428,16 +391,13 @@ class ReportGenerator:
                 logging.error(f"Failed to create or use threat model for {model_path}")
                 return
 
-            # Process threats and add the model to our list for global report
             grouped_threats = threat_model.process_threats()
             all_project_models.append(threat_model)
 
-            # Generate all files for the current model
             self.generate_html_report(threat_model, grouped_threats, output_dir / f"{model_name}_threat_report.html")
             self.generate_json_export(threat_model, grouped_threats, output_dir / f"{model_name}.json")
             self.generate_diagram_html(threat_model, output_dir, breadcrumb, project_protocols, project_protocol_styles)
 
-            # Generate STIX report for the current model
             try:
                 stix_output_file = output_dir / f"{model_name}_stix_report.json"
                 all_detailed_threats = threat_model.get_all_threats_details()
@@ -452,7 +412,6 @@ class ReportGenerator:
             except Exception as e:
                 logging.error(f"❌ Failed to generate STIX report for {model_name}: {e}")
 
-            # Generate ATT&CK Navigator Layer for the current model
             try:
                 navigator_output_file = output_dir / f"{model_name}_attack_navigator_layer.json"
                 all_detailed_threats = threat_model.get_all_threats_details()
@@ -465,14 +424,12 @@ class ReportGenerator:
             except Exception as e:
                 logging.error(f"❌ Failed to generate ATT&CK Navigator layer for {model_name}: {e}")
 
-            # Recurse into submodels
             for server in threat_model.servers:
                 if 'submodel' in server:
                     submodel_path_str = server['submodel']
-                    # Resolve path relative to the current model file and validate
                     submodel_path = _validate_path_within_project(str(model_path.parent / submodel_path_str))
 
-                    if submodel_path.is_file(): # .exists() is checked by _validate_path_within_project
+                    if submodel_path.is_file():
                         sub_dir_name = submodel_path.parent.name
                         sub_output_dir = output_dir / sub_dir_name
                         sub_output_dir.mkdir(exist_ok=True)
@@ -516,7 +473,6 @@ class ReportGenerator:
 
         template = self.env.get_template('navigable_diagram_template.html')
 
-        # Determine parent link
         parent_link = None
         if len(breadcrumb) > 1:
             parent_link = f"../{breadcrumb[-2][1]}"

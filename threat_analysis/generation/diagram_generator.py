@@ -729,8 +729,8 @@ class DiagramGenerator:
         if hasattr(threat_model, 'actors'):
             for actor in threat_model.actors:
                 color = actor.get('color') or '#FFFF99'
-                if 'Acteur' not in legend_node_types:
-                    legend_node_types['Acteur'] = ('👤 Acteur', color)
+                if 'Actor' not in legend_node_types:
+                    legend_node_types['Actor'] = ('👤 Actor', color)
         if hasattr(threat_model, 'servers'):
             server_types_seen = set()
             for server in threat_model.servers:
@@ -741,12 +741,12 @@ class DiagramGenerator:
                     type_key, display_name, color = 'Firewall', '🔥 Firewall', color or '#FF6B6B'
                 elif ('database' in name or 'db' in name) and 'Database' not in server_types_seen:
                     type_key, display_name, color = 'Database', '🗄️ Database', color or '#ADD8D6'
-                elif 'Serveur' not in server_types_seen:
-                    type_key, display_name, color = 'Serveur', '🖥️ Serveur', color or '#90EE90'
+                elif 'Server' not in server_types_seen:
+                    type_key, display_name, color = 'Server', '🖥️ Server', color or '#90EE90'
                 if type_key and type_key not in legend_node_types:
                     legend_node_types[type_key] = (display_name, color)
                     server_types_seen.add(type_key)
-        default_types = {'Acteur': ('👤 Acteur', '#FFFF99'), 'Serveur': ('🖥️ Serveur', '#90EE90'), 'Database': ('🗄️ Database', '#ADD8D6'), 'Firewall': ('🔥 Firewall', '#FF6B6B')}
+        default_types = {'Actor': ('👤 Actor', '#FFFF99'), 'Server': ('🖥️ Server', '#90EE90'), 'Database': ('🗄️ Database', '#ADD8D6'), 'Firewall': ('🔥 Firewall', '#FF6B6B')}
         for key, value in default_types.items():
             if key not in legend_node_types:
                 legend_node_types[key] = value

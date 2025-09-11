@@ -28,7 +28,6 @@ def create_threat_model(
     markdown_content: str,
     model_name: str,
     model_description: str,
-    mitre_mapping: MitreMapping,
     validate: bool = True,
 ) -> Optional[ThreatModel]:
     """
@@ -38,7 +37,6 @@ def create_threat_model(
         markdown_content: The Markdown content of the threat model.
         model_name: The name of the threat model.
         model_description: The description of the threat model.
-        mitre_mapping: An instance of MitreMapping.
         validate: Whether to validate the model after parsing.
 
     Returns:
@@ -46,7 +44,8 @@ def create_threat_model(
     """
     try:
         threat_model = ThreatModel(model_name, model_description)
-        parser = ModelParser(threat_model, mitre_mapping)
+        # The MitreMapping object is now created inside ThreatModel, so we get it from there
+        parser = ModelParser(threat_model, threat_model.mitre_mapper)
         parser.parse_markdown(markdown_content)
         logging.info(f"✅ Model '{model_name}' loaded successfully.")
 

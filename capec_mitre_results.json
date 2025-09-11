@@ -1,0 +1,174 @@
+{
+  "capec": {
+    "id": "180",
+    "url": "https://capec.mitre.org/data/definitions/180.html",
+    "title": "Common Attack Pattern Enumeration and Classification",
+    "description": "An attacker exploits a weakness in the configuration of access controls and is able to bypass the intended protection that these measures guard against and thereby obtain unauthorized access to the system or network. Sensitive functionality should always be protected with access controls. However configuring all but the most trivial access control systems can be very complicated and there are many opportunities for mistakes. If an attacker can learn of incorrectly configured access security settings, they may be able to exploit this in an attack.",
+    "extended_description": "Most commonly, attackers would take advantage of controls that provided too little protection for sensitive activities in order to perform actions that should be denied to them. In some circumstances, an attacker may be able to take advantage of overly restrictive access control policies, initiating denial of services (if an application locks because it unexpectedly failed to be granted access) or causing other legitimate actions to fail due to security. The latter class of attacks, however, is usually less severe and easier to detect than attacks based on inadequate security restrictions. This attack pattern differs from CAPEC 1, \"Accessing Functionality Not Properly Constrained by ACLs\" in that the latter describes attacks where sensitive functionality lacks access controls, where, in this pattern, the access control is present, but incorrectly configured.",
+    "likelihood": "High",
+    "severity": "Medium",
+    "relationships": [],
+    "attack_execution_flow": [],
+    "prerequisites": "The target must apply access controls, but incorrectly configure them. However, not all incorrect configurations can be exploited by an attacker. If the incorrect configuration applies too little security to some functionality, then the attacker may be able to exploit it if the access control would be the only thing preventing an attacker's access and it no longer does so. If the incorrect configuration applies too much security, it must prevent legitimate activity and the attacker must be able to force others to require this activity..",
+    "skills_required": [],
+    "consequences": [],
+    "mitigations": [],
+    "related_weaknesses": [
+      {
+        "id": "732",
+        "url": "http://cwe.mitre.org/data/definitions/732.html"
+      },
+      {
+        "id": "1190",
+        "url": "http://cwe.mitre.org/data/definitions/1190.html"
+      },
+      {
+        "id": "1191",
+        "url": "http://cwe.mitre.org/data/definitions/1191.html"
+      },
+      {
+        "id": "1193",
+        "url": "http://cwe.mitre.org/data/definitions/1193.html"
+      },
+      {
+        "id": "1220",
+        "url": "http://cwe.mitre.org/data/definitions/1220.html"
+      },
+      {
+        "id": "1268",
+        "url": "http://cwe.mitre.org/data/definitions/1268.html"
+      },
+      {
+        "id": "1280",
+        "url": "http://cwe.mitre.org/data/definitions/1280.html"
+      },
+      {
+        "id": "1297",
+        "url": "http://cwe.mitre.org/data/definitions/1297.html"
+      },
+      {
+        "id": "1311",
+        "url": "http://cwe.mitre.org/data/definitions/1311.html"
+      },
+      {
+        "id": "1315",
+        "url": "http://cwe.mitre.org/data/definitions/1315.html"
+      },
+      {
+        "id": "1318",
+        "url": "http://cwe.mitre.org/data/definitions/1318.html"
+      },
+      {
+        "id": "1320",
+        "url": "http://cwe.mitre.org/data/definitions/1320.html"
+      },
+      {
+        "id": "1321",
+        "url": "http://cwe.mitre.org/data/definitions/1321.html"
+      },
+      {
+        "id": "Privacy Policy",
+        "url": "https://cwe.mitre.org/about/privacy_policy.html"
+      },
+      {
+        "id": "",
+        "url": "https://twitter.com/CweCapec"
+      },
+      {
+        "id": "",
+        "url": "https://www.linkedin.com/showcase/cve-cwe-capec"
+      },
+      {
+        "id": "",
+        "url": "https://medium.com/@CWE_CAPEC"
+      }
+    ],
+    "taxonomy_mappings": []
+  },
+  "attack_technique": {
+    "id": "T1574.010",
+    "url": "https://attack.mitre.org/techniques/T1574/010/",
+    "title": "Hijack Execution Flow:\n                        Services File Permissions Weakness",
+    "description": "Adversaries may execute their own malicious payloads by hijacking the binaries used by services. Adversaries may use flaws in the permissions of Windows services to replace the binary that is executed upon service start. These service processes may automatically execute specific binaries as part of their functionality or to perform other actions. If the permissions on the file system directory containing a target binary, or permissions on the binary itself are improperly set, then the target binary may be overwritten with another binary using user-level permissions and executed by the original process. If the original process and thread are running under a higher permissions level, then the replaced binary will also execute under higher-level permissions, which could include SYSTEM.",
+    "tactics": [
+      "Persistence",
+      "Privilege Escalation",
+      "Defense Evasion"
+    ],
+    "platforms": [
+      "Contributors: Stefan Kanthak; Travis Smith",
+      "Tripwire"
+    ],
+    "data_sources": [],
+    "mitigations": [
+      {
+        "id": "T1574.001",
+        "name": "DLL",
+        "description": ""
+      },
+      {
+        "id": "T1574.004",
+        "name": "Dylib Hijacking",
+        "description": ""
+      },
+      {
+        "id": "T1574.005",
+        "name": "Executable Installer File Permissions Weakness",
+        "description": ""
+      },
+      {
+        "id": "T1574.006",
+        "name": "Dynamic Linker Hijacking",
+        "description": ""
+      },
+      {
+        "id": "T1574.007",
+        "name": "Path Interception by PATH Environment Variable",
+        "description": ""
+      },
+      {
+        "id": "T1574.008",
+        "name": "Path Interception by Search Order Hijacking",
+        "description": ""
+      },
+      {
+        "id": "T1574.009",
+        "name": "Path Interception by Unquoted Path",
+        "description": ""
+      },
+      {
+        "id": "T1574.010",
+        "name": "Services File Permissions Weakness",
+        "description": ""
+      },
+      {
+        "id": "T1574.011",
+        "name": "Services Registry Permissions Weakness",
+        "description": ""
+      },
+      {
+        "id": "T1574.012",
+        "name": "COR_PROFILER",
+        "description": ""
+      },
+      {
+        "id": "T1574.013",
+        "name": "KernelCallbackTable",
+        "description": ""
+      },
+      {
+        "id": "T1574.014",
+        "name": "AppDomainManager",
+        "description": ""
+      }
+    ],
+    "detection": "",
+    "examples": [
+      {
+        "name": "S0089",
+        "description": "BlackEnergy"
+      }
+    ]
+  },
+  "search_results": []
+}

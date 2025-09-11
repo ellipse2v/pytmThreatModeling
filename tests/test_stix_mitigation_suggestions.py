@@ -12,16 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from threat_analysis.mitigation_suggestions import get_stix_mitigation_suggestions
+import pytest
+from threat_analysis.mitigation_suggestions import MitigationStixMapper
 
+@pytest.fixture(scope="module")
+def mitigation_mapper():
+    """Fixture to initialize the MitigationStixMapper once per module."""
+    return MitigationStixMapper()
 
-def test_get_stix_mitigation_suggestions_empty():
-    """Test get_stix_mitigation_suggestions with an empty list of technique IDs."""
-    suggestions = get_stix_mitigation_suggestions([])
-    assert suggestions == []
+def test_mapper_initialization(mitigation_mapper):
+    """Test that the MitigationStixMapper initializes and loads data."""
+    assert mitigation_mapper is not None
+    assert isinstance(mitigation_mapper.attack_to_mitigations_map, dict)
+    # Check that the map is not empty, assuming the data file is present
+    assert len(mitigation_mapper.attack_to_mitigations_map) > 0
 
+def test_mapping_for_known_technique(mitigation_mapper):
+    """Test retrieving mitigations for a known ATT&CK technique."""
+    # T1566 is Phishing, which should have M1017 (User Training) as a mitigation.
+    technique_id = "T1566"
+    assert technique_id in mitigation_mapper.attack_to_mitigations_map
+    
+    suggestions = mitigation_mapper.attack_to_mitigations_map[technique_id]
+    assert isinstance(suggestions, list)
+    assert len(suggestions) > 0
 
-def test_get_stix_mitigation_suggestions_no_match():
-    """Test get_stix_mitigation_suggestions with a technique ID that has no mapping."""
-    suggestions = get_stix_mitigation_suggestions(["T9999"])
-    assert suggestions == []
+    # Check if one of the expected mitigations is present
+    mitigation_ids = [mit['id'] for mit in suggestions]
+    assert "M1017" in mitigation_ids
+
+def test_mapping_for_unknown_technique(mitigation_mapper):
+    """Test that an unknown technique ID has no mapping."""
+    technique_id = "T9999"
+    assert technique_id not in mitigation_mapper.attack_to_mitigations_map
