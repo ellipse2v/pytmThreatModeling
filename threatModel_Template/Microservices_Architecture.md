@@ -16,13 +16,13 @@ This threat model explores a microservices-based architecture, where an applicat
 - **Attacker**: color=red
 
 ## Servers
-- **Load Balancer**: color=lightgray
-- **API Gateway (Kong/Envoy)**: boundary="API Gateway"
-- **Service A (e.g., User Service)**: boundary="Microservice A"
-- **Service B (e.g., Product Service)**: boundary="Microservice B"
-- **Service Discovery (Consul/Eureka)**: color=yellow
-- **Message Broker (Kafka/RabbitMQ)**: color=cyan
-- **Database (SQL/NoSQL)**: boundary="Shared/Dedicated Database"
+- **Load Balancer**: color=lightgray, type="load_balancer"
+- **API Gateway (Kong/Envoy)**: boundary="API Gateway", type="api_gateway"
+- **Service A (e.g., User Service)**: boundary="Microservice A", type="microservice"
+- **Service B (e.g., Product Service)**: boundary="Microservice B", type="microservice"
+- **Service Discovery (Consul/Eureka)**: color=yellow, type="service_discovery"
+- **Message Broker (Kafka/RabbitMQ)**: color=cyan, type="message_broker"
+- **Database (SQL/NoSQL)**: boundary="Shared/Dedicated Database", type="database"
 
 ## Dataflows
 - **Client Request**: from="End User", to="Load Balancer", protocol="HTTPS", color=darkgreen

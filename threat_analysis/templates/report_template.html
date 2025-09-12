@@ -678,7 +678,7 @@
                                     {% if all_defend_mitigations %}
                                         {% for mitigation in all_defend_mitigations %}
                                             {% if mitigation.id %}
-                                            <li><a href="https://d3fend.mitre.org/technique/d3f:{{ mitigation.url_friendly_name }}" target="_blank" class="mitre-link">{{ mitigation.id }}: {{ mitigation.description }}</a></li>
+                                            <li><a href="https://d3fend.mitre.org/technique/d3f:{{ mitigation.url_friendly_name }}" target="_blank" class="mitre-link">{{ mitigation.id }}: {{ mitigation.name }}</a></li>
                                             {% endif %}
                                         {% endfor %}
                                     {% else %}

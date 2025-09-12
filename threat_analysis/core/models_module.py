@@ -262,11 +262,28 @@ class ThreatModel:
         expanded_pytm_threats = self._expand_class_targets(pytm_raw_threats)
 
         # --- Generate and add custom threats ---
+        custom_threats_tuples = self._apply_custom_threats()
 
+        # Combine filtered PyTM threats with custom threats
+        self.threats_raw = expanded_pytm_threats + custom_threats_tuples
+
+        # Normalization and grouping of threats
+        self.grouped_threats = self._group_threats()
+
+        # MITRE ATT&CK Analysis
+        self._perform_mitre_analysis()
+
+        return self.grouped_threats
+
+    def _apply_custom_threats(self) -> List[Tuple[CustomThreat, Any]]:
+        """
+        Applies custom threats to the threat model and returns them.
+        """
+        
         custom_threats_list = get_custom_threats(self)
         
-        # Convert custom threats to (threat, target) tuples
-        custom_threats_tuples = []
+        generated_custom_threats = []
+
         for threat_dict in custom_threats_list:
             target_name = threat_dict.get('component')
             target_obj = self.get_element_by_name(target_name)
@@ -280,6 +297,7 @@ class ThreatModel:
                     target=target_obj,
                     capec_ids=threat_dict.get('capec_ids')
                 )
+                
                 # Calculate and store severity for custom threats
                 threat_type = custom_threat.stride_category
                 target_name_for_severity = getattr(target_obj, 'name', 'Unknown')
@@ -287,7 +305,7 @@ class ThreatModel:
                 classification = None
                 if isinstance(target_obj, Dataflow) and hasattr(target_obj, 'data') and target_obj.data:
                     # Assuming dataflows carry a single data object for simplicity in this context
-                    data_obj = next(iter(target_obj.data)) # Get the first data object from the DataSet
+                    data_obj = next(iter(custom_threat.target.data)) # Get the first data object from the DataSet
                     if hasattr(data_obj, 'classification'):
                         classification = data_obj.classification.name # Get string representation of enum
 
@@ -300,18 +318,9 @@ class ThreatModel:
                     likelihood=custom_threat.likelihood
                 )
 
-                custom_threats_tuples.append((custom_threat, target_obj))
-
-        # Combine filtered PyTM threats with custom threats
-        self.threats_raw = expanded_pytm_threats + custom_threats_tuples
-
-        # Normalization and grouping of threats
-        self.grouped_threats = self._group_threats()
-
-        # MITRE ATT&CK Analysis
-        self._perform_mitre_analysis()
-
-        return self.grouped_threats
+                generated_custom_threats.append((custom_threat, target_obj))
+        
+        return generated_custom_threats
 
     def _expand_class_targets(self, threats: List[Any]) -> List[Tuple[Any, Any]]:
         """
@@ -461,6 +470,3 @@ class ThreatModel:
             })
             
         return detailed_threats
-        
-
-    # The get_pytm_class_by_name and expand_threat_targets functions are no longer needed.

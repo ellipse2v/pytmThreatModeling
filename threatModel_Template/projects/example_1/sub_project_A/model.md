@@ -1,2 +1,2 @@
 ## Servers
-- **Database**:
+- **Database**: type="database"

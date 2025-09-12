@@ -225,39 +225,41 @@ class DiagramGenerator:
         escaped_name = self._escape_label(node_name)
         
         # Check for special node types based on name
-        if 'router' in node_name_lower:
-            attributes.append('shape=box') # Routers often represented as boxes
-            default_fillcolor = '#FFD700' # Gold color for routers
+        # Extract 'type' if available in the element dictionary
+        element_type = None
+        if isinstance(element, dict):
+            element_type = element.get('type')
+        
+        # Prioritize 'type' for rendering, then fall back to name-based inference
+        if element_type == 'router':
+            attributes.append('shape=box')
+            default_fillcolor = '#FFD700'
             icon = '🌐 '
-        elif 'switch' in node_name_lower:
+        elif element_type == 'switch':
             attributes.append('shape=diamond')
             default_fillcolor = 'orange'
             icon = '🔀 '
-        elif 'firewall' in node_name_lower:
+        elif element_type == 'firewall':
             attributes.append('shape=hexagon')
             default_fillcolor = 'red'
             icon = '🔥 '
-                # Check for database
-        elif 'database' in node_name_lower or 'db' in node_name_lower:
-                attributes.append('shape=cylinder')
-                icon = '🗄️ '
-                default_fillcolor = 'lightblue'
-        
-        # Check for web server
-        elif 'web' in node_name_lower and 'server' in node_name_lower:
+        elif element_type == 'database':
+            attributes.append('shape=cylinder')
+            icon = '🗄️ '
+            default_fillcolor = 'lightblue'
+        elif element_type == 'web_server': # Using 'web_server' as the type
             attributes.append('shape=box')
             attributes.append('style=filled')
             attributes.append('fillcolor=lightgreen')
             icon = '🌐 '
             default_fillcolor = 'lightgreen'
-        
-        # Check for API
-        elif 'api' in node_name_lower:
+        elif element_type == 'api_gateway': # Using 'api_gateway' as the type
             attributes.append('shape=box')
             attributes.append('style=filled')
             attributes.append('fillcolor=lightyellow')
             icon = '🔌 '
             default_fillcolor = 'lightyellow'
+        
         else:
             # Default shapes based on node type
             if node_type == 'actor':
@@ -726,30 +728,50 @@ class DiagramGenerator:
 
         # Node types legend (remains the same)
         legend_node_types = {}
+        default_types = {
+            'Actor': ('👤 Actor', '#FFFF99'),
+            'Server': ('🖥️ Server', '#90EE90'),
+            'Database': ('🗄️ Database', '#ADD8D6'),
+            'Firewall': ('🔥 Firewall', '#FF6B6B'),
+            'Router': ('🌐 Router', '#FFD700'),
+            'Switch': ('🔀 Switch', 'orange'),
+            'Web Server': ('🌐 Web Server', 'lightgreen'),
+            'API Gateway': ('🔌 API Gateway', 'lightyellow')
+        }
+        for key, value in default_types.items():
+            if key not in legend_node_types:
+                legend_node_types[key] = value
+
         if hasattr(threat_model, 'actors'):
             for actor in threat_model.actors:
                 color = actor.get('color') or '#FFFF99'
-                if 'Actor' not in legend_node_types:
+                if 'Actor' not in legend_node_types: # This check is now redundant if default_types are always added
                     legend_node_types['Actor'] = ('👤 Actor', color)
         if hasattr(threat_model, 'servers'):
             server_types_seen = set()
             for server in threat_model.servers:
-                name = server.get('name', '').lower()
+                server_type = server.get('type') # Get the type attribute
                 color = server.get('color')
                 type_key, display_name = None, None
-                if 'firewall' in name and 'Firewall' not in server_types_seen:
+
+                if server_type == 'firewall' and 'Firewall' not in server_types_seen:
                     type_key, display_name, color = 'Firewall', '🔥 Firewall', color or '#FF6B6B'
-                elif ('database' in name or 'db' in name) and 'Database' not in server_types_seen:
+                elif server_type == 'database' and 'Database' not in server_types_seen:
                     type_key, display_name, color = 'Database', '🗄️ Database', color or '#ADD8D6'
-                elif 'Server' not in server_types_seen:
+                elif server_type == 'router' and 'Router' not in server_types_seen: # New type
+                    type_key, display_name, color = 'Router', '🌐 Router', color or '#FFD700'
+                elif server_type == 'switch' and 'Switch' not in server_types_seen: # New type
+                    type_key, display_name, color = 'Switch', '🔀 Switch', color or 'orange'
+                elif server_type == 'web_server' and 'Web Server' not in server_types_seen: # New type
+                    type_key, display_name, color = 'Web Server', '🌐 Web Server', color or 'lightgreen'
+                elif server_type == 'api_gateway' and 'API Gateway' not in server_types_seen: # New type
+                    type_key, display_name, color = 'API Gateway', '🔌 API Gateway', color or 'lightyellow'
+                elif 'Server' not in server_types_seen: # Generic server fallback
                     type_key, display_name, color = 'Server', '🖥️ Server', color or '#90EE90'
+                
                 if type_key and type_key not in legend_node_types:
                     legend_node_types[type_key] = (display_name, color)
                     server_types_seen.add(type_key)
-        default_types = {'Actor': ('👤 Actor', '#FFFF99'), 'Server': ('🖥️ Server', '#90EE90'), 'Database': ('🗄️ Database', '#ADD8D6'), 'Firewall': ('🔥 Firewall', '#FF6B6B')}
-        for key, value in default_types.items():
-            if key not in legend_node_types:
-                legend_node_types[key] = value
         for _, (label, color) in legend_node_types.items():
             legend_items.append(f'''<div style="display: flex; align-items: center; margin-bottom: 3px;"><div style="width: 12px; height: 8px; background-color: {color}; border: 1px solid #999; margin-right: 8px; border-radius: 2px;"></div><span style="font-size: 9px;">{label}</span></div>''')
 

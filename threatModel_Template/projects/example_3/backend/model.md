@@ -3,12 +3,12 @@
 - **Protected DB Zone**: isTrusted=True
 
 ## Servers
-- **CoreSwitch**: type=Switch, boundary="Trusted Application Zone"
+- **CoreSwitch**: type="switch", boundary="Trusted Application Zone"
 - **AuthService**: boundary="Trusted Application Zone"
 - **OrderService**: submodel=../order_service/model.md, boundary="Trusted Application Zone"
-- **DBSwitch**: type=Switch, boundary="Protected DB Zone"
-- **DBFirewall**: type=Firewall, boundary="Protected DB Zone"
-- **ProductDB**: submodel=./database/model.md, boundary="Protected DB Zone"
+- **DBSwitch**: type="switch", boundary="Protected DB Zone"
+- **DBFirewall**: type="firewall", boundary="Protected DB Zone"
+- **ProductDB**: submodel=./database/model.md, boundary="Protected DB Zone", type="database"
 
 ## Data
 - **AuthRequest**: description="Request for authentication or authorization", classification="SECRET"

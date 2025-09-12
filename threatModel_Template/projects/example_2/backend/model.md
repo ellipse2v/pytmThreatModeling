@@ -1,8 +1,8 @@
 ## Servers
-- **APIGateway**:
+- **APIGateway**: type="api_gateway"
 - **AuthService**:
 - **OrderService**:
-- **ProductDB**: submodel=./database/model.md
+- **ProductDB**: submodel=./database/model.md, type="database"
 
 ## Dataflows
 - **GatewayToAuth**: from=APIGateway, to=AuthService, protocol=gRPC

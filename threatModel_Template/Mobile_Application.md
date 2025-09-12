@@ -13,12 +13,12 @@ This threat model focuses on a native mobile application (iOS or Android), cover
 - **Attacker**: color=red
 
 ## Servers
-- **Mobile Application**: boundary="Mobile Device (Client)"
-- **API Gateway/Load Balancer**: boundary="Backend API"
-- **Backend Application Server**: boundary="Backend API"
-- **Backend Database**: boundary="Backend API"
-- **Identity Provider (OAuth/SSO)**: boundary="Third-Party Services (Authentication, Payment)"
-- **Payment Gateway**: boundary="Third-Party Services (Authentication, Payment)"
+- **Mobile Application**: boundary="Mobile Device (Client)", type="mobile_application"
+- **API Gateway/Load Balancer**: boundary="Backend API", type="api_gateway"
+- **Backend Application Server**: boundary="Backend API", type="app_server"
+- **Backend Database**: boundary="Backend API", type="database"
+- **Identity Provider (OAuth/SSO)**: boundary="Third-Party Services (Authentication, Payment)", type="identity_provider"
+- **Payment Gateway**: boundary="Third-Party Services (Authentication, Payment)", type="payment_gateway"
 
 ## Dataflows
 - **API Request (Authentication)**: from="Mobile Application", to="Identity Provider (OAuth/SSO)", protocol="HTTPS", color=darkgreen

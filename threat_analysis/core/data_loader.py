@@ -119,7 +119,8 @@ def load_d3fend_mapping() -> Dict[str, Dict[str, str]]:
             Format: {
                 "D3F-ID": {
                     "name": "D3FEND Technique Name",
-                    "description": "Technique description"
+                    "description": "Technique description",
+                    "url_name": "D3FENDTechniqueForURL"
                 }
             }
     
@@ -148,7 +149,14 @@ def load_d3fend_mapping() -> Dict[str, Dict[str, str]]:
             logging.info("Used latin-1 encoding for d3fend.csv")
         
         # Required columns validation
-        required_columns = ['ID', 'D3FEND Technique', 'Definition']
+        required_columns = ['ID', 'Definition']
+        technique_cols = ["D3FEND Technique", "D3FEND Technique Level 0", "D3FEND Technique Level 1"]
+        
+        # Check for at least one technique column
+        if not any(col in df.columns for col in technique_cols):
+            logging.error(f"Missing any of the D3FEND technique name columns in d3fend.csv: {technique_cols}")
+            return d3fend_details
+
         missing_columns = [col for col in required_columns if col not in df.columns]
         if missing_columns:
             logging.error(f"Missing required columns in d3fend.csv: {missing_columns}")
@@ -166,17 +174,26 @@ def load_d3fend_mapping() -> Dict[str, Dict[str, str]]:
                     logging.warning(f"Empty or invalid ID at row {index + 1}, skipping")
                     continue
                 
-                d3fend_name = (_clean_string(row['D3FEND Technique']) 
-                              if pd.notna(row['D3FEND Technique']) 
-                              else d3fend_id)
+                # Determine the name for display from the main technique column if it exists
+                d3fend_name = d3fend_id
+                if 'D3FEND Technique' in df.columns and pd.notna(row['D3FEND Technique']):
+                    d3fend_name = _clean_string(row['D3FEND Technique'])
+
+                # Determine the name for the URL by finding the first available technique column
+                url_name_part = ''
+                for col in technique_cols:
+                    if col in df.columns and pd.notna(row[col]) and _clean_string(row[col]):
+                        url_name_part = _clean_string(row[col])
+                        break # Found the first non-empty value
                 
                 d3fend_description = (_clean_string(row['Definition']) 
-                                    if pd.notna(row['Definition']) 
+                                    if 'Definition' in df.columns and pd.notna(row['Definition']) 
                                     else "")
                 
                 d3fend_details[d3fend_id] = {
                     "name": d3fend_name,
-                    "description": d3fend_description
+                    "description": d3fend_description,
+                    "url_name": url_name_part
                 }
                 
             except Exception as row_error:

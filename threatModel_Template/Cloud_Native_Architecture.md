@@ -16,11 +16,11 @@ This threat model focuses on a cloud-native architecture using serverless servic
 - **Attacker**: color=red
 
 ## Servers
-- **CloudFront/CDN**: color=lightgray
-- **API Gateway (AWS API Gateway/Google Cloud Endpoints)**: boundary="API Gateway"
-- **Lambda Function/Cloud Function**: boundary="FaaS Function (Lambda/Cloud Functions)"
-- **DynamoDB/Firestore**: boundary="NoSQL Database (DynamoDB/Firestore)"
-- **S3 Bucket/Cloud Storage**: boundary="Object Storage (S3/Cloud Storage)"
+- **CloudFront/CDN**: color=lightgray, type="cdn"
+- **API Gateway (AWS API Gateway/Google Cloud Endpoints)**: boundary="API Gateway", type="api_gateway"
+- **Lambda Function/Cloud Function**: boundary="FaaS Function (Lambda/Cloud Functions)", type="faas"
+- **DynamoDB/Firestore**: boundary="NoSQL Database (DynamoDB/Firestore)", type="database"
+- **S3 Bucket/Cloud Storage**: boundary="Object Storage (S3/Cloud Storage)", type="object_storage"
 
 ## Dataflows
 - **Client Request**: from="End User", to="CloudFront/CDN", protocol="HTTPS", color=darkgreen

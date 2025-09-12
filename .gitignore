@@ -199,3 +199,7 @@ cython_debug/
 !/output/tmp/
 docnotforgit/technical_documentation.md
 docnotforgit/advanced threat modeling.pdf
+/docnotforgit/
+tooling/output/generated_flows/connected_action_flow.afb
+tooling/output/generated_flows/simple_action_flow.afb
+tooling/output/generated_flows/or_condition_flow.afb

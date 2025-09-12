@@ -17,11 +17,11 @@ This threat model describes a typical IoT architecture, including devices, gatew
 - **Cloud Administrator**: boundary="Cloud Platform"
 
 ## Servers
-- **IoT Gateway Server**: boundary="IoT Gateway"
-- **IoT Hub**: boundary="Cloud Platform"
-- **Data Storage**: boundary="Cloud Platform"
-- **Analytics Engine**: boundary="Cloud Platform"
-- **Device Management Service**: boundary="Cloud Platform"
+- **IoT Gateway Server**: boundary="IoT Gateway", type="iot_gateway"
+- **IoT Hub**: boundary="Cloud Platform", type="iot_hub"
+- **Data Storage**: boundary="Cloud Platform", type="data_storage"
+- **Analytics Engine**: boundary="Cloud Platform", type="analytics_engine"
+- **Device Management Service**: boundary="Cloud Platform", type="device_management_service"
 
 ## Dataflows
 - **Sensor Data**: from="Sensor", to="IoT Gateway Server", protocol="MQTT/CoAP", color=teal

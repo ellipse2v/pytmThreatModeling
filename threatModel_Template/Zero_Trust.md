@@ -15,11 +15,11 @@ This threat model outlines a Zero Trust architecture, emphasizing the principle 
 - **Administrator**: boundary="Trusted Network"
 
 ## Servers
-- **Authentication Service**: boundary="Identity Provider (IdP)"
-- **Authorization Service**: boundary="Identity Provider (IdP)"
-- **Policy Engine**: boundary="Policy Enforcement Point (PEP)"
-- **Microservice A**: boundary="Workload"
-- **Microservice B**: boundary="Workload"
+- **Authentication Service**: boundary="Identity Provider (IdP)", type="authentication_service"
+- **Authorization Service**: boundary="Identity Provider (IdP)", type="authorization_service"
+- **Policy Engine**: boundary="Policy Enforcement Point (PEP)", type="policy_engine"
+- **Microservice A**: boundary="Workload", type="microservice"
+- **Microservice B**: boundary="Workload", type="microservice"
 
 ## Dataflows
 - **User Authentication Request**: from="User", to="Authentication Service", protocol="HTTPS", color=darkgreen

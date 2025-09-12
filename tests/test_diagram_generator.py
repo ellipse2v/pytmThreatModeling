@@ -153,21 +153,21 @@ def test_get_node_attributes_actor(diagram_generator):
 
 
 def test_get_node_attributes_firewall(diagram_generator):
-    firewall_dict = {'name': 'External Firewall'}
+    firewall_dict = {'name': 'External Firewall', 'type': 'firewall'}
     attrs = diagram_generator._get_node_attributes(firewall_dict, 'server')
     assert 'shape=hexagon' in attrs
     assert 'fillcolor="red"' in attrs
     assert 'label="🔥 External Firewall"' in attrs
 
 def test_get_node_attributes_database(diagram_generator):
-    db_dict = {'name': 'App Database'}
+    db_dict = {'name': 'App Database', 'type': 'database'}
     attrs = diagram_generator._get_node_attributes(db_dict, 'server')
     assert 'shape=cylinder' in attrs
     assert 'fillcolor="lightblue"' in attrs
     assert 'label="🗄️ App Database"' in attrs
 
 def test_get_node_attributes_web_server(diagram_generator):
-    web_server_dict = {'name': 'Web Server'}
+    web_server_dict = {'name': 'Web Server', 'type': 'web_server'}
     attrs = diagram_generator._get_node_attributes(web_server_dict, 'server')
     assert 'shape=box' in attrs
     assert 'style=filled' in attrs
@@ -175,7 +175,7 @@ def test_get_node_attributes_web_server(diagram_generator):
     assert 'label="🌐 Web Server"' in attrs
 
 def test_get_node_attributes_api(diagram_generator):
-    api_dict = {'name': 'Payment API'}
+    api_dict = {'name': 'Payment API', 'type': 'api_gateway'}
     attrs = diagram_generator._get_node_attributes(api_dict, 'server')
     assert 'shape=box' in attrs
     assert 'style=filled' in attrs
@@ -374,24 +374,31 @@ def test_generate_legend_html_basic(diagram_generator):
     mock_threat_model.dataflows = []
     mock_threat_model.get_all_protocol_styles.return_value = {}
     legend_html = diagram_generator._generate_legend_html(mock_threat_model)
-    assert "Actor" in legend_html
-    assert "Server" in legend_html
-    assert "Firewall" in legend_html
-    assert "Database" in legend_html
+    assert "👤" in legend_html
+    assert "🖥️" in legend_html
+    assert "🔥" in legend_html
+    assert "🗄️" in legend_html
+    assert "🌐" in legend_html
+    assert "🔀" in legend_html
+    assert "🔌" in legend_html
     assert "Trust Boundaries" in legend_html
     assert "Untrust Boundaries" in legend_html
 
 def test_generate_legend_html_with_actors_and_servers(diagram_generator):
     mock_threat_model = MagicMock()
     mock_threat_model.actors = [{'name': 'User', 'color': 'yellow'}]
-    mock_threat_model.servers = [{'name': 'WebServer', 'color': 'green'}, {'name': 'Firewall', 'color': 'red'}, {'name': 'Database', 'color': 'blue'}]
+    mock_threat_model.servers = [
+        {'name': 'WebServer', 'color': 'green', 'type': 'web_server'},
+        {'name': 'Firewall', 'color': 'red', 'type': 'firewall'},
+        {'name': 'Database', 'color': 'blue', 'type': 'database'}
+    ]
     mock_threat_model.dataflows = []
     mock_threat_model.get_all_protocol_styles.return_value = {}
     legend_html = diagram_generator._generate_legend_html(mock_threat_model)
-    assert '👤 Actor' in legend_html
-    assert '🖥️ Server' in legend_html
-    assert '🔥 Firewall' in legend_html
-    assert '🗄️ Database' in legend_html
+    assert '👤' in legend_html
+    assert '🖥️' in legend_html
+    assert '🔥' in legend_html
+    assert '🗄️' in legend_html
 
 def test_generate_legend_html_with_protocol_styles(diagram_generator):
     mock_threat_model = MagicMock()

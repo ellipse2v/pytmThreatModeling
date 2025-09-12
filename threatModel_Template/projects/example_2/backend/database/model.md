@@ -1,6 +1,6 @@
 ## Servers
-- **PrimaryDB**:
-- **ReplicaDB**:
+- **PrimaryDB**: type="database"
+- **ReplicaDB**: type="database"
 
 ## Dataflows
 - **Replication**: from=PrimaryDB, to=ReplicaDB, protocol="DB Sync"

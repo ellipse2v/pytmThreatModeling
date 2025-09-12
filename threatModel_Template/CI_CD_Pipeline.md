@@ -16,10 +16,10 @@ This threat model focuses on a CI/CD pipeline, covering the development, integra
 - **Attacker**: color=red
 
 ## Servers
-- **Git Repository**: boundary="Code Repository"
-- **Jenkins/GitLab CI/GitHub Actions**: boundary="Build Server"
-- **Docker Registry/Artifactory**: boundary="Artifact Registry"
-- **Kubernetes Cluster/Cloud VM**: boundary="Production Environment"
+- **Git Repository**: boundary="Code Repository", type="git_repo"
+- **Jenkins/GitLab CI/GitHub Actions**: boundary="Build Server", type="ci_cd_server"
+- **Docker Registry/Artifactory**: boundary="Artifact Registry", type="docker_registry"
+- **Kubernetes Cluster/Cloud VM**: boundary="Production Environment", type="kubernetes_cluster"
 
 ## Dataflows
 - **Push Code**: from="Developer", to="Git Repository", protocol="HTTPS/SSH", color=darkgreen

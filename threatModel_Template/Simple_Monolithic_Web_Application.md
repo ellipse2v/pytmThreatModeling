@@ -14,9 +14,9 @@ This threat model describes a simple monolithic web application, where all funct
 - **Attacker**: color=red
 
 ## Servers
-- **Load Balancer (Optional)**: color=lightgray
-- **Monolithic Application (e.g., PHP, Ruby on Rails, Node.js Express)**: boundary="Monolithic Web Server"
-- **Database Server (MySQL, PostgreSQL, MongoDB)**: boundary="Database"
+- **Load Balancer (Optional)**: color=lightgray, type="load_balancer"
+- **Monolithic Application (e.g., PHP, Ruby on Rails, Node.js Express)**: boundary="Monolithic Web Server", type="web_server"
+- **Database Server (MySQL, PostgreSQL, MongoDB)**: boundary="Database", type="database"
 
 ## Dataflows
 - **HTTP/S Request**: from="End User", to="Load Balancer (Optional)", protocol="HTTPS", color=darkgreen

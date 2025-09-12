@@ -15,7 +15,7 @@
 import pytest
 from unittest.mock import MagicMock, patch
 from threat_analysis.core.model_parser import ModelParser
-from threat_analysis.core.models_module import ThreatModel
+from threat_analysis.core.models_module import ThreatModel, CustomThreat
 from threat_analysis.core.mitre_mapping_module import MitreMapping
 from pytm import Classification, Lifetime
 
@@ -197,33 +197,119 @@ def test_parse_key_value_params(model_parser):
     assert params["key4"] == "#FF00FF"
     assert params["key5"] == "unquoted_string"
 
-def test_apply_custom_threats_servers(model_parser, threat_model, mitre_mapping):
-    threat_model.add_server("TestServer", "Default Boundary")
-    mitre_mapping.custom_threats = {
-        "servers": [
-            {"name": "ServerThreat-{server_name}", "description": "Desc", "stride_category": "T", "impact": 4, "likelihood": 3}
-        ]
-    }
-    generated_threats, elements_with_threats = model_parser._apply_custom_threats()
-    assert len(generated_threats) == 1
-    assert generated_threats[0][0].name == "Desc"
-    assert generated_threats[0][1].name == "TestServer"
-    assert len(elements_with_threats) == 1
-    assert list(elements_with_threats)[0].name == "TestServer"
+@patch('threat_analysis.core.models_module.get_custom_threats')
+def test_apply_custom_threats_servers(mock_get_custom_threats, threat_model, mitre_mapping):
+    # Test case 1: Server matches condition
+    threat_model.add_server("WebServer", "Default Boundary", type="web_server")
+    mock_get_custom_threats.return_value = [
+        {
+            "component": "WebServer",
+            "description": "Web Server Threat",
+            "stride_category": "T",
+            "impact": 4,
+            "likelihood": 3
+        }
+    ]
+    
+    with patch('sys.argv', ['']):
+        threat_model.process_threats()
+    
+    threat_model.threats_raw = [t for t in threat_model.threats_raw if isinstance(t[0], CustomThreat)]
+    assert len(threat_model.threats_raw) >= 1
+    assert any(t[0].description == "Web Server Threat" for t in threat_model.threats_raw)
+    assert any(t[1].name == "WebServer" for t in threat_model.threats_raw if not isinstance(t[1], tuple))
 
-def test_apply_custom_threats_dataflows(model_parser, threat_model, mitre_mapping):
-    threat_model.add_actor("Source", "Default Boundary")
-    threat_model.add_server("Sink", "Default Boundary")
-    threat_model.add_data("TestFlowData")
-    threat_model.add_dataflow(threat_model.get_element_by_name("Source"), threat_model.get_element_by_name("Sink"), "TestFlow", "HTTP", data_name="TestFlowData")
-    mitre_mapping.custom_threats = {
-        "dataflows": [
-            {"name": "DataflowThreat-{dataflow_name}", "description": "Desc", "stride_category": "S", "impact": 3, "likelihood": 2}
-        ]
-    }
-    generated_threats, elements_with_threats = model_parser._apply_custom_threats()
-    assert len(generated_threats) == 1
-    assert generated_threats[0][0].name == "Desc"
-    assert generated_threats[0][1].name == "TestFlow"
-    assert len(elements_with_threats) == 1
-    assert list(elements_with_threats)[0].name == "TestFlow"
+    # Test case 2: Server does NOT match condition
+    threat_model_no_match = ThreatModel(name="Test Threat Model No Match")
+    threat_model_no_match.add_boundary("Default Boundary")
+    threat_model_no_match.add_server("DatabaseServer", "Default Boundary", type="database")
+    mock_get_custom_threats.return_value = []
+    
+    with patch('sys.argv', ['']):
+        threat_model_no_match.process_threats()
+    
+    threat_model_no_match.threats_raw = [t for t in threat_model_no_match.threats_raw if isinstance(t[0], CustomThreat)]
+    assert len(threat_model_no_match.threats_raw) == 0
+
+    # Test case 3: Server with no specific type, and a general rule
+    threat_model_general = ThreatModel(name="Test Threat Model General")
+    threat_model_general.add_boundary("Default Boundary")
+    threat_model_general.add_server("GenericServer", "Default Boundary") # No type specified
+    mock_get_custom_threats.return_value = [
+        {
+            "component": "GenericServer",
+            "description": "General Server Threat",
+            "stride_category": "T",
+            "impact": 1,
+            "likelihood": 1
+        }
+    ]
+    
+    with patch('sys.argv', ['']):
+        threat_model_general.process_threats()
+    
+    threat_model_general.threats_raw = [t for t in threat_model_general.threats_raw if isinstance(t[0], CustomThreat)]
+    assert len(threat_model_general.threats_raw) >= 1
+    assert any(t[0].description == "General Server Threat" for t in threat_model_general.threats_raw)
+    assert any(t[1].name == "GenericServer" for t in threat_model_general.threats_raw if not isinstance(t[1], tuple))
+
+
+@patch('threat_analysis.core.models_module.get_custom_threats')
+def test_apply_custom_threats_dataflows_new(mock_get_custom_threats, threat_model, mitre_mapping):
+    # Setup elements
+    threat_model.add_actor("User", "Default Boundary")
+    threat_model.add_server("WebServer", "Default Boundary", type="web_server")
+    threat_model.add_data("SensitiveData", classification=Classification.SECRET)
+
+    # Add a dataflow that matches the custom threat conditions
+    threat_model.add_dataflow(
+        threat_model.get_element_by_name("User"),
+        threat_model.get_element_by_name("WebServer"),
+        "SecureSensitiveDataFlow",
+        "HTTPS",
+        data_name="SensitiveData",
+        is_encrypted=True
+    )
+
+    # Define a custom threat for dataflows
+    mock_get_custom_threats.return_value = [
+        {
+            "component": "SecureSensitiveDataFlow",
+            "description": "Sensitive Data Flow Threat",
+            "stride_category": "ID",
+            "impact": 5,
+            "likelihood": 1
+        }
+    ]
+
+    # Apply custom threats
+    with patch('sys.argv', ['']):
+        threat_model.process_threats()
+
+    # Assertions
+    threat_model.threats_raw = [t for t in threat_model.threats_raw if isinstance(t[0], CustomThreat)]
+    assert len(threat_model.threats_raw) >= 1
+    assert any(t[0].description == "Sensitive Data Flow Threat" for t in threat_model.threats_raw)
+    assert any(t[1].name == "SecureSensitiveDataFlow" for t in threat_model.threats_raw if not isinstance(t[1], tuple))
+
+    # Test case where dataflow does NOT match conditions
+    threat_model_no_match = ThreatModel(name="Test Threat Model No Match")
+    threat_model_no_match.add_boundary("Default Boundary")
+    threat_model_no_match.add_actor("User2", "Default Boundary")
+    threat_model_no_match.add_server("WebServer2", "Default Boundary")
+    threat_model_no_match.add_data("NonSensitiveData", classification=Classification.PUBLIC)
+    threat_model_no_match.add_dataflow(
+        threat_model_no_match.get_element_by_name("User2"),
+        threat_model_no_match.get_element_by_name("WebServer2"),
+        "InsecureNonSensitiveDataFlow",
+        "HTTP",
+        data_name="NonSensitiveData",
+        is_encrypted=False
+    )
+    mock_get_custom_threats.return_value = []
+    
+    with patch('sys.argv', ['']):
+        threat_model_no_match.process_threats()
+    
+    threat_model_no_match.threats_raw = [t for t in threat_model_no_match.threats_raw if isinstance(t[0], CustomThreat)]
+    assert len(threat_model_no_match.threats_raw) == 0

@@ -98,7 +98,8 @@ THREAT_RULES = {
                     "description": "Denial of Service against {name} through resource-intensive queries or excessive connections",
                     "stride_category": "Denial of Service",
                     "impact": 4,
-                    "likelihood": 3
+                    "likelihood": 3,
+                    "capec_ids": ["CAPEC-488", "CAPEC-115"]
                 }
             ]
         },
@@ -144,13 +145,15 @@ THREAT_RULES = {
                     "description": "Denial of Service (DoS) attack targeting {name} to exhaust its resources and disrupt network connectivity",
                     "stride_category": "Denial of Service",
                     "impact": 5,
-                    "likelihood": 4
+                    "likelihood": 4,
+                    "capec_ids": ["CAPEC-125", "CAPEC-494"]
                 },
                 {
                     "description": "Vulnerability in the management interface of {name} leading to critical privilege escalation",
                     "stride_category": "Elevation of Privilege",
                     "impact": 5,
-                    "likelihood": 5
+                    "likelihood": 5,
+                    "capec_ids": ["CAPEC-51"]
                 },
                 {
                     "description": "Firewall bypass through fragmented packets or other evasion techniques against {name}",

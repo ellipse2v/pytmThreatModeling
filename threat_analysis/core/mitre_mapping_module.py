@@ -26,51 +26,9 @@ from pathlib import Path
 from threat_analysis.custom_threats import get_custom_threats
 from threat_analysis import data_loader
 from threat_analysis.mitigation_suggestions import MitigationStixMapper, get_framework_mitigation_suggestions
+from threat_analysis.core.mitre_static_maps import ATTACK_D3FEND_MAPPING
 
-attack_d3fend_mapping = {
-    "M1013 Application Developer Guidance": ["A future release of D3FEND will define a taxonomy of Source Code Hardening Techniques."],
-    "M1015 Active Directory Configuration": ["D3-ANCI Authentication Cache Invalidation", "D3-DTP Domain Trust Policy", "D3-UAP User Account Permissions"],
-    "M1016 Vulnerability Scanning": ["Future D3FEND releases will model the scanning and inventory domains."],
-    "M1017 User Training": ["Modeling user training is outside the scope of D3FEND."],
-    "M1018 User Account Management": ["D3-LFP Local File Permissions", "D3-SCF System Call Filtering", "D3-SCP System Configuration Permissions"],
-    "M1019 Threat Intelligence Program": ["Establishing and running a Threat Intelligence Program is outside the scope of D3FEND."],
-    "M1020 SSL/TLS Inspection": ["D3-NTA Network Traffic Analysis"],
-    "M1021 Restrict Web-Based Content": ["D3-DNSAL DNS Allowlisting", "D3-DNSDL DNS Denylisting", "D3-FA File Analysis", "D3-ITF Inbound Traffic Filtering", "D3-NTA Network Traffic Analysis", "D3-OTF Outbound Traffic Filtering", "D3-UA URL Analysis"],
-    "M1022 Restrict File and Directory Permissions": ["D3-LFP Local File Permissions"],
-    "M1024 Restrict Registry Permission": ["D3-SCP System Configuration Permissions"],
-    "M1025 Privileged Process Integrity": ["D3-BA Bootloader Authentication", "D3-DLIC Driver Load Integrity Checking", "D3-PSEP Process Segment Execution Prevention", "D3-SCF System Call Filtering"],
-    "M1026 Privileged Account Management": ["D3-DAM Domain Account Monitoring", "D3-LAM Local Account Monitoring", "D3-SPP Strong Password Policy"],
-    "M1027 Password Policies": ["D3-OTP One-time Password", "D3-SPP Strong Password Policy"],
-    "M1028 Operating System Configuration": ["D3-PH Platform Hardening"],
-    "M1029 Remote Data Storage": ["IT disaster recovery plans are outside the current scope of D3FEND."],
-    "M1030 Network Segmentation": ["D3-BDI Broadcast Domain Isolation", "D3-ET Encrypted Tunnels", "D3-ISVA Inbound Session Volume Analysis", "D3-ITF Inbound Traffic Filtering"],
-    "M1031 Network Intrusion Prevention": ["D3-ITF Inbound Traffic Filtering", "D3-NTA Network Traffic Analysis", "D3-OTF Outbound Traffic Filtering"],
-    "M1032 Multi-factor Authentication": ["D3-MFA Multi-factor Authentication"],
-    "M1033 Limit Software Installation": ["D3-EAL Executable Allowlisting", "D3-EDL Executable Denylisting"],
-    "M1034 Limit Hardware Installation": ["D3-IOPR IO Port Restriction"],
-    "M1035 Limit Access to Resource Over Network": ["D3-NI Network Isolation"],
-    "M1036 Account Use Policies": ["D3-AL Account Locking", "D3-ANCI Authentication Cache Invalidation", "D3-ANET Authentication Event Thresholding"],
-    "M1037 Filter Network Traffic": ["D3-NI Network Isolation"],
-    "M1038 Execution Prevention": ["D3-DLIC Driver Load Integrity Checking", "D3-EAL Executable Allowlisting", "D3-EDL Executable Denylisting", "D3-PSEP Process Segment Execution Prevention"],
-    "M1039 Environment Variable Permissions": ["D3-ACH Application Configuration Hardening", "D3-SFA System File Analysis"],
-    "M1040 Behavior Prevention on Endpoint": ["D3-ANET Authentication Event Thresholding", "D3-AZET Authorization Event Thresholding", "D3-JFAPA Job Function Access Pattern Analysis", "D3-RAPA Resource Access Pattern Analysis", "D3-SDA Session Duration Analysis", "D3-UDTA User Data Transfer Analysis", "D3-UGLPA User Geolocation Logon Pattern Analysis", "D3-WSAA Web Session Activity Analysis"],
-    "M1041 Encrypt Sensitive Information": ["D3-DENCR Disk Encryption", "D3-ET Encrypted Tunnels", "D3-FE File Encryption", "D3-MENCR Message Encryption"],
-    "M1042 Disable or Remove Feature or Program": ["D3-ACH Application Configuration Hardening", "D3-EDL Executable Denylisting", "D3-SCF System Call Filtering"],
-    "M1043 Credential Access Protection": ["D3-HBPI Hardware-based Process Isolation"],
-    "M1044 Restrict Library Loading": ["D3-SCF System Call Filtering"],
-    "M1045 Code Signing": ["D3-DLIC Driver Load Integrity Checking", "D3-EAL Executable Allowlisting", "D3-SBV Service Binary Verification"],
-    "M1046 Boot Integrity": ["D3-BA Bootloader Authentication", "D3-TBI TPM Boot Integrity"],
-    "M1047 Audit": ["D3-DAM Domain Account Monitoring", "D3-LAM Local Account Monitoring", "D3-SFA System File Analysis"],
-    "M1048 Application Isolation and Sandboxing": ["D3-DA Dynamic Analysis", "D3-HBPI Hardware-based Process Isolation", "D3-SCF System Call Filtering"],
-    "M1049 Antivirus/Antimalware": ["D3-FCR File Content Rules", "D3-FH File Hashing", "D3-PA Process Analysis"],
-    "M1050 Exploit Protection": ["D3-SSC Shadow Stack Comparisons", "D3-AH Application Hardening", "D3-EHPV Exception Handler Pointer Validation", "D3-ITF Inbound Traffic Filtering"],
-    "M1051 Update Software": ["D3-SU Software Update"],
-    "M1052 User Account Control": ["D3-SCF System Call Filtering"],
-    "M1053 Data Backup": ["Comprehensive IT disaster recovery plans are outside the current scope of D3FEND."],
-    "M1054 Software Configuration": ["D3-ACH Application Configuration Hardening", "D3-CP Certificate Pinning"],
-    "M1055 Do Not Mitigate": [],
-    "M1056 Pre-compromise": ["D3-DE Decoy Environment", "D3-DO Decoy Object"]
-}
+
 
 class MitreMapping:
     """Class for managing MITRE ATT&CK mapping with D3FEND mitigations"""
@@ -145,35 +103,31 @@ class MitreMapping:
         """
         d3fend_mitigations = []
         # Find the matching MITRE mitigation in the attack_d3fend_mapping
-        for attack_d3fend_key, d3fend_entries in attack_d3fend_mapping.items():
+        for attack_d3fend_key, d3fend_entries in ATTACK_D3FEND_MAPPING.items():
             if mitigation_id in attack_d3fend_key:
                 for d3fend_entry in d3fend_entries:
                     # Extract D3FEND ID
-                    d3fend_id_match = re.match(r'^(D3-[A-Z0-9]+)', d3fend_entry)
+                    d3fend_id_match = re.match(r'^(D3-[A-Z0-9]+)\s*(.*)', d3fend_entry)
                     if d3fend_id_match:
-                        d3fend_id = d3fend_id_match.group(1)
-                        # Check if we have details for this D3FEND ID
+                        d3fend_id = d3fend_id_match.group(1).strip()
+                        name_part = d3fend_id_match.group(2).strip() if d3fend_id_match.group(2) else d3fend_id
+                        
+                        url_name = name_part # Fallback
+                        
                         if d3fend_id in self.d3fend_details:
-                            # Create a URL-friendly name from the description
-                            name_part = self.d3fend_details[d3fend_id]['name']
-                            url_friendly_name = name_part.replace(' ', '-')
-                            
-                            d3fend_mitigations.append({
-                                "id": d3fend_id,
-                                "name": name_part,
-                                "description": self.d3fend_details[d3fend_id]['description'],
-                                "url_friendly_name": url_friendly_name
-                            })
+                            details = self.d3fend_details[d3fend_id]
+                            url_name = details.get('url_name', name_part).strip()
                         else:
-                            # Fallback if no details are found
-                            name_part = d3fend_entry.split(' ', 1)[1] if ' ' in d3fend_entry else d3fend_entry
-                            url_friendly_name = name_part.replace(' ', '-')
-                            d3fend_mitigations.append({
-                                "id": "UNKNOWN",
-                                "name": name_part,
-                                "description": "D3FEND mitigation details not found or not applicable.",
-                                "url_friendly_name": url_friendly_name
-                            })
+                            logging.warning(f"D3FEND ID '{d3fend_id}' extracted from '{d3fend_entry}' not found in d3fend_details. Using name as fallback url_name.")
+
+                        url_friendly_name = url_name.replace(' ', '')
+                        
+                        d3fend_mitigations.append({
+                            "id": d3fend_id,
+                            "name": name_part,
+                            "description": self.d3fend_details.get(d3fend_id, {}).get('description', "D3FEND mitigation details not found or not applicable."),
+                            "url_friendly_name": url_friendly_name
+                        })
                 # Since we found the matching MITRE ID, we can stop searching
                 break
         return d3fend_mitigations

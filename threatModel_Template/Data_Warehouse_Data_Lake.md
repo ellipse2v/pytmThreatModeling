@@ -17,12 +17,12 @@ This threat model focuses on a Data Warehouse or Data Lake architecture, which i
 - **Business User**: boundary="Consumption Layer"
 
 ## Servers
-- **ETL/ELT Tools**: boundary="Ingestion Layer"
-- **Object Storage (S3/ADLS)**: boundary="Storage Layer (Raw/Curated)"
-- **Data Lakehouse (Delta Lake/Iceberg)**: boundary="Storage Layer (Raw/Curated)"
-- **Spark/Hadoop Cluster**: boundary="Processing Layer"
-- **Data Warehouse (Snowflake/BigQuery)**: boundary="Processing Layer"
-- **BI Tools/Dashboards**: boundary="Consumption Layer"
+- **ETL/ELT Tools**: boundary="Ingestion Layer", type="etl_tools"
+- **Object Storage (S3/ADLS)**: boundary="Storage Layer (Raw/Curated)", type="object_storage"
+- **Data Lakehouse (Delta Lake/Iceberg)**: boundary="Storage Layer (Raw/Curated)", type="data_lakehouse"
+- **Spark/Hadoop Cluster**: boundary="Processing Layer", type="compute_cluster"
+- **Data Warehouse (Snowflake/BigQuery)**: boundary="Processing Layer", type="data_warehouse"
+- **BI Tools/Dashboards**: boundary="Consumption Layer", type="bi_tools"
 
 ## Dataflows
 - **Data Ingestion**: from="Data Provider", to="ETL/ELT Tools", protocol="Various (API, SFTP, Streaming)"

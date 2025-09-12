@@ -14,11 +14,11 @@ This threat model describes a traditional enterprise network architecture, cente
 - **External Attacker**: boundary="Internet"
 
 ## Servers
-- **Domain Controller (Active Directory)**: boundary="Internal Network"
-- **File Server**: boundary="Internal Network"
-- **Application Server**: boundary="Internal Network"
-- **Web Server (DMZ)**: boundary="DMZ"
-- **Firewall**: color=gray
+- **Domain Controller (Active Directory)**: boundary="Internal Network", type="domain_controller"
+- **File Server**: boundary="Internal Network", type="file_server"
+- **Application Server**: boundary="Internal Network", type="app_server"
+- **Web Server (DMZ)**: boundary="DMZ", type="web_server"
+- **Firewall**: color=gray, type="firewall"
 
 ## Dataflows
 - **User Authentication**: from="Employee", to="Domain Controller (Active Directory)", protocol="Kerberos/LDAP", color=teal

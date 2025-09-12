@@ -1,6 +1,6 @@
 ## Servers
-- **WebServer**:
-- **LoadBalancer**:
+- **WebServer**: type="web_server"
+- **LoadBalancer**: type="load_balancer"
 
 ## Dataflows
 - **LBtoWeb**: from=LoadBalancer, to=WebServer, protocol=HTTP

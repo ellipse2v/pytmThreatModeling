@@ -24,18 +24,18 @@ This model describes a network architecture with a Demilitarized Zone (DMZ), ext
 - **System Administrator**: boundary=Intranet, color=forestgreen
 
 ## Servers
-- **External Firewall**: boundary=DMZ, color=#D3D3D3
-- **Protocol Break Device**: boundary=DMZ
-- **Internal Firewall**: boundary=DMZ, color=#D3D3D3
-- **Gateway Load Balancer**: boundary=Gateway_Zone, color=gold, isFilled=True
-- **App Server 1**: boundary=Gateway_Zone, color=#B0E0E6
-- **App Server 2**: boundary=Gateway_Zone, color=#B0E0E6
-- **App Server 3**: boundary=Gateway_Zone, color=#B0E0E6
-- **Switch**: boundary=Intranet, color=#E6E6FA
-- **Central Server**: boundary=Intranet, color=#98FB98
-- **Application Database**: boundary=Intranet, color=#FFDAB9
-- **Authentication Server**: boundary=Intranet
-- **Command Machine**: boundary=Command_Zone
+- **External Firewall**: boundary=DMZ, color=#D3D3D3, type="firewall"
+- **Protocol Break Device**: boundary=DMZ, type="protocol_break_device"
+- **Internal Firewall**: boundary=DMZ, color=#D3D3D3, type="firewall"
+- **Gateway Load Balancer**: boundary=Gateway_Zone, color=gold, isFilled=True, type="load_balancer"
+- **App Server 1**: boundary=Gateway_Zone, color=#B0E0E6, type="app_server"
+- **App Server 2**: boundary=Gateway_Zone, color=#B0E0E6, type="app_server"
+- **App Server 3**: boundary=Gateway_Zone, color=#B0E0E6, type="app_server"
+- **Switch**: boundary=Intranet, color=#E6E6FA, type="switch"
+- **Central Server**: boundary=Intranet, color=#98FB98, type="central_server"
+- **Application Database**: boundary=Intranet, color=#FFDAB9, type="database"
+- **Authentication Server**: boundary=Intranet, type="authentication_server"
+- **Command Machine**: boundary=Command_Zone, type="command_machine"
 
 ## Data
 - **Web Traffic**: description="Standard web requests/responses", classification="PUBLIC"

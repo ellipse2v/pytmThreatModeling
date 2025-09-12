@@ -134,6 +134,8 @@ class AnsiblePlugin(IaCPlugin):
                 props_list = [f"{k}={v}" for k, v in server.items() if k != "name"]
                 if "ansible_host" in server:
                     props_list.append(f"ip={server['ansible_host']}")
+                if "type" in server:
+                    props_list.append(f"type={server['type']}")
                 props = ", ".join(props_list)
                 markdown.append(f"- **{server['name']}**: {props}")
             markdown.append("")
